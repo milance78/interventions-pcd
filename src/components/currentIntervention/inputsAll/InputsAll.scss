@@ -1,0 +1,64 @@
+.inputs-all {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 8px;
+
+  width: 100%;
+
+  .inputs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+
+    width: 100%;
+    min-width: 0;
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  .inputs-row--main-address {
+    .simple-input--main-address {
+      flex: 0 1 70%;
+    }
+
+    .simple-input--lom-key {
+      flex: 0 1 30%;
+    }
+  }
+
+  .inputs-row--details-phone {
+    > * {
+      flex: 1 1 50%;
+    }
+  }
+}
+
+@media (max-width: 680px) {
+  .inputs-all {
+    .inputs-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .inputs-row--main-address {
+      .simple-input--main-address,
+      .simple-input--lom-key {
+        flex: 1 1 auto;
+        width: 100%;
+      }
+    }
+
+    .inputs-row--details-phone {
+      > * {
+        flex: 1 1 auto;
+        width: 100%;
+      }
+    }
+  }
+}

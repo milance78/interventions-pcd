@@ -1,0 +1,61 @@
+.clients-on-address {
+  position: relative;
+
+  width: 100%;
+}
+
+.clients-on-address__copy-wrapper {
+  position: absolute;
+
+  top: 9px;
+  right: 7px;
+
+  display: flex;
+}
+
+.clients-on-address__copy-button {
+  width: 32px;
+  height: 32px;
+
+  color: #475569 !important;
+  background: rgba(
+    241,
+    245,
+    249,
+    0.94
+  ) !important;
+
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 7px !important;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease !important;
+
+  &:hover {
+    color: #1d4ed8 !important;
+    background: #dbeafe !important;
+    border-color: #93c5fd !important;
+
+    transform: scale(1.05);
+  }
+
+  &.Mui-disabled {
+    color: #a8b1bf !important;
+    background: rgba(
+      241,
+      245,
+      249,
+      0.68
+    ) !important;
+    border-color: #e2e8f0 !important;
+  }
+}
+
+.clients-on-address__copy-button--copied {
+  color: #166534 !important;
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}

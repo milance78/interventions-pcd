@@ -1,0 +1,99 @@
+.simple-input {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+
+  .icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    flex-shrink: 0;
+
+    background-color: #f0f0f0;
+    border-radius: 50%;
+
+    svg {
+      display: block;
+
+      max-width: 28px;
+      max-height: 28px;
+    }
+  }
+}
+
+.simple-input__control {
+  position: relative;
+
+  flex: 1;
+  min-width: 0;
+
+  .MuiFormControl-root {
+    width: 100%;
+  }
+}
+
+.simple-input__copy-wrapper {
+  position: absolute;
+
+  top: 50%;
+  right: 5px;
+
+  display: flex;
+
+  transform: translateY(-50%);
+}
+
+.simple-input__copy-button {
+  width: 32px;
+  height: 32px;
+
+  color: #475569 !important;
+  background: rgba(
+    241,
+    245,
+    249,
+    0.94
+  ) !important;
+
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 7px !important;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease !important;
+
+  &:hover {
+    color: #1d4ed8 !important;
+    background: #dbeafe !important;
+    border-color: #93c5fd !important;
+
+    transform: scale(1.05);
+  }
+
+  &.Mui-disabled {
+    color: #a8b1bf !important;
+    background: rgba(
+      241,
+      245,
+      249,
+      0.68
+    ) !important;
+    border-color: #e2e8f0 !important;
+  }
+}
+
+.simple-input__copy-button--copied {
+  color: #166534 !important;
+  background: #dcfce7 !important;
+  border-color: #86efac !important;
+}

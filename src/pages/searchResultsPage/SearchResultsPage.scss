@@ -1,0 +1,38 @@
+.search-result-row {
+  cursor: pointer;
+  outline: none;
+
+  &:focus-visible {
+    box-shadow:
+      0 0 0 4px rgba(37, 99, 235, 0.18),
+      0 13px 25px rgba(30, 41, 59, 0.12);
+  }
+}
+
+.search-result-edit-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 31px;
+  height: 31px;
+
+  color: #1d4ed8;
+  background: #dbeafe;
+  border: 1px solid #93c5fd;
+  border-radius: 8px;
+}
+
+.search-result-identifiers {
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.45;
+
+  strong {
+    color: #172033;
+  }
+}
