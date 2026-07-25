@@ -3,6 +3,9 @@ import * as React from "react";
 import AddTaskRounded from "@mui/icons-material/AddTaskRounded";
 import DeleteSweepRounded from "@mui/icons-material/DeleteSweepRounded";
 import HistoryRounded from "@mui/icons-material/HistoryRounded";
+import CallRounded from "@mui/icons-material/CallRounded";
+import CloseRounded from "@mui/icons-material/CloseRounded";
+import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
 import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
@@ -483,11 +486,43 @@ const CurrentInterventionPage = () => {
               className="cure-selector__buttons"
             >
               {[
-                ["noCure", "no CURE"],
-                ["firstCure", "1ᵉʳ CURE"],
-                ["secondCure", "2ᵉᵐᵉ CURE"],
-                ["thirdCure", "3ᵉᵐᵉ CURE"],
-              ].map(([value, label]) => (
+                {
+                  value: "noCure",
+                  label: (
+                    <span className="no-cure-phone-icon" aria-hidden="true">
+                      <CallRounded className="no-cure-phone-icon__phone" />
+                      <CloseRounded className="no-cure-phone-icon__cross" />
+                    </span>
+                  ),
+                },
+                {
+                  value: "firstCure",
+                  label: (
+                    <>
+                      <span>1.</span>
+                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
+                    </>
+                  ),
+                },
+                {
+                  value: "secondCure",
+                  label: (
+                    <>
+                      <span>2.</span>
+                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
+                    </>
+                  ),
+                },
+                {
+                  value: "thirdCure",
+                  label: (
+                    <>
+                      <span>3.</span>
+                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
+                    </>
+                  ),
+                },
+              ].map(({ value, label }) => (
                 <Button
                   key={value}
                   type="button"
@@ -497,6 +532,12 @@ const CurrentInterventionPage = () => {
                   }`}
                   disabled={isHistoryView}
                   onClick={() => handleCureSelection(value as typeof cure)}
+                  sx={{ "& .MuiButton-startIcon": { margin: 0 }, gap: "4px" }}
+                  aria-label={
+                    value === "noCure"
+                      ? "No CURE"
+                      : `${value === "firstCure" ? "1er" : value === "secondCure" ? "2ème" : "3ème"} CURE`
+                  }
                 >
                   {label}
                 </Button>

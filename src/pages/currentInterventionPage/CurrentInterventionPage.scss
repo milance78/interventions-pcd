@@ -901,9 +901,10 @@
     width: auto;
     min-width: 0;
 
+    /* MUI ButtonGroup was forcing a transparent border here. */
     .MuiButtonGroup-grouped {
       margin: 0 !important;
-      border: 1px solid transparent !important;
+      border: 1px solid #cbd5e1 !important;
       border-radius: 999px !important;
     }
   }
@@ -914,93 +915,65 @@
     min-height: 29px;
     padding: 4px 10px !important;
     border-radius: 999px !important;
+    border: 1px solid #cbd5e1 !important;
     font-size: 11px !important;
-    font-weight: 750 !important;
+    font-weight: 600 !important;
     line-height: 1 !important;
-    letter-spacing: 0.01em !important;
+    letter-spacing: 0 !important;
     text-transform: none !important;
     white-space: nowrap;
+    color: #64748b !important;
+    background: #f8fafc !important;
     box-shadow: none !important;
     transition:
       transform 150ms ease,
       background-color 150ms ease,
       border-color 150ms ease,
-      box-shadow 150ms ease !important;
+      color 150ms ease !important;
 
     &:hover {
+      color: #475569 !important;
+      background: #f1f5f9 !important;
+      border-color: #b8c3d1 !important;
       transform: translateY(-1px);
     }
-  }
 
-  .cure-selector__button {
-    color: #5f6472 !important;
-    background: #f8f6fb !important;
-    border-color: #ded8e8 !important;
-
-    &:hover {
-      color: #6d4b8d !important;
-      background: #f1eafb !important;
-      border-color: #cdb9e2 !important;
-    }
-
-    &:nth-child(1) {
-      background: #f4f6f8 !important;
-      border-color: #d9dee5 !important;
-    }
-
-    &:nth-child(2) {
-      background: #f3effb !important;
-      border-color: #d9cdee !important;
-    }
-
-    &:nth-child(3) {
-      background: #eef5fb !important;
-      border-color: #caddeb !important;
-    }
-
-    &:nth-child(4) {
-      background: #f8f1f3 !important;
-      border-color: #ead3d9 !important;
+    &:active {
+      transform: scale(0.97);
     }
   }
 
+  /* Active CURE: same light-blue family as the Création button. */
   .cure-selector__button--active {
-    color: #49305f !important;
-    background: #e7dcf3 !important;
-    border-color: #bfa8d6 !important;
-    box-shadow: 0 3px 9px rgba(104, 73, 135, 0.16) !important;
+    color: #1d4ed8 !important;
+    background: #dbeafe !important;
+    border: 1px solid #93c5fd !important;
+    box-shadow: none !important;
 
     &:hover {
-      color: #49305f !important;
-      background: #ded0ed !important;
-      border-color: #ae91c8 !important;
-    }
-  }
-
-  .sms-toggle-button {
-    flex: 0 0 auto;
-    color: #4f6871 !important;
-    background: #eef8f7 !important;
-    border-color: #c6e3df !important;
-
-    &:hover {
-      color: #28635e !important;
-      background: #e1f2ef !important;
-      border-color: #9fcfc8 !important;
+      color: #1d4ed8 !important;
+      background: #dbeafe !important;
+      border-color: #93c5fd !important;
     }
   }
 
   .sms-toggle-button--active {
-    color: #285a55 !important;
-    background: #d5ece8 !important;
-    border-color: #93c8c0 !important;
-    box-shadow: 0 3px 9px rgba(57, 116, 108, 0.16) !important;
+    color: #806000 !important;
+    background: #fff7d6 !important;
+    border: 1px solid #e8ca67 !important;
+    box-shadow: none !important;
 
     &:hover {
-      color: #214f4a !important;
-      background: #cae5e0 !important;
-      border-color: #7fbbb2 !important;
+      color: #806000 !important;
+      background: #fff3c4 !important;
+      border-color: #dfbd50 !important;
     }
+  }
+
+  .sms-toggle-button:not(.sms-toggle-button--active):hover {
+    color: #475569 !important;
+    background: #f1f5f9 !important;
+    border-color: #b8c3d1 !important;
   }
 
   &.current-intervention-page--history {
@@ -1011,17 +984,22 @@
     .cure-selector__button.Mui-disabled,
     .sms-toggle-button.Mui-disabled {
       opacity: 1 !important;
+      color: #64748b !important;
       -webkit-text-fill-color: #64748b !important;
     }
 
     .cure-selector__button--active.Mui-disabled {
-      color: #49305f !important;
-      -webkit-text-fill-color: #49305f !important;
+      color: #1d4ed8 !important;
+      -webkit-text-fill-color: #1d4ed8 !important;
+      background: #dbeafe !important;
+      border-color: #93c5fd !important;
     }
 
     .sms-toggle-button--active.Mui-disabled {
-      color: #285a55 !important;
-      -webkit-text-fill-color: #285a55 !important;
+      color: #806000 !important;
+      -webkit-text-fill-color: #806000 !important;
+      background: #fff7d6 !important;
+      border-color: #e8ca67 !important;
     }
   }
 
@@ -1042,4 +1020,78 @@
       flex-wrap: wrap;
     }
   }
+}
+
+/* +SMS: compact rounded rectangle, not a pill.
+   Kept at the end intentionally so it overrides MUI ButtonGroup radius. */
+.current-intervention-page
+  .cure-selector
+  .sms-toggle-button.MuiButtonBase-root,
+.current-intervention-page
+  .cure-selector
+  .sms-toggle-button.MuiButtonGroup-grouped {
+  border-radius: 5px !important;
+}
+
+/* No CURE: telephone receiver with a clearly visible X, matching the approved mockup. */
+.current-intervention-page .no-cure-phone-icon {
+  position: relative;
+  display: inline-flex;
+  width: 24px;
+  height: 20px;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.current-intervention-page .no-cure-phone-icon__phone {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.current-intervention-page .no-cure-phone-icon__cross {
+  position: absolute;
+  top: -3px;
+  right: -1px;
+  width: 13px !important;
+  height: 13px !important;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+
+/* CURE compact icon sizing */
+.current-intervention-page .cure-selector__button {
+  gap: 4px !important;
+}
+
+.current-intervention-page .cure-selector__button > span:not(.no-cure-phone-icon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+}
+
+.current-intervention-page .cure-selector__button > svg {
+  width: 15px !important;
+  height: 15px !important;
+  font-size: 15px !important;
+}
+
+.current-intervention-page .no-cure-phone-icon {
+  width: 20px;
+  height: 17px;
+}
+
+.current-intervention-page .no-cure-phone-icon__phone {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.current-intervention-page .no-cure-phone-icon__cross {
+  top: -2px;
+  right: 0;
+  width: 11px !important;
+  height: 11px !important;
 }
