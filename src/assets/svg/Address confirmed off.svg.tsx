@@ -1,12 +1,12 @@
 import { forwardRef } from "react";
 import type { SVGProps } from "react";
-import artworkUrl from "./Address confirmed.png";
+import artworkUrl from "./Address confirmed off.png";
 
-export type AddressConfirmedIconProps = SVGProps<SVGSVGElement> & {
+export type AddressConfirmedOffIconProps = SVGProps<SVGSVGElement> & {
   title?: string;
 };
 
-const AddressConfirmedIcon = forwardRef<SVGSVGElement, AddressConfirmedIconProps>(
+const AddressConfirmedOffIcon = forwardRef<SVGSVGElement, AddressConfirmedOffIconProps>(
   ({ title, ...props }, ref) => (
     <svg
       width="256"
@@ -32,7 +32,7 @@ const AddressConfirmedIcon = forwardRef<SVGSVGElement, AddressConfirmedIconProps
   ),
 );
 
-AddressConfirmedIcon.displayName = "AddressConfirmedIcon";
+AddressConfirmedOffIcon.displayName = "AddressConfirmedOffIcon";
 
-export { AddressConfirmedIcon as ReactComponent };
-export default AddressConfirmedIcon;
+export { AddressConfirmedOffIcon as ReactComponent };
+export default AddressConfirmedOffIcon;

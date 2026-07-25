@@ -55,7 +55,9 @@ import {
 } from "../../firebase/interventionsService";
 
 import { ReactComponent as AddressConfirmedIcon } from "../../assets/svg/Address confirmed.svg.tsx";
+import { ReactComponent as AddressConfirmedOffIcon } from "../../assets/svg/Address confirmed off.svg.tsx";
 import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Address not confirmed.svg.tsx";
+import { ReactComponent as AddressNotConfirmedOffIcon } from "../../assets/svg/Address not confirmed off.svg.tsx";
 import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb off.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
 import { ReactComponent as QuestionMarkOffIcon } from "../../assets/svg/Question mark off.svg.tsx";
@@ -175,20 +177,23 @@ const CurrentInterventionPage = () => {
   const [importMessage, setImportMessage] = React.useState("");
 
 
-  const generatedCureLine = /(?:^|\n)(?:1er|2(?:e|ème|eme)|3(?:e|ème|eme)) CURE(?: \+ SMS)? fait le \d{1,2}\/\d{1,2}\/\d{4} à \d{2}:\d{2}h(?=\n|$)/gi;
+  const generatedCureLine = /(?:1er|2(?:e|ème|eme)|3(?:e|ème|eme)) CURE(?: \+ SMS)? fait le (\d{2}\/\d{2}\/\d{4}) à \d{2}:\d{2}h/g;
 
   const buildCureComment = (
     nextCure: typeof cure,
     nextSmsEnabled: boolean,
   ) => {
-    const cleanedComment = comment
-      .replace(generatedCureLine, "")
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-
-    if (nextCure === "noCure") return cleanedComment;
-
     const now = new Date();
+    const today = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`;
+    let workingComment = comment;
+
+    workingComment = workingComment
+      .replace(generatedCureLine, (match, date) => date === today ? "" : match)
+      .replace(/\n{3,}/g, "\n\n")
+      .trimEnd();
+
+    if (nextCure === "noCure") return workingComment.trim();
+
     const day = String(now.getDate()).padStart(2, "0");
     const month = String(now.getMonth() + 1).padStart(2, "0");
     const year = String(now.getFullYear());
@@ -203,9 +208,13 @@ const CurrentInterventionPage = () => {
     const smsText = supportsSms && nextSmsEnabled ? " + SMS" : "";
     const cureLine = `${cureLabel} CURE${smsText} fait le ${day}/${month}/${year} à ${hours}:${minutes}h`;
 
-    return cleanedComment
-      ? `${cleanedComment}\n\n${cureLine}`
-      : cureLine;
+    if (!workingComment) return cureLine;
+
+    const lastLine = workingComment.split(/\n/).filter(Boolean).at(-1) ?? "";
+    const isAutomaticCureLine = generatedCureLine.test(lastLine);
+    generatedCureLine.lastIndex = 0;
+
+    return `${workingComment}${isAutomaticCureLine ? "\n" : "\n\n"}${cureLine}`;
   };
 
   const handleCureSelection = (nextCure: typeof cure) => {
@@ -234,6 +243,38 @@ const CurrentInterventionPage = () => {
         }),
       );
     }
+  };
+
+  type AddressConfirmationStatus = "confirmed" | "notConfirmed";
+
+  const confirmedAddressText = "Adresse confirmée";
+  const notConfirmedAddressText = "Adresse pas encore confirmée";
+  const addressConfirmationPrefix = /^(?:Adresse confirmée|Adresse pas encore confirmée)(?:\r?\n(?:\r?\n)?)?/;
+
+  const addressConfirmationStatus: AddressConfirmationStatus | null =
+    comment === confirmedAddressText || comment.startsWith(`${confirmedAddressText}\n`)
+      ? "confirmed"
+      : comment === notConfirmedAddressText || comment.startsWith(`${notConfirmedAddressText}\n`)
+        ? "notConfirmed"
+        : null;
+
+  const handleAddressConfirmationToggle = (nextStatus: AddressConfirmationStatus) => {
+    if (isHistoryView) return;
+
+    const commentWithoutStatus = comment
+      .replace(addressConfirmationPrefix, "")
+      .replace(/^\r?\n+/, "");
+
+    const nextComment = addressConfirmationStatus === nextStatus
+      ? commentWithoutStatus
+      : `${nextStatus === "confirmed" ? confirmedAddressText : notConfirmedAddressText}${commentWithoutStatus ? `\n\n${commentWithoutStatus}` : ""}`;
+
+    dispatch(
+      updateField({
+        field: "comment",
+        value: nextComment,
+      }),
+    );
   };
 
   const submitActions = async () => {
@@ -555,6 +596,48 @@ const CurrentInterventionPage = () => {
             >
               +SMS
             </Button>
+
+            <div className="address-confirmation-controls" aria-label="Confirmation de l’adresse">
+              <button
+                type="button"
+                className={`address-confirmation-button ${
+                  addressConfirmationStatus === "notConfirmed"
+                    ? "address-confirmation-button--active"
+                    : ""
+                }`}
+                disabled={isHistoryView}
+                onClick={() => handleAddressConfirmationToggle("notConfirmed")}
+                aria-label="Adresse pas encore confirmée"
+                aria-pressed={addressConfirmationStatus === "notConfirmed"}
+                title="Adresse pas encore confirmée"
+              >
+                {addressConfirmationStatus === "notConfirmed" ? (
+                  <AddressNotConfirmedIcon />
+                ) : (
+                  <AddressNotConfirmedOffIcon />
+                )}
+              </button>
+
+              <button
+                type="button"
+                className={`address-confirmation-button ${
+                  addressConfirmationStatus === "confirmed"
+                    ? "address-confirmation-button--active"
+                    : ""
+                }`}
+                disabled={isHistoryView}
+                onClick={() => handleAddressConfirmationToggle("confirmed")}
+                aria-label="Adresse confirmée"
+                aria-pressed={addressConfirmationStatus === "confirmed"}
+                title="Adresse confirmée"
+              >
+                {addressConfirmationStatus === "confirmed" ? (
+                  <AddressConfirmedIcon />
+                ) : (
+                  <AddressConfirmedOffIcon />
+                )}
+              </button>
+            </div>
           </div>
 
           <div className="comment-field copy-field">

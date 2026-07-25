@@ -891,8 +891,8 @@
     gap: 7px;
     flex-shrink: 0;
     align-self: flex-start;
-    width: auto;
-    max-width: 50%;
+    width: 100%;
+    max-width: none;
   }
 
   .cure-selector__buttons {
@@ -1094,4 +1094,60 @@
   right: 0;
   width: 11px !important;
   height: 11px !important;
+}
+
+
+/* Address confirmation toggles */
+.current-intervention-page {
+  .address-confirmation-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    padding-right: 4px;
+  }
+
+  .address-confirmation-button {
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 150ms ease, filter 150ms ease, opacity 150ms ease;
+
+    svg {
+      display: block;
+      width: 44px;
+      height: 44px;
+      overflow: visible;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-2px) scale(1.04);
+      filter: drop-shadow(0 5px 7px rgba(15, 23, 42, 0.18));
+    }
+
+    &:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+
+    &:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.28);
+      outline-offset: 2px;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.72;
+    }
+  }
+
+  .address-confirmation-button--active {
+    filter: drop-shadow(0 4px 6px rgba(15, 23, 42, 0.16));
+  }
 }
