@@ -7,8 +7,7 @@ import { updateField } from "../../../redux/features/newInterventionSlice";
 type BooleanField =
   | "isSnow"
   | "isUnclear"
-  | "isGoodExample"
-  | "isAddressConfirmed";
+  | "isGoodExample";
 
 interface BooleanInputProps {
   field: BooleanField;

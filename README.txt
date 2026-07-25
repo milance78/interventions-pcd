@@ -1,13 +1,11 @@
-ADDRESS ICONS — EXACT APPROVED ARTWORK
+ADDRESS CONFIRMATION — STABLE ICON SWITCH + SUBTLE BUTTON DEPTH
 
-Copy the src folder into the project and replace existing files.
+Replace the two included files.
 
-Included:
-- Address confirmed.svg.tsx
-- Address confirmed off.svg.tsx
-- Address not confirmed.svg.tsx
-- Address not confirmed off.svg.tsx
-- Four matching PNG artwork files used by the TSX wrappers
-
-The ON icons use the approved vivid artwork.
-The OFF icons keep the identical geometry and are rendered in pale gray.
+Changes:
+- ON and OFF icon versions remain mounted at all times.
+- State changes use opacity only, preventing image unload/reload flicker.
+- Hover never changes vertical position.
+- Press/release movement is reduced.
+- Active state now sits only 1.5px lower instead of 3px.
+- Mouse-down feedback is only 1–2px.

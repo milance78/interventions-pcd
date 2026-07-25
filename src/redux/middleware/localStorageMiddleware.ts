@@ -34,7 +34,7 @@ const currentData = (state: Intervention): InterventionData => ({
   displayAllFields: state.displayAllFields,
   snowReference: state.snowReference,
   isUnclear: state.isUnclear,
-  isAddressConfirmed: state.isAddressConfirmed,
+  addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,
   isSnow: state.isSnow,
   comment: state.comment,

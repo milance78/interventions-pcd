@@ -21,6 +21,7 @@ import "./TodayListPage.scss";
 import AdditionalInformationDialog from "../../components/additionalInformationDialog/AdditionalInformationDialog";
 
 import { ReactComponent as AddressConfirmedIcon } from "../../assets/svg/Address confirmed.svg.tsx";
+import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Address not confirmed.svg.tsx";
 import { ReactComponent as CIDIcon } from "../../assets/svg/CID.svg.tsx";
 import { ReactComponent as IDIcon } from "../../assets/svg/ID.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
@@ -243,7 +244,7 @@ const TodayListPage = () => {
 
             const hasFlags =
               intervention.isUnclear ||
-              intervention.isAddressConfirmed ||
+              intervention.addressConfirmation !== "none" ||
               intervention.isGoodExample ||
               intervention.isSnow;
 
@@ -342,9 +343,15 @@ const TodayListPage = () => {
                         </TodayBooleanIcon>
                       )}
 
-                      {intervention.isAddressConfirmed && (
+                      {intervention.addressConfirmation === "confirmed" && (
                         <TodayBooleanIcon>
                           <AddressConfirmedIcon />
+                        </TodayBooleanIcon>
+                      )}
+
+                      {intervention.addressConfirmation === "notConfirmed" && (
+                        <TodayBooleanIcon>
+                          <AddressNotConfirmedIcon />
                         </TodayBooleanIcon>
                       )}
 

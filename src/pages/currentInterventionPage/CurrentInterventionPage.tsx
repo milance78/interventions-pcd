@@ -163,6 +163,7 @@ const CurrentInterventionPage = () => {
     additionalInformation,
     cure,
     smsEnabled,
+    addressConfirmation,
     isEditing,
     isHistoryView,
     hasDraft,
@@ -251,24 +252,24 @@ const CurrentInterventionPage = () => {
   const notConfirmedAddressText = "Adresse pas encore confirmée";
   const addressConfirmationPrefix = /^(?:Adresse confirmée|Adresse pas encore confirmée)(?:\r?\n(?:\r?\n)?)?/;
 
-  const addressConfirmationStatus: AddressConfirmationStatus | null =
-    comment === confirmedAddressText || comment.startsWith(`${confirmedAddressText}\n`)
-      ? "confirmed"
-      : comment === notConfirmedAddressText || comment.startsWith(`${notConfirmedAddressText}\n`)
-        ? "notConfirmed"
-        : null;
-
   const handleAddressConfirmationToggle = (nextStatus: AddressConfirmationStatus) => {
     if (isHistoryView) return;
 
     const commentWithoutStatus = comment
       .replace(addressConfirmationPrefix, "")
       .replace(/^\r?\n+/, "");
-
-    const nextComment = addressConfirmationStatus === nextStatus
+    const nextAddressConfirmation =
+      addressConfirmation === nextStatus ? "none" : nextStatus;
+    const nextComment = nextAddressConfirmation === "none"
       ? commentWithoutStatus
-      : `${nextStatus === "confirmed" ? confirmedAddressText : notConfirmedAddressText}${commentWithoutStatus ? `\n\n${commentWithoutStatus}` : ""}`;
+      : `${nextAddressConfirmation === "confirmed" ? confirmedAddressText : notConfirmedAddressText}${commentWithoutStatus ? `\n\n${commentWithoutStatus}` : ""}`;
 
+    dispatch(
+      updateField({
+        field: "addressConfirmation",
+        value: nextAddressConfirmation,
+      }),
+    );
     dispatch(
       updateField({
         field: "comment",
@@ -470,18 +471,6 @@ const CurrentInterventionPage = () => {
                 />
               </div>
 
-              <div className="option-button">
-                <BooleanInput
-                  field="isAddressConfirmed"
-                  label="Adresse confirmée ?"
-                  trueIcon={
-                    <AddressConfirmedIcon />
-                  }
-                  falseIcon={
-                    <AddressNotConfirmedIcon />
-                  }
-                />
-              </div>
             </div>
           </section>
         </section>
@@ -601,41 +590,63 @@ const CurrentInterventionPage = () => {
               <button
                 type="button"
                 className={`address-confirmation-button ${
-                  addressConfirmationStatus === "notConfirmed"
-                    ? "address-confirmation-button--active"
-                    : ""
-                }`}
-                disabled={isHistoryView}
-                onClick={() => handleAddressConfirmationToggle("notConfirmed")}
-                aria-label="Adresse pas encore confirmée"
-                aria-pressed={addressConfirmationStatus === "notConfirmed"}
-                title="Adresse pas encore confirmée"
-              >
-                {addressConfirmationStatus === "notConfirmed" ? (
-                  <AddressNotConfirmedIcon />
-                ) : (
-                  <AddressNotConfirmedOffIcon />
-                )}
-              </button>
-
-              <button
-                type="button"
-                className={`address-confirmation-button ${
-                  addressConfirmationStatus === "confirmed"
+                  addressConfirmation === "confirmed"
                     ? "address-confirmation-button--active"
                     : ""
                 }`}
                 disabled={isHistoryView}
                 onClick={() => handleAddressConfirmationToggle("confirmed")}
                 aria-label="Adresse confirmée"
-                aria-pressed={addressConfirmationStatus === "confirmed"}
+                aria-pressed={addressConfirmation === "confirmed"}
                 title="Adresse confirmée"
               >
-                {addressConfirmationStatus === "confirmed" ? (
-                  <AddressConfirmedIcon />
-                ) : (
-                  <AddressConfirmedOffIcon />
-                )}
+                <span className="address-confirmation-icon-stack" aria-hidden="true">
+                  <AddressConfirmedOffIcon
+                    className={`address-confirmation-icon address-confirmation-icon--off ${
+                      addressConfirmation === "confirmed"
+                        ? "address-confirmation-icon--hidden"
+                        : "address-confirmation-icon--visible"
+                    }`}
+                  />
+                  <AddressConfirmedIcon
+                    className={`address-confirmation-icon address-confirmation-icon--on ${
+                      addressConfirmation === "confirmed"
+                        ? "address-confirmation-icon--visible"
+                        : "address-confirmation-icon--hidden"
+                    }`}
+                  />
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className={`address-confirmation-button ${
+                  addressConfirmation === "notConfirmed"
+                    ? "address-confirmation-button--active"
+                    : ""
+                }`}
+                disabled={isHistoryView}
+                onClick={() => handleAddressConfirmationToggle("notConfirmed")}
+                aria-label="Adresse pas encore confirmée"
+                aria-pressed={addressConfirmation === "notConfirmed"}
+                title="Adresse pas encore confirmée"
+              >
+                <span className="address-confirmation-icon-stack" aria-hidden="true">
+                  <AddressNotConfirmedOffIcon
+                    className={`address-confirmation-icon address-confirmation-icon--off ${
+                      addressConfirmation === "notConfirmed"
+                        ? "address-confirmation-icon--hidden"
+                        : "address-confirmation-icon--visible"
+                    }`}
+                  />
+                  <AddressNotConfirmedIcon
+                    className={`address-confirmation-icon address-confirmation-icon--on ${
+                      addressConfirmation === "notConfirmed"
+                        ? "address-confirmation-icon--visible"
+                        : "address-confirmation-icon--hidden"
+                    }`}
+                  />
+                </span>
               </button>
             </div>
           </div>

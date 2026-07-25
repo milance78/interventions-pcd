@@ -8,6 +8,7 @@ export type InterventionMode =
   | "TODAY_EDIT";
 
 export type CureValue = "noCure" | "firstCure" | "secondCure" | "thirdCure";
+export type AddressConfirmation = "none" | "confirmed" | "notConfirmed";
 
 const loadSmsPreference = (): boolean => {
   try {
@@ -40,7 +41,7 @@ export interface InterventionData {
   displayAllFields: boolean;
   snowReference: string;
   isUnclear: boolean;
-  isAddressConfirmed: boolean;
+  addressConfirmation: AddressConfirmation;
   isGoodExample: boolean;
   isSnow: boolean;
   comment: string;
@@ -93,7 +94,7 @@ export const emptyInterventionData: InterventionData = {
   displayAllFields: false,
   snowReference: "",
   isUnclear: false,
-  isAddressConfirmed: false,
+  addressConfirmation: "none",
   isGoodExample: false,
   isSnow: false,
   comment: "",
@@ -118,7 +119,8 @@ export const hasMeaningfulDraft = (
       key === "dateKey" ||
       key === "displayAllFields" ||
       key === "cure" ||
-      key === "smsEnabled"
+      key === "smsEnabled" ||
+      (key === "addressConfirmation" && value === "none")
     ) {
       return false;
     }
@@ -151,7 +153,7 @@ const extractData = (state: Intervention): InterventionData => ({
   displayAllFields: state.displayAllFields,
   snowReference: state.snowReference,
   isUnclear: state.isUnclear,
-  isAddressConfirmed: state.isAddressConfirmed,
+  addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,
   isSnow: state.isSnow,
   comment: state.comment,
@@ -316,9 +318,17 @@ const NewInterventionSlice = createSlice({
       _state,
       action: PayloadAction<Partial<InterventionData>>,
     ): Intervention => {
+      const legacyDraft = action.payload as Partial<InterventionData> & {
+        isAddressConfirmed?: boolean;
+      };
+      const addressConfirmation: AddressConfirmation =
+        legacyDraft.addressConfirmation ??
+        (legacyDraft.isAddressConfirmed ? "confirmed" : "none");
+      const { isAddressConfirmed: _legacyAddressConfirmed, ...draftData } = legacyDraft;
       const draft = {
         ...emptyInterventionData,
-        ...action.payload,
+        ...draftData,
+        addressConfirmation,
         documentId: "",
         createdAt: null,
         updatedAt: null,

@@ -1101,7 +1101,7 @@
 .current-intervention-page {
   .address-confirmation-controls {
     display: inline-flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 8px;
     margin-left: auto;
     padding-right: 4px;
@@ -1114,26 +1114,29 @@
     border: 0;
     border-radius: 12px;
     background: transparent;
+    box-shadow: none;
     cursor: pointer;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: transform 150ms ease, filter 150ms ease, opacity 150ms ease;
-
-    svg {
-      display: block;
-      width: 44px;
-      height: 44px;
-      overflow: visible;
-    }
+    transform: translateY(0);
+    filter: drop-shadow(0 4px 4px rgba(15, 23, 42, 0.22));
+    transition:
+      transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 120ms ease,
+      background-color 120ms ease,
+      box-shadow 120ms ease;
+    will-change: transform, filter;
 
     &:hover:not(:disabled) {
-      transform: translateY(-2px) scale(1.04);
-      filter: drop-shadow(0 5px 7px rgba(15, 23, 42, 0.18));
+      transform: translateY(0);
+      filter: drop-shadow(0 4px 4px rgba(15, 23, 42, 0.26)) brightness(0.975);
+      background-color: rgba(148, 163, 184, 0.045);
     }
 
     &:active:not(:disabled) {
-      transform: scale(0.96);
+      transform: translateY(1px);
+      filter: drop-shadow(0 2px 2px rgba(15, 23, 42, 0.14)) brightness(0.99);
     }
 
     &:focus-visible {
@@ -1147,7 +1150,53 @@
     }
   }
 
+  .address-confirmation-icon-stack {
+    position: relative;
+    display: block;
+    width: 44px;
+    height: 44px;
+    flex: 0 0 44px;
+  }
+
+  .address-confirmation-icon {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 44px;
+    height: 44px;
+    overflow: visible;
+    pointer-events: none;
+    transition: opacity 90ms linear;
+    backface-visibility: hidden;
+    transform: translateZ(0);
+  }
+
+  .address-confirmation-icon--visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .address-confirmation-icon--hidden {
+    opacity: 0;
+    visibility: visible;
+  }
+
   .address-confirmation-button--active {
-    filter: drop-shadow(0 4px 6px rgba(15, 23, 42, 0.16));
+    transform: translateY(1.5px);
+    filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.08));
+    background-color: rgba(148, 163, 184, 0.06);
+    box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.12);
+
+    &:hover:not(:disabled) {
+      transform: translateY(1.5px);
+      filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.08)) brightness(0.99);
+      background-color: rgba(148, 163, 184, 0.075);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(2px);
+      filter: none;
+      box-shadow: inset 0 2px 4px rgba(15, 23, 42, 0.15);
+    }
   }
 }

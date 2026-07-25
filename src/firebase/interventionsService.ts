@@ -38,11 +38,27 @@ const extractLegacyAddressDetail = (details: string, label: string) => {
 };
 
 const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> => {
+  const { isAddressConfirmed: legacyAddressConfirmed, ...dataWithoutLegacyAddress } = data;
   const addressDetails = data.addressDetails ?? "";
 
+  const comment = data.comment ?? data.commentaire ?? "";
+  const addressConfirmation =
+    data.addressConfirmation === "confirmed" ||
+    data.addressConfirmation === "notConfirmed" ||
+    data.addressConfirmation === "none"
+      ? data.addressConfirmation
+      : legacyAddressConfirmed === true
+        ? "confirmed"
+        : comment === "Adresse confirmée" || comment.startsWith("Adresse confirmée\n")
+          ? "confirmed"
+          : comment === "Adresse pas encore confirmée" || comment.startsWith("Adresse pas encore confirmée\n")
+            ? "notConfirmed"
+            : "none";
+
   return {
-    ...data,
-    comment: data.comment ?? data.commentaire ?? "",
+    ...dataWithoutLegacyAddress,
+    comment,
+    addressConfirmation,
     additionalInformation:
       data.additionalInformation ?? data.informationsSupplementaires ?? "",
     cure: data.cure ?? data.Cure ?? "noCure",
