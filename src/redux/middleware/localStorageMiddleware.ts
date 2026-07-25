@@ -39,6 +39,8 @@ const currentData = (state: Intervention): InterventionData => ({
   isSnow: state.isSnow,
   comment: state.comment,
   additionalInformation: state.additionalInformation,
+  cure: state.cure,
+  smsEnabled: state.smsEnabled,
   status: state.status,
   createdAt: null,
   updatedAt: null,
@@ -52,6 +54,25 @@ export const localStorageMiddleware: Middleware =
     const intervention = state?.newIntervention as Intervention | undefined;
 
     if (!intervention) return result;
+
+    const typedAction = action as {
+      type?: string;
+      payload?: { field?: string; value?: unknown };
+    };
+
+    if (
+      typedAction.type === "newIntervention/updateField" &&
+      typedAction.payload?.field === "smsEnabled"
+    ) {
+      try {
+        window.localStorage.setItem(
+          "interventions-pcd:sms-enabled",
+          String(Boolean(typedAction.payload.value)),
+        );
+      } catch {
+        // Local storage may be unavailable; intervention persistence still works.
+      }
+    }
 
     const draft = intervention.mode === "VIEW_HISTORY" ||
       intervention.mode === "SEARCH_EDIT" ||

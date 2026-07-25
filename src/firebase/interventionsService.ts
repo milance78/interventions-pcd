@@ -45,6 +45,8 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     comment: data.comment ?? data.commentaire ?? "",
     additionalInformation:
       data.additionalInformation ?? data.informationsSupplementaires ?? "",
+    cure: data.cure ?? data.Cure ?? "noCure",
+    smsEnabled: data.smsEnabled ?? data.sms ?? false,
     mailbox:
       data.mailbox ?? data.mailBox ?? data.box ??
       extractLegacyAddressDetail(addressDetails, "Bo[iî]te"),

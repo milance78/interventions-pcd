@@ -6,245 +6,229 @@ export type SmartImportResult = {
   sourceType: "NPS" | "SNOW" | "ISIS" | "SAFE" | "UNKNOWN";
 };
 
+type ParsedSource = Partial<InterventionData> & {
+  descriptionFr?: string;
+  descriptionEn?: string;
+};
+
 const clean = (value: string | undefined) =>
   (value ?? "")
     .replace(/\u00a0/g, " ")
+    .replace(/\uFFFD/g, "'")
     .replace(/[ \t]+/g, " ")
-    .replace(/^\s+|\s+$/g, "");
+    .trim();
 
 const meaningful = (value: string | undefined) => {
-  const normalized = clean(value);
-  return normalized && normalized !== "--" && normalized !== "-" ? normalized : "";
+  const result = clean(value);
+  return result && result !== "--" && result !== "-" ? result : "";
 };
 
-const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+const first = (...values: Array<string | undefined>) =>
+  values.map(meaningful).find(Boolean) ?? "";
 
-const findAfterLabel = (text: string, labels: string[]): string => {
-  for (const label of labels) {
-    const escaped = escapeRegExp(label);
-    const patterns = [
-      new RegExp(`(?:^|\\n)\\s*${escaped}\\s*[\\t:]+\\s*([^\\n\\t]+)`, "im"),
-      new RegExp(`(?:^|\\n)\\s*${escaped}\\s{2,}([^\\n]+)`, "im"),
-      new RegExp(`${escaped}\\s*[\\t:]+\\s*([^\\n\\t]+)`, "i"),
-    ];
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
-    for (const pattern of patterns) {
-      const match = text.match(pattern);
-      const value = meaningful(match?.[1]);
-      if (value) return value;
-    }
-  }
-  return "";
+const normalizeText = (rawText: string) =>
+  rawText.replace(/\r/g, "").replace(/\u00a0/g, " ").replace(/\uFFFD/g, "'");
+
+const detectSource = (text: string): SmartImportResult["sourceType"] => {
+  const upper = text.toUpperCase();
+  if (upper.includes("SNOW_ID") || upper.includes("SNOW_TITLE")) return "SNOW";
+  if (upper.includes("WORK ITEM TREATMENT") || upper.includes("NPS_EXCEPTION_CD")) return "NPS";
+  if (upper.includes("ORDER VIEWER LINKS") || upper.includes("MISE À JOUR INTERVENTION")) return "SAFE";
+  if (upper.includes("FISISINTV") || upper.includes("SERVICE ORDER")) return "ISIS";
+  return "UNKNOWN";
 };
 
-const findTableValue = (text: string, label: string): string => {
-  const lines = text.split(/\r?\n/);
-  const target = label.toLowerCase();
-
-  for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
-    const cells = lines[lineIndex].split(/\t+/).map(clean);
-    const index = cells.findIndex((cell) => cell.toLowerCase() === target);
-    if (index < 0) continue;
-
-    const sameLineValue = meaningful(cells[index + 1]);
-    if (sameLineValue && !/^(Prénom|Code postal|Nom de la ville|N°|No |Adresse)/i.test(sameLineValue)) {
-      return sameLineValue;
-    }
-
-    for (let nextIndex = lineIndex + 1; nextIndex < Math.min(lines.length, lineIndex + 4); nextIndex += 1) {
-      const nextCells = lines[nextIndex].split(/\t+/).map(clean);
-      if (!nextCells.some(Boolean)) continue;
-      const value = meaningful(nextCells[index]);
-      if (value) return value;
-      break;
-    }
-  }
-  return "";
+const section = (text: string, start: RegExp, ends: RegExp[]): string => {
+  const match = start.exec(text);
+  if (!match) return "";
+  const from = match.index + match[0].length;
+  const rest = text.slice(from);
+  const offsets = ends
+    .map((pattern) => {
+      pattern.lastIndex = 0;
+      return pattern.exec(rest)?.index;
+    })
+    .filter((value): value is number => typeof value === "number");
+  return rest.slice(0, offsets.length ? Math.min(...offsets) : rest.length);
 };
 
-const first = (...values: string[]) => values.find(Boolean) ?? "";
-
-const splitWideCells = (line: string) =>
+const splitLoose = (line: string) =>
   line
     .split(/\t+| {2,}/)
     .map(clean)
     .filter(Boolean);
 
-// Browser table copy/paste uses four spaces between columns. Keeping empty
-// cells is essential: otherwise a blank Mail Box shifts "Etage",
-// "Appartement", "N° de bloc" and "LOM Key" into the wrong inputs.
-const splitTableCells = (line: string) =>
-  line
-    // A single tab is one table-cell separator. Do not collapse repeated tabs:
-    // repeated tabs represent intentionally empty cells in copied browser tables.
-    .split(/\t| {4}/)
-    .map(clean);
+const extractLabelValue = (text: string, labels: string[]): string => {
+  const allLines = text.split("\n");
 
-const findValueBesideLabel = (text: string, labels: string[]): string => {
-  const allLabels = [
-    "Provisioning Order Id",
-    "ID d'intervention",
-    "OA ID / POI ID",
-    "Code d'erreur",
-    "Descriptions",
-    "Date de création (jj/mm/aaaa hh:mm:ss)",
-    "Date souhaitée (jj/mm/aaaa hh:mm:ss)",
-    "Statut",
-    "Source",
-    "Priorité",
-    "Remarques",
-    "INTERVENTION_ID",
-    "OAG_ID",
-    "INTERVENTION_DESCRIPTION",
-    "CUSTOMER_ID",
-    "LIST_FILTER",
-    "TECHNOLOGY",
-    "TICKET_NUM",
-    "CUST_LANGUAGE",
-  ];
+  for (const label of labels) {
+    const escaped = escapeRegExp(label);
 
-  for (const line of text.split(/\r?\n/)) {
-    const cells = splitWideCells(line);
-    if (cells.length < 2) continue;
+    for (const line of allLines) {
+      const direct = line.match(new RegExp(`(?:^|\\s{2,}|\\t)${escaped}\\s*(?:\\t+| {2,}|:)\\s*(.+)$`, "i"));
+      if (direct) {
+        const tail = splitLoose(direct[1]);
+        const value = meaningful(tail[0]);
+        if (value) return value;
+      }
 
-    for (const label of labels) {
-      const index = cells.findIndex(
-        (cell) => cell.toLowerCase() === label.toLowerCase(),
-      );
-      if (index < 0) continue;
-
-      const candidate = meaningful(cells[index + 1]);
-      if (
-        candidate &&
-        !allLabels.some(
-          (knownLabel) => knownLabel.toLowerCase() === candidate.toLowerCase(),
-        )
-      ) {
-        return candidate;
+      const cells = splitLoose(line);
+      const index = cells.findIndex((cell) => cell.toLowerCase() === label.toLowerCase());
+      if (index >= 0) {
+        const value = meaningful(cells[index + 1]);
+        if (value) return value;
       }
     }
+
+    const nextLine = text.match(new RegExp(`(?:^|\\n)\\s*${escaped}\\s*\\n\\s*([^\\n]+)`, "i"));
+    const value = meaningful(nextLine?.[1]);
+    if (value) return value;
   }
 
   return "";
 };
 
-const extractFixedWidthRow = (
+/** Reads a browser-copied table by using header character positions. */
+const extractFixedColumns = (
   text: string,
-  requiredHeader: string,
-  headers: string[],
+  requiredHeaders: string[],
+  allHeaders: string[],
 ): Record<string, string> => {
-  const lines = text.split(/\r?\n/);
+  const lines = text.split("\n");
   const headerIndex = lines.findIndex((line) =>
-    line.toLowerCase().includes(requiredHeader.toLowerCase()),
+    requiredHeaders.every((header) => line.toLowerCase().includes(header.toLowerCase())),
   );
   if (headerIndex < 0) return {};
 
   const headerLine = lines[headerIndex];
-  const positions = headers
-    .map((header) => ({ header, index: headerLine.indexOf(header) }))
+  const positions = allHeaders
+    .map((header) => ({ header, index: headerLine.toLowerCase().indexOf(header.toLowerCase()) }))
     .filter((item) => item.index >= 0)
     .sort((a, b) => a.index - b.index);
   if (!positions.length) return {};
 
-  let valueLine = "";
-  for (let index = headerIndex + 1; index < Math.min(lines.length, headerIndex + 5); index += 1) {
-    if (lines[index].trim()) {
-      valueLine = lines[index];
-      break;
-    }
-  }
-  if (!valueLine) return {};
-
-  const result: Record<string, string> = {};
-  positions.forEach((position, index) => {
-    const end = positions[index + 1]?.index ?? valueLine.length;
-    result[position.header] = meaningful(valueLine.slice(position.index, end));
-  });
-  return result;
-};
-
-const extractContactRow = (text: string): Record<string, string> => {
-  const lines = text.split(/\r?\n/);
-  const headerIndex = lines.findIndex((line) =>
-    line.includes("Nom de la personne de contact") && line.includes("N° de GSM"),
-  );
-  if (headerIndex < 0) return {};
-
-  const headerCells = splitTableCells(lines[headerIndex]);
   const valueLine = lines.slice(headerIndex + 1, headerIndex + 5).find((line) => line.trim());
   if (!valueLine) return {};
-  const valueCells = splitTableCells(valueLine);
 
-  const labels = [
-    "Type de contact",
-    "Catégorie de contact",
-    "Nom de la personne de contact",
-    "Numéro de contact",
-    "N° de GSM",
-    "Adresse e-mail",
-    "Responsable ventes",
-  ];
-
-  const result: Record<string, string> = {};
-  for (const label of labels) {
-    const index = headerCells.findIndex(
-      (cell) => cell.toLowerCase() === label.toLowerCase(),
-    );
-    result[label] = index >= 0 ? meaningful(valueCells[index]) : "";
-  }
-
-  return result;
+  const output: Record<string, string> = {};
+  positions.forEach((position, index) => {
+    const end = positions[index + 1]?.index ?? valueLine.length;
+    output[position.header] = meaningful(valueLine.slice(position.index, end));
+  });
+  return output;
 };
 
-const extractNewAddressSection = (text: string): string => {
-  const startMatch = /(?:^|\n)\s*Nouvelle adresse\b/i.exec(text);
-  if (!startMatch) return "";
-
-  const start = startMatch.index + startMatch[0].length;
-  const remaining = text.slice(start);
-  const endPatterns = [
-    /(?:^|\n)\s*Ancienne adresse\b/i,
-    /(?:^|\n)\s*Manual TSI\/Design reason\b/i,
-    /(?:^|\n)\s*Stop Servicing Copper Date\b/i,
-    /(?:^|\n)\s*Order Viewer Links\b/i,
-  ];
-
-  const endOffsets = endPatterns
-    .map((pattern) => pattern.exec(remaining)?.index)
-    .filter((index): index is number => typeof index === "number");
-
-  const end = endOffsets.length ? Math.min(...endOffsets) : remaining.length;
-  return remaining.slice(0, end);
-};
-
-const extractNewAddressInfrastructure = (text: string): string => {
-  const section = extractNewAddressSection(text);
-  if (!section) return "";
-
-  for (const line of section.split(/\r?\n/)) {
-    const cells = splitWideCells(line);
-    for (const cell of cells) {
-      if (/^(FIBER|FIBRE)$/i.test(cell)) return "fiber";
-      if (/^(COPPER|CUIVRE)$/i.test(cell)) return "copper";
-    }
-  }
-
-  return "";
-};
-
-const extractAddressRow = (text: string): Record<string, string> => {
-  // Address fields are read only from the "Nouvelle adresse" block.
-  // Any "Ancienne adresse" block is intentionally ignored.
-  const newAddressSection = extractNewAddressSection(text);
-  if (!newAddressSection) return {};
-
-  const lines = newAddressSection.split(/\r?\n/);
-  const headerIndex = lines.findIndex((line) =>
-    line.includes("N° de maison alphanumérique") && line.includes("LOM Key"),
+const extractNewAddressSection = (text: string) =>
+  section(
+    text,
+    /(?:^|\n)\s*Nouvelle adresse\b/i,
+    [
+      /(?:^|\n)\s*Ancienne adresse\b/i,
+      /(?:^|\n)\s*Manual TSI\/Design reason\b/i,
+      /(?:^|\n)\s*Stop Servicing Copper Date\b/i,
+      /(?:^|\n)\s*Order Viewer Links\b/i,
+    ],
   );
-  if (headerIndex < 0) return {};
 
-  const labels = [
+
+const getFirstDataLineAfterHeaders = (block: string, requiredHeaders: string[]) => {
+  const lines = block.split("\n");
+  const headerIndex = lines.findIndex((line) =>
+    requiredHeaders.every((header) => line.toLowerCase().includes(header.toLowerCase())),
+  );
+  if (headerIndex < 0) return { headerLine: "", valueLine: "" };
+
+  const valueLine = lines
+    .slice(headerIndex + 1, headerIndex + 6)
+    .map((line) => line.trim())
+    .find((line) => line.length > 0) ?? "";
+
+  return { headerLine: lines[headerIndex], valueLine };
+};
+
+const parseCustomerSection = (text: string) => {
+  const block = section(
+    text,
+    /(?:^|\n)\s*Information client\b/i,
+    [/(?:^|\n)\s*Contact Client\b/i, /(?:^|\n)\s*Informations d'intervention\b/i],
+  );
+  const { valueLine } = getFirstDataLineAfterHeaders(block, ["ID client", "Partner Account ID"]);
+  const values = splitLoose(valueLine);
+
+  return {
+    clientID: meaningful(values[0]),
+    firstName: meaningful(values[3]),
+    lastName: meaningful(values[2]),
+  };
+};
+
+const parseContactSection = (text: string) => {
+  const block = section(
+    text,
+    /(?:^|\n)\s*Contact Client\b/i,
+    [/(?:^|\n)\s*Informations d'intervention\b/i, /(?:^|\n)\s*Adresse d'installation\b/i],
+  );
+  const { valueLine } = getFirstDataLineAfterHeaders(block, ["Nom de la personne de contact", "N° de GSM"]);
+  const phone = meaningful(valueLine.match(/(?:\+|00)?\d[\d\s()./-]{7,}\d/)?.[0]?.replace(/\s+/g, ""));
+  const emailIndex = valueLine.search(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/);
+  const beforePhone = phone ? valueLine.slice(0, valueLine.indexOf(phone)) : emailIndex >= 0 ? valueLine.slice(0, emailIndex) : valueLine;
+  const cells = splitLoose(beforePhone);
+  const contactName = meaningful(cells.length >= 3 ? cells[cells.length - 1] : "");
+
+  return { contactName, phone };
+};
+
+const streetStartPattern = /\b(Rue|Avenue|Boulevard|Chaussée|Chaussee|Square|Clos|Place|Quai|Route|Chemin|Allée|Allee|Drève|Dreve|Sentier|Impasse|Laan|Straat|Steenweg|Weg|Plein)\b/i;
+
+const parseCollapsedAddressRow = (valueLine: string) => {
+  const line = clean(valueLine);
+  const zipMatch = line.match(/\b(\d{4})\b/);
+  if (!zipMatch || zipMatch.index == null) return {} as Record<string, string>;
+
+  const afterZip = line.slice(zipMatch.index + zipMatch[0].length).trim();
+  const streetMatch = streetStartPattern.exec(afterZip);
+  if (!streetMatch || streetMatch.index == null) return {} as Record<string, string>;
+
+  const city = meaningful(afterZip.slice(0, streetMatch.index));
+  const fromStreet = afterZip.slice(streetMatch.index).trim();
+
+  // Right side is stable: house number, optional address details, LOM, subArea, MDU/SDU, zone.
+  const rightMatch = fromStreet.match(/^(.*?)\s+(\d+[A-Za-z]?)\s+(?:(.*?)\s+)?(\d{5,})\s+([A-Z0-9]+)\s+(SDU|MDU)\s+(.+)$/i);
+  if (!rightMatch) return {} as Record<string, string>;
+
+  const detailTokens = splitLoose(rightMatch[3] ?? "");
+  return {
+    "Code postal": zipMatch[1],
+    "Nom de la ville": city,
+    "Nom de la rue": meaningful(rightMatch[1]),
+    "N° de maison": meaningful(rightMatch[2].match(/^\d+/)?.[0]),
+    "N° de maison alphanumérique": meaningful(rightMatch[2].replace(/^\d+/, "")),
+    "Mail Box": meaningful(detailTokens[0]),
+    Etage: meaningful(detailTokens[1]),
+    Appartement: meaningful(detailTokens[2]),
+    "N° de bloc": meaningful(detailTokens[3]),
+    "LOM Key": meaningful(rightMatch[4]),
+    subArea: meaningful(rightMatch[5]),
+    "Indicateur MDU/SDU": meaningful(rightMatch[6]),
+    "ZONE:": meaningful(rightMatch[7]),
+  };
+};
+
+const parseNewAddress = (text: string): ParsedSource => {
+  const block = extractNewAddressSection(text);
+  if (!block) return {};
+
+  const infrastructureMatch = block.match(/(?:^|\n|\s)(Fiber|Fibre|Copper|Cuivre)(?=\s|\n|$)/i);
+  const infrastructure = infrastructureMatch
+    ? /fiber|fibre/i.test(infrastructureMatch[1])
+      ? "fiber"
+      : "copper"
+    : "";
+
+  const headers = [
     "Pays",
     "Code postal",
     "Nom de la ville",
@@ -261,305 +245,236 @@ const extractAddressRow = (text: string): Record<string, string> => {
     "ZONE:",
   ];
 
-  const headerCells = splitTableCells(lines[headerIndex]);
-  const valueLine = lines
-    .slice(headerIndex + 1, headerIndex + 6)
-    .find((line) => {
-      const cells = splitTableCells(line);
-      return cells.some((cell) => /Belgique|Belgium/i.test(cell)) ||
-        cells.some((cell) => /^\d{4}$/.test(cell));
-    });
-  if (!valueLine) return {};
+  const { headerLine, valueLine } = getFirstDataLineAfterHeaders(block, ["Nom de la rue", "LOM Key"]);
+  let row: Record<string, string> = {};
 
-  const valueCells = splitTableCells(valueLine);
-  const result: Record<string, string> = {};
-
-  for (const label of labels) {
-    const index = headerCells.findIndex(
-      (cell) => cell.toLowerCase() === label.toLowerCase(),
-    );
-    result[label] = index >= 0 ? meaningful(valueCells[index]) : "";
+  // Browser copies with tabs preserve empty cells exactly.
+  if (headerLine.includes("\t") && valueLine.includes("\t")) {
+    const headerCells = headerLine.split("\t").map(clean);
+    const valueCells = valueLine.split("\t").map(clean);
+    for (const header of headers) {
+      const index = headerCells.findIndex((cell) => cell.toLowerCase() === header.toLowerCase());
+      if (index >= 0) row[header] = meaningful(valueCells[index]);
+    }
+  } else {
+    row = parseCollapsedAddressRow(valueLine);
   }
 
-  return result;
-};
-
-const extractCustomerRow = (text: string): Record<string, string> => {
-  const lines = text.split(/\r?\n/);
-  const headerIndex = lines.findIndex((line) =>
-    line.includes("ID client") && line.includes("Partner Account ID") && line.includes("Nom de famille"),
-  );
-  if (headerIndex < 0) return {};
-
-  const headerCells = splitTableCells(lines[headerIndex]);
-  const valueLine = lines.slice(headerIndex + 1, headerIndex + 5).find((line) => line.trim());
-  if (!valueLine) return {};
-  const valueCells = splitTableCells(valueLine);
-
-  const read = (label: string) => {
-    const index = headerCells.findIndex(
-      (cell) => cell.toLowerCase() === label.toLowerCase(),
-    );
-    return index >= 0 ? meaningful(valueCells[index]) : "";
-  };
+  const street = meaningful(row["Nom de la rue"]);
+  const number = meaningful(row["N° de maison"]);
+  const alpha = meaningful(row["N° de maison alphanumérique"]);
+  const zip = meaningful(row["Code postal"]);
+  const city = meaningful(row["Nom de la ville"]);
+  const house = `${number}${alpha}`;
+  const firstLine = clean(`${street} ${house}`);
+  const secondLine = clean(`${zip} ${city}`);
 
   return {
-    "ID client": read("ID client"),
-    "Partner Account ID": read("Partner Account ID"),
-    "Nom de famille": read("Nom de famille"),
-    Prénom: read("Prénom"),
+    infrastructure,
+    mainAddress: firstLine && secondLine ? `${firstLine}, ${secondLine}` : first(firstLine, secondLine),
+    mailbox: meaningful(row["Mail Box"]),
+    floor: meaningful(row.Etage),
+    apartment: meaningful(row.Appartement),
+    blockNumber: meaningful(row["N° de bloc"]),
+    LOMKey: meaningful(row["LOM Key"]),
   };
 };
 
-const detectSource = (text: string): SmartImportResult["sourceType"] => {
-  const upper = text.toUpperCase();
-  if (upper.includes("SNOW_TITLE") || upper.includes("SNOW_ID")) return "SNOW";
-  if (upper.includes("WORK ITEM TREATMENT") || upper.includes("NPS_EXCEPTION_CD")) return "NPS";
-  if (upper.includes("FISISINTV") || upper.includes("INFORMATIONS 'SERVICE ORDER'")) return "ISIS";
-  if (upper.includes("FSAFEMLONU") || upper.includes("ORDER VIEWER LINKS")) return "SAFE";
-  return "UNKNOWN";
+
+const extractSafeFrenchDescription = (text: string): string => {
+  const interventionBlock = section(
+    text,
+    /(?:^|\n)\s*Informations d'intervention\b/i,
+    [
+      /(?:^|\n)\s*Adresse d'installation\b/i,
+      /(?:^|\n)\s*Order Viewer Links\b/i,
+      /(?:^|\n)\s*Envoi Notification\b/i,
+      /(?:^|\n)\s*Mise à jour intervention\b/i,
+    ],
+  );
+
+  if (interventionBlock) {
+    const lines = interventionBlock.split("\n");
+
+    for (const line of lines) {
+      const cells = splitLoose(line);
+      const index = cells.findIndex((cell) =>
+        /^(Descriptions|Description d'intervention)$/i.test(cell),
+      );
+
+      if (index >= 0) {
+        const value = meaningful(cells[index + 1]);
+        if (value && !/^(Date de création|Date souhaitée|Statut|Source|Priorité|Remarques)$/i.test(value)) {
+          return value;
+        }
+      }
+    }
+
+    const multiline = interventionBlock.match(
+      /(?:^|\n|\t| {2,})(?:Descriptions|Description d'intervention)\s*(?:\t+| {2,}|:)\s*([^\n\t]+?)(?=(?:\t+| {2,})(?:Date de création|Date souhaitée|Statut|Source|Priorité|Remarques)\b|$)/i,
+    );
+    const value = meaningful(multiline?.[1]);
+    if (value) return value;
+  }
+
+  // Some SAFE pages copy the French description as the first standalone line.
+  // Use it only when a SAFE-style "Descriptions" label exists somewhere in the text.
+  if (/\bDescriptions\b/i.test(text)) {
+    const firstStandalone = text
+      .split("\n")
+      .map(meaningful)
+      .find((line) =>
+        Boolean(line) &&
+        !/^(powered by|Information client|Contact Client|Informations d'intervention|Adresse d'installation)/i.test(line) &&
+        !/^[A-Z0-9_-]{6,}$/i.test(line),
+      );
+    if (firstStandalone) return firstStandalone;
+  }
+
+  return "";
 };
 
-const normalizeInfrastructure = (raw: string) => {
-  const value = raw.toUpperCase();
-  if (/\bFIBER\b|\bFIBRE\b/.test(value)) return "fiber";
-  if (/\bCOPPER\b|\bCUIVRE\b/.test(value)) return "copper";
-  return "";
+const parseSafe = (text: string): ParsedSource => {
+  const contact = parseContactSection(text);
+  const customer = parseCustomerSection(text);
+
+  const updateBlock = section(
+    text,
+    /(?:^|\n)\s*Mise à jour intervention\b/i,
+    [/(?:^|\n)\s*Retour\b/i, /(?:^|\n)\s*Ajouter Tâche\b/i],
+  );
+  const remarksMatch = updateBlock.match(
+    /(?:^|\n)\s*Remarques\s*(?:\t+| {2,}|\n)\s*([\s\S]*?)(?=(?:\t+| {2,}|\n)\s*(?:Action|Route vers|A la clôture|Client en ligne)\b|$)/i,
+  );
+  const remarks = meaningful(remarksMatch?.[1]);
+
+  const descriptionFr = extractSafeFrenchDescription(text);
+
+  const explicitNaCid = extractLabelValue(text, ["NA / CID"]);
+  const interventionId = extractLabelValue(text, ["ID d'intervention"]);
+  const oagID = first(
+    extractLabelValue(text, ["OAG_ID", "OAG ID", "Provisioning Order Id"]),
+    extractLabelValue(text, ["ORDER_NUM"]),
+  );
+
+  const contactName = meaningful(contact.contactName);
+  const fallbackName = clean(`${customer.firstName ?? ""} ${customer.lastName ?? ""}`);
+
+  return {
+    ...parseNewAddress(text),
+    interventionId,
+    oagID,
+    clientID: first(customer.clientID, extractLabelValue(text, ["ID client"])),
+    na: explicitNaCid,
+    clientName: first(contactName, fallbackName),
+    phone: meaningful(contact.phone),
+    descriptionFr,
+    comment: remarks ? `Remarque préexistante:\n${remarks}` : "",
+  };
+};
+
+const parseWorkItem = (text: string): ParsedSource => {
+  const snowReference = extractLabelValue(text, ["SNOW_ID"]);
+  const infrastructureRaw = extractLabelValue(text, ["TECHNOLOGY"]);
+  const infrastructure = /fiber|fibre/i.test(infrastructureRaw)
+    ? "fiber"
+    : /copper|cuivre/i.test(infrastructureRaw)
+      ? "copper"
+      : "";
+
+  return {
+    interventionId: extractLabelValue(text, ["INTERVENTION_ID"]),
+    snowReference,
+    oagID: first(
+      extractLabelValue(text, ["OAG_ID"]),
+      extractLabelValue(text, ["ORDER_NUM"]),
+    ),
+    clientID: first(
+      extractLabelValue(text, ["CUSTOMER_ID"]),
+      extractLabelValue(text, ["CUST_NUM"]),
+    ),
+    na: extractLabelValue(text, ["NA"]),
+    descriptionEn: first(
+      extractLabelValue(text, ["INTERVENTION_DESCRIPTION"]),
+      extractLabelValue(text, ["NPS_EXC_DESCRIPTION"]),
+    ),
+    infrastructure,
+  };
 };
 
 const normalizeNetwork = (text: string) => {
-  const upper = text.toUpperCase();
-  if (upper.includes("MOBILE VIKINGS")) return "mobileVikings";
-  if (upper.includes("SCARLET")) return "scarlet";
-  if (/\bOLO\b/.test(upper) && !upper.includes("IS_OLO\tNO")) return "otherOlo";
-  if (upper.includes("PROXIMUS") || upper.includes("PXS") || upper.includes("NPS")) return "proximus";
+  // Only explicit operator fields are authoritative. Product names such as
+  // "CFS_Scarlet internet" inside Order Items must never select the network.
+  const listFilter = extractLabelValue(text, ["LIST_FILTER"]).toUpperCase();
+  const explicitOperator = first(
+    extractLabelValue(text, ["Opérateur", "Operateur", "Operator", "Réseau", "Reseau"]),
+    listFilter,
+  ).toUpperCase();
+
+  if (explicitOperator.includes("MOBILE VIKINGS")) return "mobileVikings";
+  if (explicitOperator.includes("SCARLET")) return "scarlet";
+  if (/\bOLO\b/.test(explicitOperator)) return "otherOlo";
+  if (explicitOperator === "PXS" || explicitOperator.includes("PROXIMUS")) return "proximus";
   return "";
 };
 
-const normalizeStatus = (raw: string) => {
-  const upper = raw.toUpperCase();
-  if (/DONE|TERMIN|CLOSED|RESOLVED/.test(upper)) return "completed";
-  if (/WAIT|PENDING|HOLD|CURE CONTACT|INPROGRESS|IN PROGRESS/.test(upper)) return "on hold";
-  if (/ROUTE|TRANSFER|TRANSMIS/.test(upper)) return "transferred";
+const normalizeStatus = (text: string) => {
+  const raw = first(
+    extractLabelValue(text, ["Status"]),
+    extractLabelValue(text, ["Statut"]),
+    extractLabelValue(text, ["NPS_STATUS"]),
+  ).toUpperCase();
+  if (/DONE|TERMIN|CLOSED|RESOLVED/.test(raw)) return "completed";
+  if (/WAIT|PENDING|HOLD|CURE CONTACT|INPROGRESS|IN PROGRESS/.test(raw)) return "on hold";
+  if (/ROUTE|TRANSFER|TRANSMIS/.test(raw)) return "transferred";
   return "";
 };
 
-const composeClientName = (text: string) => {
-  const contactRow = extractContactRow(text);
-  const contactName = meaningful(contactRow["Nom de la personne de contact"]);
-  if (contactName) return contactName;
-
-  const customerRow = extractCustomerRow(text);
-  const tableName = clean(`${customerRow["Prénom"] ?? ""} ${customerRow["Nom de famille"] ?? ""}`);
-  if (tableName) return tableName;
-
-  const explicit = first(
-    findValueBesideLabel(text, ["Nom du client", "CUSTOMER_NAME"]),
-    findAfterLabel(text, ["Nom du client", "CUSTOMER_NAME"]),
-    findTableValue(text, "Nom de famille"),
-  );
-  if (explicit && !/^(Prénom|N\.P\.C\.)$/i.test(explicit)) {
-    const firstName = first(
-      findValueBesideLabel(text, ["CUST_FIRST_NAME"]),
-      findAfterLabel(text, ["CUST_FIRST_NAME"]),
-      findTableValue(text, "Prénom"),
-    );
-    if (firstName && !explicit.toLowerCase().includes(firstName.toLowerCase())) {
-      return clean(`${explicit} ${firstName}`);
-    }
-    return explicit;
-  }
-
-  const lastName = first(
-    findValueBesideLabel(text, ["CUST_LAST_NAME"]),
-    findAfterLabel(text, ["CUST_LAST_NAME"]),
-  );
-  const firstName = first(
-    findValueBesideLabel(text, ["CUST_FIRST_NAME"]),
-    findAfterLabel(text, ["CUST_FIRST_NAME"]),
-  );
-  return clean(`${lastName} ${firstName}`);
-};
-
-const parseStructuredAddress = (text: string) => {
-  const newAddressSection = extractNewAddressSection(text);
-  const addressRow = extractAddressRow(text);
-  const hasStructuredRow = Object.keys(addressRow).length > 0;
-
-  const rowOrFallback = (
-    rowLabel: string,
-    fallbackLabels: string[],
-  ) => {
-    if (hasStructuredRow) return meaningful(addressRow[rowLabel]);
-    if (!newAddressSection) return "";
-
-    // Even the fallback search is restricted to "Nouvelle adresse". This
-    // prevents fields from an "Ancienne adresse" block being imported.
-    return first(
-      findValueBesideLabel(newAddressSection, fallbackLabels),
-      findAfterLabel(newAddressSection, fallbackLabels),
-      findTableValue(newAddressSection, rowLabel),
-    );
-  };
-
-  const street = rowOrFallback("Nom de la rue", ["ADDRESS_STREET_NAME", "Nom de la rue"]);
-  const number = rowOrFallback("N° de maison", ["ADDRESS_HOUSE_NUMBER", "N° de maison", "No de maison"]);
-  const alpha = rowOrFallback("N° de maison alphanumérique", [
-    "N° de maison alphanumérique",
-    "No de maison alphanumérique",
-  ]);
-  const zip = rowOrFallback("Code postal", ["ADDRESS_ZIP_CODE", "Code postal"]);
-  const city = rowOrFallback("Nom de la ville", ["ADDRESS_CITY_NAME", "Nom de la ville"]);
-  const mailbox = rowOrFallback("Mail Box", ["ADDRESS_BOX", "Mail Box", "Boîte", "Boite"]);
-  const floor = rowOrFallback("Etage", ["ADDRESS_FLOOR", "Etage", "Étage"]);
-  const apartment = rowOrFallback("Appartement", ["Appartement", "N° appartement", "No appartement"]);
-  const blockNumber = rowOrFallback("N° de bloc", ["N° de bloc", "No de bloc", "Block"]);
-
-  const house = clean(`${number}${alpha}`);
-  const streetAndNumber = clean(`${street} ${house}`);
-  const cityLine = clean(`${zip} ${city}`);
-  const mainAddress = streetAndNumber && cityLine
-    ? `${streetAndNumber}, ${cityLine}`
-    : first(streetAndNumber, cityLine);
+const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<InterventionData> => {
+  const infrastructure = first(safe.infrastructure, work.infrastructure);
+  // A French SAFE/NPS description is authoritative whenever it exists.
+  // English Work Item descriptions are used only as a fallback.
+  const description = meaningful(safe.descriptionFr) || meaningful(work.descriptionEn);
+  const na = infrastructure === "fiber" ? "" : first(safe.na, work.na);
 
   return {
-    mainAddress,
-    // Legacy field remains empty. The four dedicated inputs are now the
-    // single source of truth for address details.
-    addressDetails: "",
-    mailbox,
-    floor,
-    apartment,
-    blockNumber,
-    lomKey: hasStructuredRow ? meaningful(addressRow["LOM Key"]) : "",
-  };
-};
-
-const latestHumanJournalMessage = (text: string) => {
-  const journalIndex = text.search(/\bJournal\b/i);
-  if (journalIndex < 0) return "";
-  const journal = text.slice(journalIndex);
-  const regex = /(?:^|\n)(\d{2}\/\d{2}\/\d{4}\s+\d{2}:\d{2}:\d{2})\s+([^\n\t]+?)\s*[\t]+([^\n]+)/g;
-  let match: RegExpExecArray | null;
-  const messages: string[] = [];
-  while ((match = regex.exec(journal))) {
-    const author = clean(match[2]);
-    const message = clean(match[3]);
-    if (!/SYSTEM/i.test(author) && message && !/^\.:/.test(message)) messages.push(message);
-  }
-  return messages[0] ?? "";
-};
-
-const cleanMultiline = (value: string | undefined) =>
-  (value ?? "")
-    .replace(/\u00a0/g, " ")
-    .split(/\r?\n/)
-    .map((line) => clean(line))
-    .filter(Boolean)
-    .join("\n")
-    .trim();
-
-const extractFinalUpdateRemarks = (text: string) => {
-  const sectionIndex = text.toLowerCase().lastIndexOf("mise à jour intervention");
-  if (sectionIndex < 0) return "";
-
-  const section = text.slice(sectionIndex);
-  const match = section.match(
-    /(?:^|\n|\t)\s*Remarques(?!\s+ordre)\s*(?:\t+| {2,}|\n)\s*([\s\S]*?)(?=(?:\t+| {2,}|\n)\s*(?:Action|Route vers|A la clôture|Client en ligne|Retour|Mise à jour|Ajouter Tâche)\b|$)/i,
-  );
-
-  const remarks = cleanMultiline(match?.[1]);
-  if (!remarks || /^(Envoi Notification|Description Notification)$/i.test(remarks)) return "";
-  return remarks;
-};
-
-
-
-export const parseSmartImport = (rawText: string): SmartImportResult => {
-  const text = rawText.replace(/\r/g, "").replace(/\uFFFD/g, "'");
-  const sourceType = detectSource(text);
-  const address = parseStructuredAddress(text);
-  const customerRow = extractCustomerRow(text);
-
-  const interventionId = first(
-    findValueBesideLabel(text, ["INTERVENTION_ID", "ID d'intervention"]),
-    findAfterLabel(text, ["INTERVENTION_ID", "ID d'intervention"]),
-    findTableValue(text, "ID d'intervention"),
-  );
-  const oagID = first(
-    findValueBesideLabel(text, ["OAG_ID", "OAG ID / PO ID", "Provisioning Order Id"]),
-    findAfterLabel(text, ["OAG_ID", "OAG ID / PO ID", "Provisioning Order Id"]),
-    findTableValue(text, "OAG ID / PO ID"),
-  );
-  const snowReference = first(
-    findValueBesideLabel(text, ["SNOW_ID"]),
-    findAfterLabel(text, ["SNOW_ID"]),
-  );
-  const description = first(
-    findValueBesideLabel(text, ["Descriptions", "Description d'intervention"]),
-    findAfterLabel(text, ["Descriptions", "Description d'intervention"]),
-    findValueBesideLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION", "SNOW_TITLE"]),
-    findAfterLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION", "SNOW_TITLE"]),
-    findTableValue(text, "Descriptions"),
-  );
-  const clientID = first(
-    findValueBesideLabel(text, ["CUSTOMER_ID", "CUST_NUM"]),
-    findAfterLabel(text, ["CUSTOMER_ID", "CUST_NUM"]),
-    meaningful(customerRow["ID client"]),
-  );
-  // Partner Account ID is not an NA value. NA is imported only when an
-  // explicit NA field exists, and it remains empty for fibre interventions.
-  const explicitNa = first(
-    findValueBesideLabel(text, ["NA / CID", "NA"]),
-    findAfterLabel(text, ["NA / CID", "NA"]),
-  );
-  const contactRow = extractContactRow(text);
-  const phone = first(
-    meaningful(contactRow["N° de GSM"]),
-    findValueBesideLabel(text, ["N° de GSM", "Numéro de contact", "CUST_PHONE", "PHONE"]),
-    findAfterLabel(text, ["N° de GSM", "Numéro de contact", "CUST_PHONE", "PHONE"]),
-    findTableValue(text, "N° de GSM"),
-    findTableValue(text, "Numéro de contact"),
-  );
-  // LOM Key is also part of the new-address block and must never be taken
-  // from an old-address section.
-  const lomKey = address.lomKey;
-  const infrastructure = extractNewAddressInfrastructure(text);
-  const na = infrastructure === "fiber" ? "" : explicitNa;
-  const rawStatus = first(findValueBesideLabel(text, ["Status", "Statut", "NPS_STATUS"]), findAfterLabel(text, ["Status", "Statut", "NPS_STATUS"]), findTableValue(text, "Statut"));
-  const finalRemarks = extractFinalUpdateRemarks(text);
-  const comment = finalRemarks
-    ? `Remarque préexistante:\n${finalRemarks}`
-    : latestHumanJournalMessage(text);
-
-  const values: Partial<InterventionData> = {
-    interventionId,
-    oagID,
-    snowReference,
-    interventionDescription: description,
-    clientID,
+    interventionId: first(work.interventionId, safe.interventionId),
+    snowReference: work.snowReference ?? "",
+    oagID: first(work.oagID, safe.oagID),
+    clientID: first(work.clientID, safe.clientID),
     na,
-    clientName: composeClientName(text),
-    mainAddress: address.mainAddress,
-    addressDetails: address.addressDetails,
-    mailbox: address.mailbox,
-    floor: address.floor,
-    apartment: address.apartment,
-    blockNumber: address.blockNumber,
-    LOMKey: lomKey,
-    phone,
-    infrastructure: normalizeInfrastructure(infrastructure),
+    clientName: safe.clientName ?? "",
+    interventionDescription: description,
+    mainAddress: safe.mainAddress ?? "",
+    addressDetails: "",
+    mailbox: safe.mailbox ?? "",
+    floor: safe.floor ?? "",
+    apartment: safe.apartment ?? "",
+    blockNumber: safe.blockNumber ?? "",
+    LOMKey: safe.LOMKey ?? "",
+    phone: safe.phone ?? "",
+    infrastructure,
     network: normalizeNetwork(text),
-    status: normalizeStatus(rawStatus),
-    comment,
-    isSnow: sourceType === "SNOW" || Boolean(snowReference),
+    status: normalizeStatus(text),
+    comment: safe.comment ?? "",
+    additionalInformation: "",
+    isSnow: Boolean(work.snowReference),
     displayAllFields: true,
   };
+};
+
+export const parseSmartImport = (rawText: string): SmartImportResult => {
+  const text = normalizeText(rawText);
+  const sourceType = detectSource(text);
+  const safe = parseSafe(text);
+  const work = parseWorkItem(text);
+  const values = merge(safe, work, text);
 
   const filteredValues = Object.fromEntries(
-    Object.entries(values).filter(([, value]) =>
-      typeof value === "string" ? Boolean(value.trim()) : value !== undefined,
-    ),
+    Object.entries(values).filter(([, value]) => {
+      if (typeof value === "string") return value.trim().length > 0;
+      return value !== undefined;
+    }),
   ) as Partial<InterventionData>;
 
   return {

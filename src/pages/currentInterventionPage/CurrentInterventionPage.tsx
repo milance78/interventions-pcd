@@ -8,6 +8,7 @@ import CheckRounded from "@mui/icons-material/CheckRounded";
 import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
 import Send from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
+import ButtonGroup from "@mui/material/ButtonGroup";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -155,6 +156,8 @@ const CurrentInterventionPage = () => {
     clientName,
     comment,
     additionalInformation,
+    cure,
+    smsEnabled,
     isEditing,
     isHistoryView,
     hasDraft,
@@ -167,6 +170,68 @@ const CurrentInterventionPage = () => {
   const [revisions, setRevisions] = React.useState<InterventionRevision[]>([]);
   const [revisionsError, setRevisionsError] = React.useState("");
   const [importMessage, setImportMessage] = React.useState("");
+
+
+  const generatedCureLine = /(?:^|\n)(?:1er|2(?:e|ème|eme)|3(?:e|ème|eme)) CURE(?: \+ SMS)? fait le \d{1,2}\/\d{1,2}\/\d{4} à \d{2}:\d{2}h(?=\n|$)/gi;
+
+  const buildCureComment = (
+    nextCure: typeof cure,
+    nextSmsEnabled: boolean,
+  ) => {
+    const cleanedComment = comment
+      .replace(generatedCureLine, "")
+      .replace(/\n{3,}/g, "\n\n")
+      .trim();
+
+    if (nextCure === "noCure") return cleanedComment;
+
+    const now = new Date();
+    const day = String(now.getDate()).padStart(2, "0");
+    const month = String(now.getMonth() + 1).padStart(2, "0");
+    const year = String(now.getFullYear());
+    const hours = String(now.getHours()).padStart(2, "0");
+    const minutes = String(now.getMinutes()).padStart(2, "0");
+    const cureLabel = {
+      firstCure: "1er",
+      secondCure: "2eme",
+      thirdCure: "3eme",
+    }[nextCure];
+    const supportsSms = nextCure === "firstCure" || nextCure === "secondCure";
+    const smsText = supportsSms && nextSmsEnabled ? " + SMS" : "";
+    const cureLine = `${cureLabel} CURE${smsText} fait le ${day}/${month}/${year} à ${hours}:${minutes}h`;
+
+    return cleanedComment
+      ? `${cleanedComment}\n\n${cureLine}`
+      : cureLine;
+  };
+
+  const handleCureSelection = (nextCure: typeof cure) => {
+    if (isHistoryView) return;
+
+    dispatch(updateField({ field: "cure", value: nextCure }));
+    dispatch(
+      updateField({
+        field: "comment",
+        value: buildCureComment(nextCure, smsEnabled),
+      }),
+    );
+  };
+
+  const handleSmsToggle = () => {
+    if (isHistoryView) return;
+
+    const nextSmsEnabled = !smsEnabled;
+    dispatch(updateField({ field: "smsEnabled", value: nextSmsEnabled }));
+
+    if (cure === "firstCure" || cure === "secondCure") {
+      dispatch(
+        updateField({
+          field: "comment",
+          value: buildCureComment(cure, nextSmsEnabled),
+        }),
+      );
+    }
+  };
 
   const submitActions = async () => {
     const result = isEditing
@@ -411,6 +476,46 @@ const CurrentInterventionPage = () => {
             <ClientsOnAddress />
           </div>
 
+          <div className="cure-selector" aria-label="Sélection CURE">
+            <ButtonGroup
+              size="small"
+              aria-label="Niveau CURE"
+              className="cure-selector__buttons"
+            >
+              {[
+                ["noCure", "no CURE"],
+                ["firstCure", "1ᵉʳ CURE"],
+                ["secondCure", "2ᵉᵐᵉ CURE"],
+                ["thirdCure", "3ᵉᵐᵉ CURE"],
+              ].map(([value, label]) => (
+                <Button
+                  key={value}
+                  type="button"
+                  variant={cure === value ? "contained" : "outlined"}
+                  className={`cure-selector__button ${
+                    cure === value ? "cure-selector__button--active" : ""
+                  }`}
+                  disabled={isHistoryView}
+                  onClick={() => handleCureSelection(value as typeof cure)}
+                >
+                  {label}
+                </Button>
+              ))}
+            </ButtonGroup>
+            <Button
+              type="button"
+              variant={smsEnabled ? "contained" : "outlined"}
+              className={`sms-toggle-button ${
+                smsEnabled ? "sms-toggle-button--active" : ""
+              }`}
+              disabled={isHistoryView}
+              onClick={handleSmsToggle}
+              aria-pressed={smsEnabled}
+            >
+              +SMS
+            </Button>
+          </div>
+
           <div className="comment-field copy-field">
             <TextField
               label="Commentaire"
@@ -568,6 +673,8 @@ const CurrentInterventionPage = () => {
                 <div><dt>OAG ID</dt><dd>{revision.snapshot.oagID || "—"}</dd></div>
                 <div><dt>Nom du client</dt><dd>{revision.snapshot.clientName || "—"}</dd></div>
                 <div><dt>Description</dt><dd>{revision.snapshot.interventionDescription || "—"}</dd></div>
+                <div><dt>CURE</dt><dd>{revision.snapshot.cure || "noCure"}</dd></div>
+                <div><dt>+SMS</dt><dd>{revision.snapshot.smsEnabled ? "ON" : "OFF"}</dd></div>
                 <div><dt>Commentaire</dt><dd>{revision.snapshot.comment || "—"}</dd></div>
                 <div><dt>Informations supplémentaires</dt><dd>{revision.snapshot.additionalInformation || "—"}</dd></div>
                 <div><dt>Statut</dt><dd>{revision.snapshot.status || "—"}</dd></div>

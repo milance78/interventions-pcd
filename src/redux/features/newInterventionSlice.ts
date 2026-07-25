@@ -7,6 +7,16 @@ export type InterventionMode =
   | "SEARCH_EDIT"
   | "TODAY_EDIT";
 
+export type CureValue = "noCure" | "firstCure" | "secondCure" | "thirdCure";
+
+const loadSmsPreference = (): boolean => {
+  try {
+    return window.localStorage.getItem("interventions-pcd:sms-enabled") === "true";
+  } catch {
+    return false;
+  }
+};
+
 export interface InterventionData {
   documentId: string;
   interventionId: string;
@@ -35,6 +45,8 @@ export interface InterventionData {
   isSnow: boolean;
   comment: string;
   additionalInformation: string;
+  cure: CureValue;
+  smsEnabled: boolean;
   status: string;
   createdAt: string | null;
   updatedAt: string | null;
@@ -86,6 +98,8 @@ export const emptyInterventionData: InterventionData = {
   isSnow: false,
   comment: "",
   additionalInformation: "",
+  cure: "noCure",
+  smsEnabled: loadSmsPreference(),
   status: "",
   createdAt: null,
   updatedAt: null,
@@ -102,7 +116,9 @@ export const hasMeaningfulDraft = (
       key === "createdAt" ||
       key === "updatedAt" ||
       key === "dateKey" ||
-      key === "displayAllFields"
+      key === "displayAllFields" ||
+      key === "cure" ||
+      key === "smsEnabled"
     ) {
       return false;
     }
@@ -140,6 +156,8 @@ const extractData = (state: Intervention): InterventionData => ({
   isSnow: state.isSnow,
   comment: state.comment,
   additionalInformation: state.additionalInformation,
+  cure: state.cure,
+  smsEnabled: state.smsEnabled,
   status: state.status,
   createdAt: state.createdAt,
   updatedAt: state.updatedAt,
@@ -332,8 +350,14 @@ const NewInterventionSlice = createSlice({
       };
     },
 
-    startNewIntervention: (): Intervention => ({ ...initialState }),
-    clearTask: (): Intervention => ({ ...initialState }),
+    startNewIntervention: (state): Intervention => ({
+      ...initialState,
+      smsEnabled: state.smsEnabled,
+    }),
+    clearTask: (state): Intervention => ({
+      ...initialState,
+      smsEnabled: state.smsEnabled,
+    }),
   },
 });
 
