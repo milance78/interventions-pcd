@@ -432,21 +432,49 @@ export const parseSmartImport = (rawText: string): SmartImportResult => {
   const address = parseStructuredAddress(text);
   const customerRow = extractCustomerRow(text);
 
+  // Intervention ID is also strict. Generic "Identifyer" may represent a
+  // SNOW case number and therefore must not be used as an intervention ID.
   const interventionId = first(
-    findValueBesideLabel(text, ["INTERVENTION_ID", "ID d'intervention", "Identifyer"]),
-    findAfterLabel(text, ["INTERVENTION_ID", "ID d'intervention", "Identifyer"]),
+    findValueBesideLabel(text, ["INTERVENTION_ID", "ID d'intervention"]),
+    findAfterLabel(text, ["INTERVENTION_ID", "ID d'intervention"]),
     findTableValue(text, "ID d'intervention"),
   );
   const oagID = first(
-    findValueBesideLabel(text, ["OAG_ID", "OAG ID / PO ID", "Provisioning Order Id"]),
-    findAfterLabel(text, ["OAG_ID", "OAG ID / PO ID", "Provisioning Order Id"]),
+    findValueBesideLabel(text, ["OAG_ID"]),
+    findAfterLabel(text, ["OAG_ID"]),
+    findValueBesideLabel(text, ["OAG ID / PO ID", "Provisioning Order Id"]),
+    findAfterLabel(text, ["OAG ID / PO ID", "Provisioning Order Id"]),
     findTableValue(text, "OAG ID / PO ID"),
+    findValueBesideLabel(text, ["ORDER_NUM"]),
+    findAfterLabel(text, ["ORDER_NUM"]),
   );
-  const snowReference = first(findAfterLabel(text, ["SNOW_ID"]), findAfterLabel(text, ["Ticket"]));
-  const description = first(
-    findValueBesideLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION", "Descriptions", "SNOW_TITLE"]),
-    findAfterLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION", "Descriptions", "SNOW_TITLE"]),
+  // Référence SNOW is intentionally strict: only the explicit SNOW_ID field
+  // may populate it. Work Item ID, Identifyer, FK_WORKITEM and Ticket are
+  // different identifiers and must never leak into this input.
+  const snowReference = first(
+    findValueBesideLabel(text, ["SNOW_ID"]),
+    findAfterLabel(text, ["SNOW_ID"]),
+  );
+
+  // SAFE/NPS exposes the French wording under "Descriptions" (or sometimes
+  // "Description d'intervention"). Work Item pages usually expose the same
+  // information in English under INTERVENTION_DESCRIPTION or
+  // NPS_EXC_DESCRIPTION. When both sources are pasted together, French always
+  // wins; English remains the fallback when no French value is present.
+  const frenchDescription = first(
+    findValueBesideLabel(text, ["Descriptions", "Description d'intervention"]),
+    findAfterLabel(text, ["Descriptions", "Description d'intervention"]),
     findTableValue(text, "Descriptions"),
+  );
+  const englishDescription = first(
+    findValueBesideLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION"]),
+    findAfterLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION"]),
+  );
+  const description = first(
+    frenchDescription,
+    englishDescription,
+    findValueBesideLabel(text, ["SNOW_TITLE"]),
+    findAfterLabel(text, ["SNOW_TITLE"]),
   );
   const clientID = first(
     findValueBesideLabel(text, ["CUSTOMER_ID", "CUST_NUM"]),
@@ -470,8 +498,16 @@ export const parseSmartImport = (rawText: string): SmartImportResult => {
   // LOM Key is also part of the new-address block and must never be taken
   // from an old-address section.
   const lomKey = address.lomKey;
-  const infrastructure = extractNewAddressInfrastructure(text);
-  const na = infrastructure === "fiber" ? "" : explicitNa;
+  const newAddressInfrastructure = extractNewAddressInfrastructure(text);
+  // A Nouvelle adresse block is authoritative and Ancienne adresse is always
+  // ignored. Work Item-only pastes do not contain an address block, so in that
+  // specific case TECHNOLOGY is accepted as a fallback.
+  const workItemInfrastructure = first(
+    findValueBesideLabel(text, ["TECHNOLOGY"]),
+    findAfterLabel(text, ["TECHNOLOGY"]),
+  );
+  const infrastructure = first(newAddressInfrastructure, workItemInfrastructure);
+  const na = normalizeInfrastructure(infrastructure) === "fiber" ? "" : explicitNa;
   const rawStatus = first(findValueBesideLabel(text, ["Status", "Statut", "NPS_STATUS"]), findAfterLabel(text, ["Status", "Statut", "NPS_STATUS"]), findTableValue(text, "Statut"));
   const comment = first(latestHumanJournalMessage(text), findAfterLabel(text, ["Remarques"]));
 
