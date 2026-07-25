@@ -75,7 +75,9 @@ const splitWideCells = (line: string) =>
 // "Appartement", "N° de bloc" and "LOM Key" into the wrong inputs.
 const splitTableCells = (line: string) =>
   line
-    .split(/\t+| {4}/)
+    // A single tab is one table-cell separator. Do not collapse repeated tabs:
+    // repeated tabs represent intentionally empty cells in copied browser tables.
+    .split(/\t| {4}/)
     .map(clean);
 
 const findValueBesideLabel = (text: string, labels: string[]): string => {
@@ -168,19 +170,30 @@ const extractContactRow = (text: string): Record<string, string> => {
   );
   if (headerIndex < 0) return {};
 
+  const headerCells = splitTableCells(lines[headerIndex]);
   const valueLine = lines.slice(headerIndex + 1, headerIndex + 5).find((line) => line.trim());
   if (!valueLine) return {};
-  const values = splitTableCells(valueLine);
+  const valueCells = splitTableCells(valueLine);
 
-  return {
-    "Type de contact": meaningful(values[0]),
-    "Catégorie de contact": meaningful(values[1]),
-    "Nom de la personne de contact": meaningful(values[2]),
-    "Numéro de contact": meaningful(values[3]),
-    "N° de GSM": meaningful(values[4]),
-    "Adresse e-mail": meaningful(values[5]),
-    "Responsable ventes": meaningful(values[6]),
-  };
+  const labels = [
+    "Type de contact",
+    "Catégorie de contact",
+    "Nom de la personne de contact",
+    "Numéro de contact",
+    "N° de GSM",
+    "Adresse e-mail",
+    "Responsable ventes",
+  ];
+
+  const result: Record<string, string> = {};
+  for (const label of labels) {
+    const index = headerCells.findIndex(
+      (cell) => cell.toLowerCase() === label.toLowerCase(),
+    );
+    result[label] = index >= 0 ? meaningful(valueCells[index]) : "";
+  }
+
+  return result;
 };
 
 const extractNewAddressSection = (text: string): string => {
@@ -220,8 +233,8 @@ const extractNewAddressInfrastructure = (text: string): string => {
 };
 
 const extractAddressRow = (text: string): Record<string, string> => {
-  // Address and infrastructure must come exclusively from the "Nouvelle adresse"
-  // block. Any "Ancienne adresse" block is intentionally ignored.
+  // Address fields are read only from the "Nouvelle adresse" block.
+  // Any "Ancienne adresse" block is intentionally ignored.
   const newAddressSection = extractNewAddressSection(text);
   if (!newAddressSection) return {};
 
@@ -230,10 +243,6 @@ const extractAddressRow = (text: string): Record<string, string> => {
     line.includes("N° de maison alphanumérique") && line.includes("LOM Key"),
   );
   if (headerIndex < 0) return {};
-
-  const valueLine = lines.slice(headerIndex + 1, headerIndex + 5).find((line) => line.trim());
-  if (!valueLine) return {};
-  const values = splitTableCells(valueLine);
 
   const labels = [
     "Pays",
@@ -252,9 +261,27 @@ const extractAddressRow = (text: string): Record<string, string> => {
     "ZONE:",
   ];
 
-  return Object.fromEntries(
-    labels.map((label, index) => [label, meaningful(values[index])]),
-  );
+  const headerCells = splitTableCells(lines[headerIndex]);
+  const valueLine = lines
+    .slice(headerIndex + 1, headerIndex + 6)
+    .find((line) => {
+      const cells = splitTableCells(line);
+      return cells.some((cell) => /Belgique|Belgium/i.test(cell)) ||
+        cells.some((cell) => /^\d{4}$/.test(cell));
+    });
+  if (!valueLine) return {};
+
+  const valueCells = splitTableCells(valueLine);
+  const result: Record<string, string> = {};
+
+  for (const label of labels) {
+    const index = headerCells.findIndex(
+      (cell) => cell.toLowerCase() === label.toLowerCase(),
+    );
+    result[label] = index >= 0 ? meaningful(valueCells[index]) : "";
+  }
+
+  return result;
 };
 
 const extractCustomerRow = (text: string): Record<string, string> => {
@@ -264,15 +291,23 @@ const extractCustomerRow = (text: string): Record<string, string> => {
   );
   if (headerIndex < 0) return {};
 
+  const headerCells = splitTableCells(lines[headerIndex]);
   const valueLine = lines.slice(headerIndex + 1, headerIndex + 5).find((line) => line.trim());
   if (!valueLine) return {};
-  const values = splitTableCells(valueLine);
+  const valueCells = splitTableCells(valueLine);
+
+  const read = (label: string) => {
+    const index = headerCells.findIndex(
+      (cell) => cell.toLowerCase() === label.toLowerCase(),
+    );
+    return index >= 0 ? meaningful(valueCells[index]) : "";
+  };
 
   return {
-    "ID client": meaningful(values[0]),
-    "Partner Account ID": meaningful(values[1]),
-    "Nom de famille": meaningful(values[2]),
-    Prénom: meaningful(values[3]),
+    "ID client": read("ID client"),
+    "Partner Account ID": read("Partner Account ID"),
+    "Nom de famille": read("Nom de famille"),
+    Prénom: read("Prénom"),
   };
 };
 
@@ -415,13 +450,27 @@ const latestHumanJournalMessage = (text: string) => {
   return messages[0] ?? "";
 };
 
-const extractRemarks = (text: string) => {
-  const blocks: string[] = [];
-  const orderRemarks = findAfterLabel(text, ["Remarques ordre"]);
-  const remarks = findAfterLabel(text, ["Remarques"]);
-  if (orderRemarks) blocks.push(`Remarques ordre\n${orderRemarks}`);
-  if (remarks && remarks !== orderRemarks) blocks.push(`Remarques\n${remarks}`);
-  return blocks.join("\n\n");
+const cleanMultiline = (value: string | undefined) =>
+  (value ?? "")
+    .replace(/\u00a0/g, " ")
+    .split(/\r?\n/)
+    .map((line) => clean(line))
+    .filter(Boolean)
+    .join("\n")
+    .trim();
+
+const extractFinalUpdateRemarks = (text: string) => {
+  const sectionIndex = text.toLowerCase().lastIndexOf("mise à jour intervention");
+  if (sectionIndex < 0) return "";
+
+  const section = text.slice(sectionIndex);
+  const match = section.match(
+    /(?:^|\n|\t)\s*Remarques(?!\s+ordre)\s*(?:\t+| {2,}|\n)\s*([\s\S]*?)(?=(?:\t+| {2,}|\n)\s*(?:Action|Route vers|A la clôture|Client en ligne|Retour|Mise à jour|Ajouter Tâche)\b|$)/i,
+  );
+
+  const remarks = cleanMultiline(match?.[1]);
+  if (!remarks || /^(Envoi Notification|Description Notification)$/i.test(remarks)) return "";
+  return remarks;
 };
 
 
@@ -432,49 +481,26 @@ export const parseSmartImport = (rawText: string): SmartImportResult => {
   const address = parseStructuredAddress(text);
   const customerRow = extractCustomerRow(text);
 
-  // Intervention ID is also strict. Generic "Identifyer" may represent a
-  // SNOW case number and therefore must not be used as an intervention ID.
   const interventionId = first(
     findValueBesideLabel(text, ["INTERVENTION_ID", "ID d'intervention"]),
     findAfterLabel(text, ["INTERVENTION_ID", "ID d'intervention"]),
     findTableValue(text, "ID d'intervention"),
   );
   const oagID = first(
-    findValueBesideLabel(text, ["OAG_ID"]),
-    findAfterLabel(text, ["OAG_ID"]),
-    findValueBesideLabel(text, ["OAG ID / PO ID", "Provisioning Order Id"]),
-    findAfterLabel(text, ["OAG ID / PO ID", "Provisioning Order Id"]),
+    findValueBesideLabel(text, ["OAG_ID", "OAG ID / PO ID", "Provisioning Order Id"]),
+    findAfterLabel(text, ["OAG_ID", "OAG ID / PO ID", "Provisioning Order Id"]),
     findTableValue(text, "OAG ID / PO ID"),
-    findValueBesideLabel(text, ["ORDER_NUM"]),
-    findAfterLabel(text, ["ORDER_NUM"]),
   );
-  // Référence SNOW is intentionally strict: only the explicit SNOW_ID field
-  // may populate it. Work Item ID, Identifyer, FK_WORKITEM and Ticket are
-  // different identifiers and must never leak into this input.
   const snowReference = first(
     findValueBesideLabel(text, ["SNOW_ID"]),
     findAfterLabel(text, ["SNOW_ID"]),
   );
-
-  // SAFE/NPS exposes the French wording under "Descriptions" (or sometimes
-  // "Description d'intervention"). Work Item pages usually expose the same
-  // information in English under INTERVENTION_DESCRIPTION or
-  // NPS_EXC_DESCRIPTION. When both sources are pasted together, French always
-  // wins; English remains the fallback when no French value is present.
-  const frenchDescription = first(
+  const description = first(
     findValueBesideLabel(text, ["Descriptions", "Description d'intervention"]),
     findAfterLabel(text, ["Descriptions", "Description d'intervention"]),
+    findValueBesideLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION", "SNOW_TITLE"]),
+    findAfterLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION", "SNOW_TITLE"]),
     findTableValue(text, "Descriptions"),
-  );
-  const englishDescription = first(
-    findValueBesideLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION"]),
-    findAfterLabel(text, ["INTERVENTION_DESCRIPTION", "NPS_EXC_DESCRIPTION"]),
-  );
-  const description = first(
-    frenchDescription,
-    englishDescription,
-    findValueBesideLabel(text, ["SNOW_TITLE"]),
-    findAfterLabel(text, ["SNOW_TITLE"]),
   );
   const clientID = first(
     findValueBesideLabel(text, ["CUSTOMER_ID", "CUST_NUM"]),
@@ -484,8 +510,8 @@ export const parseSmartImport = (rawText: string): SmartImportResult => {
   // Partner Account ID is not an NA value. NA is imported only when an
   // explicit NA field exists, and it remains empty for fibre interventions.
   const explicitNa = first(
-    findValueBesideLabel(text, ["NA"]),
-    findAfterLabel(text, ["NA"]),
+    findValueBesideLabel(text, ["NA / CID", "NA"]),
+    findAfterLabel(text, ["NA / CID", "NA"]),
   );
   const contactRow = extractContactRow(text);
   const phone = first(
@@ -498,18 +524,13 @@ export const parseSmartImport = (rawText: string): SmartImportResult => {
   // LOM Key is also part of the new-address block and must never be taken
   // from an old-address section.
   const lomKey = address.lomKey;
-  const newAddressInfrastructure = extractNewAddressInfrastructure(text);
-  // A Nouvelle adresse block is authoritative and Ancienne adresse is always
-  // ignored. Work Item-only pastes do not contain an address block, so in that
-  // specific case TECHNOLOGY is accepted as a fallback.
-  const workItemInfrastructure = first(
-    findValueBesideLabel(text, ["TECHNOLOGY"]),
-    findAfterLabel(text, ["TECHNOLOGY"]),
-  );
-  const infrastructure = first(newAddressInfrastructure, workItemInfrastructure);
-  const na = normalizeInfrastructure(infrastructure) === "fiber" ? "" : explicitNa;
+  const infrastructure = extractNewAddressInfrastructure(text);
+  const na = infrastructure === "fiber" ? "" : explicitNa;
   const rawStatus = first(findValueBesideLabel(text, ["Status", "Statut", "NPS_STATUS"]), findAfterLabel(text, ["Status", "Statut", "NPS_STATUS"]), findTableValue(text, "Statut"));
-  const comment = first(latestHumanJournalMessage(text), findAfterLabel(text, ["Remarques"]));
+  const finalRemarks = extractFinalUpdateRemarks(text);
+  const comment = finalRemarks
+    ? `Remarque préexistante:\n${finalRemarks}`
+    : latestHumanJournalMessage(text);
 
   const values: Partial<InterventionData> = {
     interventionId,
