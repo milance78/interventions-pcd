@@ -30,11 +30,9 @@ const NetworkInput = () => {
         id="network-label"
         shrink={!isDefault}
         sx={{
-          color: "#9aa7bb",
-          fontWeight: 400,
+          color: "grey",
           "&.Mui-focused": {
-            color: "#7f8da3",
-            fontWeight: 400,
+            color: "#545454",
           },
           opacity: isDefault ? 0 : 1,
           transition: (theme) =>
@@ -54,12 +52,6 @@ const NetworkInput = () => {
         notched={!isDefault}
         onChange={handleChange}
         sx={{
-          "& .MuiSelect-select": {
-            display: "flex",
-            alignItems: "center",
-            fontWeight: isDefault ? 400 : 600,
-            color: isDefault ? "#9aa7bb" : "#111827",
-          },
           "& .MuiOutlinedInput-notchedOutline": {
             borderColor: "#bdbdbd",
           },
@@ -76,8 +68,7 @@ const NetworkInput = () => {
             return (
               <span
                 style={{
-                  color: "#9aa7bb",
-                  fontWeight: 400,
+                  color: "#777",
                 }}
               >
                 {"R\xE9seau"}

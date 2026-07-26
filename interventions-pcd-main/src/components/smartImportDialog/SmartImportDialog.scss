@@ -1,0 +1,108 @@
+.smart-import-trigger {
+  min-height: 38px !important;
+  padding: 7px 15px !important;
+  color: #5b21b6 !important;
+  background: linear-gradient(135deg, #faf5ff, #eef2ff) !important;
+  border-color: #c4b5fd !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+  box-shadow: 0 4px 12px rgba(91, 33, 182, 0.09);
+
+  &:hover {
+    background: linear-gradient(135deg, #f3e8ff, #e0e7ff) !important;
+    border-color: #8b5cf6 !important;
+  }
+}
+
+.smart-import-dialog {
+  .MuiPaper-root {
+    overflow: hidden;
+    border: 1px solid #d8d4fe;
+    border-radius: 20px;
+    box-shadow: 0 30px 80px rgba(30, 27, 75, 0.28);
+  }
+}
+
+.smart-import-dialog__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px !important;
+  color: #312e81;
+  background: linear-gradient(135deg, #faf5ff, #eef2ff);
+  border-bottom: 1px solid #ddd6fe;
+
+  > span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    font-weight: 800;
+  }
+}
+
+.smart-import-dialog__content {
+  position: relative;
+  padding: 24px !important;
+  background: #f8fafc;
+}
+
+.smart-import-dialog__paste-target {
+  position: absolute;
+  inset: 24px;
+  z-index: 2;
+  width: calc(100% - 48px);
+  height: calc(100% - 48px);
+  opacity: 0;
+  cursor: paste;
+}
+
+.smart-import-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 270px;
+  padding: 34px;
+  text-align: center;
+  background: #fff;
+  border: 2px dashed #a5b4fc;
+  border-radius: 16px;
+  cursor: text;
+
+  strong {
+    margin-top: 14px;
+    color: #1e293b;
+    font-size: 18px;
+  }
+
+  span {
+    max-width: 390px;
+    margin-top: 8px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  kbd {
+    margin-top: 20px;
+    padding: 8px 14px;
+    color: #4338ca;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-bottom-width: 3px;
+    border-radius: 8px;
+    font: 700 14px/1 system-ui, sans-serif;
+  }
+}
+
+.smart-import-dropzone__icon {
+  width: 54px !important;
+  height: 54px !important;
+  color: #7c3aed;
+}
+
+.smart-import-dropzone--processing {
+  cursor: wait;
+  border-style: solid;
+}

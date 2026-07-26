@@ -73,9 +73,9 @@ const NpsCopyIcon = forwardRef<SVGSVGElement, NpsCopyIconProps>(
 
         <rect
           x="1.5"
-          y="17.5"
+          y="18"
           width="29"
-          height="14"
+          height="13"
           rx="4.6"
           fill={`url(#${badgeGradientId})`}
           stroke="#FFFFFF"
@@ -84,7 +84,7 @@ const NpsCopyIcon = forwardRef<SVGSVGElement, NpsCopyIconProps>(
         />
         <text
           x="16"
-          y="29"
+          y="27.65"
           textAnchor="middle"
           fill="#FFFFFF"
           fontFamily="Arial, Helvetica, sans-serif"

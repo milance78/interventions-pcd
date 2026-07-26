@@ -1,40 +1,42 @@
 import * as React from "react";
-import "./NetworkInput.scss";
+import "./StatusInput.scss";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
-import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import { updateField } from "../../../redux/features/newInterventionSlice";
-const NetworkInput = () => {
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
+const StatusInput = () => {
   const dispatch = useAppDispatch();
-  const network = useAppSelector((state) => state.newIntervention.network);
+  const status = useAppSelector((state) => state.newIntervention.status);
   const handleChange = (event) => {
     dispatch(
       updateField({
-        field: "network",
+        field: "status",
         value: event.target.value,
       }),
     );
   };
-  const isDefault = network === "";
+  const isDefault = status === "";
   return (
     <FormControl
       variant="outlined"
+      className="status-input"
       size="small"
-      sx={{
-        width: "50%",
-      }}
+      fullWidth
     >
       <InputLabel
-        id="network-label"
+        className="status-label"
+        id="status-label"
         shrink={!isDefault}
         sx={{
-          color: "#9aa7bb",
-          fontWeight: 400,
+          color: "grey",
+          backgroundColor: "white",
+          padding: "0 6px",
+          borderRadius: "5px",
+          marginLeft: "-5px",
           "&.Mui-focused": {
-            color: "#7f8da3",
-            fontWeight: 400,
+            color: "#545454",
           },
           opacity: isDefault ? 0 : 1,
           transition: (theme) =>
@@ -43,22 +45,31 @@ const NetworkInput = () => {
             }),
         }}
       >
-        {"R\xE9seau"}
+        {"Status"}
       </InputLabel>
       <Select
-        labelId="network-label"
-        id="network-select"
-        value={network}
-        label="Réseau"
+        className="status-select"
+        labelId="status-label"
+        id="status-select"
+        value={status}
+        label="Status"
         displayEmpty
         notched={!isDefault}
         onChange={handleChange}
         sx={{
           "& .MuiSelect-select": {
+            backgroundColor:
+              status === ""
+                ? "#e5cce5"
+                : status === "completed"
+                  ? "#bbffbb"
+                  : status === "on hold"
+                    ? "#ffbbbb"
+                    : "#fff898",
             display: "flex",
             alignItems: "center",
-            fontWeight: isDefault ? 400 : 600,
-            color: isDefault ? "#9aa7bb" : "#111827",
+            justifyContent: "center",
+            textAlign: "center",
           },
           "& .MuiOutlinedInput-notchedOutline": {
             borderColor: "#bdbdbd",
@@ -76,34 +87,30 @@ const NetworkInput = () => {
             return (
               <span
                 style={{
-                  color: "#9aa7bb",
-                  fontWeight: 400,
+                  color: "#777",
                 }}
               >
-                {"R\xE9seau"}
+                {"Status"}
               </span>
             );
           }
           switch (selected) {
-            case "proximus":
-              return "Proximus";
-            case "scarlet":
-              return "Scarlet";
-            case "mobileVikings":
-              return "Mobile Vikings";
-            case "otherOlo":
-              return "Autre OLO";
+            case "completed":
+              return "Terminé";
+            case "on hold":
+              return "En attente";
+            case "transferred":
+              return "Transmis";
             default:
               return "";
           }
         }}
       >
-        <MenuItem value="proximus">{"Proximus"}</MenuItem>
-        <MenuItem value="scarlet">{"Scarlet"}</MenuItem>
-        <MenuItem value="mobileVikings">{"M. Vikings OLO"}</MenuItem>
-        <MenuItem value="otherOlo">{"Autre OLO"}</MenuItem>
+        <MenuItem value="completed">{"Termin\xE9"}</MenuItem>
+        <MenuItem value="on hold">{"En attente"}</MenuItem>
+        <MenuItem value="transferred">{"Transmis"}</MenuItem>
       </Select>
     </FormControl>
   );
 };
-export default NetworkInput;
+export default StatusInput;

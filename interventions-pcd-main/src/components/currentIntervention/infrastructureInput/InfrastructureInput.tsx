@@ -32,16 +32,9 @@ const InfrastructureInput = () => {
         id="infrastructure-label"
         shrink={!isEmpty}
         sx={{
-          color: "#9aa7bb",
-          fontWeight: 400,
-          opacity: isEmpty ? 0 : 1,
-          transition: (theme) =>
-            theme.transitions.create(["transform", "opacity"], {
-              duration: theme.transitions.duration.shorter,
-            }),
+          color: "#777",
           "&.Mui-focused": {
-            color: "#7f8da3",
-            fontWeight: 400,
+            color: "#545454",
           },
         }}
       >
@@ -60,8 +53,7 @@ const InfrastructureInput = () => {
             return (
               <span
                 style={{
-                  color: "#9aa7bb",
-                  fontWeight: 400,
+                  color: "#777",
                 }}
               >
                 {"Infrastructure"}
@@ -74,8 +66,6 @@ const InfrastructureInput = () => {
           "& .MuiSelect-select": {
             display: "flex",
             alignItems: "center",
-            fontWeight: isEmpty ? 400 : 600,
-            color: isEmpty ? "#9aa7bb" : "#111827",
           },
           "& .MuiOutlinedInput-notchedOutline": {
             borderColor: "#bdbdbd",
