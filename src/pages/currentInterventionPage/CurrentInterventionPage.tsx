@@ -8,6 +8,7 @@ import CloseRounded from "@mui/icons-material/CloseRounded";
 import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
 import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
+import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
 import Send from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
@@ -63,7 +64,6 @@ import { ReactComponent as QuestionMarkOffIcon } from "../../assets/svg/Question
 import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
 import { ReactComponent as SnowOffIcon } from "../../assets/svg/Snow off.svg.tsx";
 import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
-import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
 
 type CopyButtonProps = {
@@ -154,7 +154,7 @@ const CopyButton = ({
           {copied ? (
             <CheckRounded fontSize="small" />
           ) : (
-            <CopyIcon />
+            <ContentCopyRounded fontSize="small" />
           )}
         </IconButton>
       </span>
@@ -886,8 +886,16 @@ const CurrentInterventionPage = () => {
         >
           <WarningAmberRounded />
           <span>
-            <strong>Brouillon en cours</strong>
-            <small>Reprendre la saisie</small>
+            <strong>
+              Brouillon
+              <br />
+              en cours
+            </strong>
+            <small>
+              Reprendre
+              <br />
+              la saisie
+            </small>
           </span>
         </button>
       )}

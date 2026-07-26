@@ -1,11 +1,12 @@
-COPY ICONS UNIFIED + NPS READABILITY — v33
+MERGED FIX — v35
+
+This patch restores the narrow floating draft reminder and keeps the latest NPS icon sizing.
+
+Included:
+- CurrentInterventionPage.tsx from v32:
+  Brouillon / en cours / Reprendre / la saisie line breaks
+- CurrentInterventionPage.scss from v32:
+  narrow floating card, warning icon above, flat bottom edge, no pointer
+- Latest NPS copy SVG and 32 × 32 NPS button sizing from v34
 
 Replace the included src files.
-
-Changes:
-- Replaces the ordinary MUI copy icon everywhere in the project with a custom SVG.
-- The new ordinary copy icon uses the same document artwork as the NPS icon, including all three text lines.
-- Existing ordinary copy button border/frame dimensions remain 32x32.
-- NPS letters are substantially larger and more readable.
-- NPS button keeps the same width but is allowed a taller 32x42 frame.
-- Copy behavior and all existing clipboard logic remain unchanged.
