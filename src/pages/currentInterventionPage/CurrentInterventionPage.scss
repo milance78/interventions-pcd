@@ -299,6 +299,12 @@
     width: 32px;
     height: 32px;
 
+    svg {
+      width: 23px;
+      height: 23px;
+      overflow: visible;
+    }
+
     color: #475569 !important;
     background: rgba(241,
         245,
@@ -340,8 +346,8 @@
 
   .nps-copy-button {
     svg {
-      width: 25px;
-      height: 25px;
+      width: 24px;
+      height: 24px;
       overflow: visible;
     }
 
