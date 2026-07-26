@@ -30,7 +30,7 @@ const CopyIcon = forwardRef<SVGSVGElement, CopyIconProps>(
             dx="0"
             dy="1.2"
             stdDeviation="1.2"
-            floodColor="#334155"
+            floodColor="#64748B"
             floodOpacity="0.24"
           />
         </filter>
@@ -42,8 +42,8 @@ const CopyIcon = forwardRef<SVGSVGElement, CopyIconProps>(
         width="15"
         height="18"
         rx="2.5"
-        fill="#CBD5E1"
-        stroke="#64748B"
+        fill="#E2E8F0"
+        stroke="#A8B4C6"
         strokeWidth="1.4"
       />
       <rect
@@ -53,13 +53,13 @@ const CopyIcon = forwardRef<SVGSVGElement, CopyIconProps>(
         height="19"
         rx="2.8"
         fill="url(#copyPaper)"
-        stroke="#475569"
+        stroke="#B5C0D0"
         strokeWidth="1.5"
         filter="url(#copyShadow)"
       />
-      <path d="M13 12H21" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M13 15.5H21" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
-      <path d="M13 19H21" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M13 12H21" stroke="#B5C0D0" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M13 15.5H21" stroke="#B5C0D0" strokeWidth="1.5" strokeLinecap="round" />
+      <path d="M13 19H21" stroke="#B5C0D0" strokeWidth="1.5" strokeLinecap="round" />
     </svg>
   ),
 );

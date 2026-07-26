@@ -1,12 +1,10 @@
-MERGED FIX — v35
+COPY ICONS — SOFT GLOBAL VERSION v36
 
-This patch restores the narrow floating draft reminder and keeps the latest NPS icon sizing.
+Copy the included src folder into the project and replace existing files.
 
-Included:
-- CurrentInterventionPage.tsx from v32:
-  Brouillon / en cours / Reprendre / la saisie line breaks
-- CurrentInterventionPage.scss from v32:
-  narrow floating card, warning icon above, flat bottom edge, no pointer
-- Latest NPS copy SVG and 32 × 32 NPS button sizing from v34
-
-Replace the included src files.
+Changes:
+- The new Copy.svg.tsx keeps the same artwork and dimensions.
+- Gray strokes/fills are lighter and softer, matching the previous subtle icon tone.
+- NPS copy icon uses the same soft gray palette while preserving the purple NPS badge.
+- Every remaining ContentCopyRounded usage in the project is replaced by the custom CopyIcon.
+- Existing button frame sizes and copy behavior are unchanged.
