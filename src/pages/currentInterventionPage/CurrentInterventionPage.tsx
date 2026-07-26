@@ -5,6 +5,9 @@ import DeleteSweepRounded from "@mui/icons-material/DeleteSweepRounded";
 import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
+import CallRounded from "@mui/icons-material/CallRounded";
+import CloseRounded from "@mui/icons-material/CloseRounded";
+import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
 import Send from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
 import ButtonGroup from "@mui/material/ButtonGroup";
@@ -64,8 +67,6 @@ import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
-import VoiceMessageCall3 from "../../assets/icons/VoiceMessageCall3.png";
-import VoiceMessageCallX from "../../assets/icons/VoiceMessageCallX.png";
 
 type CopyButtonProps = {
   value: string;
@@ -583,6 +584,32 @@ const CurrentInterventionPage = () => {
                 />
               </div>
 
+              <div
+                className={`option-button cure-summary-card ${
+                  cure === "firstCure" || cure === "secondCure"
+                    ? "cure-summary-card--filled"
+                    : "cure-summary-card--empty"
+                }`}
+                aria-live="polite"
+                aria-label={
+                  cure === "firstCure"
+                    ? "CURE 1"
+                    : cure === "secondCure"
+                      ? "CURE 2"
+                      : "Emplacement CURE vide"
+                }
+              >
+                {(cure === "firstCure" || cure === "secondCure") && (
+                  <img
+                    src={cure === "firstCure" ? VoiceMessageCall1 : VoiceMessageCall2}
+                    alt=""
+                    aria-hidden="true"
+                    className="cure-summary-card__icon"
+                    draggable={false}
+                  />
+                )}
+              </div>
+
             </div>
           </section>
         </section>
@@ -630,25 +657,41 @@ const CurrentInterventionPage = () => {
               {[
                 {
                   value: "noCure",
-                  icon: VoiceMessageCallX,
-                  alt: "Aucun appel",
+                  label: (
+                    <span className="no-cure-phone-icon" aria-hidden="true">
+                      <CallRounded className="no-cure-phone-icon__phone" />
+                      <CloseRounded className="no-cure-phone-icon__cross" />
+                    </span>
+                  ),
                 },
                 {
                   value: "firstCure",
-                  icon: VoiceMessageCall1,
-                  alt: "Premier appel avec message vocal",
+                  label: (
+                    <>
+                      <span>1.</span>
+                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
+                    </>
+                  ),
                 },
                 {
                   value: "secondCure",
-                  icon: VoiceMessageCall2,
-                  alt: "Deuxième appel avec message vocal",
+                  label: (
+                    <>
+                      <span>2.</span>
+                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
+                    </>
+                  ),
                 },
                 {
                   value: "thirdCure",
-                  icon: VoiceMessageCall3,
-                  alt: "Troisième appel avec message vocal",
+                  label: (
+                    <>
+                      <span>3.</span>
+                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
+                    </>
+                  ),
                 },
-              ].map(({ value, icon, alt }) => (
+              ].map(({ value, label }) => (
                 <Button
                   key={value}
                   type="button"
@@ -665,12 +708,7 @@ const CurrentInterventionPage = () => {
                       : `${value === "firstCure" ? "1er" : value === "secondCure" ? "2ème" : "3ème"} CURE`
                   }
                 >
-                  <img
-                    src={icon}
-                    alt={alt}
-                    className="cure-selector__image"
-                    draggable={false}
-                  />
+                  {label}
                 </Button>
               ))}
             </ButtonGroup>

@@ -1255,64 +1255,87 @@
 }
 
 
-/* v49 — PNG CURE artwork icons, matched to the 44px address controls */
-.current-intervention-page .cure-selector__buttons {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-}
+/* v51 — fixed fourth CURE slot and stable top controls. */
+.current-intervention-page {
+  .boolean-inputs-row {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 
-.current-intervention-page
-  .cure-selector
-  .cure-selector__button.MuiButtonBase-root {
-  width: 44px !important;
-  min-width: 44px !important;
-  height: 44px !important;
-  min-height: 44px !important;
-  padding: 0 !important;
-  overflow: visible;
-  border: 0 !important;
-  border-radius: 12px !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  filter: drop-shadow(0 4px 4px rgba(15, 23, 42, 0.22));
-  transform: translateY(0);
-}
+  .cure-summary-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    cursor: default;
+    background: linear-gradient(145deg, #f8fbff, #edf5ff);
+    border-color: #93c5fd;
+    box-shadow:
+      0 5px 12px rgba(30, 64, 175, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
 
-.current-intervention-page
-  .cure-selector
-  .cure-selector__button.MuiButtonBase-root:hover:not(:disabled) {
-  background: transparent !important;
-  border: 0 !important;
-  filter: drop-shadow(0 4px 4px rgba(15, 23, 42, 0.26)) brightness(0.975);
-  transform: translateY(0);
-}
+  .cure-summary-card:hover {
+    transform: none !important;
+    background: linear-gradient(145deg, #f8fbff, #edf5ff);
+    border-color: #93c5fd;
+    box-shadow:
+      0 5px 12px rgba(30, 64, 175, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
 
-.current-intervention-page
-  .cure-selector
-  .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
-.current-intervention-page
-  .cure-selector
-  .cure-selector__button--active.MuiButtonBase-root {
-  background: rgba(148, 163, 184, 0.06) !important;
-  border: 0 !important;
-  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.12) !important;
-  filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.08));
-  transform: translateY(1.5px);
-}
+  .cure-summary-card--empty {
+    min-height: 64px;
+  }
 
-.current-intervention-page .cure-selector__image {
-  display: block;
-  width: 44px;
-  height: 44px;
-  max-width: none;
-  object-fit: contain;
-  pointer-events: none;
-  user-select: none;
-}
+  .cure-summary-card__icon {
+    display: block;
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+  }
 
-.current-intervention-page--history
-  .cure-selector__button.Mui-disabled
-  .cure-selector__image {
-  opacity: 1;
+  .cure-selector__buttons {
+    gap: 6px;
+  }
+
+  .cure-selector .cure-selector__button.MuiButtonBase-root,
+  .sms-toggle-button.MuiButtonBase-root {
+    min-height: 29px !important;
+    border-radius: 999px !important;
+    transition:
+      box-shadow 120ms ease,
+      filter 120ms ease,
+      background-color 120ms ease,
+      border-color 120ms ease !important;
+  }
+
+  /* No hover movement for CURE or SMS controls. */
+  .cure-selector .cure-selector__button.MuiButtonBase-root:hover:not(:disabled),
+  .sms-toggle-button.MuiButtonBase-root:hover:not(:disabled) {
+    transform: none !important;
+  }
+
+  /* Keep the inset pressed/selected effect. */
+  .cure-selector .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
+  .sms-toggle-button.MuiButtonBase-root:active:not(:disabled),
+  .cure-selector .cure-selector__button--active.MuiButtonBase-root,
+  .sms-toggle-button--active.MuiButtonBase-root {
+    transform: translateY(1.5px) scale(0.985) !important;
+    box-shadow:
+      inset 0 2px 4px rgba(15, 23, 42, 0.18),
+      0 1px 1px rgba(255, 255, 255, 0.75) !important;
+  }
+
+  .cure-selector .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
+  .sms-toggle-button.MuiButtonBase-root:active:not(:disabled) {
+    filter: brightness(0.985);
+  }
+
+  @media (max-width: 900px) {
+    .boolean-inputs-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
 }
