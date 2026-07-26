@@ -640,9 +640,9 @@ const HistoryPage = () => {
                           />
                         )}
 
-                        {hasValue(intervention.snowReference) && (
+                        {hasValue(intervention.snowReceived) && (
                           <IconValue
-                            value={intervention.snowReference}
+                            value={intervention.snowReceived}
                             icon={Numbers}
                           />
                         )}

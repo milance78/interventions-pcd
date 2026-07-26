@@ -22,8 +22,8 @@ const InputsFiber = () => {
         icon={OAGIcon}
       />
       <SimpleInput
-        field="snowReference"
-        label="Référence SNOW"
+        field="snowReceived"
+        label="Snow reçu"
         inputType="type2"
         icon={Numbers}
       />

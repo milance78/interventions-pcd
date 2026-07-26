@@ -1,6 +1,5 @@
 import "./InputsAll.scss";
 
-import Numbers from "@mui/icons-material/Numbers";
 import {
   Contact,
   House,
@@ -10,6 +9,7 @@ import {
 } from "lucide-react";
 
 import SimpleInput from "../simpleInput/SimpleInput";
+import SnowPendingInput from "../snowPendingInput/SnowPendingInput";
 import AddressMiniInput from "../addressMiniInput/AddressMiniInput";
 
 import { ReactComponent as CIDIcon } from "../../../assets/svg/CID.svg.tsx";
@@ -36,14 +36,23 @@ const InputsAll = () => {
         />
       </section>
 
-      <section className="inputs-row inputs-row--half">
-        <SimpleInput
-          field="snowReference"
-          label="Référence SNOW"
-          inputType="type2"
-          icon={Numbers}
+      <section className="inputs-row inputs-row--snow">
+        <SnowPendingInput
+          field="snowSent"
+          pendingField="isSnowSentPending"
+          label="Snow envoyé"
+          pendingLabel="Snow envoyé en attente"
         />
 
+        <SnowPendingInput
+          field="snowReceived"
+          pendingField="isSnowReceivedPending"
+          label="Snow reçu"
+          pendingLabel="Snow reçu en attente"
+        />
+      </section>
+
+      <section className="inputs-row inputs-row--full">
         <SimpleInput
           field="clientID"
           label="ID client"

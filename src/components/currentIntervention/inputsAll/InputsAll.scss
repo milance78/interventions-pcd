@@ -35,6 +35,13 @@
     }
   }
 
+  .inputs-row--snow {
+    > * {
+      flex: 1 1 50%;
+      min-width: 0;
+    }
+  }
+
 
   .inputs-row--address-details {
     > .address-mini-input {
@@ -67,6 +74,7 @@
 
     .inputs-row--half,
     .inputs-row--full,
+    .inputs-row--snow,
   
   .inputs-row--address-details {
     > .address-mini-input {

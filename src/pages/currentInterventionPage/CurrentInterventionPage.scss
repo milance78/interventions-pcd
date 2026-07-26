@@ -1341,7 +1341,7 @@
 }
 
 
-/* v53 — stable CURE/SMS buttons: no hover movement in any state */
+/* v53 retained — stable CURE/SMS pressed state */
 .current-intervention-page {
   .cure-selector .cure-selector__button.MuiButtonBase-root,
   .sms-toggle-button.MuiButtonBase-root {
@@ -1356,25 +1356,17 @@
       color 120ms ease !important;
   }
 
-  .cure-selector .cure-selector__button.MuiButtonBase-root:hover:not(:disabled),
-  .sms-toggle-button.MuiButtonBase-root:hover:not(:disabled) {
+  .cure-selector .cure-selector__button.MuiButtonBase-root:hover,
+  .sms-toggle-button.MuiButtonBase-root:hover {
     transform: none !important;
     translate: none !important;
     scale: 1 !important;
   }
 
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root,
+  .cure-selector .cure-selector__button--active.MuiButtonBase-root,
   .sms-toggle-button--active.MuiButtonBase-root,
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root:hover:not(:disabled),
-  .sms-toggle-button--active.MuiButtonBase-root:hover:not(:disabled),
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root:focus,
-  .sms-toggle-button--active.MuiButtonBase-root:focus,
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root:focus-visible,
-  .sms-toggle-button--active.MuiButtonBase-root:focus-visible {
+  .cure-selector .cure-selector__button--active.MuiButtonBase-root:hover,
+  .sms-toggle-button--active.MuiButtonBase-root:hover {
     transform: translateY(1.5px) scale(0.985) !important;
     translate: none !important;
     scale: 1 !important;
@@ -1382,12 +1374,55 @@
       inset 0 2px 4px rgba(15, 23, 42, 0.18),
       0 1px 1px rgba(255, 255, 255, 0.75) !important;
   }
+}
 
-  .cure-selector
-    .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
-  .sms-toggle-button.MuiButtonBase-root:active:not(:disabled) {
-    transform: translateY(1.5px) scale(0.985) !important;
-    translate: none !important;
-    scale: 1 !important;
+/* v54 — independent SNOW sent/received fixed slots */
+.current-intervention-page {
+  .boolean-inputs-row {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .snow-pending-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 64px;
+    padding: 4px 8px;
+    cursor: default;
+    background: linear-gradient(145deg, #f8fbff, #edf5ff);
+    border-color: #93c5fd;
+    box-shadow:
+      0 5px 12px rgba(30, 64, 175, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  .snow-pending-card:hover {
+    transform: none !important;
+    background: linear-gradient(145deg, #f8fbff, #edf5ff);
+    border-color: #93c5fd;
+    box-shadow:
+      0 5px 12px rgba(30, 64, 175, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  .snow-pending-card__icon {
+    display: block;
+    width: 50px;
+    height: 50px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  @media (max-width: 1100px) {
+    .boolean-inputs-row {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 680px) {
+    .boolean-inputs-row {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 }

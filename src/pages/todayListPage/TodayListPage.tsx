@@ -270,7 +270,7 @@ const TodayListPage = () => {
                 intervention.addressDetails,
               ) ||
               hasValue(
-                intervention.snowReference,
+                intervention.snowReceived,
               );
 
             const hasClientsOnAddress =
@@ -520,11 +520,11 @@ const TodayListPage = () => {
                     )}
 
                     {hasValue(
-                      intervention.snowReference,
+                      intervention.snowReceived,
                     ) && (
                       <TodayIconValue
                         value={
-                          intervention.snowReference
+                          intervention.snowReceived
                         }
                         icon={Numbers}
                       />

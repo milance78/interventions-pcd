@@ -39,7 +39,10 @@ export interface InterventionData {
   LOMKey: string;
   phone: string;
   displayAllFields: boolean;
-  snowReference: string;
+  snowReceived: string;
+  snowSent: string;
+  isSnowReceivedPending: boolean;
+  isSnowSentPending: boolean;
   isUnclear: boolean;
   addressConfirmation: AddressConfirmation;
   isGoodExample: boolean;
@@ -92,7 +95,10 @@ export const emptyInterventionData: InterventionData = {
   LOMKey: "",
   phone: "",
   displayAllFields: false,
-  snowReference: "",
+  snowReceived: "",
+  snowSent: "",
+  isSnowReceivedPending: false,
+  isSnowSentPending: false,
   isUnclear: false,
   addressConfirmation: "none",
   isGoodExample: false,
@@ -151,7 +157,10 @@ const extractData = (state: Intervention): InterventionData => ({
   LOMKey: state.LOMKey,
   phone: state.phone,
   displayAllFields: state.displayAllFields,
-  snowReference: state.snowReference,
+  snowReceived: state.snowReceived,
+  snowSent: state.snowSent,
+  isSnowReceivedPending: state.isSnowReceivedPending,
+  isSnowSentPending: state.isSnowSentPending,
   isUnclear: state.isUnclear,
   addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,
@@ -214,6 +223,14 @@ const NewInterventionSlice = createSlice({
           InterventionData[InterventionField]
         >
       )[field] = value;
+
+      if (
+        field === "isSnowReceivedPending" ||
+        field === "isSnowSentPending"
+      ) {
+        state.isSnow =
+          state.isSnowReceivedPending || state.isSnowSentPending;
+      }
 
       if (state.mode === "NEW" || state.mode === "DRAFT") {
         const draft = extractData(state);

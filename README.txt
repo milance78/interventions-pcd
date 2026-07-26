@@ -1,10 +1,10 @@
-CURE / SMS STABLE PRESSED STATE — v53
+SNOW INPUTS + EN ATTENTE BUTTONS — v55
 
-Changes only:
-src/pages/currentInterventionPage/CurrentInterventionPage.scss
-
-Fix:
-- No CURE or SMS button moves on hover.
-- An active/selected button stays permanently inset while hovered.
-- Hover no longer overrides the selected transform.
-- The transform property is removed from transitions, preventing visible jumping.
+- Snow envoyé and Snow reçu are ordinary independent string fields.
+- isSnowSentPending and isSnowReceivedPending are independent booleans.
+- Typing text does not activate any lower icon.
+- Each yellow En attente button controls only its matching icon.
+- Pressed effect is fixed; active buttons do not jump on hover.
+- Both lower icons can appear simultaneously.
+- Arrows have dark border, gradient, highlight and 3D shadow.
+- Legacy Firebase snowReference is read as snowReceived.

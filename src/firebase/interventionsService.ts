@@ -55,8 +55,31 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
             ? "notConfirmed"
             : "none";
 
+  const snowReceived =
+    data.snowReceived ??
+    data.snowReference ??
+    data.snowReceivedPending ??
+    "";
+  const snowSent =
+    data.snowSent ??
+    data.snowSentPending ??
+    data.snowEnvoyePending ??
+    "";
+
+  const isSnowReceivedPending = Boolean(
+    data.isSnowReceivedPending ?? false,
+  );
+  const isSnowSentPending = Boolean(
+    data.isSnowSentPending ?? false,
+  );
+
   return {
     ...dataWithoutLegacyAddress,
+    snowReceived,
+    snowSent,
+    isSnowReceivedPending,
+    isSnowSentPending,
+    isSnow: isSnowReceivedPending || isSnowSentPending,
     comment,
     addressConfirmation,
     additionalInformation:

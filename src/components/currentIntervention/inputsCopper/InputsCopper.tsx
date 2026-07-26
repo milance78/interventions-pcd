@@ -18,8 +18,8 @@ const InputsCopper = () => {
       />
       <SimpleInput field="na" label="NA" inputType="type2" icon={NAIcon} />
       <SimpleInput
-        field="snowReference"
-        label="Référence SNOW"
+        field="snowReceived"
+        label="Snow reçu"
         inputType="type2"
         icon={Numbers}
       />

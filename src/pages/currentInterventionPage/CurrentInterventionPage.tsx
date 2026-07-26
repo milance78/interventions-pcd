@@ -61,8 +61,8 @@ import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb 
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
 import { ReactComponent as QuestionMarkOffIcon } from "../../assets/svg/Question mark off.svg.tsx";
 import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
-import { ReactComponent as SnowOffIcon } from "../../assets/svg/Snow off.svg.tsx";
-import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
+import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
+import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
 import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
@@ -233,6 +233,8 @@ const CurrentInterventionPage = () => {
     additionalInformation,
     cure,
     smsEnabled,
+    isSnowReceivedPending,
+    isSnowSentPending,
     addressConfirmation,
     isEditing,
     isHistoryView,
@@ -549,13 +551,32 @@ const CurrentInterventionPage = () => {
             </span>
 
             <div className="boolean-inputs-row">
-              <div className="option-button">
-                <BooleanInput
-                  field="isSnow"
-                  label="Ticket Snow ?"
-                  trueIcon={<SnowOnIcon />}
-                  falseIcon={<SnowOffIcon />}
-                />
+              <div
+                className={`option-button snow-pending-card ${
+                  isSnowSentPending
+                    ? "snow-pending-card--filled"
+                    : "snow-pending-card--empty"
+                }`}
+                aria-label="Snow envoyé en attente"
+                title="Snow envoyé en attente"
+              >
+                {isSnowSentPending && (
+                  <SnowSentPendingIcon className="snow-pending-card__icon" />
+                )}
+              </div>
+
+              <div
+                className={`option-button snow-pending-card ${
+                  isSnowReceivedPending
+                    ? "snow-pending-card--filled"
+                    : "snow-pending-card--empty"
+                }`}
+                aria-label="Snow reçu en attente"
+                title="Snow reçu en attente"
+              >
+                {isSnowReceivedPending && (
+                  <SnowReceivedPendingIcon className="snow-pending-card__icon" />
+                )}
               </div>
 
               <div className="option-button">

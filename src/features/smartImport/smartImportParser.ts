@@ -374,7 +374,7 @@ const parseSafe = (text: string): ParsedSource => {
 };
 
 const parseWorkItem = (text: string): ParsedSource => {
-  const snowReference = extractLabelValue(text, ["SNOW_ID"]);
+  const snowReceived = extractLabelValue(text, ["SNOW_ID"]);
   const infrastructureRaw = extractLabelValue(text, ["TECHNOLOGY"]);
   const infrastructure = /fiber|fibre/i.test(infrastructureRaw)
     ? "fiber"
@@ -384,7 +384,7 @@ const parseWorkItem = (text: string): ParsedSource => {
 
   return {
     interventionId: extractLabelValue(text, ["INTERVENTION_ID"]),
-    snowReference,
+    snowReceived,
     oagID: first(
       extractLabelValue(text, ["OAG_ID"]),
       extractLabelValue(text, ["ORDER_NUM"]),
@@ -439,7 +439,7 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
 
   return {
     interventionId: first(work.interventionId, safe.interventionId),
-    snowReference: work.snowReference ?? "",
+    snowReceived: work.snowReceived ?? "",
     oagID: first(work.oagID, safe.oagID),
     clientID: first(work.clientID, safe.clientID),
     na,
@@ -458,7 +458,7 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
     status: normalizeStatus(text),
     comment: safe.comment ?? "",
     additionalInformation: "",
-    isSnow: Boolean(work.snowReference),
+    isSnow: false,
     displayAllFields: true,
   };
 };
