@@ -64,11 +64,45 @@ import { ReactComponent as QuestionMarkOffIcon } from "../../assets/svg/Question
 import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
 import { ReactComponent as SnowOffIcon } from "../../assets/svg/Snow off.svg.tsx";
 import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
+import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
 
 type CopyButtonProps = {
   value: string;
   label: string;
 };
+
+const writeTextToClipboard = async (value: string) => {
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch {
+    const temporaryTextArea = document.createElement("textarea");
+
+    temporaryTextArea.value = value;
+    temporaryTextArea.style.position = "fixed";
+    temporaryTextArea.style.opacity = "0";
+
+    document.body.appendChild(temporaryTextArea);
+
+    temporaryTextArea.focus();
+    temporaryTextArea.select();
+    document.execCommand("copy");
+
+    document.body.removeChild(temporaryTextArea);
+  }
+};
+
+const prepareNpsComment = (value: string) =>
+  value
+    .replace(/\r\n/g, "\n")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/œ/g, "oe")
+    .replace(/Œ/g, "OE")
+    .replace(/æ/g, "ae")
+    .replace(/Æ/g, "AE")
+    .split("\n")
+    .filter((line) => line.trim().length > 0)
+    .join("\n");
 
 const CopyButton = ({
   value,
@@ -81,28 +115,7 @@ const CopyButton = ({
       return;
     }
 
-    try {
-      await navigator.clipboard.writeText(value);
-    } catch {
-      const temporaryTextArea =
-        document.createElement("textarea");
-
-      temporaryTextArea.value = value;
-      temporaryTextArea.style.position = "fixed";
-      temporaryTextArea.style.opacity = "0";
-
-      document.body.appendChild(
-        temporaryTextArea,
-      );
-
-      temporaryTextArea.focus();
-      temporaryTextArea.select();
-      document.execCommand("copy");
-
-      document.body.removeChild(
-        temporaryTextArea,
-      );
-    }
+    await writeTextToClipboard(value);
 
     setCopied(true);
 
@@ -149,6 +162,61 @@ const CopyButton = ({
   );
 };
 
+const NpsCopyButton = ({
+  value,
+  label,
+}: CopyButtonProps) => {
+  const [copied, setCopied] = React.useState(false);
+  const npsValue = prepareNpsComment(value);
+
+  const copyNpsValue = async () => {
+    if (!npsValue.trim()) {
+      return;
+    }
+
+    await writeTextToClipboard(npsValue);
+
+    setCopied(true);
+
+    window.setTimeout(() => {
+      setCopied(false);
+    }, 1200);
+  };
+
+  return (
+    <Tooltip
+      title={
+        copied
+          ? "NPS copié"
+          : npsValue.trim()
+            ? "Copier pour NPS"
+            : "Champ vide"
+      }
+      placement="left"
+      arrow
+    >
+      <span className="nps-copy-button-wrapper">
+        <IconButton
+          type="button"
+          size="small"
+          aria-label={`Copier ${label} pour NPS`}
+          className={`copy-field-button nps-copy-button ${
+            copied ? "copy-field-button--copied" : ""
+          }`}
+          disabled={!npsValue.trim()}
+          onClick={copyNpsValue}
+        >
+          {copied ? (
+            <CheckRounded fontSize="small" />
+          ) : (
+            <NpsCopyIcon />
+          )}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+};
+
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -176,6 +244,7 @@ const CurrentInterventionPage = () => {
   const [revisions, setRevisions] = React.useState<InterventionRevision[]>([]);
   const [revisionsError, setRevisionsError] = React.useState("");
   const [importMessage, setImportMessage] = React.useState("");
+  const commentInputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
 
   const generatedCureLine = /(?:1er|2(?:e|ème|eme)|3(?:e|ème|eme)) CURE(?: \+ SMS)? fait le (\d{2}\/\d{2}\/\d{4}) à \d{2}:\d{2}h/g;
@@ -250,19 +319,54 @@ const CurrentInterventionPage = () => {
 
   const confirmedAddressText = "Adresse confirmée";
   const notConfirmedAddressText = "Adresse pas encore confirmée";
-  const addressConfirmationPrefix = /^(?:Adresse confirmée|Adresse pas encore confirmée)(?:\r?\n(?:\r?\n)?)?/;
+  const automaticAddressLine =
+    /^(?:Adresse confirmée|Adresse pas encore confirmée)$/;
 
-  const handleAddressConfirmationToggle = (nextStatus: AddressConfirmationStatus) => {
+  const removeAutomaticAddressLines = (value: string) => {
+    const lines = value.replace(/\r\n/g, "\n").split("\n");
+    const cleanedLines = lines.filter(
+      (line) => !automaticAddressLine.test(line.trim()),
+    );
+
+    return cleanedLines
+      .join("\n")
+      .replace(/^\n+/, "")
+      .replace(/\n{3,}/g, "\n\n");
+  };
+
+  const focusCommentAt = (cursorPosition: number) => {
+    window.requestAnimationFrame(() => {
+      const textarea = commentInputRef.current;
+
+      if (!textarea) return;
+
+      textarea.focus();
+      textarea.setSelectionRange(cursorPosition, cursorPosition);
+    });
+  };
+
+  const handleAddressConfirmationToggle = (
+    nextStatus: AddressConfirmationStatus,
+  ) => {
     if (isHistoryView) return;
 
-    const commentWithoutStatus = comment
-      .replace(addressConfirmationPrefix, "")
-      .replace(/^\r?\n+/, "");
+    const commentWasCompletelyEmpty = comment.length === 0;
+    const commentWithoutStatus = removeAutomaticAddressLines(comment);
     const nextAddressConfirmation =
       addressConfirmation === nextStatus ? "none" : nextStatus;
-    const nextComment = nextAddressConfirmation === "none"
-      ? commentWithoutStatus
-      : `${nextAddressConfirmation === "confirmed" ? confirmedAddressText : notConfirmedAddressText}${commentWithoutStatus ? `\n\n${commentWithoutStatus}` : ""}`;
+
+    let nextComment = commentWithoutStatus;
+
+    if (nextAddressConfirmation !== "none") {
+      const addressText =
+        nextAddressConfirmation === "confirmed"
+          ? confirmedAddressText
+          : notConfirmedAddressText;
+
+      nextComment = commentWithoutStatus
+        ? `${addressText}\n\n${commentWithoutStatus}`
+        : `${addressText}\n\n`;
+    }
 
     dispatch(
       updateField({
@@ -276,6 +380,13 @@ const CurrentInterventionPage = () => {
         value: nextComment,
       }),
     );
+
+    if (
+      commentWasCompletelyEmpty &&
+      nextAddressConfirmation !== "none"
+    ) {
+      focusCommentAt(nextComment.length);
+    }
   };
 
   const submitActions = async () => {
@@ -655,6 +766,7 @@ const CurrentInterventionPage = () => {
             <TextField
               label="Commentaire"
               value={comment}
+              inputRef={commentInputRef}
               onChange={(event) =>
                 dispatch(
                   updateField({
@@ -677,6 +789,11 @@ const CurrentInterventionPage = () => {
             />
 
             <CopyButton
+              value={comment}
+              label="Commentaire"
+            />
+
+            <NpsCopyButton
               value={comment}
               label="Commentaire"
             />

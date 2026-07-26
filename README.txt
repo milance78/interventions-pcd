@@ -1,11 +1,12 @@
-ADDRESS CONFIRMATION — STABLE ICON SWITCH + SUBTLE BUTTON DEPTH
+COMMENTAIRE NPS COPY — v31
 
-Replace the two included files.
+Copy the included src folder into the project and replace existing files.
 
-Changes:
-- ON and OFF icon versions remain mounted at all times.
-- State changes use opacity only, preventing image unload/reload flicker.
-- Hover never changes vertical position.
-- Press/release movement is reduced.
-- Active state now sits only 1.5px lower instead of 3px.
-- Mouse-down feedback is only 1–2px.
+NPS button behavior:
+- Located directly below the normal Commentaire copy button.
+- Removes accents from Latin letters: é -> e, à -> a, ô -> o, è -> e, ç -> c, etc.
+- Converts œ/Œ to oe/OE and æ/Æ to ae/AE.
+- Removes all empty or whitespace-only lines.
+- Preserves line breaks between all remaining non-empty lines.
+- Does not change the Commentaire field itself; only clipboard output is transformed.
+- Uses a custom SVG copy icon with a visible NPS badge.
