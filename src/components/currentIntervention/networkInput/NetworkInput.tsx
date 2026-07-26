@@ -57,7 +57,7 @@ const NetworkInput = () => {
           "& .MuiSelect-select": {
             display: "flex",
             alignItems: "center",
-            fontWeight: isDefault ? 400 : 600,
+            fontWeight: 400,
             color: isDefault ? "#9aa7bb" : "#111827",
           },
           "& .MuiOutlinedInput-notchedOutline": {

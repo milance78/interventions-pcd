@@ -74,7 +74,7 @@ const InfrastructureInput = () => {
           "& .MuiSelect-select": {
             display: "flex",
             alignItems: "center",
-            fontWeight: isEmpty ? 400 : 600,
+            fontWeight: 400,
             color: isEmpty ? "#9aa7bb" : "#111827",
           },
           "& .MuiOutlinedInput-notchedOutline": {

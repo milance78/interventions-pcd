@@ -215,6 +215,10 @@ const ClientsOnAddress = () => {
           "& textarea": {
             paddingRight: "48px",
             boxSizing: "border-box",
+            fontWeight: "400 !important",
+          },
+          "& .MuiInputBase-inputMultiline": {
+            fontWeight: "400 !important",
           },
           "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
             {
