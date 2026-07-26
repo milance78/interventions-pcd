@@ -186,7 +186,7 @@
     .MuiInputLabel-root {
       color: #475569;
       font-size: 14px;
-      font-weight: 600;
+      font-weight:500;
     }
   }
 
@@ -213,7 +213,7 @@
 
   .boolean-inputs-row {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     align-items: stretch;
     gap: 18px;
     width: 100%;
@@ -691,7 +691,7 @@
     padding: 7px 11px !important;
     color: #64748b !important;
     font-size: 12px !important;
-    font-weight: 600 !important;
+    font-weight:500 !important;
     line-height: 1.2 !important;
     text-transform: none !important;
     white-space: nowrap;
@@ -779,7 +779,7 @@
   padding-inline: 14px !important;
   white-space: nowrap;
   text-transform: none !important;
-  font-weight: 600 !important;
+  font-weight:500 !important;
 }
 
 .floating-draft-reminder {
@@ -940,7 +940,7 @@
     border-radius: 999px !important;
     border: 1px solid #cbd5e1 !important;
     font-size: 11px !important;
-    font-weight: 600 !important;
+    font-weight:500 !important;
     line-height: 1 !important;
     letter-spacing: 0 !important;
     text-transform: none !important;
@@ -1224,170 +1224,23 @@
   }
 }
 
-/* Clear visual distinction between empty fields and entered values */
-.current-intervention-page {
-  .MuiInputLabel-root {
-    color: #94a3b8 !important;
-    font-weight: 400 !important;
-    opacity: 0.92;
-  }
 
-  .MuiInputLabel-root.Mui-focused,
-  .MuiInputLabel-root.MuiFormLabel-filled {
-    color: #64748b !important;
-    font-weight: 400 !important;
-  }
-
-  .MuiInputBase-input,
-  .MuiOutlinedInput-input,
-  .MuiSelect-select,
-  textarea.MuiInputBase-input {
-    color: #172033 !important;
-    font-weight: 400 !important;
-  }
-
-  input::placeholder,
-  textarea::placeholder {
-    color: #a8b1bf !important;
-    font-weight: 400 !important;
-    opacity: 1 !important;
-  }
+/* v52: absolutely no hover movement for CURE and SMS controls */
+.current-intervention-page .cure-selector .cure-selector__button.MuiButtonBase-root,
+.current-intervention-page .sms-toggle-button.MuiButtonBase-root{
+  transition:
+    box-shadow 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    filter 120ms ease !important;
 }
 
-
-/* v51 — fixed fourth CURE slot and stable top controls. */
-.current-intervention-page {
-  .boolean-inputs-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .cure-summary-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 4px 8px;
-    cursor: default;
-    background: linear-gradient(145deg, #f8fbff, #edf5ff);
-    border-color: #93c5fd;
-    box-shadow:
-      0 5px 12px rgba(30, 64, 175, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.85);
-  }
-
-  .cure-summary-card:hover {
-    transform: none !important;
-    background: linear-gradient(145deg, #f8fbff, #edf5ff);
-    border-color: #93c5fd;
-    box-shadow:
-      0 5px 12px rgba(30, 64, 175, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.85);
-  }
-
-  .cure-summary-card--empty {
-    min-height: 64px;
-  }
-
-  .cure-summary-card__icon {
-    display: block;
-    width: 46px;
-    height: 46px;
-    object-fit: contain;
-    pointer-events: none;
-    user-select: none;
-  }
-
-  .cure-selector__buttons {
-    gap: 6px;
-  }
-
-  .cure-selector .cure-selector__button.MuiButtonBase-root,
-  .sms-toggle-button.MuiButtonBase-root {
-    min-height: 29px !important;
-    border-radius: 999px !important;
-    transition:
-      box-shadow 120ms ease,
-      filter 120ms ease,
-      background-color 120ms ease,
-      border-color 120ms ease !important;
-  }
-
-  /* No hover movement for CURE or SMS controls. */
-  .cure-selector .cure-selector__button.MuiButtonBase-root:hover:not(:disabled),
-  .sms-toggle-button.MuiButtonBase-root:hover:not(:disabled) {
-    transform: none !important;
-  }
-
-  /* Keep the inset pressed/selected effect. */
-  .cure-selector .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
-  .sms-toggle-button.MuiButtonBase-root:active:not(:disabled),
-  .cure-selector .cure-selector__button--active.MuiButtonBase-root,
-  .sms-toggle-button--active.MuiButtonBase-root {
-    transform: translateY(1.5px) scale(0.985) !important;
-    box-shadow:
-      inset 0 2px 4px rgba(15, 23, 42, 0.18),
-      0 1px 1px rgba(255, 255, 255, 0.75) !important;
-  }
-
-  .cure-selector .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
-  .sms-toggle-button.MuiButtonBase-root:active:not(:disabled) {
-    filter: brightness(0.985);
-  }
-
-  @media (max-width: 900px) {
-    .boolean-inputs-row {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-}
-
-
-/* v53 — stable CURE/SMS buttons: no hover movement in any state */
-.current-intervention-page {
-  .cure-selector .cure-selector__button.MuiButtonBase-root,
-  .sms-toggle-button.MuiButtonBase-root {
-    transform: none !important;
-    translate: none !important;
-    scale: 1 !important;
-    transition:
-      box-shadow 120ms ease,
-      filter 120ms ease,
-      background-color 120ms ease,
-      border-color 120ms ease,
-      color 120ms ease !important;
-  }
-
-  .cure-selector .cure-selector__button.MuiButtonBase-root:hover:not(:disabled),
-  .sms-toggle-button.MuiButtonBase-root:hover:not(:disabled) {
-    transform: none !important;
-    translate: none !important;
-    scale: 1 !important;
-  }
-
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root,
-  .sms-toggle-button--active.MuiButtonBase-root,
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root:hover:not(:disabled),
-  .sms-toggle-button--active.MuiButtonBase-root:hover:not(:disabled),
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root:focus,
-  .sms-toggle-button--active.MuiButtonBase-root:focus,
-  .cure-selector
-    .cure-selector__button--active.MuiButtonBase-root:focus-visible,
-  .sms-toggle-button--active.MuiButtonBase-root:focus-visible {
-    transform: translateY(1.5px) scale(0.985) !important;
-    translate: none !important;
-    scale: 1 !important;
-    box-shadow:
-      inset 0 2px 4px rgba(15, 23, 42, 0.18),
-      0 1px 1px rgba(255, 255, 255, 0.75) !important;
-  }
-
-  .cure-selector
-    .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
-  .sms-toggle-button.MuiButtonBase-root:active:not(:disabled) {
-    transform: translateY(1.5px) scale(0.985) !important;
-    translate: none !important;
-    scale: 1 !important;
-  }
+.current-intervention-page .cure-selector .cure-selector__button.MuiButtonBase-root:hover,
+.current-intervention-page .sms-toggle-button.MuiButtonBase-root:hover,
+.current-intervention-page .cure-selector .cure-selector__button--active:hover,
+.current-intervention-page .sms-toggle-button--active:hover{
+  transform:none !important;
+  translate:none !important;
+  scale:1 !important;
+  filter:none !important;
 }

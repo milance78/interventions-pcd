@@ -1,14 +1,10 @@
-CURE FIXED SLOT — v51
+CURE / SMS STABLE PRESSED STATE — v53
 
 Changes only:
-- CurrentInterventionPage.tsx
-- CurrentInterventionPage.scss
+src/pages/currentInterventionPage/CurrentInterventionPage.scss
 
-Result:
-- The “CURE 1” / “CURE 2” text is removed.
-- The fourth Options de l'intervention field is always present.
-- It stays empty for No CURE and CURE 3.
-- It shows only the blue artwork icon for CURE 1 or CURE 2.
-- +SMS remains in its original upper position beside the compact CURE controls.
-- Compact CURE and +SMS controls no longer move on hover.
-- Their inset pressed/selected effect is preserved.
+Fix:
+- No CURE or SMS button moves on hover.
+- An active/selected button stays permanently inset while hovered.
+- Hover no longer overrides the selected transform.
+- The transform property is removed from transitions, preventing visible jumping.
