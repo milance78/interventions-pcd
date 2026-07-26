@@ -3,9 +3,6 @@ import * as React from "react";
 import AddTaskRounded from "@mui/icons-material/AddTaskRounded";
 import DeleteSweepRounded from "@mui/icons-material/DeleteSweepRounded";
 import HistoryRounded from "@mui/icons-material/HistoryRounded";
-import CallRounded from "@mui/icons-material/CallRounded";
-import CloseRounded from "@mui/icons-material/CloseRounded";
-import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
 import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import Send from "@mui/icons-material/Send";
@@ -65,6 +62,10 @@ import { ReactComponent as SnowOffIcon } from "../../assets/svg/Snow off.svg.tsx
 import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
 import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
+import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
+import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
+import VoiceMessageCall3 from "../../assets/icons/VoiceMessageCall3.png";
+import VoiceMessageCallX from "../../assets/icons/VoiceMessageCallX.png";
 
 type CopyButtonProps = {
   value: string;
@@ -629,41 +630,25 @@ const CurrentInterventionPage = () => {
               {[
                 {
                   value: "noCure",
-                  label: (
-                    <span className="no-cure-phone-icon" aria-hidden="true">
-                      <CallRounded className="no-cure-phone-icon__phone" />
-                      <CloseRounded className="no-cure-phone-icon__cross" />
-                    </span>
-                  ),
+                  icon: VoiceMessageCallX,
+                  alt: "Aucun appel",
                 },
                 {
                   value: "firstCure",
-                  label: (
-                    <>
-                      <span>1.</span>
-                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
-                    </>
-                  ),
+                  icon: VoiceMessageCall1,
+                  alt: "Premier appel avec message vocal",
                 },
                 {
                   value: "secondCure",
-                  label: (
-                    <>
-                      <span>2.</span>
-                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
-                    </>
-                  ),
+                  icon: VoiceMessageCall2,
+                  alt: "Deuxième appel avec message vocal",
                 },
                 {
                   value: "thirdCure",
-                  label: (
-                    <>
-                      <span>3.</span>
-                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
-                    </>
-                  ),
+                  icon: VoiceMessageCall3,
+                  alt: "Troisième appel avec message vocal",
                 },
-              ].map(({ value, label }) => (
+              ].map(({ value, icon, alt }) => (
                 <Button
                   key={value}
                   type="button"
@@ -680,7 +665,12 @@ const CurrentInterventionPage = () => {
                       : `${value === "firstCure" ? "1er" : value === "secondCure" ? "2ème" : "3ème"} CURE`
                   }
                 >
-                  {label}
+                  <img
+                    src={icon}
+                    alt={alt}
+                    className="cure-selector__image"
+                    draggable={false}
+                  />
                 </Button>
               ))}
             </ButtonGroup>

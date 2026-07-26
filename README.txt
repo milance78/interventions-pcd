@@ -1,12 +1,16 @@
-VOICE MESSAGE CALL SVG ICONS
+CURE PNG ICONS — v49
 
-Ready-to-use assets:
-src/assets/svg/VoiceMessageCall1.svg
-src/assets/svg/VoiceMessageCall2.svg
+Changed:
+- CurrentInterventionPage.tsx
+- CurrentInterventionPage.scss
+- Added four transparent PNG assets under src/assets/icons/
 
-Both are pure SVG artwork with:
-- blue/cyan gradient tile
-- detailed white handset
-- signal waves
-- large top-right numbered badge
-- scalable 256 × 256 viewBox
+The four old CURE phone controls are replaced with:
+- VoiceMessageCallX.png
+- VoiceMessageCall1.png
+- VoiceMessageCall2.png
+- VoiceMessageCall3.png
+
+Each icon is displayed at 44 × 44 px, matching the existing address-confirmation controls.
+The PNG files have transparent outer backgrounds.
+No business logic or other UI sections are changed.

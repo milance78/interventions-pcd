@@ -1253,3 +1253,66 @@
     opacity: 1 !important;
   }
 }
+
+
+/* v49 — PNG CURE artwork icons, matched to the 44px address controls */
+.current-intervention-page .cure-selector__buttons {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.current-intervention-page
+  .cure-selector
+  .cure-selector__button.MuiButtonBase-root {
+  width: 44px !important;
+  min-width: 44px !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 !important;
+  overflow: visible;
+  border: 0 !important;
+  border-radius: 12px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: drop-shadow(0 4px 4px rgba(15, 23, 42, 0.22));
+  transform: translateY(0);
+}
+
+.current-intervention-page
+  .cure-selector
+  .cure-selector__button.MuiButtonBase-root:hover:not(:disabled) {
+  background: transparent !important;
+  border: 0 !important;
+  filter: drop-shadow(0 4px 4px rgba(15, 23, 42, 0.26)) brightness(0.975);
+  transform: translateY(0);
+}
+
+.current-intervention-page
+  .cure-selector
+  .cure-selector__button.MuiButtonBase-root:active:not(:disabled),
+.current-intervention-page
+  .cure-selector
+  .cure-selector__button--active.MuiButtonBase-root {
+  background: rgba(148, 163, 184, 0.06) !important;
+  border: 0 !important;
+  box-shadow: inset 0 1px 3px rgba(15, 23, 42, 0.12) !important;
+  filter: drop-shadow(0 1px 1px rgba(15, 23, 42, 0.08));
+  transform: translateY(1.5px);
+}
+
+.current-intervention-page .cure-selector__image {
+  display: block;
+  width: 44px;
+  height: 44px;
+  max-width: none;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.current-intervention-page--history
+  .cure-selector__button.Mui-disabled
+  .cure-selector__image {
+  opacity: 1;
+}
