@@ -1,0 +1,9 @@
+{
+  "name": "PCD Tool",
+  "short_name": "PCD",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#222222",
+  "icons": []
+}
