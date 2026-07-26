@@ -4,8 +4,8 @@ import {
   type KeyboardEvent,
 } from "react";
 
+import { ReactComponent as CopyIcon } from "../../../assets/svg/Copy.svg.tsx";
 import CheckRounded from "@mui/icons-material/CheckRounded";
-import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
@@ -258,7 +258,7 @@ const ClientsOnAddress = () => {
             {copied ? (
               <CheckRounded fontSize="small" />
             ) : (
-              <ContentCopyRounded fontSize="small" />
+              <CopyIcon />
             )}
           </IconButton>
         </span>

@@ -1,12 +1,11 @@
-COMMENTAIRE NPS COPY — v31
+COPY ICONS UNIFIED + NPS READABILITY — v33
 
-Copy the included src folder into the project and replace existing files.
+Replace the included src files.
 
-NPS button behavior:
-- Located directly below the normal Commentaire copy button.
-- Removes accents from Latin letters: é -> e, à -> a, ô -> o, è -> e, ç -> c, etc.
-- Converts œ/Œ to oe/OE and æ/Æ to ae/AE.
-- Removes all empty or whitespace-only lines.
-- Preserves line breaks between all remaining non-empty lines.
-- Does not change the Commentaire field itself; only clipboard output is transformed.
-- Uses a custom SVG copy icon with a visible NPS badge.
+Changes:
+- Replaces the ordinary MUI copy icon everywhere in the project with a custom SVG.
+- The new ordinary copy icon uses the same document artwork as the NPS icon, including all three text lines.
+- Existing ordinary copy button border/frame dimensions remain 32x32.
+- NPS letters are substantially larger and more readable.
+- NPS button keeps the same width but is allowed a taller 32x42 frame.
+- Copy behavior and all existing clipboard logic remain unchanged.

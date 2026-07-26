@@ -338,10 +338,22 @@
     border-color: #86efac !important;
   }
 
-  .nps-copy-button {
+  .copy-field-button:not(.nps-copy-button) {
     svg {
       width: 25px;
       height: 25px;
+      overflow: visible;
+    }
+  }
+
+  .nps-copy-button {
+    width: 32px;
+    height: 42px;
+    padding: 0 !important;
+
+    svg {
+      width: 30px;
+      height: 38px;
       overflow: visible;
     }
 

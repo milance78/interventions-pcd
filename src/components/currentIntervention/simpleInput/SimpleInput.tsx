@@ -1,6 +1,6 @@
 import * as React from "react";
 
-import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
+import { ReactComponent as CopyIcon } from "../../../assets/svg/Copy.svg.tsx";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
@@ -176,7 +176,7 @@ const SimpleInput = ({
               {copied ? (
                 <CheckRounded fontSize="small" />
               ) : (
-                <ContentCopyRounded fontSize="small" />
+                <CopyIcon />
               )}
             </IconButton>
           </span>
