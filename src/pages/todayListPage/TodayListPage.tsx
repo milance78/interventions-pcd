@@ -1,5 +1,6 @@
 import {
   useMemo,
+  useRef,
   type ElementType,
   type ReactNode,
 } from "react";
@@ -10,6 +11,7 @@ import {
   KeyRound,
   NotebookTabs,
   Pencil,
+  FileX2,
   PhoneCall,
   TextInitial,
   Trash2,
@@ -17,6 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import "./TodayListPage.scss";
+import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 
 import AdditionalInformationDialog from "../../components/additionalInformationDialog/AdditionalInformationDialog";
 
@@ -28,7 +31,10 @@ import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb o
 import { ReactComponent as NAIcon } from "../../assets/svg/NA.svg.tsx";
 import { ReactComponent as OAGIcon } from "../../assets/svg/OAG.svg.tsx";
 import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
-import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
+import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
+import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
+import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
+import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
 
 import { loadInterventionForEdit } from "../../redux/features/newInterventionSlice";
 import {
@@ -148,6 +154,7 @@ const TodayStackedField = ({
 
 const TodayListPage = () => {
   const dispatch = useAppDispatch();
+  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
 
   const interventions = useAppSelector(
@@ -185,9 +192,15 @@ const TodayListPage = () => {
     );
   }, [interventions]);
 
+  usePersistentElementScroll(
+    "today",
+    scrollContainerRef,
+    true,
+  );
+
   return (
     <main className="today-list-page">
-      <div className="today-list-content">
+      <div ref={scrollContainerRef} className="today-list-content">
         <header className="today-page-header">
           <div className="today-page-title">
             <span className="today-page-eyebrow">
@@ -246,7 +259,11 @@ const TodayListPage = () => {
               intervention.isUnclear ||
               intervention.addressConfirmation !== "none" ||
               intervention.isGoodExample ||
-              intervention.isSnow;
+              intervention.isSnowSentPending ||
+              intervention.isSnowReceivedPending ||
+              Boolean(intervention.isResPending) ||
+              intervention.cure === "firstCure" ||
+              intervention.cure === "secondCure";
 
             const hasIdentifiers =
               hasValue(
@@ -361,9 +378,59 @@ const TodayListPage = () => {
                         </TodayBooleanIcon>
                       )}
 
-                      {intervention.isSnow && (
+                      {intervention.isSnowSentPending && (
                         <TodayBooleanIcon>
-                          <SnowOnIcon />
+                          <SnowSentPendingIcon />
+                        </TodayBooleanIcon>
+                      )}
+
+                      {intervention.isSnowReceivedPending && (
+                        <TodayBooleanIcon>
+                          <SnowReceivedPendingIcon />
+                        </TodayBooleanIcon>
+                      )}
+
+                      {Boolean(
+                          intervention.isResPending ||
+                            (intervention as typeof intervention & {
+                              resPending?: boolean;
+                            }).resPending,
+                        ) && (
+                        <TodayBooleanIcon>
+                          <span className="today-flag-res" title="Résiliation en attente">
+                            <FileX2 />
+                            <small>RES</small>
+                          </span>
+                        </TodayBooleanIcon>
+                      )}
+
+                      {(
+                        intervention.cure === "firstCure" ||
+                        intervention.cure === "secondCure" ||
+                        intervention.cure === ("CURE1" as typeof intervention.cure) ||
+                        intervention.cure === ("CURE2" as typeof intervention.cure)
+                      ) && (
+                        <TodayBooleanIcon>
+                          <img
+                            src={
+                              intervention.cure === "firstCure" ||
+                              intervention.cure === ("CURE1" as typeof intervention.cure)
+                                ? VoiceMessageCall1
+                                : VoiceMessageCall2
+                            }
+                            alt={
+                              intervention.cure === "firstCure" ||
+                              intervention.cure === ("CURE1" as typeof intervention.cure)
+                                ? "CURE 1"
+                                : "CURE 2"
+                            }
+                            title={
+                              intervention.cure === "firstCure" ||
+                              intervention.cure === ("CURE1" as typeof intervention.cure)
+                                ? "CURE 1"
+                                : "CURE 2"
+                            }
+                          />
                         </TodayBooleanIcon>
                       )}
                     </div>

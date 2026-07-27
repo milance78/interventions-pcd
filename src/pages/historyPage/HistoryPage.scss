@@ -795,3 +795,62 @@
     min-height: 150px;
   }
 }
+
+.history-boolean-icon img {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.history-flag-res {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  position: relative;
+  color: #8a6100;
+  background: linear-gradient(145deg, #fff9dc, #f5dfa0);
+  border: 1px solid #dfbd4e;
+  border-radius: 9px;
+  box-shadow: 0 3px 7px rgba(128, 91, 0, 0.15);
+}
+
+.history-flag-res svg {
+  width: 19px !important;
+  height: 19px !important;
+}
+
+.history-flag-res small {
+  position: absolute;
+  right: 2px;
+  bottom: 1px;
+  font-size: 6px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+
+/* v62: guarantee CURE / RES flag visibility */
+.history-boolean-icon,
+.history-flags .boolean-icon,
+.history-card__flags .boolean-icon {
+  overflow: visible;
+}
+
+.history-boolean-icon img,
+.history-flags img,
+.history-card__flags img {
+  display: block !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px;
+  min-height: 36px;
+  object-fit: contain;
+}
+
+.history-flag-res {
+  display: grid !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}

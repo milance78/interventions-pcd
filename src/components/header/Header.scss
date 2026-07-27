@@ -272,3 +272,35 @@
     padding: 0 20px 22px !important;
   }
 }
+
+
+.header__link--on-hold {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.header__on-hold-notification {
+  min-width: 21px;
+  height: 21px;
+  padding: 0 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  color: #ffffff;
+  background: linear-gradient(145deg, #ef5350, #c93838);
+  box-shadow:
+    0 3px 8px rgba(185, 45, 45, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  font-size: 10px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.header__link--active .header__on-hold-notification {
+  border-color: #dbeafe;
+}

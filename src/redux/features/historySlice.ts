@@ -1,5 +1,6 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { Intervention } from "./newInterventionSlice";
+import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 type HistoryState = {
   interventions: Intervention[];
@@ -42,24 +43,33 @@ const historySlice = createSlice({
     },
     addHistoryIntervention: (state, action: PayloadAction<Intervention>) => {
       const exists = state.interventions.some(
-        (item) => item.documentId === action.payload.documentId,
+        (item) =>
+          item.documentId === action.payload.documentId &&
+          item.dateKey === action.payload.dateKey,
       );
 
       if (!exists) {
-        state.interventions.push(action.payload);
+        state.interventions.unshift(action.payload);
       }
     },
     updateHistoryIntervention: (
       state,
       action: PayloadAction<Intervention>,
     ) => {
-      const index = state.interventions.findIndex(
-        (item) => item.documentId === action.payload.documentId,
-      );
+      state.interventions = state.interventions.map((item) => {
+        if (!isSameLogicalIntervention(item, action.payload)) {
+          return item;
+        }
 
-      if (index !== -1) {
-        state.interventions[index] = action.payload;
-      }
+        return {
+          ...item,
+          ...action.payload,
+          // Preserve the day on which this occurrence belongs.
+          documentId: item.documentId,
+          dateKey: item.dateKey,
+          createdAt: item.createdAt ?? action.payload.createdAt,
+        };
+      });
     },
     deleteHistoryIntervention: (state, action: PayloadAction<string>) => {
       state.interventions = state.interventions.filter(

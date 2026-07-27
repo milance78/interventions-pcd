@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useRef,
   type ElementType,
@@ -15,6 +16,7 @@ import {
   TextInitial,
   Trash2,
   UserRound,
+  FileX2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -30,12 +32,20 @@ import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb o
 import { ReactComponent as NAIcon } from "../../assets/svg/NA.svg.tsx";
 import { ReactComponent as OAGIcon } from "../../assets/svg/OAG.svg.tsx";
 import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
-import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
+import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
+import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
+import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
+import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
 
 import { loadInterventionFromHistory } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { deleteInterventionThunk } from "../../redux/thunks/deleteInterventionThunk";
 import type { Intervention } from "../../redux/features/newInterventionSlice";
+import {
+  interventionActivityValue,
+  interventionLogicalKey,
+} from "../../utils/interventionIdentity";
+import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 
 const hasValue = (value?: string | null): value is string =>
   Boolean(value?.trim());
@@ -252,6 +262,12 @@ const HistoryPage = () => {
     Record<string, HTMLElement | null>
   >({});
 
+  usePersistentElementScroll(
+    "history",
+    scrollContainerRef,
+    isInitialized,
+  );
+
   const groupedInterventions = useMemo(() => {
     const groups = new Map<
       string,
@@ -262,10 +278,26 @@ const HistoryPage = () => {
       }
     >();
 
+    const uniqueByDateAndTicket = new Map<string, Intervention>();
+
     interventions.forEach((intervention) => {
       const interventionDate = getInterventionDate(intervention);
       const dateKey = getDateKey(interventionDate);
+      const uniqueKey = `${dateKey}:${interventionLogicalKey(intervention)}`;
+      const existing = uniqueByDateAndTicket.get(uniqueKey);
 
+      if (
+        !existing ||
+        interventionActivityValue(intervention) >
+          interventionActivityValue(existing)
+      ) {
+        uniqueByDateAndTicket.set(uniqueKey, intervention);
+      }
+    });
+
+    uniqueByDateAndTicket.forEach((intervention) => {
+      const interventionDate = getInterventionDate(intervention);
+      const dateKey = getDateKey(interventionDate);
       const currentGroup = groups.get(dateKey);
 
       if (currentGroup) {
@@ -371,6 +403,19 @@ const HistoryPage = () => {
 
     requestAnimationFrame(animateScroll);
   };
+
+  useEffect(() => {
+    if (!isInitialized || groupedInterventions.length === 0) return;
+
+    const pendingDate = window.sessionStorage.getItem(
+      "history:pending-date",
+    );
+
+    if (!pendingDate) return;
+
+    window.sessionStorage.removeItem("history:pending-date");
+    window.requestAnimationFrame(() => scrollToDate(pendingDate));
+  }, [groupedInterventions, isInitialized]);
 
   return (
     <main className="history-page">
@@ -547,9 +592,55 @@ const HistoryPage = () => {
                             </BooleanIcon>
                           )}
 
-                          {intervention.isSnow && (
+                          {intervention.isSnowSentPending && (
                             <BooleanIcon>
-                              <SnowOnIcon />
+                              <SnowSentPendingIcon />
+                            </BooleanIcon>
+                          )}
+
+                          {intervention.isSnowReceivedPending && (
+                            <BooleanIcon>
+                              <SnowReceivedPendingIcon />
+                            </BooleanIcon>
+                          )}
+
+                          {Boolean(
+                          intervention.isResPending ||
+                            (intervention as typeof intervention & {
+                              resPending?: boolean;
+                            }).resPending,
+                        ) && (
+                            <BooleanIcon>
+                              <span
+                                className="history-flag-res"
+                                title="Résiliation en attente"
+                              >
+                                <FileX2 />
+                                <small>RES</small>
+                              </span>
+                            </BooleanIcon>
+                          )}
+
+                          {(intervention.cure === "firstCure" ||
+                            intervention.cure === "secondCure") && (
+                            <BooleanIcon>
+                              <img
+                                src={
+                                  intervention.cure === "firstCure"
+                                    ? VoiceMessageCall1
+                                    : VoiceMessageCall2
+                                }
+                                alt={
+                                  intervention.cure === "firstCure"
+                                    ? "CURE 1"
+                                    : "CURE 2"
+                                }
+                                title={
+                                  intervention.cure === "firstCure"
+                                    ? "CURE 1"
+                                    : "CURE 2"
+                                }
+                              />
                             </BooleanIcon>
                           )}
                         </div>

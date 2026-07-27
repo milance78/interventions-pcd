@@ -2,6 +2,10 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { auth } from "../../firebase/firebaseConfig";
 import { updateSearchInterventionAndMoveToToday } from "../../firebase/interventionsService";
 import { addIntervention } from "../features/interventionsListSlice";
+import {
+  addHistoryIntervention,
+  updateHistoryIntervention,
+} from "../features/historySlice";
 import type { Intervention } from "../features/newInterventionSlice";
 
 export const updateSearchInterventionThunk = createAsyncThunk<
@@ -23,6 +27,8 @@ export const updateSearchInterventionThunk = createAsyncThunk<
       today,
       intervention,
     );
+    dispatch(updateHistoryIntervention(updated));
+    dispatch(addHistoryIntervention(updated));
     dispatch(addIntervention(updated));
     return updated;
   } catch (error) {

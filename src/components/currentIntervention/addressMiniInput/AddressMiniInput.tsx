@@ -9,16 +9,21 @@ import { useAppDispatch, useAppSelector } from "../../../redux/store";
 interface AddressMiniInputProps {
   field: InterventionField;
   label: string;
+  className?: string;
 }
 
-const AddressMiniInput = ({ field, label }: AddressMiniInputProps) => {
+const AddressMiniInput = ({
+  field,
+  label,
+  className = "",
+}: AddressMiniInputProps) => {
   const dispatch = useAppDispatch();
   const value = useAppSelector((state) => state.newIntervention[field]);
   const stringValue = typeof value === "string" ? value : "";
 
   return (
     <TextField
-      className="address-mini-input"
+      className={`address-mini-input ${className}`.trim()}
       size="small"
       fullWidth
       label={label}

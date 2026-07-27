@@ -9,6 +9,7 @@ import StatisticsPage from "./pages/statisticsPage/StatisticsPage";
 import SearchResultsPage from "./pages/searchResultsPage/SearchResultsPage";
 import TemplatesPage from "./pages/templatesPage/TemplatesPage";
 import TodayListPage from "./pages/todayListPage/TodayListPage";
+import OnHoldPage from "./pages/onHoldPage/OnHoldPage";
 
 const App = () => (
   <div className="app">
@@ -22,6 +23,7 @@ const App = () => (
           element={<CurrentInterventionPage />}
         />
         <Route path="/liste-du-jour" element={<TodayListPage />} />
+        <Route path="/en-attente" element={<OnHoldPage />} />
         <Route path="/historique" element={<HistoryPage />} />
         <Route path="/statistiques" element={<StatisticsPage />} />
         <Route path="/recherche" element={<SearchResultsPage />} />

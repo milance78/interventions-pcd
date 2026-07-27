@@ -17,6 +17,7 @@ import {
   startNewIntervention,
 } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
+import { getOverdueCureCount } from "../../utils/onHoldUtils";
 
 import "./Header.scss";
 
@@ -32,9 +33,16 @@ const DialogTransition = React.forwardRef(function DialogTransition(
 const Header = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const { hasDraft, mode } = useAppSelector((state) => state.newIntervention);
-
   const [now, setNow] = React.useState(new Date());
+  const { hasDraft, mode } = useAppSelector((state) => state.newIntervention);
+  const historyInterventions = useAppSelector(
+    (state) => state.history.interventions,
+  );
+  const overdueCureCount = React.useMemo(
+    () => getOverdueCureCount(historyInterventions),
+    [historyInterventions, now],
+  );
+
   const [newDialogOpen, setNewDialogOpen] = React.useState(false);
 
   React.useEffect(() => {
@@ -98,6 +106,26 @@ const Header = () => {
           }
         >
           Liste du jour
+        </NavLink>
+
+        <NavLink
+          to="/en-attente"
+          className={({ isActive }) =>
+            `header__link header__link--on-hold ${
+              isActive ? "header__link--active" : ""
+            }`
+          }
+        >
+          <span>En attente</span>
+          {overdueCureCount > 0 && (
+            <span
+              className="header__on-hold-notification"
+              aria-label={`${overdueCureCount} ticket${overdueCureCount > 1 ? "s" : ""} CURE en retard`}
+              title={`${overdueCureCount} ticket${overdueCureCount > 1 ? "s" : ""} CURE en retard`}
+            >
+              {overdueCureCount}
+            </span>
+          )}
         </NavLink>
 
         <NavLink

@@ -20,6 +20,7 @@ interface SnowPendingInputProps {
   pendingField: PendingField;
   label: string;
   pendingLabel: string;
+  className?: string;
 }
 
 const SnowPendingInput = ({
@@ -27,6 +28,7 @@ const SnowPendingInput = ({
   pendingField,
   label,
   pendingLabel,
+  className = "",
 }: SnowPendingInputProps) => {
   const dispatch = useAppDispatch();
   const isPending = useAppSelector((state) =>
@@ -34,7 +36,7 @@ const SnowPendingInput = ({
   );
 
   return (
-    <div className="snow-pending-input">
+    <div className={`snow-pending-input ${className}`.trim()}>
       <div className="snow-pending-input__field">
         <SimpleInput
           field={field}

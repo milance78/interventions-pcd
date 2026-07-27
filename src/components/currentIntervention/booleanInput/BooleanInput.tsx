@@ -6,6 +6,7 @@ import { updateField } from "../../../redux/features/newInterventionSlice";
 
 type BooleanField =
   | "isSnow"
+  | "isResPending"
   | "isUnclear"
   | "isGoodExample";
 

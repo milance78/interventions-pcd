@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createInterventionThunk } from "../thunks/createInterventionThunk";
 import type { Intervention } from "./newInterventionSlice";
+import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 const initialState: Intervention[] = [];
 
@@ -22,12 +23,20 @@ const interventionsListSlice = createSlice({
       state,
       action: PayloadAction<Intervention>,
     ) => {
-      const index = state.findIndex(
-        (item) => item.documentId === action.payload.documentId,
+      const index = state.findIndex((item) =>
+        isSameLogicalIntervention(item, action.payload),
       );
 
       if (index !== -1) {
-        state[index] = action.payload;
+        const existing = state[index];
+
+        state[index] = {
+          ...existing,
+          ...action.payload,
+          documentId: existing.documentId,
+          dateKey: existing.dateKey,
+          createdAt: existing.createdAt ?? action.payload.createdAt,
+        };
       }
     },
     deleteLocalIntervention: (state, action: PayloadAction<string>) => {

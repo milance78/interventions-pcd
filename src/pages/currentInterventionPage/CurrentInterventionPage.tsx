@@ -22,6 +22,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useNavigate } from "react-router-dom";
+import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 import "./CurrentInterventionPage.scss";
 
@@ -226,6 +227,12 @@ const CurrentInterventionPage = () => {
   const newIntervention = useAppSelector(
     (state) => state.newIntervention,
   );
+  const historyInterventions = useAppSelector(
+    (state) => state.history.interventions,
+  );
+  const todayInterventions = useAppSelector(
+    (state) => state.interventionsList,
+  );
 
   const {
     clientName,
@@ -235,6 +242,7 @@ const CurrentInterventionPage = () => {
     smsEnabled,
     isSnowReceivedPending,
     isSnowSentPending,
+    isResPending,
     addressConfirmation,
     isEditing,
     isHistoryView,
@@ -395,24 +403,12 @@ const CurrentInterventionPage = () => {
 
   const submitActions = async () => {
     const result = isEditing
-      ? await dispatch(
-          updateInterventionThunk(
-            newIntervention,
-          ),
-        )
-      : await dispatch(
-          createInterventionThunk(
-            newIntervention,
-          ),
-        );
+      ? await dispatch(updateInterventionThunk(newIntervention))
+      : await dispatch(createInterventionThunk(newIntervention));
 
     const requestFailed =
-      createInterventionThunk.rejected.match(
-        result,
-      ) ||
-      updateInterventionThunk.rejected.match(
-        result,
-      );
+      createInterventionThunk.rejected.match(result) ||
+      updateInterventionThunk.rejected.match(result);
 
     if (requestFailed) {
       const message =
@@ -425,16 +421,67 @@ const CurrentInterventionPage = () => {
       return;
     }
 
+    const isRetrievedIntervention =
+      mode === "SEARCH_EDIT" || mode === "HISTORY_EDIT";
+
+    if (isRetrievedIntervention) {
+      if (mode === "SEARCH_EDIT") {
+        const isAlreadyInToday = todayInterventions.some((item) =>
+          isSameLogicalIntervention(item, newIntervention),
+        );
+
+        if (isAlreadyInToday) {
+          navigate("/liste-du-jour");
+          return;
+        }
+
+        const normalizedInterventionId =
+          newIntervention.interventionId.trim().toLowerCase();
+        const normalizedOagId =
+          newIntervention.oagID.trim().toLowerCase();
+
+        const latestDate = historyInterventions
+          .filter((item) => {
+            if (
+              normalizedInterventionId &&
+              item.interventionId.trim().toLowerCase() ===
+                normalizedInterventionId
+            ) {
+              return true;
+            }
+
+            return Boolean(
+              normalizedOagId &&
+                item.oagID.trim().toLowerCase() === normalizedOagId,
+            );
+          })
+          .map((item) => item.dateKey ?? "")
+          .filter(Boolean)
+          .sort((a, b) => b.localeCompare(a))[0];
+
+        if (latestDate) {
+          window.sessionStorage.setItem(
+            "history:pending-date",
+            latestDate,
+          );
+        }
+      }
+
+      navigate("/historique");
+      return;
+    }
+
     if (isEditing && hasDraft) {
       dispatch(resumeDraft());
     } else {
       dispatch(clearTask());
     }
+
     navigate("/liste-du-jour");
   };
 
   const addToTodayList = async () => {
-    if (mode !== "SEARCH_EDIT") return;
+    if (mode !== "SEARCH_EDIT" && mode !== "HISTORY_EDIT") return;
 
     const result = await dispatch(
       updateSearchInterventionThunk(newIntervention),
@@ -451,11 +498,7 @@ const CurrentInterventionPage = () => {
     }
 
     dispatch(markSearchInterventionSaved(result.payload));
-
-    if (!hasDraft) {
-      dispatch(clearTask());
-      navigate("/liste-du-jour");
-    }
+    navigate("/liste-du-jour");
   };
 
   const openRevisionHistory = async () => {
@@ -499,6 +542,8 @@ const CurrentInterventionPage = () => {
 
   const isNewOrDraft = mode === "NEW" || mode === "DRAFT";
   const isSearchEdit = mode === "SEARCH_EDIT";
+  const isHistoryEdit = mode === "HISTORY_EDIT";
+  const isRetrievedEdit = isSearchEdit || isHistoryEdit;
 
   return (
     <main
@@ -512,11 +557,13 @@ const CurrentInterventionPage = () => {
             <h1>
               {isSearchEdit
                 ? "Intervention trouvée"
-                : isHistoryView
+                : isHistoryEdit
                   ? "Intervention de l'historique"
-                  : isEditing
-                    ? "Modifier l'intervention"
-                    : "Nouvelle intervention"}
+                  : isHistoryView
+                    ? "Intervention de l'historique"
+                    : isEditing
+                      ? "Modifier l'intervention"
+                      : "Nouvelle intervention"}
             </h1>
 
             <div className="card-header__actions">
@@ -527,11 +574,13 @@ const CurrentInterventionPage = () => {
               <span className="editing-badge">
                 {isSearchEdit
                   ? "Modification recherchée"
-                  : isHistoryView
-                    ? "Historique"
-                    : isEditing
-                      ? "Modification"
-                      : "Création"}
+                  : isHistoryEdit
+                    ? "Modification historique"
+                    : isHistoryView
+                      ? "Historique"
+                      : isEditing
+                        ? "Modification"
+                        : "Création"}
               </span>
             </div>
           </header>
@@ -546,91 +595,121 @@ const CurrentInterventionPage = () => {
           </div>
 
           <section className="intervention-options">
-            <span className="options-title">
-              Options de l'intervention
-            </span>
-
             <div className="boolean-inputs-row">
-              <div
-                className={`option-button snow-pending-card ${
-                  isSnowSentPending
-                    ? "snow-pending-card--filled"
-                    : "snow-pending-card--empty"
-                }`}
-                aria-label="Snow envoyé en attente"
-                title="Snow envoyé en attente"
-              >
-                {isSnowSentPending && (
-                  <SnowSentPendingIcon className="snow-pending-card__icon" />
-                )}
+              <div className="intervention-option-group intervention-option-group--actions">
+                <span className="intervention-option-group__label">
+                  Actions
+                </span>
+
+                <div className="intervention-option-group__items">
+                  <div className="option-button">
+                    <BooleanInput
+                      field="isUnclear"
+                      label="Question à poser à l'M&P ?"
+                      trueIcon={<QuestionMarkOnIcon />}
+                      falseIcon={<QuestionMarkOffIcon />}
+                    />
+                  </div>
+
+                  <div className="option-button">
+                    <BooleanInput
+                      field="isGoodExample"
+                      label="Bon exemple à retenir ?"
+                      trueIcon={<LightBulbOnIcon />}
+                      falseIcon={<LightBulbOffIcon />}
+                    />
+                  </div>
+
+                  <div className="option-button option-button--res">
+                    <button
+                      type="button"
+                      className={`res-pending-button ${
+                        isResPending ? "res-pending-button--active" : ""
+                      }`}
+                      onClick={() =>
+                        dispatch(
+                          updateField({
+                            field: "isResPending",
+                            value: !isResPending,
+                          }),
+                        )
+                      }
+                      aria-label="Résiliation en attente"
+                      title="Résiliation en attente"
+                      aria-pressed={isResPending}
+                      disabled={isHistoryView}
+                    >
+                      RES
+                    </button>
+                  </div>
+                </div>
               </div>
 
-              <div
-                className={`option-button snow-pending-card ${
-                  isSnowReceivedPending
-                    ? "snow-pending-card--filled"
-                    : "snow-pending-card--empty"
-                }`}
-                aria-label="Snow reçu en attente"
-                title="Snow reçu en attente"
-              >
-                {isSnowReceivedPending && (
-                  <SnowReceivedPendingIcon className="snow-pending-card__icon" />
-                )}
-              </div>
+              <div className="intervention-option-group intervention-option-group--states">
+                <span className="intervention-option-group__label">
+                  États en attente
+                </span>
 
-              <div className="option-button">
-                <BooleanInput
-                  field="isUnclear"
-                  label="Question à poser à l'M&P ?"
-                  trueIcon={
-                    <QuestionMarkOnIcon />
-                  }
-                  falseIcon={
-                    <QuestionMarkOffIcon />
-                  }
-                />
-              </div>
+                <div className="intervention-option-group__items">
+                  <div
+                    className={`option-button snow-pending-card ${
+                      isSnowSentPending
+                        ? "snow-pending-card--filled"
+                        : "snow-pending-card--empty"
+                    }`}
+                    aria-label="Snow envoyé en attente"
+                    title="Snow envoyé en attente"
+                  >
+                    {isSnowSentPending && (
+                      <SnowSentPendingIcon className="snow-pending-card__icon" />
+                    )}
+                  </div>
 
-              <div className="option-button">
-                <BooleanInput
-                  field="isGoodExample"
-                  label="Bon exemple à retenir ?"
-                  trueIcon={
-                    <LightBulbOnIcon />
-                  }
-                  falseIcon={
-                    <LightBulbOffIcon />
-                  }
-                />
-              </div>
+                  <div
+                    className={`option-button snow-pending-card ${
+                      isSnowReceivedPending
+                        ? "snow-pending-card--filled"
+                        : "snow-pending-card--empty"
+                    }`}
+                    aria-label="Snow reçu en attente"
+                    title="Snow reçu en attente"
+                  >
+                    {isSnowReceivedPending && (
+                      <SnowReceivedPendingIcon className="snow-pending-card__icon" />
+                    )}
+                  </div>
 
-              <div
-                className={`option-button cure-summary-card ${
-                  cure === "firstCure" || cure === "secondCure"
-                    ? "cure-summary-card--filled"
-                    : "cure-summary-card--empty"
-                }`}
-                aria-live="polite"
-                aria-label={
-                  cure === "firstCure"
-                    ? "CURE 1"
-                    : cure === "secondCure"
-                      ? "CURE 2"
-                      : "Emplacement CURE vide"
-                }
-              >
-                {(cure === "firstCure" || cure === "secondCure") && (
-                  <img
-                    src={cure === "firstCure" ? VoiceMessageCall1 : VoiceMessageCall2}
-                    alt=""
-                    aria-hidden="true"
-                    className="cure-summary-card__icon"
-                    draggable={false}
-                  />
-                )}
+                  <div
+                    className={`option-button cure-summary-card ${
+                      cure === "firstCure" || cure === "secondCure"
+                        ? "cure-summary-card--filled"
+                        : "cure-summary-card--empty"
+                    }`}
+                    aria-live="polite"
+                    aria-label={
+                      cure === "firstCure"
+                        ? "CURE 1"
+                        : cure === "secondCure"
+                          ? "CURE 2"
+                          : "Emplacement CURE vide"
+                    }
+                  >
+                    {(cure === "firstCure" || cure === "secondCure") && (
+                      <img
+                        src={
+                          cure === "firstCure"
+                            ? VoiceMessageCall1
+                            : VoiceMessageCall2
+                        }
+                        alt=""
+                        aria-hidden="true"
+                        className="cure-summary-card__icon"
+                        draggable={false}
+                      />
+                    )}
+                  </div>
+                </div>
               </div>
-
             </div>
           </section>
         </section>
@@ -871,7 +950,7 @@ const CurrentInterventionPage = () => {
             </div>
 
             <div className="current-intervention-submit-buttons">
-              {isHistoryView || isSearchEdit ? (
+              {isRetrievedEdit ? (
                 <>
                   {newIntervention.documentId && (
                     <Button
@@ -885,18 +964,40 @@ const CurrentInterventionPage = () => {
                     </Button>
                   )}
 
-                  {isSearchEdit && (
+                  <Button
+                    variant="contained"
+                    size="large"
+                    onClick={submitActions}
+                    startIcon={<Send />}
+                    className="submit-intervention-button"
+                  >
+                    Enregistrer
+                  </Button>
+
+                  <Button
+                    variant="outlined"
+                    size="large"
+                    onClick={addToTodayList}
+                    startIcon={<AddTaskRounded />}
+                    className="add-to-today-button add-to-today-button--history"
+                  >
+                    <span className="add-to-today-button__label">
+                      <span>Ajouter à la</span>
+                      <span>liste du jour</span>
+                    </span>
+                  </Button>
+                </>
+              ) : isHistoryView ? (
+                <>
+                  {newIntervention.documentId && (
                     <Button
-                      variant="outlined"
+                      variant="text"
                       size="large"
-                      onClick={addToTodayList}
-                      startIcon={<AddTaskRounded />}
-                      className="add-to-today-button add-to-today-button--history"
+                      onClick={openRevisionHistory}
+                      startIcon={<HistoryRounded />}
+                      className="revision-history-button"
                     >
-                      <span className="add-to-today-button__label">
-                        <span>Ajouter à la</span>
-                        <span>liste du jour</span>
-                      </span>
+                      Historique des modifications
                     </Button>
                   )}
                 </>
@@ -922,7 +1023,7 @@ const CurrentInterventionPage = () => {
                     startIcon={<Send />}
                     className="submit-intervention-button"
                   >
-                    {isEditing ? "Enregistrer" : "Envoyer"}
+                    Enregistrer
                   </Button>
                 </>
               )}

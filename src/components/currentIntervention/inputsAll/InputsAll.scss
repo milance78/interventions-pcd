@@ -2,18 +2,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-
   gap: 8px;
-
   width: 100%;
 
   .inputs-row {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     gap: 10px;
-
     width: 100%;
     min-width: 0;
 
@@ -42,25 +38,45 @@
     }
   }
 
-
-  .inputs-row--address-details {
-    > .address-mini-input {
-      flex: 0 1 10%;
-      width: 10%;
+  .inputs-row--address-line {
+    .simple-input--main-address {
+      flex: 1 1 72%;
+      width: 72%;
     }
 
-    .simple-input--phone {
-      flex: 1 1 60%;
+    > .address-mini-input {
+      flex: 0 1 7%;
+      width: 7%;
     }
   }
 
-  .inputs-row--main-address {
-    .simple-input--main-address {
-      flex: 0 1 70%;
-    }
-
+  .inputs-row--lom-phone {
     .simple-input--lom-key {
       flex: 0 1 30%;
+      width: 30%;
+    }
+
+    .simple-input--phone {
+      flex: 1 1 70%;
+      width: 70%;
+    }
+  }
+}
+
+@media (max-width: 900px) {
+  .inputs-all {
+    .inputs-row--address-line {
+      flex-wrap: wrap;
+
+      .simple-input--main-address {
+        flex: 1 1 100%;
+        width: 100%;
+      }
+
+      > .address-mini-input {
+        flex: 1 1 calc(25% - 8px);
+        width: calc(25% - 8px);
+      }
     }
   }
 }
@@ -75,19 +91,8 @@
     .inputs-row--half,
     .inputs-row--full,
     .inputs-row--snow,
-  
-  .inputs-row--address-details {
-    > .address-mini-input {
-      flex: 0 1 10%;
-      width: 10%;
-    }
-
-    .simple-input--phone {
-      flex: 1 1 60%;
-    }
-  }
-
-  .inputs-row--main-address {
+    .inputs-row--address-line,
+    .inputs-row--lom-phone {
       > *,
       .simple-input--main-address,
       .simple-input--lom-key,

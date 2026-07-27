@@ -12,6 +12,10 @@ import {
 
 import { db } from "./firebaseConfig";
 import type { Intervention, InterventionData } from "../redux/features/newInterventionSlice";
+import {
+  interventionActivityValue,
+  interventionLogicalKey,
+} from "../utils/interventionIdentity";
 
 const getDayReference = (userId: string, date: string) =>
   doc(db, "users", userId, "days", date);
@@ -73,18 +77,36 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     data.isSnowSentPending ?? false,
   );
 
+  const normalizedCure =
+    data.cure === "CURE1"
+      ? "firstCure"
+      : data.cure === "CURE2"
+        ? "secondCure"
+        : data.cure === "CURE3"
+          ? "thirdCure"
+          : data.cure ?? data.Cure ?? "noCure";
+
   return {
     ...dataWithoutLegacyAddress,
     snowReceived,
     snowSent,
     isSnowReceivedPending,
     isSnowSentPending,
+    isResPending: Boolean(
+      data.isResPending ??
+        data.resPending ??
+        data.RES ??
+        data.res ??
+        false,
+    ),
     isSnow: isSnowReceivedPending || isSnowSentPending,
     comment,
     addressConfirmation,
     additionalInformation:
       data.additionalInformation ?? data.informationsSupplementaires ?? "",
-    cure: data.cure ?? data.Cure ?? "noCure",
+    cure: normalizedCure,
+    curePendingSince:
+      convertTimestampToString(data.curePendingSince) ?? null,
     smsEnabled: data.smsEnabled ?? data.sms ?? false,
     mailbox:
       data.mailbox ?? data.mailBox ?? data.box ??
@@ -136,17 +158,6 @@ const stripUiFields = (intervention: Intervention) => {
     ...interventionData
   } = intervention;
   return interventionData;
-};
-
-const activityValue = (intervention: Intervention) =>
-  intervention.updatedAt ?? intervention.createdAt ?? intervention.dateKey ?? "";
-
-const logicalKey = (intervention: Intervention) => {
-  const interventionId = intervention.interventionId?.trim().toLowerCase();
-  if (interventionId) return `intervention:${interventionId}`;
-  const oagId = intervention.oagID?.trim().toLowerCase();
-  if (oagId) return `oag:${oagId}`;
-  return `document:${intervention.documentId}`;
 };
 
 const updateSummaryInBackground = (userId: string, date: string) => {
@@ -215,6 +226,49 @@ export const loadCompleteHistory = async (userId: string): Promise<HistoryDay[]>
   return days
     .filter((day) => day.interventions.length > 0)
     .sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+};
+
+
+export const hydrateOccurrencesWithLatestState = (
+  occurrences: Intervention[],
+  latestInterventions: Intervention[],
+): Intervention[] => {
+  const latestByKey = new Map<string, Intervention>();
+
+  latestInterventions.forEach((intervention) => {
+    const key = interventionLogicalKey(intervention);
+    const current = latestByKey.get(key);
+
+    if (
+      !current ||
+      interventionActivityValue(intervention) >
+        interventionActivityValue(current)
+    ) {
+      latestByKey.set(key, intervention);
+    }
+  });
+
+  return occurrences.map((occurrence) => {
+    const latest = latestByKey.get(
+      interventionLogicalKey(occurrence),
+    );
+
+    if (!latest) return occurrence;
+
+    return {
+      ...occurrence,
+      ...latest,
+      // Membership in History/Today remains attached to its original day.
+      documentId: occurrence.documentId,
+      dateKey: occurrence.dateKey,
+      createdAt: occurrence.createdAt ?? latest.createdAt,
+      isEditing: false,
+      isHistoryView: false,
+      mode: "VIEW_HISTORY",
+      draftSnapshot: null,
+      hasDraft: false,
+    };
+  });
 };
 
 export const deleteIntervention = async (userId: string, date: string, documentId: string) => {
@@ -302,7 +356,14 @@ export const updateSearchInterventionAndMoveToToday = async (
 ): Promise<Intervention> => {
   if (!intervention.documentId) throw new Error("Missing Firestore document ID");
 
-  const caseId = intervention.documentId;
+  const originalSnapshotRef = doc(
+    getInterventionsReference(userId, originalDate),
+    intervention.documentId,
+  );
+  const originalSnapshot = await getDoc(originalSnapshotRef);
+  const caseId = originalSnapshot.exists()
+    ? originalSnapshot.data().caseId ?? intervention.documentId
+    : intervention.documentId;
   const activeRef = doc(getActiveReference(userId), caseId);
   const activeSnapshot = await getDoc(activeRef);
   const currentData: Record<string, any> = activeSnapshot.exists()
@@ -366,7 +427,7 @@ export const loadDailySummary = async (userId: string, date: string) => {
   return snapshot.exists() ? snapshot.data() : null;
 };
 
-const loadOrBuildActiveInterventions = async (userId: string): Promise<Intervention[]> => {
+export const loadLatestInterventions = async (userId: string): Promise<Intervention[]> => {
   const activeSnapshot = await getDocs(getActiveReference(userId));
   const active = activeSnapshot.docs.map((item) => {
     const data = item.data();
@@ -380,9 +441,9 @@ const loadOrBuildActiveInterventions = async (userId: string): Promise<Intervent
   const latestByLogicalKey = new Map<string, Intervention>();
 
   [...history, ...active].forEach((item) => {
-    const key = logicalKey(item);
+    const key = interventionLogicalKey(item);
     const current = latestByLogicalKey.get(key);
-    if (!current || activityValue(item) > activityValue(current)) {
+    if (!current || interventionActivityValue(item) > interventionActivityValue(current)) {
       latestByLogicalKey.set(key, item);
     }
   });
@@ -414,12 +475,12 @@ const loadOrBuildActiveInterventions = async (userId: string): Promise<Intervent
 export const searchInterventions = async (userId: string, searchValue: string): Promise<Intervention[]> => {
   const normalizedSearchValue = searchValue.trim().toLowerCase();
   if (!normalizedSearchValue) return [];
-  const active = await loadOrBuildActiveInterventions(userId);
+  const active = await loadLatestInterventions(userId);
   return active
     .filter((intervention) => {
       const interventionId = intervention.interventionId?.trim().toLowerCase() ?? "";
       const oagId = intervention.oagID?.trim().toLowerCase() ?? "";
       return interventionId === normalizedSearchValue || oagId === normalizedSearchValue;
     })
-    .sort((first, second) => activityValue(second).localeCompare(activityValue(first)));
+    .sort((first, second) => interventionActivityValue(second).localeCompare(interventionActivityValue(first)));
 };

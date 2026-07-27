@@ -3,7 +3,6 @@ import "./StatusInput.scss";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import InputLabel from "@mui/material/InputLabel";
 import { updateField } from "../../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 const StatusInput = () => {
@@ -25,54 +24,49 @@ const StatusInput = () => {
       size="small"
       fullWidth
     >
-      <InputLabel
-        className="status-label"
-        id="status-label"
-        shrink={!isDefault}
-        sx={{
-          color: "grey",
-          backgroundColor: "white",
-          padding: "0 6px",
-          borderRadius: "5px",
-          marginLeft: "-5px",
-          "&.Mui-focused": {
-            color: "#545454",
-          },
-          opacity: isDefault ? 0 : 1,
-          transition: (theme) =>
-            theme.transitions.create(["transform", "opacity"], {
-              duration: theme.transitions.duration.shorter,
-            }),
-        }}
-      >
-        {"Status"}
-      </InputLabel>
       <Select
         className="status-select"
-        labelId="status-label"
         id="status-select"
         value={status}
-        label="Status"
         displayEmpty
-        notched={!isDefault}
+        notched={false}
         onChange={handleChange}
         sx={{
           "& .MuiSelect-select": {
             backgroundColor:
               status === ""
-                ? "#e5cce5"
+                ? "#f1f5f9"
                 : status === "completed"
-                  ? "#bbffbb"
+                  ? "#dcfce7"
                   : status === "on hold"
-                    ? "#ffbbbb"
-                    : "#fff898",
+                    ? "#fef3c7"
+                    : status === "transferred"
+                      ? "#dbeafe"
+                      : "#f1f5f9",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
           },
+          color:
+            status === "completed"
+              ? "#166534"
+              : status === "on hold"
+                ? "#92400e"
+                : status === "transferred"
+                  ? "#1d4ed8"
+                  : "#475569",
+          fontWeight: 700,
+          borderRadius: "12px",
           "& .MuiOutlinedInput-notchedOutline": {
-            borderColor: "#bdbdbd",
+            borderColor:
+              status === "completed"
+                ? "#86d49c"
+                : status === "on hold"
+                  ? "#efc55d"
+                  : status === "transferred"
+                    ? "#93baf4"
+                    : "#cbd5e1",
           },
           "&:hover .MuiOutlinedInput-notchedOutline": {
             borderColor: "#9e9e9e",

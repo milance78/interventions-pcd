@@ -436,6 +436,14 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
   // English Work Item descriptions are used only as a fallback.
   const description = meaningful(safe.descriptionFr) || meaningful(work.descriptionEn);
   const na = infrastructure === "fiber" ? "" : first(safe.na, work.na);
+  const hasAnyAddressDetail = Boolean(
+    meaningful(safe.mailbox) ||
+      meaningful(safe.floor) ||
+      meaningful(safe.apartment) ||
+      meaningful(safe.blockNumber),
+  );
+  const shouldIgnoreCopperLom =
+    infrastructure === "copper" && hasAnyAddressDetail;
 
   return {
     interventionId: first(work.interventionId, safe.interventionId),
@@ -451,7 +459,7 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
     floor: safe.floor ?? "",
     apartment: safe.apartment ?? "",
     blockNumber: safe.blockNumber ?? "",
-    LOMKey: safe.LOMKey ?? "",
+    LOMKey: shouldIgnoreCopperLom ? "" : safe.LOMKey ?? "",
     phone: safe.phone ?? "",
     infrastructure,
     network: normalizeNetwork(text),

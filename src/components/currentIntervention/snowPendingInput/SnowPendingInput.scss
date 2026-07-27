@@ -80,3 +80,14 @@
     grid-template-columns: minmax(0, 1fr) 84px;
   }
 }
+
+
+.snow-pending-input--emphasized {
+  .MuiOutlinedInput-root {
+    background: #eef1f5;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #aeb8c5;
+  }
+}

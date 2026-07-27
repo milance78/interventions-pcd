@@ -3,9 +3,11 @@ import { onAuthStateChanged } from "firebase/auth";
 
 import { auth } from "../../firebase/firebaseConfig";
 import {
+  hydrateOccurrencesWithLatestState,
   loadCompleteHistory,
   loadDailySummary,
   loadInterventions,
+  loadLatestInterventions,
 } from "../../firebase/interventionsService";
 import {
   clearHistory,
@@ -40,49 +42,72 @@ const InterventionsLoader = () => {
       const today = getLocalDate();
       dispatch(startHistoryRefresh());
 
-      const todayPromise = loadInterventions(user.uid, today)
-        .then((interventions) => {
-          dispatch(setInterventions(interventions));
-        })
-        .catch((error) => {
-          console.error("Unable to load interventions:", error);
-          dispatch(setInterventions([]));
-        });
+      try {
+        const [
+          todayOccurrences,
+          historyDays,
+          latestInterventions,
+          summary,
+        ] = await Promise.all([
+          loadInterventions(user.uid, today),
+          loadCompleteHistory(user.uid),
+          loadLatestInterventions(user.uid),
+          loadDailySummary(user.uid, today).catch(() => null),
+        ]);
 
-      const statisticsPromise = loadDailySummary(user.uid, today)
-        .then((summary) => {
-          const now = new Date();
+        dispatch(
+          setInterventions(
+            hydrateOccurrencesWithLatestState(
+              todayOccurrences,
+              latestInterventions,
+            ),
+          ),
+        );
 
-          dispatch(
-            setStatistics({
-              date: now.toLocaleDateString("fr-BE"),
-              time: now.toLocaleTimeString("fr-BE"),
-              total: summary?.total ?? 0,
-              completed: summary?.completed ?? 0,
-              onHold: summary?.onHold ?? 0,
-              transferred: summary?.transferred ?? 0,
-              closedByAnotherAgent: summary?.closedByAnotherAgent ?? 0,
-            }),
-          );
-        })
-        .catch((error) => {
-          console.error("Unable to load statistics:", error);
-        });
+        dispatch(
+          setHistory(
+            hydrateOccurrencesWithLatestState(
+              historyDays.flatMap((day) => day.interventions),
+              latestInterventions,
+            ),
+          ),
+        );
 
-      const historyPromise = loadCompleteHistory(user.uid)
-        .then((days) => {
-          dispatch(setHistory(days.flatMap((day) => day.interventions)));
-        })
-        .catch((error) => {
-          console.error("Unable to load history:", error);
-          dispatch(setHistoryError("Impossible de charger l'historique."));
-        });
+        const now = new Date();
 
-      await Promise.allSettled([
-        todayPromise,
-        statisticsPromise,
-        historyPromise,
-      ]);
+        dispatch(
+          setStatistics({
+            date: now.toLocaleDateString("fr-BE"),
+            time: now.toLocaleTimeString("fr-BE"),
+            total: summary?.total ?? todayOccurrences.length,
+            completed:
+              summary?.completed ??
+              todayOccurrences.filter(
+                (item) => item.status === "completed",
+              ).length,
+            onHold:
+              summary?.onHold ??
+              todayOccurrences.filter(
+                (item) => item.status === "on hold",
+              ).length,
+            transferred:
+              summary?.transferred ??
+              todayOccurrences.filter(
+                (item) => item.status === "transferred",
+              ).length,
+            closedByAnotherAgent:
+              summary?.closedByAnotherAgent ??
+              todayOccurrences.filter(
+                (item) =>
+                  item.status === "closed by another agent",
+              ).length,
+          }),
+        );
+      } catch (error) {
+        console.error("Unable to load interventions:", error);
+        dispatch(setInterventions([]));
+        dispatch(setHistoryError("Impossible de charger l'historique."));
+      }
     });
 
     return unsubscribe;

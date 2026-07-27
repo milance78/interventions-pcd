@@ -4,6 +4,7 @@ export type InterventionMode =
   | "NEW"
   | "DRAFT"
   | "VIEW_HISTORY"
+  | "HISTORY_EDIT"
   | "SEARCH_EDIT"
   | "TODAY_EDIT";
 
@@ -43,6 +44,7 @@ export interface InterventionData {
   snowSent: string;
   isSnowReceivedPending: boolean;
   isSnowSentPending: boolean;
+  isResPending: boolean;
   isUnclear: boolean;
   addressConfirmation: AddressConfirmation;
   isGoodExample: boolean;
@@ -50,6 +52,7 @@ export interface InterventionData {
   comment: string;
   additionalInformation: string;
   cure: CureValue;
+  curePendingSince: string | null;
   smsEnabled: boolean;
   status: string;
   createdAt: string | null;
@@ -99,6 +102,7 @@ export const emptyInterventionData: InterventionData = {
   snowSent: "",
   isSnowReceivedPending: false,
   isSnowSentPending: false,
+  isResPending: false,
   isUnclear: false,
   addressConfirmation: "none",
   isGoodExample: false,
@@ -106,6 +110,7 @@ export const emptyInterventionData: InterventionData = {
   comment: "",
   additionalInformation: "",
   cure: "noCure",
+  curePendingSince: null,
   smsEnabled: loadSmsPreference(),
   status: "",
   createdAt: null,
@@ -161,6 +166,7 @@ const extractData = (state: Intervention): InterventionData => ({
   snowSent: state.snowSent,
   isSnowReceivedPending: state.isSnowReceivedPending,
   isSnowSentPending: state.isSnowSentPending,
+  isResPending: state.isResPending,
   isUnclear: state.isUnclear,
   addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,
@@ -168,6 +174,7 @@ const extractData = (state: Intervention): InterventionData => ({
   comment: state.comment,
   additionalInformation: state.additionalInformation,
   cure: state.cure,
+  curePendingSince: state.curePendingSince,
   smsEnabled: state.smsEnabled,
   status: state.status,
   createdAt: state.createdAt,
@@ -217,12 +224,26 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
 
       const { field, value } = action.payload;
+      const previousCure = state.cure;
+
       (
         state as unknown as Record<
           InterventionField,
           InterventionData[InterventionField]
         >
       )[field] = value;
+
+      if (field === "cure") {
+        const nextCure = value as CureValue;
+        const isPendingCure =
+          nextCure === "firstCure" || nextCure === "secondCure";
+
+        if (!isPendingCure) {
+          state.curePendingSince = null;
+        } else if (previousCure !== nextCure || !state.curePendingSince) {
+          state.curePendingSince = new Date().toISOString();
+        }
+      }
 
       if (
         field === "isSnowReceivedPending" ||
@@ -295,9 +316,9 @@ const NewInterventionSlice = createSlice({
       return {
         ...initialState,
         ...action.payload,
-        isEditing: false,
-        isHistoryView: true,
-        mode: "VIEW_HISTORY",
+        isEditing: true,
+        isHistoryView: false,
+        mode: "HISTORY_EDIT",
         ...draftState,
       };
     },
