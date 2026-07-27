@@ -203,7 +203,7 @@ const OnHoldPage = () => {
               type="button"
               role="tab"
               aria-selected={activeTab === tab.value}
-              className={`on-hold-tab ${
+              className={`on-hold-tab on-hold-tab--${tab.value} ${
                 activeTab === tab.value ? "on-hold-tab--active" : ""
               }`}
               onClick={() => setActiveTab(tab.value)}

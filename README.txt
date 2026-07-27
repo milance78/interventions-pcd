@@ -1,10 +1,13 @@
-STABLE TODAY COUNTER — v77
+EMERGENCY FIX — v81
 
-- Restores the last version in which the circular ring animation worked.
-- Removes delayed number replacement and number pop animation from v76.
-- Counter value changes immediately.
-- Ring animation runs independently through the Web Animations API.
-- Addition draws clockwise from 12 o'clock.
-- Deletion draws counterclockwise from 12 o'clock.
-- Keeps the 300 ms delay, large ring, thick stroke and light pastel colors.
-- Uses a fresh storage namespace so failed v76 state cannot interfere.
+- Restored the complete InputsAll.tsx component.
+- Restored its default export.
+- Removed only the ID and OAG icon usages/imports.
+- SVG asset files remain untouched.
+- Removed the IDENTIFIANTS PRINCIPAUX caption.
+- Changed the panel from soft blue to soft light gray.
+- Manifest check: public/site.webmanifest is valid JSON. The browser error is likely a stale cached request or a dev-server fallback response, not malformed project JSON.
+
+IMPORTANT:
+v80 accidentally replaced InputsAll.tsx with a comment-only placeholder.
+This patch contains the complete corrected source file, not instructions.

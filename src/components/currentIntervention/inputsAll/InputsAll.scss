@@ -24,6 +24,32 @@
     }
   }
 
+  .inputs-row--primary-identifiers {
+    position: relative;
+
+    margin: 2px 0;
+    padding: 14px 12px;
+    box-sizing: border-box;
+
+    background:
+      linear-gradient(
+        135deg,
+        rgba(250, 251, 252, 0.98),
+        rgba(243, 245, 248, 0.96)
+      );
+
+    border: 1px solid #d8e0ea;
+    border-radius: 15px;
+
+    box-shadow:
+      0 4px 10px rgba(30, 41, 59, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+
+    > * {
+      min-width: 0;
+    }
+  }
+
   .inputs-row--full {
     > * {
       flex: 1 1 100%;
@@ -101,6 +127,15 @@
         flex: 1 1 auto;
         width: 100%;
       }
+    }
+  }
+}
+
+
+@media (max-width: 680px) {
+  .inputs-all {
+    .inputs-row--primary-identifiers {
+      padding: 18px 11px 12px;
     }
   }
 }

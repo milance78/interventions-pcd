@@ -13,9 +13,7 @@ import SnowPendingInput from "../snowPendingInput/SnowPendingInput";
 import AddressMiniInput from "../addressMiniInput/AddressMiniInput";
 
 import { ReactComponent as CIDIcon } from "../../../assets/svg/CID.svg.tsx";
-import { ReactComponent as IDIcon } from "../../../assets/svg/ID.svg.tsx";
 import { ReactComponent as NAIcon } from "../../../assets/svg/NA.svg.tsx";
-import { ReactComponent as OAGIcon } from "../../../assets/svg/OAG.svg.tsx";
 import { useAppSelector } from "../../../redux/store";
 
 const InputsAll = () => {
@@ -48,19 +46,17 @@ const InputsAll = () => {
 
   return (
     <div className="inputs-all">
-      <section className="inputs-row inputs-row--half">
+      <section className="inputs-row inputs-row--half inputs-row--primary-identifiers">
         <SimpleInput
           field="interventionId"
           label="ID de l'intervention"
           inputType="type2"
-          icon={IDIcon}
         />
 
         <SimpleInput
           field="oagID"
           label="OAG ID"
           inputType="type2"
-          icon={OAGIcon}
         />
       </section>
 
