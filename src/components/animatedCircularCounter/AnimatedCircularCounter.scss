@@ -1,0 +1,114 @@
+.animated-today-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 auto;
+  white-space: nowrap;
+
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.animated-today-counter__label {
+  display: inline-block;
+}
+
+.animated-today-counter__circle {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  flex: 0 0 78px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.animated-today-counter__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.animated-today-counter__track,
+.animated-today-counter__progress {
+  fill: none;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.animated-today-counter__track {
+  stroke: #edf1f5;
+  stroke-width: 8;
+}
+
+.animated-today-counter__progress {
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 0;
+
+  /* 12 o'clock starting point, clockwise by default. */
+  transform: rotate(-90deg);
+}
+
+.animated-today-counter__progress[data-direction="counterclockwise"] {
+  /* Start at 12 o'clock and draw in the mathematically opposite direction. */
+  transform: rotate(-90deg) scaleY(-1);
+}
+
+.animated-today-counter__number {
+  position: relative;
+  z-index: 1;
+
+  color: #253047;
+  font-size: 18px;
+  font-weight: 850;
+  line-height: 1;
+}
+
+.animated-today-counter--green
+  .animated-today-counter__progress {
+  stroke: #9bcdb0;
+}
+
+.animated-today-counter--amber
+  .animated-today-counter__progress {
+  stroke: #dcc985;
+}
+
+.animated-today-counter--blue
+  .animated-today-counter__progress {
+  stroke: #a6c6e8;
+}
+
+@media (max-width: 720px) {
+  .animated-today-counter {
+    gap: 9px;
+  }
+
+  .animated-today-counter__circle {
+    width: 68px;
+    height: 68px;
+    flex-basis: 68px;
+  }
+
+  .animated-today-counter__track {
+    stroke-width: 7;
+  }
+
+  .animated-today-counter__progress {
+    stroke-width: 8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animated-today-counter__progress {
+    stroke-dashoffset: 0 !important;
+    opacity: 1 !important;
+  }
+}

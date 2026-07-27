@@ -1,12 +1,10 @@
-ON HOLD PURPLE UI — v66
+STABLE TODAY COUNTER — v77
 
-- Header notification now reads “CURE: N”.
-- Notification is a smaller pastel pink-purple rectangle.
-- It is absolutely positioned slightly higher beneath En attente.
-- On Hold page uses soft pink/lilac gradients instead of blue.
-- Commentaire and Informations supplémentaires are placed side by side.
-- Both fields have exactly equal width.
-- On wide screens they sit to the right inside the card.
-- Responsive layouts keep them readable on smaller screens.
-- CUIVRE uses a blue technology badge.
-- FIBRE uses a green technology badge.
+- Restores the last version in which the circular ring animation worked.
+- Removes delayed number replacement and number pop animation from v76.
+- Counter value changes immediately.
+- Ring animation runs independently through the Web Animations API.
+- Addition draws clockwise from 12 o'clock.
+- Deletion draws counterclockwise from 12 o'clock.
+- Keeps the 300 ms delay, large ring, thick stroke and light pastel colors.
+- Uses a fresh storage namespace so failed v76 state cannot interfere.

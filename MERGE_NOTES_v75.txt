@@ -1,0 +1,35 @@
+INTERVENTIONS PCD — PRESERVED TODAY CHANGES + REBUILT COUNTERS (v75)
+
+BASE
+- The newest "Ceo projekat" version was retained as the source of truth so
+  today's useful functional and UI changes are not lost.
+- The older stable project was used only as a comparison reference.
+
+PRESERVED
+- Edit/Delete spacing and vertically stacked copy controls.
+- En attente blue-gray palette aligned with Today and History.
+- Circular overdue CURE notification with count + handset icon.
+- Draft/workflow safety, comment copy, delete confirmations and the other
+  useful changes already present in the newest project.
+
+REMOVED/REPLACED
+- The failed v71-v74 circular-animation logic was not retained.
+- AnimatedCircularCounter was rewritten from zero.
+
+NEW COUNTER ENGINE
+- Uses the browser Web Animations API directly on the SVG progress circle.
+- React rerenders do not drive individual animation frames.
+- Previous values survive route changes via module memory and sessionStorage.
+- New v2 storage keys avoid stale values from the failed implementations.
+- Increase: starts at 12 o'clock and draws clockwise to 12 o'clock.
+- Decrease: starts at 12 o'clock and draws counterclockwise to 12 o'clock.
+- Start delay: 300 ms.
+- Ring diameter: 78 px.
+- Track: 8 px; colored progress ring: 9 px.
+- Colors are lighter/pastel green, amber and blue.
+- Total remains the simple gray counter.
+
+BUILD NOTE
+- Source was prepared without node_modules. Run `npm install` and then
+  `npm run build` locally. The container could not complete dependency
+  installation, so a full dependency-backed build could not be certified here.

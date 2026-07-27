@@ -1,0 +1,93 @@
+.snow-pending-input {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+}
+
+.snow-pending-input__field {
+  min-width: 0;
+
+  > * {
+    width: 100%;
+  }
+}
+
+.snow-pending-input__button {
+  align-self: stretch;
+  min-width: 82px;
+  padding: 0 12px;
+  color: #806000;
+  background: linear-gradient(145deg, #fffdf3 0%, #fff8d8 55%, #f7e7a2 100%);
+  border: 1px solid #e8ca67;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow:
+    0 4px 8px rgba(133, 99, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transform: none;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    color 120ms ease;
+}
+
+.snow-pending-input__button:hover {
+  color: #806000;
+  background: linear-gradient(145deg, #fffdf3 0%, #fff8d8 55%, #f7e7a2 100%);
+  border-color: #e8ca67;
+  box-shadow:
+    0 4px 8px rgba(133, 99, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  transform: none;
+}
+
+.snow-pending-input__button:active,
+.snow-pending-input__button--active,
+.snow-pending-input__button--active:hover {
+  color: #6f5200;
+  background: linear-gradient(145deg, #f4df8b 0%, #fff0b8 45%, #fff8d8 100%);
+  border-color: #d7b53f;
+  box-shadow:
+    inset 0 3px 7px rgba(112, 81, 0, 0.26),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.48),
+    0 1px 1px rgba(255, 255, 255, 0.85);
+  transform: translateY(1.5px) scale(0.985);
+}
+
+.snow-pending-input__button:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(234, 179, 8, 0.2),
+    0 4px 8px rgba(133, 99, 0, 0.16);
+}
+
+.snow-pending-input__button--active:focus-visible {
+  box-shadow:
+    0 0 0 3px rgba(234, 179, 8, 0.2),
+    inset 0 3px 7px rgba(112, 81, 0, 0.26);
+}
+
+@media (max-width: 680px) {
+  .snow-pending-input {
+    grid-template-columns: minmax(0, 1fr) 84px;
+  }
+}
+
+
+.snow-pending-input--emphasized {
+  .MuiOutlinedInput-root {
+    background: #eef1f5;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #aeb8c5;
+  }
+}
