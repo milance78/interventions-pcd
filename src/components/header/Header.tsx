@@ -123,7 +123,7 @@ const Header = () => {
               aria-label={`${overdueCureCount} ticket${overdueCureCount > 1 ? "s" : ""} CURE en retard`}
               title={`${overdueCureCount} ticket${overdueCureCount > 1 ? "s" : ""} CURE en retard`}
             >
-              {overdueCureCount}
+              CURE: {overdueCureCount}
             </span>
           )}
         </NavLink>

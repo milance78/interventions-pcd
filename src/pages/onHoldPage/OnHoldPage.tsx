@@ -116,7 +116,13 @@ const OnHoldPage = () => {
         }`}
         onClick={() => openIntervention(intervention)}
       >
-        <span className="on-hold-card__technology">
+        <span
+          className={`on-hold-card__technology ${
+            infrastructureLabel(intervention.infrastructure) === "FIBRE"
+              ? "on-hold-card__technology--fiber"
+              : "on-hold-card__technology--copper"
+          }`}
+        >
           {infrastructureLabel(intervention.infrastructure)}
         </span>
 
