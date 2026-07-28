@@ -27,16 +27,16 @@ const CableCutIcon = () => (
     focusable="false"
     className="on-hold-cable-cut-icon"
   >
-    <path className="on-hold-cable-cut-icon__cable" d="M1.5 6.5H38.5" />
+    <path className="on-hold-cable-cut-icon__cable" d="M7 5.4H33" />
 
-    <path className="on-hold-cable-cut-icon__blade" d="M20 13.2 16.2 3.4" />
-    <path className="on-hold-cable-cut-icon__blade" d="M20 13.2 23.8 3.4" />
+    <path className="on-hold-cable-cut-icon__blade" d="M20 14.1 17.1 1.6" />
+    <path className="on-hold-cable-cut-icon__blade" d="M20 14.1 22.9 1.6" />
 
-    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="13.2" r="1.55" />
-    <circle className="on-hold-cable-cut-icon__handle" cx="15.7" cy="18.3" r="3.15" />
-    <circle className="on-hold-cable-cut-icon__handle" cx="24.3" cy="18.3" r="3.15" />
-    <path className="on-hold-cable-cut-icon__arm" d="M19 14.2 17.4 15.8" />
-    <path className="on-hold-cable-cut-icon__arm" d="M21 14.2 22.6 15.8" />
+    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="14.1" r="1.6" />
+    <circle className="on-hold-cable-cut-icon__handle" cx="15.6" cy="19" r="3.15" />
+    <circle className="on-hold-cable-cut-icon__handle" cx="24.4" cy="19" r="3.15" />
+    <path className="on-hold-cable-cut-icon__arm" d="M18.9 15.2 17.2 16.9" />
+    <path className="on-hold-cable-cut-icon__arm" d="M21.1 15.2 22.8 16.9" />
   </svg>
 );
 
