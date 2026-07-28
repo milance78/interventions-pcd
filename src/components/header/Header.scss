@@ -24,6 +24,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-left: 2px;
 }
 
 .header__date {
@@ -293,7 +294,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 2px;
+  gap: 0;
   box-sizing: border-box;
 
   border: 2px solid rgba(255, 255, 255, 0.96);
@@ -321,17 +322,19 @@
 }
 
 .header__on-hold-notification strong {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 900;
   line-height: 1;
+  margin-right: -2px;
 }
 
 .header__on-hold-notification svg {
-  width: 12px;
-  height: 12px;
-  flex: 0 0 12px;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
 
-  transform: rotate(45deg);
+  transform: scaleX(-1) rotate(45deg);
+  margin-left: -2px;
   transform-origin: center;
 
   filter: drop-shadow(
