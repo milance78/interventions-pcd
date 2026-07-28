@@ -58,18 +58,12 @@
   width: auto;
   max-width: 1160px;
   margin: 0;
-  padding: 5px;
+  padding: 0;
   display: grid;
   grid-template-columns: repeat(6, max-content);
   justify-content: end;
-  gap: 4px;
+  gap: 0;
   flex: 0 1 auto;
-  background: rgba(241, 245, 249, 0.82);
-  border: 1px solid rgba(148, 163, 184, 0.28);
-  border-radius: 16px;
-  box-shadow:
-    inset 0 1px 2px rgba(15, 23, 42, 0.04),
-    0 8px 18px rgba(15, 23, 42, 0.045);
 }
 
 .on-hold-tab {
@@ -78,9 +72,9 @@
   --tab-line: rgba(49, 90, 134, 0.52);
 
   position: relative;
-  min-height: 44px;
-  min-width: 122px;
-  padding: 8px 12px;
+  min-height: 56px;
+  min-width: 144px;
+  padding: 10px 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -88,11 +82,12 @@
   color: #64748b;
   background: transparent;
   border: 0;
-  border-radius: 11px;
+  border-left: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 0;
   cursor: pointer;
   font: inherit;
-  font-size: 12px;
-  font-weight: 720;
+  font-size: 15px;
+  font-weight: 780;
   white-space: nowrap;
   transition:
     color 160ms ease,
@@ -115,9 +110,9 @@
   }
 
   strong {
-    min-width: 22px;
-    height: 22px;
-    padding: 0 6px;
+    min-width: 30px;
+    height: 30px;
+    padding: 0 8px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -126,15 +121,19 @@
     background: var(--tab-soft);
     border: 1px solid color-mix(in srgb, var(--tab-color) 16%, transparent);
     border-radius: 999px;
-    font-size: 10px;
-    font-weight: 850;
+    font-size: 13px;
+    font-weight: 900;
     line-height: 1;
+  }
+
+  &:first-child {
+    border-left: 0;
   }
 
   &:hover {
     color: var(--tab-color);
-    background: rgba(255, 255, 255, 0.68);
-    transform: translateY(-1px);
+    background: color-mix(in srgb, var(--tab-color) 5%, transparent);
+    transform: none;
   }
 
   &:focus-visible {
@@ -150,17 +149,40 @@
   color: var(--tab-color);
 
   svg {
-    width: 20px;
-    height: 20px;
+    width: 27px;
+    height: 27px;
   }
 }
 
-.on-hold-disconnected-icon {
+.on-hold-cable-cut-icon {
+  width: 38px !important;
+  height: 25px !important;
+  overflow: visible;
   fill: none;
   stroke: currentColor;
-  stroke-width: 1.9;
   stroke-linecap: round;
   stroke-linejoin: round;
+
+  &__cable {
+    stroke-width: 2.8;
+  }
+
+  &__blade {
+    stroke-width: 2.15;
+  }
+
+  &__pivot {
+    fill: #ffffff;
+    stroke-width: 1.8;
+  }
+
+  &__handle {
+    stroke-width: 2.1;
+  }
+
+  &__arm {
+    stroke-width: 2.1;
+  }
 }
 
 .on-hold-tab--cure {
@@ -197,10 +219,8 @@
 .on-hold-tab--active,
 .on-hold-tab--active:hover {
   color: var(--tab-color);
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow:
-    0 5px 13px rgba(15, 23, 42, 0.08),
-    inset 0 0 0 1px rgba(148, 163, 184, 0.16);
+  background: color-mix(in srgb, var(--tab-color) 7%, transparent);
+  box-shadow: none;
   transform: none;
 
   &::after {
@@ -331,30 +351,32 @@
 }
 
 .on-hold-card__technology {
-  min-height: 34px;
-  padding: 7px 12px;
+  min-height: 32px;
+  padding: 6px 11px;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
   font-size: 12px;
-  font-weight: 850;
+  font-weight: 860;
   line-height: 1;
   text-align: center;
   letter-spacing: 0.04em;
 }
 
 .on-hold-card__technology--copper {
-  color: #7a431d;
-  background: linear-gradient(145deg, #fff8ef 0%, #f2e4d2 100%);
-  border: 1px solid #ead6bd;
+  color: #1d5eb7;
+  background: linear-gradient(145deg, #f2f7ff 0%, #e2edff 100%);
+  border: 1px solid #bfd5f5;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .on-hold-card__technology--fiber {
-  color: #1859ad;
-  background: linear-gradient(145deg, #f1f7ff 0%, #dfedff 100%);
-  border: 1px solid #bfd7f8;
+  color: #168254;
+  background: linear-gradient(145deg, #f1fbf6 0%, #ddf4e8 100%);
+  border: 1px solid #bde2cf;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .on-hold-card__status {
@@ -368,37 +390,52 @@
 }
 
 .on-hold-card__status-main {
-  display: flex;
+  min-height: 32px;
+  padding: 5px 10px;
+  box-sizing: border-box;
+  display: inline-flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
   color: #6d28d9;
-  font-size: 13px;
-  font-weight: 850;
-  letter-spacing: 0.03em;
+  background: rgba(109, 40, 217, 0.08);
+  border: 1px solid rgba(109, 40, 217, 0.18);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 860;
+  letter-spacing: 0.035em;
+  line-height: 1;
   white-space: nowrap;
 
   svg {
-    width: 21px;
-    height: 21px;
-    flex: 0 0 21px;
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
   }
 }
 
 .on-hold-card--res .on-hold-card__status-main {
-  color: #d76a1d;
+  color: #c85c0c;
+  background: rgba(234, 122, 37, 0.09);
+  border-color: rgba(234, 122, 37, 0.22);
 }
 
 .on-hold-card--snowReceived .on-hold-card__status-main,
 .on-hold-card--snowSent .on-hold-card__status-main {
   color: #1557b8;
+  background: rgba(37, 99, 235, 0.08);
+  border-color: rgba(37, 99, 235, 0.18);
 }
 
 .on-hold-card--questions .on-hold-card__status-main {
   color: #0f8a63;
+  background: rgba(16, 165, 121, 0.08);
+  border-color: rgba(16, 165, 121, 0.19);
 }
 
 .on-hold-card--other .on-hold-card__status-main {
-  color: #b06b00;
+  color: #a76300;
+  background: rgba(217, 144, 16, 0.09);
+  border-color: rgba(217, 144, 16, 0.21);
 }
 
 .on-hold-card__status small {

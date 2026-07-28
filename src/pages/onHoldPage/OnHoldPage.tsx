@@ -19,20 +19,24 @@ import {
 import "./OnHoldPage.scss";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 
-const DisconnectedLineIcon = () => (
+const CableCutIcon = () => (
   <svg
-    viewBox="0 0 24 24"
+    viewBox="0 0 40 24"
     aria-hidden="true"
     focusable="false"
-    className="on-hold-disconnected-icon"
+    className="on-hold-cable-cut-icon"
   >
-    <path d="M2.5 9.75h4.25" />
-    <path d="M17.25 14.25h4.25" />
-    <path d="M6.75 7.25v5.5" />
-    <path d="M17.25 11.25v5.5" />
-    <path d="M6.75 8.25h2.1a3.15 3.15 0 0 1 3.15 3.15v1.2" />
-    <path d="M17.25 15.75h-2.1A3.15 3.15 0 0 1 12 12.6v-1.2" />
-    <path d="M9.6 8.2 14.4 15.8" />
+    <path className="on-hold-cable-cut-icon__cable" d="M1.5 8H13" />
+    <path className="on-hold-cable-cut-icon__cable" d="M27 8h11.5" />
+
+    <path className="on-hold-cable-cut-icon__blade" d="M20 13 14.5 4.5" />
+    <path className="on-hold-cable-cut-icon__blade" d="M20 13 25.5 4.5" />
+
+    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="13" r="1.45" />
+    <circle className="on-hold-cable-cut-icon__handle" cx="15.7" cy="18.3" r="3.15" />
+    <circle className="on-hold-cable-cut-icon__handle" cx="24.3" cy="18.3" r="3.15" />
+    <path className="on-hold-cable-cut-icon__arm" d="M19 14.2 17.4 15.8" />
+    <path className="on-hold-cable-cut-icon__arm" d="M21 14.2 22.6 15.8" />
   </svg>
 );
 
@@ -45,7 +49,7 @@ const tabs: Array<{
   {
     value: "res",
     label: "Résiliation",
-    icon: <DisconnectedLineIcon />,
+    icon: <CableCutIcon />,
   },
   {
     value: "snowReceived",
@@ -146,7 +150,7 @@ const OnHoldPage = () => {
 
   const getStatusIcon = () => {
     if (activeTab === "cure") return <PhoneInTalkRounded />;
-    if (activeTab === "res") return <DisconnectedLineIcon />;
+    if (activeTab === "res") return <CableCutIcon />;
     if (activeTab === "snowReceived" || activeTab === "snowSent") {
       return <AcUnitRounded />;
     }
