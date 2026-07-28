@@ -1,5 +1,6 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
+import { flushSync } from "react-dom";
 import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
 import AcUnitRounded from "@mui/icons-material/AcUnitRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
@@ -26,13 +27,12 @@ const CableCutIcon = () => (
     focusable="false"
     className="on-hold-cable-cut-icon"
   >
-    <path className="on-hold-cable-cut-icon__cable" d="M1.5 8H13" />
-    <path className="on-hold-cable-cut-icon__cable" d="M27 8h11.5" />
+    <path className="on-hold-cable-cut-icon__cable" d="M1.5 6.5H38.5" />
 
-    <path className="on-hold-cable-cut-icon__blade" d="M20 13 14.5 4.5" />
-    <path className="on-hold-cable-cut-icon__blade" d="M20 13 25.5 4.5" />
+    <path className="on-hold-cable-cut-icon__blade" d="M20 13.2 16.2 3.4" />
+    <path className="on-hold-cable-cut-icon__blade" d="M20 13.2 23.8 3.4" />
 
-    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="13" r="1.45" />
+    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="13.2" r="1.55" />
     <circle className="on-hold-cable-cut-icon__handle" cx="15.7" cy="18.3" r="3.15" />
     <circle className="on-hold-cable-cut-icon__handle" cx="24.3" cy="18.3" r="3.15" />
     <path className="on-hold-cable-cut-icon__arm" d="M19 14.2 17.4 15.8" />
@@ -68,6 +68,11 @@ const tabs: Array<{
   },
   { value: "other", label: "Autre", icon: <MoreHorizRounded /> },
 ];
+const tabOrder = tabs.map((tab) => tab.value);
+
+type ViewTransitionDocument = Document & {
+  startViewTransition?: (update: () => void) => { finished: Promise<void> };
+};
 
 const infrastructureLabel = (value: string) => {
   const normalized = value.trim().toLowerCase();
@@ -92,6 +97,33 @@ const OnHoldPage = () => {
   const isRefreshing = useAppSelector((state) => state.history.isRefreshing);
   const [activeTab, setActiveTab] = React.useState<OnHoldTab>("cure");
   const scrollContainerRef = React.useRef<HTMLElement | null>(null);
+
+  const changeTab = React.useCallback(
+    (nextTab: OnHoldTab) => {
+      if (nextTab === activeTab) return;
+
+      const currentIndex = tabOrder.indexOf(activeTab);
+      const nextIndex = tabOrder.indexOf(nextTab);
+      const direction = nextIndex > currentIndex ? "next" : "previous";
+      const transitionDocument = document as ViewTransitionDocument;
+
+      if (!transitionDocument.startViewTransition) {
+        setActiveTab(nextTab);
+        return;
+      }
+
+      document.documentElement.dataset.onHoldSlideDirection = direction;
+
+      const transition = transitionDocument.startViewTransition(() => {
+        flushSync(() => setActiveTab(nextTab));
+      });
+
+      void transition.finished.finally(() => {
+        delete document.documentElement.dataset.onHoldSlideDirection;
+      });
+    },
+    [activeTab],
+  );
 
   usePersistentElementScroll("on-hold", scrollContainerRef, !isRefreshing);
 
@@ -267,7 +299,7 @@ const OnHoldPage = () => {
                 className={`on-hold-tab on-hold-tab--${tab.value} ${
                   activeTab === tab.value ? "on-hold-tab--active" : ""
                 }`}
-                onClick={() => setActiveTab(tab.value)}
+                onClick={() => changeTab(tab.value)}
               >
                 <span className="on-hold-tab__icon">{tab.icon}</span>
                 <span>{tab.label}</span>
