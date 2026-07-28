@@ -6,11 +6,13 @@ import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import { updateField } from "../../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
+
 const InfrastructureInput = () => {
   const dispatch = useAppDispatch();
   const infrastructure = useAppSelector(
     (state) => state.newIntervention.infrastructure,
   );
+
   const handleChange = (event) => {
     dispatch(
       updateField({
@@ -19,61 +21,54 @@ const InfrastructureInput = () => {
       }),
     );
   };
+
   const isEmpty = infrastructure === "";
+
   return (
-    <FormControl
-      variant="outlined"
-      size="small"
-      sx={{
-        width: "50%",
-      }}
-    >
-      <InputLabel
-        id="infrastructure-label"
-        shrink={!isEmpty}
-        sx={{
-          color: "#9aa7bb",
-          fontWeight: 400,
-          opacity: isEmpty ? 0 : 1,
-          transition: (theme) =>
-            theme.transitions.create(["transform", "opacity"], {
-              duration: theme.transitions.duration.shorter,
-            }),
-          "&.Mui-focused": {
-            color: "#7f8da3",
+    <FormControl variant="outlined" size="small" sx={{ width: "100%" }}>
+      {!isEmpty && (
+        <InputLabel
+          id="infrastructure-label"
+          shrink
+          sx={{
+            color: "#9aa7bb",
             fontWeight: 400,
-          },
-        }}
-      >
-        {"Infrastructure"}
-      </InputLabel>
+            "&.Mui-focused": {
+              color: "#7f8da3",
+              fontWeight: 400,
+            },
+          }}
+        >
+          Infrastructure
+        </InputLabel>
+      )}
+
       <Select
-        labelId="infrastructure-label"
+        labelId={!isEmpty ? "infrastructure-label" : undefined}
         id="infrastructure-select"
         value={infrastructure}
-        label="Infrastructure"
+        label={!isEmpty ? "Infrastructure" : undefined}
         displayEmpty
         notched={!isEmpty}
         onChange={handleChange}
-        renderValue={(selected) => {
-          if (selected === "") {
-            return (
-              <span
-                style={{
-                  color: "#9aa7bb",
-                  fontWeight: 400,
-                }}
-              >
-                {"Infrastructure"}
-              </span>
-            );
-          }
-          return selected === "fiber" ? "Fibre" : "Cuivre";
-        }}
+        renderValue={(selected) =>
+          selected === "" ? (
+            <span className="core-select-placeholder">Infrastructure</span>
+          ) : selected === "fiber" ? (
+            "Fibre"
+          ) : (
+            "Cuivre"
+          )
+        }
         sx={{
           "& .MuiSelect-select": {
             display: "flex",
             alignItems: "center",
+            minHeight: "0 !important",
+            height: "40px",
+            padding: "0 38px 0 13px !important",
+            boxSizing: "border-box",
+            lineHeight: "20px",
             fontWeight: 400,
             color: isEmpty ? "#9aa7bb" : "#111827",
           },
@@ -89,10 +84,11 @@ const InfrastructureInput = () => {
           },
         }}
       >
-        <MenuItem value="copper">{"Cuivre"}</MenuItem>
-        <MenuItem value="fiber">{"Fibre"}</MenuItem>
+        <MenuItem value="copper">Cuivre</MenuItem>
+        <MenuItem value="fiber">Fibre</MenuItem>
       </Select>
     </FormControl>
   );
 };
+
 export default InfrastructureInput;

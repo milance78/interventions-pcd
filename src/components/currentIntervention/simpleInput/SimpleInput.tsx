@@ -94,11 +94,13 @@ const SimpleInput = ({
         inputType === "type1"
           ? "type1"
           : "type2"
-      } ${className}`.trim()}
+      } ${Icon ? "simple-input--with-icon" : "simple-input--without-icon"} ${className}`.trim()}
     >
-      <div className="icon-container">
-        {Icon ? <Icon /> : null}
-      </div>
+      {Icon ? (
+        <div className="icon-container">
+          <Icon />
+        </div>
+      ) : null}
 
       <div className="simple-input__control">
         <FormControl>

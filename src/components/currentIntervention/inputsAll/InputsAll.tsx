@@ -46,20 +46,6 @@ const InputsAll = () => {
 
   return (
     <div className="inputs-all">
-      <section className="inputs-row inputs-row--half inputs-row--primary-identifiers">
-        <SimpleInput
-          field="interventionId"
-          label="ID de l'intervention"
-          inputType="type2"
-        />
-
-        <SimpleInput
-          field="oagID"
-          label="OAG ID"
-          inputType="type2"
-        />
-      </section>
-
       <section className="inputs-row inputs-row--snow">
         <SnowPendingInput
           field="snowSent"

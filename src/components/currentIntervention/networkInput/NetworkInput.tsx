@@ -6,9 +6,11 @@ import MenuItem from "@mui/material/MenuItem";
 import InputLabel from "@mui/material/InputLabel";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import { updateField } from "../../../redux/features/newInterventionSlice";
+
 const NetworkInput = () => {
   const dispatch = useAppDispatch();
   const network = useAppSelector((state) => state.newIntervention.network);
+
   const handleChange = (event) => {
     dispatch(
       updateField({
@@ -17,46 +19,63 @@ const NetworkInput = () => {
       }),
     );
   };
+
   const isDefault = network === "";
+
   return (
-    <FormControl
-      variant="outlined"
-      size="small"
-      sx={{
-        width: "50%",
-      }}
-    >
-      <InputLabel
-        id="network-label"
-        shrink={!isDefault}
-        sx={{
-          color: "#9aa7bb",
-          fontWeight: 400,
-          "&.Mui-focused": {
-            color: "#7f8da3",
+    <FormControl variant="outlined" size="small" sx={{ width: "100%" }}>
+      {!isDefault && (
+        <InputLabel
+          id="network-label"
+          shrink
+          sx={{
+            color: "#9aa7bb",
             fontWeight: 400,
-          },
-          opacity: isDefault ? 0 : 1,
-          transition: (theme) =>
-            theme.transitions.create(["transform", "opacity"], {
-              duration: theme.transitions.duration.shorter,
-            }),
-        }}
-      >
-        {"R\xE9seau"}
-      </InputLabel>
+            "&.Mui-focused": {
+              color: "#7f8da3",
+              fontWeight: 400,
+            },
+          }}
+        >
+          Réseau
+        </InputLabel>
+      )}
+
       <Select
-        labelId="network-label"
+        labelId={!isDefault ? "network-label" : undefined}
         id="network-select"
         value={network}
-        label="Réseau"
+        label={!isDefault ? "Réseau" : undefined}
         displayEmpty
         notched={!isDefault}
         onChange={handleChange}
+        renderValue={(selected) => {
+          if (selected === "") {
+            return <span className="core-select-placeholder">Réseau</span>;
+          }
+
+          switch (selected) {
+            case "proximus":
+              return "Proximus";
+            case "scarlet":
+              return "Scarlet";
+            case "mobileVikings":
+              return "Mobile Vikings";
+            case "otherOlo":
+              return "Autre OLO";
+            default:
+              return "";
+          }
+        }}
         sx={{
           "& .MuiSelect-select": {
             display: "flex",
             alignItems: "center",
+            minHeight: "0 !important",
+            height: "40px",
+            padding: "0 38px 0 13px !important",
+            boxSizing: "border-box",
+            lineHeight: "20px",
             fontWeight: 400,
             color: isDefault ? "#9aa7bb" : "#111827",
           },
@@ -71,39 +90,14 @@ const NetworkInput = () => {
             borderWidth: "2px",
           },
         }}
-        renderValue={(selected) => {
-          if (selected === "") {
-            return (
-              <span
-                style={{
-                  color: "#9aa7bb",
-                  fontWeight: 400,
-                }}
-              >
-                {"R\xE9seau"}
-              </span>
-            );
-          }
-          switch (selected) {
-            case "proximus":
-              return "Proximus";
-            case "scarlet":
-              return "Scarlet";
-            case "mobileVikings":
-              return "Mobile Vikings";
-            case "otherOlo":
-              return "Autre OLO";
-            default:
-              return "";
-          }
-        }}
       >
-        <MenuItem value="proximus">{"Proximus"}</MenuItem>
-        <MenuItem value="scarlet">{"Scarlet"}</MenuItem>
-        <MenuItem value="mobileVikings">{"M. Vikings OLO"}</MenuItem>
-        <MenuItem value="otherOlo">{"Autre OLO"}</MenuItem>
+        <MenuItem value="proximus">Proximus</MenuItem>
+        <MenuItem value="scarlet">Scarlet</MenuItem>
+        <MenuItem value="mobileVikings">M. Vikings OLO</MenuItem>
+        <MenuItem value="otherOlo">Autre OLO</MenuItem>
       </Select>
     </FormControl>
   );
 };
+
 export default NetworkInput;

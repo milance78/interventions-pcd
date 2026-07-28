@@ -32,6 +32,7 @@ import ClientsOnAddress from "../../components/currentIntervention/clientsOnAddr
 import InfrastructureInput from "../../components/currentIntervention/infrastructureInput/InfrastructureInput";
 import InputsAll from "../../components/currentIntervention/inputsAll/InputsAll";
 import NetworkInput from "../../components/currentIntervention/networkInput/NetworkInput";
+import SimpleInput from "../../components/currentIntervention/simpleInput/SimpleInput";
 import StatusInput from "../../components/currentIntervention/status/StatusInput";
 import SmartImportDialog from "../../components/smartImportDialog/SmartImportDialog";
 
@@ -622,10 +623,24 @@ const CurrentInterventionPage = () => {
             </div>
           </header>
 
-          <div className="basic-info">
+          <section className="intervention-core-fields">
             <InfrastructureInput />
             <NetworkInput />
-          </div>
+
+            <SimpleInput
+              field="interventionId"
+              label="ID de l'intervention"
+              inputType="type2"
+              className="simple-input--core-field"
+            />
+
+            <SimpleInput
+              field="oagID"
+              label="OAG ID"
+              inputType="type2"
+              className="simple-input--core-field"
+            />
+          </section>
 
           <div className="technical-inputs">
             <InputsAll />
