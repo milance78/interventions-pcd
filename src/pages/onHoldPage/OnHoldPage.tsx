@@ -22,21 +22,21 @@ import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 
 const CableCutIcon = () => (
   <svg
-    viewBox="0 0 40 24"
+    viewBox="0 0 40 28"
     aria-hidden="true"
     focusable="false"
     className="on-hold-cable-cut-icon"
   >
-    <path className="on-hold-cable-cut-icon__cable" d="M7 5.4H33" />
+    <path className="on-hold-cable-cut-icon__cable" d="M11 8.7H29" />
 
-    <path className="on-hold-cable-cut-icon__blade" d="M20 14.1 17.1 1.6" />
-    <path className="on-hold-cable-cut-icon__blade" d="M20 14.1 22.9 1.6" />
+    <path className="on-hold-cable-cut-icon__blade" d="M20 17.1 14.8 1.7" />
+    <path className="on-hold-cable-cut-icon__blade" d="M20 17.1 25.2 1.7" />
 
-    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="14.1" r="1.6" />
-    <circle className="on-hold-cable-cut-icon__handle" cx="15.6" cy="19" r="3.15" />
-    <circle className="on-hold-cable-cut-icon__handle" cx="24.4" cy="19" r="3.15" />
-    <path className="on-hold-cable-cut-icon__arm" d="M18.9 15.2 17.2 16.9" />
-    <path className="on-hold-cable-cut-icon__arm" d="M21.1 15.2 22.8 16.9" />
+    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="17.1" r="1.75" />
+    <circle className="on-hold-cable-cut-icon__handle" cx="14.9" cy="23" r="3.55" />
+    <circle className="on-hold-cable-cut-icon__handle" cx="25.1" cy="23" r="3.55" />
+    <path className="on-hold-cable-cut-icon__arm" d="M18.7 18.5 16.9 20.3" />
+    <path className="on-hold-cable-cut-icon__arm" d="M21.3 18.5 23.1 20.3" />
   </svg>
 );
 

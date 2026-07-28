@@ -78,7 +78,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   color: #64748b;
   background: transparent;
   border: 0;
@@ -90,10 +90,10 @@
   font-weight: 780;
   white-space: nowrap;
   transition:
-    color 160ms ease,
-    background-color 160ms ease,
-    box-shadow 160ms ease,
-    transform 160ms ease;
+    color 145ms ease,
+    background-color 145ms ease,
+    box-shadow 145ms ease,
+    transform 110ms ease;
 
   &::after {
     content: "";
@@ -132,8 +132,11 @@
 
   &:hover {
     color: var(--tab-color);
-    background: color-mix(in srgb, var(--tab-color) 5%, transparent);
-    transform: none;
+    background: color-mix(in srgb, var(--tab-color) 4%, transparent);
+  }
+
+  &:active {
+    transform: translateY(1px) scale(0.992);
   }
 
   &:focus-visible {
@@ -156,7 +159,7 @@
 
 .on-hold-cable-cut-icon {
   width: 38px !important;
-  height: 25px !important;
+  height: 28px !important;
   overflow: visible;
   fill: none;
   stroke: currentColor;
@@ -164,24 +167,24 @@
   stroke-linejoin: round;
 
   &__cable {
-    stroke-width: 2.65;
+    stroke-width: 2.5;
   }
 
   &__blade {
-    stroke-width: 3.35;
+    stroke-width: 3.7;
   }
 
   &__pivot {
     fill: #ffffff;
-    stroke-width: 1.8;
+    stroke-width: 2;
   }
 
   &__handle {
-    stroke-width: 2.1;
+    stroke-width: 2.35;
   }
 
   &__arm {
-    stroke-width: 2.1;
+    stroke-width: 2.45;
   }
 }
 
@@ -297,18 +300,6 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   will-change: transform;
 }
 
-/* Senke se privremeno gase samo dok browser pravi slider snimke.
-   Tako kartice ne menjaju rasterizaciju i nema treptanja tokom pokreta. */
-html[data-on-hold-slide-direction] .on-hold-card {
-  box-shadow: none !important;
-  transition: none !important;
-}
-
-html[data-on-hold-slide-direction] .on-hold-card:hover {
-  transform: none;
-  box-shadow: none !important;
-}
-
 @media (prefers-reduced-motion: reduce) {
   html[data-on-hold-slide-direction]::view-transition-old(on-hold-list),
   html[data-on-hold-slide-direction]::view-transition-new(on-hold-list) {
@@ -388,10 +379,10 @@ html[data-on-hold-slide-direction] .on-hold-card:hover {
 
   &:hover {
     transform: translateY(-1px);
-    border-color: #aebed2;
+    border-color: #b7c5d6;
     box-shadow:
-      0 13px 25px rgba(30, 41, 59, 0.12),
-      0 3px 7px rgba(30, 41, 59, 0.06);
+      0 10px 22px rgba(30, 41, 59, 0.095),
+      0 3px 7px rgba(30, 41, 59, 0.045);
   }
 
   &:focus-visible {
@@ -422,19 +413,20 @@ html[data-on-hold-slide-direction] .on-hold-card:hover {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 16px;
+  gap: 14px;
 }
 
 .on-hold-card__technology {
-  min-height: 32px;
-  padding: 6px 11px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 12px;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  font-size: 12px;
-  font-weight: 860;
+  font-size: 12.5px;
+  font-weight: 850;
   line-height: 1;
   text-align: center;
   letter-spacing: 0.04em;
@@ -465,27 +457,35 @@ html[data-on-hold-slide-direction] .on-hold-card:hover {
 }
 
 .on-hold-card__status-main {
-  min-height: 32px;
-  padding: 5px 10px;
+  height: 34px;
+  min-height: 34px;
+  padding: 0 11px;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 9px;
   color: #6d28d9;
   background: rgba(109, 40, 217, 0.08);
   border: 1px solid rgba(109, 40, 217, 0.18);
   border-radius: 8px;
-  font-size: 12px;
-  font-weight: 860;
+  font-size: 12.5px;
+  font-weight: 850;
   letter-spacing: 0.035em;
   line-height: 1;
   white-space: nowrap;
 
   svg {
-    width: 18px;
-    height: 18px;
-    flex: 0 0 18px;
+    width: 19px;
+    height: 19px;
+    flex: 0 0 19px;
   }
+}
+
+
+.on-hold-card__status-main .on-hold-cable-cut-icon {
+  width: 24px !important;
+  height: 22px !important;
+  flex: 0 0 24px;
 }
 
 .on-hold-card--res .on-hold-card__status-main {
@@ -537,8 +537,8 @@ html[data-on-hold-slide-direction] .on-hold-card:hover {
   }
 
   strong {
-    font-size: 10px;
-    font-weight: 850;
+    font-size: 10.5px;
+    font-weight: 820;
     letter-spacing: 0.02em;
     text-transform: uppercase;
   }
