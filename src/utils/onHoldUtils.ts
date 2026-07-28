@@ -8,7 +8,9 @@ export type OnHoldTab =
   | "cure"
   | "snowSent"
   | "snowReceived"
-  | "res";
+  | "res"
+  | "questions"
+  | "other";
 
 const BELGIUM_TIME_ZONE = "Europe/Brussels";
 
@@ -362,8 +364,29 @@ export const getOnHoldInterventions = (
     );
   }
 
+  if (tab === "res") {
+    return latest.filter(
+      (intervention) => intervention.isResPending,
+    );
+  }
+
+  if (tab === "questions") {
+    return latest.filter(
+      (intervention) => intervention.isUnclear,
+    );
+  }
+
+  // "Autre" is the catch-all list for interventions explicitly put on hold
+  // without a CURE, SNOW, résiliation or M&P question marker.
   return latest.filter(
-    (intervention) => intervention.isResPending,
+    (intervention) =>
+      intervention.status === "on hold" &&
+      intervention.cure !== "firstCure" &&
+      intervention.cure !== "secondCure" &&
+      !intervention.isSnowSentPending &&
+      !intervention.isSnowReceivedPending &&
+      !intervention.isResPending &&
+      !intervention.isUnclear,
   );
 };
 

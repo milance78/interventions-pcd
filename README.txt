@@ -1,22 +1,10 @@
-TYPESCRIPT NORMALIZE FIX — v85
+ON HOLD PAGE PATCH v4
 
-Root cause:
-normalizeInterventionStrings required T extends Record<string, unknown>.
-The Intervention interface does not declare a string index signature, so
-TypeScript widened normalized Intervention objects to Record<string, unknown>.
+Changes:
+- More elegant segmented-control tabs with subtle active underline.
+- All existing icons preserved except Résiliation.
+- Résiliation now uses a custom disconnected-line/plug icon inspired by the supplied references.
+- Résiliation remains orange.
+- Stable scrollbar behavior retained.
 
-Fix:
-- Changed the generic constraint from:
-    T extends Record<string, unknown>
-  to:
-    T extends object
-- The function still returns the exact input type T.
-- Intervention now remains Intervention after normalization.
-
-This resolves the reported TS2345 / TS2740 errors in:
-- CurrentInterventionPage.tsx
-- createInterventionThunk.ts
-- updateInterventionThunk.ts
-- updateSearchInterventionThunk.ts
-
-Only src/utils/textUtils.ts is changed.
+Extract into the project root and replace existing files.

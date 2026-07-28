@@ -1,7 +1,11 @@
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
+import AcUnitRounded from "@mui/icons-material/AcUnitRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
+import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
+import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
+import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
 
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { loadInterventionFromSearch } from "../../redux/features/newInterventionSlice";
@@ -15,14 +19,50 @@ import {
 import "./OnHoldPage.scss";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 
+const DisconnectedLineIcon = () => (
+  <svg
+    viewBox="0 0 24 24"
+    aria-hidden="true"
+    focusable="false"
+    className="on-hold-disconnected-icon"
+  >
+    <path d="M2.5 9.75h4.25" />
+    <path d="M17.25 14.25h4.25" />
+    <path d="M6.75 7.25v5.5" />
+    <path d="M17.25 11.25v5.5" />
+    <path d="M6.75 8.25h2.1a3.15 3.15 0 0 1 3.15 3.15v1.2" />
+    <path d="M17.25 15.75h-2.1A3.15 3.15 0 0 1 12 12.6v-1.2" />
+    <path d="M9.6 8.2 14.4 15.8" />
+  </svg>
+);
+
 const tabs: Array<{
   value: OnHoldTab;
   label: string;
+  icon: React.ReactNode;
 }> = [
-  { value: "cure", label: "CURE en attente" },
-  { value: "snowSent", label: "Snow envoyé en attente" },
-  { value: "snowReceived", label: "Snow reçu en attente" },
-  { value: "res", label: "Résiliation en attente" },
+  { value: "cure", label: "CURE", icon: <PhoneInTalkRounded /> },
+  {
+    value: "res",
+    label: "Résiliation",
+    icon: <DisconnectedLineIcon />,
+  },
+  {
+    value: "snowReceived",
+    label: "Snow reçu",
+    icon: <AcUnitRounded />,
+  },
+  {
+    value: "snowSent",
+    label: "Snow envoyé",
+    icon: <AcUnitRounded />,
+  },
+  {
+    value: "questions",
+    label: "Questions M&P",
+    icon: <HelpOutlineRounded />,
+  },
+  { value: "other", label: "Autre", icon: <MoreHorizRounded /> },
 ];
 
 const infrastructureLabel = (value: string) => {
@@ -36,9 +76,8 @@ const infrastructureLabel = (value: string) => {
 
 const formatDeadline = (date: Date | null) =>
   date
-    ? date.toLocaleString("fr-BE", {
+    ? date.toLocaleDateString("fr-BE", {
         dateStyle: "short",
-        timeStyle: "short",
       })
     : "";
 
@@ -50,11 +89,7 @@ const OnHoldPage = () => {
   const [activeTab, setActiveTab] = React.useState<OnHoldTab>("cure");
   const scrollContainerRef = React.useRef<HTMLElement | null>(null);
 
-  usePersistentElementScroll(
-    "on-hold",
-    scrollContainerRef,
-    !isRefreshing,
-  );
+  usePersistentElementScroll("on-hold", scrollContainerRef, !isRefreshing);
 
   const interventions = React.useMemo(
     () => getOnHoldInterventions(history, activeTab),
@@ -72,102 +107,128 @@ const OnHoldPage = () => {
         return firstOverdue ? -1 : 1;
       }
 
-      return (
-        (first.curePendingSince ?? first.updatedAt ?? "").localeCompare(
-          second.curePendingSince ?? second.updatedAt ?? "",
-        )
+      return (first.curePendingSince ?? first.updatedAt ?? "").localeCompare(
+        second.curePendingSince ?? second.updatedAt ?? "",
       );
     });
   }, [activeTab, interventions]);
 
-  const overdue = activeTab === "cure"
-    ? sortedInterventions.filter((item) => isCureOverdue(item))
-    : [];
-  const current = activeTab === "cure"
-    ? sortedInterventions.filter((item) => !isCureOverdue(item))
-    : sortedInterventions;
+  const overdue =
+    activeTab === "cure"
+      ? sortedInterventions.filter((item) => isCureOverdue(item))
+      : [];
+  const current =
+    activeTab === "cure"
+      ? sortedInterventions.filter((item) => !isCureOverdue(item))
+      : sortedInterventions;
 
-  const openIntervention = (intervention: (typeof sortedInterventions)[number]) => {
+  const openIntervention = (
+    intervention: (typeof sortedInterventions)[number],
+  ) => {
     dispatch(loadInterventionFromSearch(intervention));
     navigate("/intervention-en-cours");
+  };
+
+  const getCardLabel = (
+    intervention: (typeof sortedInterventions)[number],
+  ) => {
+    if (activeTab === "cure") {
+      return intervention.cure === "firstCure" ? "CURE 1" : "CURE 2";
+    }
+
+    if (activeTab === "res") return "RÉSILIATION";
+    if (activeTab === "snowReceived") return "SNOW REÇU";
+    if (activeTab === "snowSent") return "SNOW ENVOYÉ";
+    if (activeTab === "questions") return "QUESTION M&P";
+
+    return "AUTRE";
+  };
+
+  const getStatusIcon = () => {
+    if (activeTab === "cure") return <PhoneInTalkRounded />;
+    if (activeTab === "res") return <DisconnectedLineIcon />;
+    if (activeTab === "snowReceived" || activeTab === "snowSent") {
+      return <AcUnitRounded />;
+    }
+    if (activeTab === "questions") return <HelpOutlineRounded />;
+
+    return <MoreHorizRounded />;
   };
 
   const renderCard = (
     intervention: (typeof sortedInterventions)[number],
     overdueCard = false,
   ) => {
-    const label =
-      activeTab === "cure"
-        ? intervention.cure === "firstCure"
-          ? "CURE 1"
-          : "CURE 2"
-        : activeTab === "snowSent"
-          ? "SNOW ENVOYÉ"
-          : activeTab === "snowReceived"
-            ? "SNOW REÇU"
-            : "RÉSILIATION";
+    const deadline = overdueCard ? getCureDeadline(intervention) : null;
 
     return (
       <article
         key={`${activeTab}-${intervention.documentId}-${intervention.dateKey ?? ""}`}
         role="button"
         tabIndex={0}
-        className={`on-hold-card ${
+        className={`on-hold-card on-hold-card--${activeTab} ${
           overdueCard ? "on-hold-card--overdue" : ""
         }`}
         onClick={() => openIntervention(intervention)}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
             openIntervention(intervention);
           }
         }}
       >
-        <span
-          className={`on-hold-card__technology ${
-            infrastructureLabel(intervention.infrastructure) === "FIBRE"
-              ? "on-hold-card__technology--fiber"
-              : "on-hold-card__technology--copper"
-          }`}
-        >
-          {infrastructureLabel(intervention.infrastructure)}
+        <span className="on-hold-card__status-column">
+          <span
+            className={`on-hold-card__technology ${
+              infrastructureLabel(intervention.infrastructure) === "FIBRE"
+                ? "on-hold-card__technology--fiber"
+                : "on-hold-card__technology--copper"
+            }`}
+          >
+            {infrastructureLabel(intervention.infrastructure)}
+          </span>
+
+          <span className="on-hold-card__status">
+            <span className="on-hold-card__status-main">
+              {getStatusIcon()}
+              <span>{getCardLabel(intervention)}</span>
+            </span>
+
+            {overdueCard && (
+              <small>
+                <AccessTimeRounded />
+                <span>
+                  <strong>Échéance dépassée</strong>
+                  {deadline && <span>{formatDeadline(deadline)}</span>}
+                </span>
+              </small>
+            )}
+          </span>
         </span>
 
         <span className="on-hold-card__identity">
           <span>
             <strong>Intervention ID</strong>
-            <span>{intervention.interventionId || "—"}</span>
+            <span title={intervention.interventionId || "—"}>
+              {intervention.interventionId || "—"}
+            </span>
           </span>
           <span>
             <strong>OAG ID</strong>
-            <span>{intervention.oagID || "—"}</span>
+            <span title={intervention.oagID || "—"}>
+              {intervention.oagID || "—"}
+            </span>
           </span>
-        </span>
-
-        <span className="on-hold-card__status">
-          {label}
-          {overdueCard && (
-            <small>
-              <AccessTimeRounded />
-              Échéance dépassée
-              {getCureDeadline(intervention)
-                ? ` · ${formatDeadline(getCureDeadline(intervention))}`
-                : ""}
-            </small>
-          )}
         </span>
 
         <span className="on-hold-card__details">
           <span>
             <strong>Commentaire</strong>
-            <span>
-              {intervention.comment?.trim() || "—"}
-            </span>
+            <span>{intervention.comment?.trim() || "—"}</span>
           </span>
           <span>
             <strong>Informations supplémentaires</strong>
-            <span>
-              {intervention.additionalInformation?.trim() || "—"}
-            </span>
+            <span>{intervention.additionalInformation?.trim() || "—"}</span>
           </span>
         </span>
 
@@ -182,9 +243,7 @@ const OnHoldPage = () => {
         <div className="on-hold-page__heading">
           <span className="on-hold-page__eyebrow">SUIVI</span>
           <h1>En attente</h1>
-          <p>
-            Interventions nécessitant un suivi CURE, SNOW ou résiliation.
-          </p>
+          <p>Interventions nécessitant un suivi.</p>
         </div>
 
         <div
@@ -206,6 +265,7 @@ const OnHoldPage = () => {
                 }`}
                 onClick={() => setActiveTab(tab.value)}
               >
+                <span className="on-hold-tab__icon">{tab.icon}</span>
                 <span>{tab.label}</span>
                 <strong>{count}</strong>
               </button>
