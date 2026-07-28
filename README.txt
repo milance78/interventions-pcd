@@ -1,14 +1,22 @@
-ON HOLD HEADER TABS + CLEAN CARDS — v82
+TYPESCRIPT NORMALIZE FIX — v85
 
-- Moved the four On Hold tabs into the title/header card.
-- Tabs now occupy the previously empty right side of the header.
-- On Hold outer padding and content width now match Today/History.
-- Removed Copy and NPS Copy controls ONLY from On Hold cards.
-- Copy controls on all other pages are untouched.
-- Card and detail-field heights now follow their content.
-- Detail fields only scroll for unusually long content.
-- Scrollbars are thinner and more discreet.
-- Notification returned into the header navigation row.
-- Replaced the signal handset with a simple PhoneRounded icon.
-- Handset is rotated vertically with its opening oriented toward the count.
-- Notification color changed from red to a softer warm amber/caramel tone.
+Root cause:
+normalizeInterventionStrings required T extends Record<string, unknown>.
+The Intervention interface does not declare a string index signature, so
+TypeScript widened normalized Intervention objects to Record<string, unknown>.
+
+Fix:
+- Changed the generic constraint from:
+    T extends Record<string, unknown>
+  to:
+    T extends object
+- The function still returns the exact input type T.
+- Intervention now remains Intervention after normalization.
+
+This resolves the reported TS2345 / TS2740 errors in:
+- CurrentInterventionPage.tsx
+- createInterventionThunk.ts
+- updateInterventionThunk.ts
+- updateSearchInterventionThunk.ts
+
+Only src/utils/textUtils.ts is changed.

@@ -4,7 +4,7 @@ export const trimOuterWhitespace = (value: string) =>
 export const trimLeadingHorizontalWhitespace = (value: string) =>
   value.replace(/^[ \t]+/, "");
 
-export const normalizeInterventionStrings = <T extends Record<string, unknown>>(
+export const normalizeInterventionStrings = <T extends object>(
   value: T,
 ): T =>
   Object.fromEntries(
