@@ -21,7 +21,7 @@ import {
 const ClientsOnAddress = () => {
   const dispatch = useAppDispatch();
 
-  const { clientsOnAddress, comment } = useAppSelector(
+  const { clientsOnAddress, comment, infrastructure } = useAppSelector(
     (state) => state.newIntervention,
   );
 
@@ -34,17 +34,62 @@ const ClientsOnAddress = () => {
   const automaticAddressLine =
     /^(?:Adresse confirmée\.?|Adresse pas encore confirmée\.?)$/i;
 
-  const syncClientsInComment = (previousValue: string, nextValue: string) => {
-    const normalizedComment = comment.replace(/\r\n/g, "\n");
-    let remaining = normalizedComment;
+  const normalizeClientText = (value: string) => {
+    const trimmed = value.trim().replace(/;+$/, "");
+    if (!trimmed) return "";
 
-    if (previousValue.trim()) {
-      remaining = remaining.replace(previousValue.trim(), "");
+    return /[A-ZÀ-ÖØ-Þ]{2}/.test(trimmed)
+      ? `${trimmed.charAt(0).toLocaleUpperCase("fr-FR")}${trimmed
+          .slice(1)
+          .toLocaleLowerCase("fr-FR")}`
+      : trimmed;
+  };
+
+  const extractClients = (value: string) =>
+    value
+      .replace(/\r\n/g, "\n")
+      .split("\n")
+      .map((line) => line.replace(/^\s*\d+\.\s*/, ""))
+      .map(normalizeClientText)
+      .filter(Boolean);
+
+  const formatClientsForComment = (value: string) => {
+    const clients = extractClients(value);
+    if (!clients.length) return "";
+
+    const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
+
+    if (isCopper && clients.length === 1) {
+      return `Un client TF à l'adresse: ${clients[0]};`;
     }
 
-    const lines = remaining
-      .split("\n")
-      .map((line) => line.trimEnd());
+    if (isCopper) {
+      return `Clients TF à l'adresse:\n${clients
+        .map((client, index) => `${index + 1}. ${client};`)
+        .join("\n")}`;
+    }
+
+    return clients
+      .map((client, index) => `${index + 1}. ${client};`)
+      .join("\n");
+  };
+
+  const removePreviousClientsBlock = (value: string, previousValue: string) => {
+    let remaining = value;
+    const previousBlock = formatClientsForComment(previousValue);
+
+    if (previousBlock) remaining = remaining.replace(previousBlock, "");
+    if (previousValue.trim()) remaining = remaining.replace(previousValue.trim(), "");
+
+    return remaining
+      .replace(/(?:^|\n\n?)Un client TF à l'adresse:[^\n]*/i, "")
+      .replace(/(?:^|\n\n?)Clients TF à l'adresse:\n(?:\d+\.\s*[^\n]*\n?)*/i, "");
+  };
+
+  const syncClientsInComment = (previousValue: string, nextValue: string) => {
+    const normalizedComment = comment.replace(/\r\n/g, "\n");
+    const remaining = removePreviousClientsBlock(normalizedComment, previousValue);
+    const lines = remaining.split("\n").map((line) => line.trimEnd());
     const automaticLines = lines.filter((line) =>
       automaticAddressLine.test(line.trim()),
     );
@@ -56,16 +101,11 @@ const ClientsOnAddress = () => {
 
     const blocks = [
       automaticLines.join("\n"),
-      nextValue.trim(),
+      formatClientsForComment(nextValue),
       otherText,
     ].filter(Boolean);
 
-    dispatch(
-      updateField({
-        field: "comment",
-        value: blocks.join("\n\n"),
-      }),
-    );
+    dispatch(updateField({ field: "comment", value: blocks.join("\n\n") }));
   };
 
   const updateClientsOnAddress = (

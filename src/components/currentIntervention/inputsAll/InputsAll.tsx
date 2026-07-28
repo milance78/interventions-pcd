@@ -48,17 +48,17 @@ const InputsAll = () => {
     <div className="inputs-all">
       <section className="inputs-row inputs-row--snow">
         <SnowPendingInput
-          field="snowSent"
-          pendingField="isSnowSentPending"
-          label="Snow envoyé"
-          pendingLabel="Snow envoyé en attente"
-        />
-
-        <SnowPendingInput
           field="snowReceived"
           pendingField="isSnowReceivedPending"
           label="Snow reçu"
           pendingLabel="Snow reçu en attente"
+        />
+
+        <SnowPendingInput
+          field="snowSent"
+          pendingField="isSnowSentPending"
+          label="Snow envoyé"
+          pendingLabel="Snow envoyé en attente"
         />
       </section>
 
@@ -87,7 +87,7 @@ const InputsAll = () => {
           inputType="type2"
           icon={NAIcon}
           className={
-            emphasizeSnAndLom
+            isCopper
               ? "simple-input--emphasized"
               : ""
           }

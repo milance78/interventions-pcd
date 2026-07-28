@@ -23,6 +23,16 @@ const meaningful = (value: string | undefined) => {
   return result && result !== "--" && result !== "-" ? result : "";
 };
 
+const isPlaceholderValue = (value: string | undefined) =>
+  /^(?:preemptive_first_name\s+preemptive_last_name|nom de famille|last name|first name|action)$/i.test(
+    clean(value),
+  );
+
+const meaningfulBusinessValue = (value: string | undefined) => {
+  const result = meaningful(value);
+  return result && !isPlaceholderValue(result) ? result : "";
+};
+
 const first = (...values: Array<string | undefined>) =>
   values.map(meaningful).find(Boolean) ?? "";
 
@@ -86,6 +96,26 @@ const extractLabelValue = (text: string, labels: string[]): string => {
     const nextLine = text.match(new RegExp(`(?:^|\\n)\\s*${escaped}\\s*\\n\\s*([^\\n]+)`, "i"));
     const value = meaningful(nextLine?.[1]);
     if (value) return value;
+  }
+
+  return "";
+};
+
+const extractBusinessLabelValue = (text: string, labels: string[]) => {
+  let remaining = text;
+
+  for (let attempt = 0; attempt < 12; attempt += 1) {
+    const candidate = extractLabelValue(remaining, labels);
+    if (!candidate) return "";
+
+    const validCandidate = meaningfulBusinessValue(candidate);
+    if (validCandidate) return validCandidate;
+
+    const candidateIndex = remaining
+      .toLocaleLowerCase("fr-FR")
+      .indexOf(candidate.toLocaleLowerCase("fr-FR"));
+    if (candidateIndex < 0) return "";
+    remaining = remaining.slice(candidateIndex + candidate.length);
   }
 
   return "";
@@ -346,7 +376,8 @@ const parseSafe = (text: string): ParsedSource => {
   const remarksMatch = updateBlock.match(
     /(?:^|\n)\s*Remarques\s*(?:\t+| {2,}|\n)\s*([\s\S]*?)(?=(?:\t+| {2,}|\n)\s*(?:Action|Route vers|A la clôture|Client en ligne)\b|$)/i,
   );
-  const remarks = meaningful(remarksMatch?.[1]);
+  const remarksCandidate = meaningful(remarksMatch?.[1]);
+  const remarks = /^Action\b/i.test(remarksCandidate) ? "" : remarksCandidate;
 
   const descriptionFr = extractSafeFrenchDescription(text);
 
@@ -364,12 +395,15 @@ const parseSafe = (text: string): ParsedSource => {
     ...parseNewAddress(text),
     interventionId,
     oagID,
-    clientID: first(customer.clientID, extractLabelValue(text, ["ID client"])),
+    clientID: first(
+      meaningfulBusinessValue(customer.clientID),
+      extractBusinessLabelValue(text, ["ID client"]),
+    ),
     na: explicitNaCid,
     clientName: first(contactName, fallbackName),
     phone: meaningful(contact.phone),
     descriptionFr,
-    comment: remarks ? `Remarque préexistante:\n${remarks}` : "",
+    comment: remarks ? `Remarque préexistante:\n"${remarks}"` : "",
   };
 };
 
@@ -390,8 +424,8 @@ const parseWorkItem = (text: string): ParsedSource => {
       extractLabelValue(text, ["ORDER_NUM"]),
     ),
     clientID: first(
-      extractLabelValue(text, ["CUSTOMER_ID"]),
-      extractLabelValue(text, ["CUST_NUM"]),
+      extractBusinessLabelValue(text, ["CUSTOMER_ID"]),
+      extractBusinessLabelValue(text, ["CUST_NUM"]),
     ),
     na: extractLabelValue(text, ["NA"]),
     descriptionEn: first(
@@ -401,7 +435,7 @@ const parseWorkItem = (text: string): ParsedSource => {
     clientName:
       /MOBILE\s*VIKINGS/i.test(text) ||
       /LIST_FILTER\s*[:\t ]+.*MOBILE\s*VIKINGS/i.test(text)
-        ? extractLabelValue(text, ["SCOPE"])
+        ? extractBusinessLabelValue(text, ["SCOPE"])
         : "",
     infrastructure,
   };
@@ -437,6 +471,25 @@ const normalizeStatus = (text: string) => {
 
 const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<InterventionData> => {
   const infrastructure = first(safe.infrastructure, work.infrastructure);
+  const network = normalizeNetwork(text);
+  const rawClientID = first(
+    meaningfulBusinessValue(work.clientID),
+    meaningfulBusinessValue(safe.clientID),
+  );
+  const clientID =
+    network === "mobileVikings" && rawClientID === "611347052"
+      ? `Identifiant commun ${rawClientID}`
+      : rawClientID;
+  const clientName =
+    network === "mobileVikings"
+      ? first(
+          meaningfulBusinessValue(work.clientName),
+          meaningfulBusinessValue(safe.clientName),
+        )
+      : first(
+          meaningfulBusinessValue(safe.clientName),
+          meaningfulBusinessValue(work.clientName),
+        );
   // A French SAFE/NPS description is authoritative whenever it exists.
   // English Work Item descriptions are used only as a fallback.
   const description = meaningful(safe.descriptionFr) || meaningful(work.descriptionEn);
@@ -454,9 +507,9 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
     interventionId: first(work.interventionId, safe.interventionId),
     snowReceived: work.snowReceived ?? "",
     oagID: first(work.oagID, safe.oagID),
-    clientID: first(work.clientID, safe.clientID),
+    clientID,
     na,
-    clientName: first(safe.clientName, work.clientName),
+    clientName,
     interventionDescription: description,
     mainAddress: safe.mainAddress ?? "",
     addressDetails: "",
@@ -467,7 +520,7 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
     LOMKey: shouldIgnoreCopperLom ? "" : safe.LOMKey ?? "",
     phone: safe.phone ?? "",
     infrastructure,
-    network: normalizeNetwork(text),
+    network,
     status: normalizeStatus(text),
     comment: safe.comment ?? "",
     additionalInformation: "",

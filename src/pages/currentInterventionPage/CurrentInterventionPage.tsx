@@ -265,7 +265,7 @@ const CurrentInterventionPage = () => {
   const commentInputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
 
-  const generatedCureLine = /(?:1er|2(?:e|ème|eme)|3(?:e|ème|eme)) CURE(?: \+ SMS)? fait le (\d{2}\/\d{2}\/\d{4}) à \d{2}:\d{2}h\.?/g;
+  const generatedCureLine = /(?:1er|2(?:e|ème|eme)|3(?:e|ème|eme)) CURE(?: \+ SMS)? fait le (\d{2}\/\d{2}\/\d{4}) à \d{2}:\d{2}h[.;]?/g;
 
   const buildCureComment = (
     nextCure: typeof cure,
@@ -294,7 +294,7 @@ const CurrentInterventionPage = () => {
     }[nextCure];
     const supportsSms = nextCure === "firstCure" || nextCure === "secondCure";
     const smsText = supportsSms && nextSmsEnabled ? " + SMS" : "";
-    const cureLine = `${cureLabel} CURE${smsText} fait le ${day}/${month}/${year} à ${hours}:${minutes}h.`;
+    const cureLine = `${cureLabel} CURE${smsText} fait le ${day}/${month}/${year} à ${hours}:${minutes}h;`;
 
     if (!workingComment) return cureLine;
 
@@ -705,20 +705,6 @@ const CurrentInterventionPage = () => {
                 <div className="intervention-option-group__items">
                   <div
                     className={`option-button snow-pending-card ${
-                      isSnowSentPending
-                        ? "snow-pending-card--filled"
-                        : "snow-pending-card--empty"
-                    }`}
-                    aria-label="Snow envoyé en attente"
-                    title="Snow envoyé en attente"
-                  >
-                    {isSnowSentPending && (
-                      <SnowSentPendingIcon className="snow-pending-card__icon" />
-                    )}
-                  </div>
-
-                  <div
-                    className={`option-button snow-pending-card ${
                       isSnowReceivedPending
                         ? "snow-pending-card--filled"
                         : "snow-pending-card--empty"
@@ -728,6 +714,22 @@ const CurrentInterventionPage = () => {
                   >
                     {isSnowReceivedPending && (
                       <SnowReceivedPendingIcon className="snow-pending-card__icon" />
+                    )}
+                  </div>
+
+
+
+                  <div
+                    className={`option-button snow-pending-card ${
+                      isSnowSentPending
+                        ? "snow-pending-card--filled"
+                        : "snow-pending-card--empty"
+                    }`}
+                    aria-label="Snow envoyé en attente"
+                    title="Snow envoyé en attente"
+                  >
+                    {isSnowSentPending && (
+                      <SnowSentPendingIcon className="snow-pending-card__icon" />
                     )}
                   </div>
 
