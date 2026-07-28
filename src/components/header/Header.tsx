@@ -1,6 +1,6 @@
 import * as React from "react";
 import AddRounded from "@mui/icons-material/AddRounded";
-import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
+import PhoneRounded from "@mui/icons-material/PhoneRounded";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -125,7 +125,7 @@ const Header = () => {
               title={`${overdueCureCount} ticket${overdueCureCount > 1 ? "s" : ""} CURE en retard`}
             >
               <strong>{overdueCureCount}</strong>
-              <PhoneInTalkRounded aria-hidden="true" />
+              <PhoneRounded aria-hidden="true" />
             </span>
           )}
         </NavLink>

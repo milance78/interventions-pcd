@@ -1,13 +1,14 @@
-EMERGENCY FIX — v81
+ON HOLD HEADER TABS + CLEAN CARDS — v82
 
-- Restored the complete InputsAll.tsx component.
-- Restored its default export.
-- Removed only the ID and OAG icon usages/imports.
-- SVG asset files remain untouched.
-- Removed the IDENTIFIANTS PRINCIPAUX caption.
-- Changed the panel from soft blue to soft light gray.
-- Manifest check: public/site.webmanifest is valid JSON. The browser error is likely a stale cached request or a dev-server fallback response, not malformed project JSON.
-
-IMPORTANT:
-v80 accidentally replaced InputsAll.tsx with a comment-only placeholder.
-This patch contains the complete corrected source file, not instructions.
+- Moved the four On Hold tabs into the title/header card.
+- Tabs now occupy the previously empty right side of the header.
+- On Hold outer padding and content width now match Today/History.
+- Removed Copy and NPS Copy controls ONLY from On Hold cards.
+- Copy controls on all other pages are untouched.
+- Card and detail-field heights now follow their content.
+- Detail fields only scroll for unusually long content.
+- Scrollbars are thinner and more discreet.
+- Notification returned into the header navigation row.
+- Replaced the signal handset with a simple PhoneRounded icon.
+- Handset is rotated vertically with its opening oriented toward the count.
+- Notification color changed from red to a softer warm amber/caramel tone.

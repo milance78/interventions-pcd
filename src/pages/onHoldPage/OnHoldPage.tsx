@@ -14,7 +14,6 @@ import {
 
 import "./OnHoldPage.scss";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
-import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
 
 const tabs: Array<{
   value: OnHoldTab;
@@ -162,10 +161,6 @@ const OnHoldPage = () => {
             <strong>Commentaire</strong>
             <span>
               {intervention.comment?.trim() || "—"}
-              <CommentCopyActions
-                value={intervention.comment ?? ""}
-                compact
-              />
             </span>
           </span>
           <span>
@@ -184,36 +179,40 @@ const OnHoldPage = () => {
   return (
     <main ref={scrollContainerRef} className="on-hold-page">
       <section className="on-hold-page__header">
-        <div>
+        <div className="on-hold-page__heading">
           <span className="on-hold-page__eyebrow">SUIVI</span>
           <h1>En attente</h1>
           <p>
             Interventions nécessitant un suivi CURE, SNOW ou résiliation.
           </p>
         </div>
+
+        <div
+          className="on-hold-tabs"
+          role="tablist"
+          aria-label="Listes en attente"
+        >
+          {tabs.map((tab) => {
+            const count = getOnHoldInterventions(history, tab.value).length;
+
+            return (
+              <button
+                key={tab.value}
+                type="button"
+                role="tab"
+                aria-selected={activeTab === tab.value}
+                className={`on-hold-tab on-hold-tab--${tab.value} ${
+                  activeTab === tab.value ? "on-hold-tab--active" : ""
+                }`}
+                onClick={() => setActiveTab(tab.value)}
+              >
+                <span>{tab.label}</span>
+                <strong>{count}</strong>
+              </button>
+            );
+          })}
+        </div>
       </section>
-
-      <div className="on-hold-tabs" role="tablist" aria-label="Listes en attente">
-        {tabs.map((tab) => {
-          const count = getOnHoldInterventions(history, tab.value).length;
-
-          return (
-            <button
-              key={tab.value}
-              type="button"
-              role="tab"
-              aria-selected={activeTab === tab.value}
-              className={`on-hold-tab on-hold-tab--${tab.value} ${
-                activeTab === tab.value ? "on-hold-tab--active" : ""
-              }`}
-              onClick={() => setActiveTab(tab.value)}
-            >
-              <span>{tab.label}</span>
-              <strong>{count}</strong>
-            </button>
-          );
-        })}
-      </div>
 
       <section className="on-hold-list">
         {isRefreshing && history.length === 0 ? (
