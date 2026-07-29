@@ -4,6 +4,7 @@ import AddTaskRounded from "@mui/icons-material/AddTaskRounded";
 import DeleteSweepRounded from "@mui/icons-material/DeleteSweepRounded";
 import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
+import CheckRounded from "@mui/icons-material/CheckRounded";
 import CallRounded from "@mui/icons-material/CallRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
@@ -15,7 +16,9 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useNavigate } from "react-router-dom";
@@ -65,11 +68,163 @@ import { ReactComponent as QuestionMarkOffIcon } from "../../assets/svg/Question
 import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
 import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
 import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
+import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
+import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
-import { FieldCopyButton } from "../../components/currentIntervention/fieldCopyButtons/FieldCopyButtons";
 import { normalizeInterventionStrings, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
+
+type CopyButtonProps = {
+  value: string;
+  label: string;
+};
+
+const writeTextToClipboard = async (value: string) => {
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch {
+    const temporaryTextArea = document.createElement("textarea");
+
+    temporaryTextArea.value = value;
+    temporaryTextArea.style.position = "fixed";
+    temporaryTextArea.style.opacity = "0";
+
+    document.body.appendChild(temporaryTextArea);
+
+    temporaryTextArea.focus();
+    temporaryTextArea.select();
+    document.execCommand("copy");
+
+    document.body.removeChild(temporaryTextArea);
+  }
+};
+
+const prepareNpsComment = (value: string) =>
+  value
+    .replace(/\r\n/g, "\n")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/œ/g, "oe")
+    .replace(/Œ/g, "OE")
+    .replace(/æ/g, "ae")
+    .replace(/Æ/g, "AE")
+    .split("\n")
+    .filter((line) => line.trim().length > 0)
+    .join("\n");
+
+const CopyButton = ({
+  value,
+  label,
+}: CopyButtonProps) => {
+  const [copied, setCopied] = React.useState(false);
+
+  const copyValue = async () => {
+    if (!value.trim()) {
+      return;
+    }
+
+    await writeTextToClipboard(value);
+
+    setCopied(true);
+
+    window.setTimeout(() => {
+      setCopied(false);
+    }, 1200);
+  };
+
+
+
+  return (
+    <Tooltip
+      title={
+        copied
+          ? "Copié"
+          : value.trim()
+            ? "Copier"
+            : "Champ vide"
+      }
+      placement="top"
+      arrow
+    >
+      <span className="copy-field-button-wrapper">
+        <IconButton
+          type="button"
+          size="small"
+          aria-label={`Copier ${label}`}
+          className={`copy-field-button ${
+            copied
+              ? "copy-field-button--copied"
+              : ""
+          }`}
+          disabled={!value.trim()}
+          onClick={copyValue}
+        >
+          {copied ? (
+            <CheckRounded fontSize="small" />
+          ) : (
+            <CopyIcon />
+          )}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+};
+
+const NpsCopyButton = ({
+  value,
+  label,
+}: CopyButtonProps) => {
+  const [copied, setCopied] = React.useState(false);
+  const npsValue = prepareNpsComment(value);
+
+  const copyNpsValue = async () => {
+    if (!npsValue.trim()) {
+      return;
+    }
+
+    await writeTextToClipboard(npsValue);
+
+    setCopied(true);
+
+    window.setTimeout(() => {
+      setCopied(false);
+    }, 1200);
+  };
+
+  return (
+    <Tooltip
+      title={
+        copied
+          ? "NPS copié"
+          : npsValue.trim()
+            ? "Copier pour NPS"
+            : "Champ vide"
+      }
+      placement="left"
+      arrow
+    >
+      <span className="nps-copy-button-wrapper">
+        <IconButton
+          type="button"
+          size="small"
+          aria-label={`Copier ${label} pour NPS`}
+          className={`copy-field-button nps-copy-button ${
+            copied ? "copy-field-button--copied" : ""
+          }`}
+          disabled={!npsValue.trim()}
+          onClick={copyNpsValue}
+        >
+          {copied ? (
+            <CheckRounded fontSize="small" />
+          ) : (
+            <NpsCopyIcon />
+          )}
+        </IconButton>
+      </span>
+    </Tooltip>
+  );
+};
 
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();
@@ -645,7 +800,7 @@ const CurrentInterventionPage = () => {
               }}
             />
 
-            <FieldCopyButton
+            <CopyButton
               value={clientName}
               label="Nom du client"
             />

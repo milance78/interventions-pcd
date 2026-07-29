@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
 
 export type InterventionMode =
   | "NEW"
@@ -10,6 +11,21 @@ export type InterventionMode =
 
 export type CureValue = "noCure" | "firstCure" | "secondCure" | "thirdCure";
 export type AddressConfirmation = "none" | "confirmed" | "notConfirmed";
+export type AddressClientMode = "base" | "plus";
+
+export interface AddressClient {
+  id: string;
+  mode: AddressClientMode;
+  fullName: string;
+  operator: string;
+  naInService: string;
+  addressDetails: string;
+  utac: string;
+  clientId: string;
+  na: string;
+  cid: string;
+  voip: string;
+}
 
 const loadSmsPreference = (): boolean => {
   try {
@@ -37,6 +53,7 @@ export interface InterventionData {
   apartment: string;
   blockNumber: string;
   clientsOnAddress: string;
+  addressClients: AddressClient[];
   LOMKey: string;
   phone: string;
   displayAllFields: boolean;
@@ -78,6 +95,13 @@ interface UpdateFieldPayload {
 
 type ImportedDataPayload = Partial<InterventionData>;
 
+interface UpdateAddressClientPayload {
+  id: string;
+  field: keyof Omit<AddressClient, "id">;
+  value: string | AddressClientMode;
+}
+
+
 export const emptyInterventionData: InterventionData = {
   documentId: "",
   interventionId: "",
@@ -96,6 +120,7 @@ export const emptyInterventionData: InterventionData = {
   apartment: "",
   blockNumber: "",
   clientsOnAddress: "",
+  addressClients: [],
   LOMKey: "",
   phone: "",
   displayAllFields: false,
@@ -138,6 +163,7 @@ export const hasMeaningfulDraft = (
     }
 
     if (typeof value === "boolean") return value;
+    if (Array.isArray(value)) return value.length > 0;
     return typeof value === "string" && value.trim().length > 0;
   });
 };
@@ -160,6 +186,7 @@ const extractData = (state: Intervention): InterventionData => ({
   apartment: state.apartment,
   blockNumber: state.blockNumber,
   clientsOnAddress: state.clientsOnAddress,
+  addressClients: state.addressClients,
   LOMKey: state.LOMKey,
   phone: state.phone,
   displayAllFields: state.displayAllFields,
@@ -182,6 +209,16 @@ const extractData = (state: Intervention): InterventionData => ({
   updatedAt: state.updatedAt,
   dateKey: state.dateKey,
 });
+
+const refreshDraftMetadata = (state: Intervention) => {
+  if (state.mode !== "NEW" && state.mode !== "DRAFT") return;
+  const draft = extractData(state);
+  state.hasDraft = hasMeaningfulDraft(draft);
+  state.mode = state.hasDraft ? "DRAFT" : "NEW";
+  state.draftSnapshot = state.hasDraft
+    ? { ...draft, documentId: "", createdAt: null, updatedAt: null, dateKey: undefined }
+    : null;
+};
 
 const captureCurrentDraft = (state: Intervention) => {
   if (state.mode !== "NEW" && state.mode !== "DRAFT") {
@@ -235,6 +272,18 @@ const NewInterventionSlice = createSlice({
         >
       )[field] = value;
 
+      if (field === "clientsOnAddress" && typeof value === "string") {
+        state.addressClients = parseLegacyAddressClients(value);
+      }
+
+      if (field === "addressClients" && Array.isArray(value)) {
+        state.clientsOnAddress = serializeAddressClients(value, state.infrastructure);
+      }
+
+      if (field === "infrastructure") {
+        state.clientsOnAddress = serializeAddressClients(state.addressClients, String(value));
+      }
+
       if (field === "cure") {
         const nextCure = value as CureValue;
         const isPendingCure =
@@ -271,6 +320,36 @@ const NewInterventionSlice = createSlice({
       }
     },
 
+    addAddressClient: (state, action: PayloadAction<AddressClient>) => {
+      if (state.mode === "VIEW_HISTORY") return;
+      state.addressClients.push(action.payload);
+      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      refreshDraftMetadata(state);
+    },
+
+    updateAddressClient: (state, action: PayloadAction<UpdateAddressClientPayload>) => {
+      if (state.mode === "VIEW_HISTORY") return;
+      const client = state.addressClients.find((item) => item.id === action.payload.id);
+      if (!client) return;
+      (client as unknown as Record<string, unknown>)[action.payload.field] = action.payload.value;
+      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      refreshDraftMetadata(state);
+    },
+
+    removeAddressClient: (state, action: PayloadAction<string>) => {
+      if (state.mode === "VIEW_HISTORY") return;
+      state.addressClients = state.addressClients.filter((item) => item.id !== action.payload);
+      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      refreshDraftMetadata(state);
+    },
+
+    setAddressClients: (state, action: PayloadAction<AddressClient[]>) => {
+      if (state.mode === "VIEW_HISTORY") return;
+      state.addressClients = action.payload;
+      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      refreshDraftMetadata(state);
+    },
+
     applyImportedData: (state, action: PayloadAction<ImportedDataPayload>) => {
       if (state.mode === "VIEW_HISTORY") return;
 
@@ -279,6 +358,11 @@ const NewInterventionSlice = createSlice({
         const field = key as InterventionField;
         (state as unknown as Record<string, unknown>)[field] = value;
       }
+
+      if ((!action.payload.addressClients || action.payload.addressClients.length === 0) && action.payload.clientsOnAddress) {
+        state.addressClients = parseLegacyAddressClients(action.payload.clientsOnAddress);
+      }
+      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
 
       if (state.mode === "NEW" || state.mode === "DRAFT") {
         const draft = extractData(state);
@@ -369,9 +453,14 @@ const NewInterventionSlice = createSlice({
         legacyDraft.addressConfirmation ??
         (legacyDraft.isAddressConfirmed ? "confirmed" : "none");
       const { isAddressConfirmed: _legacyAddressConfirmed, ...draftData } = legacyDraft;
+      const addressClients = Array.isArray(draftData.addressClients)
+        ? draftData.addressClients
+        : parseLegacyAddressClients(draftData.clientsOnAddress ?? "");
       const draft = {
         ...emptyInterventionData,
         ...draftData,
+        addressClients,
+        clientsOnAddress: serializeAddressClients(addressClients, draftData.infrastructure ?? ""),
         addressConfirmation,
         documentId: "",
         createdAt: null,
@@ -451,6 +540,7 @@ const NewInterventionSlice = createSlice({
 });
 
 export const {
+  addAddressClient,
   applyImportedData,
   cancelDraft,
   clearCurrentForm,
@@ -460,8 +550,11 @@ export const {
   loadInterventionFromHistory,
   loadInterventionFromSearch,
   markSearchInterventionSaved,
+  removeAddressClient,
   resumeDraft,
+  setAddressClients,
   startNewIntervention,
+  updateAddressClient,
   updateField,
 } = NewInterventionSlice.actions;
 

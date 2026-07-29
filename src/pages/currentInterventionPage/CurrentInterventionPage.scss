@@ -423,29 +423,10 @@
     .clients-address-field {
       flex-shrink: 0;
       width: 100%;
+      min-width: 0;
 
-      >* {
+      > * {
         width: 100%;
-      }
-
-      .MuiInputBase-root {
-        min-height: 118px !important;
-        max-height: 118px !important;
-        align-items: flex-start;
-      }
-
-      textarea {
-        height: 88px !important;
-        min-height: 88px !important;
-        max-height: 88px !important;
-
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        resize: none !important;
-
-        color: #172033 !important;
-        font-size: 16px !important;
-        line-height: 23px !important;
       }
     }
 

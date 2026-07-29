@@ -1,356 +1,353 @@
-import {
-  useState,
-  type ChangeEvent,
-  type KeyboardEvent,
-} from "react";
+import * as React from "react";
 
-import { ReactComponent as CopyIcon } from "../../../assets/svg/Copy.svg.tsx";
+import AddRounded from "@mui/icons-material/AddRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
+import CloseRounded from "@mui/icons-material/CloseRounded";
+import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
+import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
+import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
 import IconButton from "@mui/material/IconButton";
+import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 
 import "./ClientsOnAddress.scss";
 
-import { updateField } from "../../../redux/features/newInterventionSlice";
 import {
-  useAppDispatch,
-  useAppSelector,
-} from "../../../redux/store";
+  addAddressClient,
+  removeAddressClient,
+  updateAddressClient,
+  updateField,
+  type AddressClient,
+} from "../../../redux/features/newInterventionSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
+import {
+  addressClientHasData,
+  createAddressClient,
+  formatAddressClientsForComment,
+  normalizePersonName,
+  serializeAddressClients,
+} from "../../../utils/addressClients";
+
+const automaticAddressLine =
+  /^(?:Adresse confirmée\.?|Adresse pas encore confirmée\.?)$/i;
+
+const removeAddressClientsBlock = (value: string) =>
+  value
+    .replace(/(?:^|\n\n?)Un client TF à l'adresse:[^\n]*/gi, "")
+    .replace(/(?:^|\n\n?)Clients TF à l'adresse:\n(?:\d+\.\s*[^\n]*\n?)*/gi, "")
+    .replace(/(?:^|\n\n?)Clients à l'adresse:\n(?:\d+\.\s*[^\n]*\n?)*/gi, "")
+    .replace(/^\n+|\n+$/g, "")
+    .replace(/\n{3,}/g, "\n\n");
+
+const writeText = async (value: string) => {
+  try {
+    await navigator.clipboard.writeText(value);
+  } catch {
+    const textarea = document.createElement("textarea");
+    textarea.value = value;
+    textarea.style.position = "fixed";
+    textarea.style.opacity = "0";
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textarea);
+  }
+};
+
+type CopyAdornmentProps = {
+  value: string;
+  label: string;
+};
+
+const CopyAdornment = ({ value, label }: CopyAdornmentProps) => {
+  const [copied, setCopied] = React.useState(false);
+
+  const handleCopy = async () => {
+    if (!value.trim()) return;
+    await writeText(value.trim());
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1000);
+  };
+
+  return (
+    <InputAdornment position="end">
+      <Tooltip title={copied ? "Copié" : `Copier ${label}`} arrow>
+        <span>
+          <IconButton
+            size="small"
+            className="address-client-field__copy"
+            disabled={!value.trim()}
+            onClick={handleCopy}
+            aria-label={`Copier ${label}`}
+          >
+            {copied ? <CheckRounded /> : <ContentCopyRounded />}
+          </IconButton>
+        </span>
+      </Tooltip>
+    </InputAdornment>
+  );
+};
+
+type ClientFieldProps = {
+  client: AddressClient;
+  field: keyof Omit<AddressClient, "id" | "mode">;
+  label: string;
+  inputRef?: React.Ref<HTMLInputElement>;
+  onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+};
+
+const ClientField = ({ client, field, label, inputRef, onKeyDown, onBlur }: ClientFieldProps) => {
+  const dispatch = useAppDispatch();
+  const isHistoryView = useAppSelector((state) => state.newIntervention.isHistoryView);
+  const value = client[field];
+
+  return (
+    <TextField
+      size="small"
+      label={label}
+      value={value}
+      disabled={isHistoryView}
+      inputRef={inputRef}
+      onKeyDown={onKeyDown}
+      onBlur={onBlur}
+      onChange={(event) =>
+        dispatch(
+          updateAddressClient({
+            id: client.id,
+            field,
+            value: event.target.value,
+          }),
+        )
+      }
+      slotProps={{
+        input: {
+          endAdornment: <CopyAdornment value={value} label={label} />,
+        },
+      }}
+    />
+  );
+};
 
 const ClientsOnAddress = () => {
   const dispatch = useAppDispatch();
-
-  const { clientsOnAddress, comment, infrastructure } = useAppSelector(
+  const { addressClients, infrastructure, comment, isHistoryView } = useAppSelector(
     (state) => state.newIntervention,
   );
+  const nameRefs = React.useRef<Record<string, HTMLInputElement | null>>({});
+  const [expandedClientIds, setExpandedClientIds] = React.useState<Set<string>>(() => new Set());
+  const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
 
-  const [isFocused, setIsFocused] =
-    useState(false);
+  React.useEffect(() => {
+    const clientIds = new Set(addressClients.map((client) => client.id));
+    setExpandedClientIds((current) => {
+      const next = new Set([...current].filter((id) => clientIds.has(id)));
+      return next.size === current.size ? current : next;
+    });
+  }, [addressClients]);
 
-  const [copied, setCopied] =
-    useState(false);
-
-  const automaticAddressLine =
-    /^(?:Adresse confirmée\.?|Adresse pas encore confirmée\.?)$/i;
-
-  const normalizeClientText = (value: string) => {
-    const trimmed = value.trim().replace(/;+$/, "");
-    if (!trimmed) return "";
-
-    return /[A-ZÀ-ÖØ-Þ]{2}/.test(trimmed)
-      ? `${trimmed.charAt(0).toLocaleUpperCase("fr-FR")}${trimmed
-          .slice(1)
-          .toLocaleLowerCase("fr-FR")}`
-      : trimmed;
-  };
-
-  const extractClients = (value: string) =>
-    value
-      .replace(/\r\n/g, "\n")
-      .split("\n")
-      .map((line) => line.replace(/^\s*\d+\.\s*/, ""))
-      .map(normalizeClientText)
-      .filter(Boolean);
-
-  const formatClientsForComment = (value: string) => {
-    const clients = extractClients(value);
-    if (!clients.length) return "";
-
-    const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
-
-    if (isCopper && clients.length === 1) {
-      return `Un client TF à l'adresse: ${clients[0]};`;
-    }
-
-    if (isCopper) {
-      return `Clients TF à l'adresse:\n${clients
-        .map((client, index) => `${index + 1}. ${client};`)
-        .join("\n")}`;
-    }
-
-    return clients
-      .map((client, index) => `${index + 1}. ${client};`)
-      .join("\n");
-  };
-
-  const removePreviousClientsBlock = (value: string, previousValue: string) => {
-    let remaining = value;
-    const previousBlock = formatClientsForComment(previousValue);
-
-    if (previousBlock) remaining = remaining.replace(previousBlock, "");
-    if (previousValue.trim()) remaining = remaining.replace(previousValue.trim(), "");
-
-    return remaining
-      .replace(/(?:^|\n\n?)Un client TF à l'adresse:[^\n]*/i, "")
-      .replace(/(?:^|\n\n?)Clients TF à l'adresse:\n(?:\d+\.\s*[^\n]*\n?)*/i, "");
-  };
-
-  const syncClientsInComment = (previousValue: string, nextValue: string) => {
+  React.useEffect(() => {
+    const formatted = formatAddressClientsForComment(addressClients, infrastructure);
     const normalizedComment = comment.replace(/\r\n/g, "\n");
-    const remaining = removePreviousClientsBlock(normalizedComment, previousValue);
+    const remaining = removeAddressClientsBlock(normalizedComment);
     const lines = remaining.split("\n").map((line) => line.trimEnd());
-    const automaticLines = lines.filter((line) =>
-      automaticAddressLine.test(line.trim()),
-    );
+    const automaticLines = lines.filter((line) => automaticAddressLine.test(line.trim()));
     const otherText = lines
       .filter((line) => !automaticAddressLine.test(line.trim()))
       .join("\n")
       .replace(/^\n+|\n+$/g, "")
       .replace(/\n{3,}/g, "\n\n");
+    const nextComment = [automaticLines.join("\n"), formatted, otherText]
+      .filter(Boolean)
+      .join("\n\n");
 
-    const blocks = [
-      automaticLines.join("\n"),
-      formatClientsForComment(nextValue),
-      otherText,
-    ].filter(Boolean);
-
-    dispatch(updateField({ field: "comment", value: blocks.join("\n\n") }));
-  };
-
-  const updateClientsOnAddress = (
-    value: string,
-    syncComment = false,
-  ) => {
-    const normalized = value.replace(/^[ \t]+/, "");
-
-    if (syncComment) {
-      syncClientsInComment(clientsOnAddress, normalized);
+    if (nextComment !== normalizedComment) {
+      dispatch(updateField({ field: "comment", value: nextComment }));
     }
+  }, [addressClients, infrastructure, comment, dispatch]);
 
-    dispatch(
-      updateField({
-        field: "clientsOnAddress",
-        value: normalized,
-      }),
-    );
-  };
+  const addClient = React.useCallback(() => {
+    const client = createAddressClient();
+    dispatch(addAddressClient(client));
+    requestAnimationFrame(() => nameRefs.current[client.id]?.focus());
+  }, [dispatch]);
 
-  const handleFocus = () => {
-    setIsFocused(true);
-
-    if (!clientsOnAddress.trim()) {
-      updateClientsOnAddress("1. ");
-    }
-  };
-
-  const handleBlur = () => {
-    setIsFocused(false);
-
-    if (
-      clientsOnAddress.trim() === "1."
-    ) {
-      updateClientsOnAddress("", true);
-    }
-  };
-
-  const handleChange = (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => {
-    updateClientsOnAddress(
-      event.target.value,
-      true,
-    );
-  };
-
-  const handleKeyDown = (
-    event: KeyboardEvent<HTMLDivElement>,
-  ) => {
-    if (event.key !== "Enter") {
-      return;
-    }
-
+  const handleNameEnter = (event: React.KeyboardEvent<HTMLDivElement>, index: number) => {
+    if (event.key !== "Enter") return;
     event.preventDefault();
 
-    const textarea =
-      event.target as HTMLTextAreaElement;
-
-    const cursorPosition =
-      textarea.selectionStart;
-
-    const textBeforeCursor =
-      clientsOnAddress.slice(
-        0,
-        cursorPosition,
-      );
-
-    const textAfterCursor =
-      clientsOnAddress.slice(
-        cursorPosition,
-      );
-
-    const currentLine =
-      textBeforeCursor
-        .split("\n")
-        .pop() ?? "";
-
-    const numberedLine =
-      currentLine.match(/^(\d+)\.\s?/);
-
-    if (
-      numberedLine &&
-      currentLine.trim() ===
-        `${numberedLine[1]}.`
-    ) {
-      const newValue =
-        textBeforeCursor.replace(
-          /\d+\.\s?$/,
-          "",
-        ) + textAfterCursor;
-
-      updateClientsOnAddress(newValue, true);
-
-      requestAnimationFrame(() => {
-        textarea.selectionStart =
-          textarea.selectionEnd =
-            cursorPosition - 3;
-      });
-
+    const next = addressClients[index + 1];
+    if (next) {
+      nameRefs.current[next.id]?.focus();
       return;
     }
 
-    const nextNumber = numberedLine
-      ? Number(numberedLine[1]) + 1
-      : 1;
+    if (addressClients[index]?.fullName.trim()) addClient();
+  };
 
-    const insertedText =
-      `\n${nextNumber}. `;
+  const handleNameBlur = (client: AddressClient) => {
+    const normalized = normalizePersonName(client.fullName);
+    if (normalized !== client.fullName) {
+      dispatch(updateAddressClient({ id: client.id, field: "fullName", value: normalized }));
+    }
+  };
 
-    const newValue =
-      textBeforeCursor +
-      insertedText +
-      textAfterCursor;
+  const toggleExtraInfo = (client: AddressClient) => {
+    setExpandedClientIds((current) => {
+      const next = new Set(current);
+      const isExpanded = next.has(client.id);
 
-    updateClientsOnAddress(newValue, true);
+      if (isExpanded) {
+        next.delete(client.id);
+      } else {
+        next.add(client.id);
+      }
 
-    requestAnimationFrame(() => {
-      const newCursorPosition =
-        cursorPosition +
-        insertedText.length;
+      dispatch(
+        updateAddressClient({
+          id: client.id,
+          field: "mode",
+          value: isExpanded ? "base" : "plus",
+        }),
+      );
 
-      textarea.selectionStart =
-        textarea.selectionEnd =
-          newCursorPosition;
+      return next;
     });
   };
 
-  const copyValue = async () => {
-    if (!clientsOnAddress.trim()) {
-      return;
-    }
-
-    try {
-      await navigator.clipboard.writeText(
-        clientsOnAddress,
-      );
-    } catch {
-      const temporaryTextArea =
-        document.createElement("textarea");
-
-      temporaryTextArea.value =
-        clientsOnAddress;
-
-      temporaryTextArea.style.position =
-        "fixed";
-
-      temporaryTextArea.style.opacity =
-        "0";
-
-      document.body.appendChild(
-        temporaryTextArea,
-      );
-
-      temporaryTextArea.focus();
-      temporaryTextArea.select();
-      document.execCommand("copy");
-
-      document.body.removeChild(
-        temporaryTextArea,
-      );
-    }
-
-    setCopied(true);
-
-    window.setTimeout(() => {
-      setCopied(false);
-    }, 1200);
+  const copyClient = async (client: AddressClient) => {
+    const value = serializeAddressClients([client], infrastructure).replace(/^1\.\s*/, "");
+    if (value) await writeText(value);
   };
 
   return (
-    <div className="clients-on-address">
-      <TextField
-        id="clients-on-address"
-        label="Clients à l'adresse"
-        multiline
-        rows={3}
-        value={clientsOnAddress}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        onChange={handleChange}
-        onKeyDown={handleKeyDown}
-        InputLabelProps={{
-          shrink:
-            isFocused ||
-            clientsOnAddress.length > 0,
-        }}
-        sx={{
-          width: "100%",
-          "& textarea": {
-            paddingRight: "48px",
-            boxSizing: "border-box",
-            fontWeight: "400 !important",
-          },
-          "& .MuiInputBase-inputMultiline": {
-            fontWeight: "400 !important",
-          },
-          "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline":
-            {
-              borderColor:
-                "grey !important",
-            },
-          "& .MuiInputLabel-root.Mui-focused":
-            {
-              color:
-                "grey !important",
-            },
-        }}
-      />
+    <section className="clients-on-address" aria-label="Clients à l'adresse">
+      <header className="clients-on-address__header">
+        <div>
+          <span className="clients-on-address__title">Clients à l'adresse</span>
+          <span className="clients-on-address__hint">
+            {isCopper ? "Cuivre" : "Fibre"} · Entrée = client suivant
+          </span>
+        </div>
 
-      <Tooltip
-        title={
-          copied
-            ? "Copié"
-            : clientsOnAddress.trim()
-              ? "Copier"
-              : "Champ vide"
-        }
-        placement="top"
-        arrow
-      >
-        <span className="clients-on-address__copy-wrapper">
-          <IconButton
+        <Tooltip title="Ajouter un client" arrow>
+          <span>
+            <IconButton
+              className="clients-on-address__add"
+              size="small"
+              disabled={isHistoryView}
+              onClick={addClient}
+              aria-label="Ajouter un client à l'adresse"
+            >
+              <AddRounded />
+            </IconButton>
+          </span>
+        </Tooltip>
+      </header>
+
+      <div className="clients-on-address__list">
+        {addressClients.length === 0 && (
+          <button
             type="button"
-            size="small"
-            aria-label="Copier Clients à l'adresse"
-            className={`clients-on-address__copy-button ${
-              copied
-                ? "clients-on-address__copy-button--copied"
-                : ""
-            }`}
-            disabled={
-              !clientsOnAddress.trim()
-            }
-            onClick={copyValue}
+            className="clients-on-address__empty"
+            disabled={isHistoryView}
+            onClick={addClient}
           >
-            {copied ? (
-              <CheckRounded fontSize="small" />
-            ) : (
-              <CopyIcon />
-            )}
-          </IconButton>
-        </span>
-      </Tooltip>
-    </div>
+            <AddRounded /> Ajouter le premier client à l'adresse
+          </button>
+        )}
+
+        {addressClients.map((client, index) => (
+          <article className="address-client" key={client.id}>
+            <div className="address-client__number">{index + 1}</div>
+
+            <div className="address-client__content">
+              <div className={`address-client__base address-client__base--${isCopper ? "copper" : "fiber"}`}>
+                <ClientField
+                  client={client}
+                  field="fullName"
+                  label="Nom et prénom"
+                  inputRef={(element) => {
+                    nameRefs.current[client.id] = element;
+                  }}
+                  onKeyDown={(event) => handleNameEnter(event, index)}
+                  onBlur={() => handleNameBlur(client)}
+                />
+
+                <ClientField client={client} field="operator" label="Opérateur" />
+
+                {isCopper ? (
+                  <ClientField client={client} field="naInService" label="NA en service" />
+                ) : (
+                  <>
+                    <ClientField client={client} field="addressDetails" label="Détail d'adresse" />
+                    <ClientField client={client} field="utac" label="UTAC" />
+                  </>
+                )}
+              </div>
+
+              {expandedClientIds.has(client.id) && (
+                <div className={`address-client__plus address-client__plus--${isCopper ? "copper" : "fiber"}`}>
+                  <ClientField client={client} field="clientId" label="ID client" />
+                  {isCopper && <ClientField client={client} field="na" label="NA client" />}
+                  <ClientField client={client} field="cid" label="CID client" />
+                  <ClientField client={client} field="voip" label="VOIP" />
+                </div>
+              )}
+            </div>
+
+            <div className="address-client__actions">
+              <Tooltip
+                title={expandedClientIds.has(client.id) ? "Masquer les infos en plus" : "Infos en plus"}
+                arrow
+              >
+                <IconButton
+                  size="small"
+                  className={`address-client__expand ${
+                    expandedClientIds.has(client.id) ? "address-client__expand--open" : ""
+                  }`}
+                  disabled={isHistoryView}
+                  onClick={() => toggleExtraInfo(client)}
+                  aria-label={
+                    expandedClientIds.has(client.id)
+                      ? "Masquer les informations supplémentaires"
+                      : "Afficher les informations supplémentaires"
+                  }
+                >
+                  {expandedClientIds.has(client.id) ? <ExpandMoreRounded /> : <AddRounded />}
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="Copier ce client" arrow>
+                <span>
+                  <IconButton
+                    size="small"
+                    disabled={!addressClientHasData(client)}
+                    onClick={() => void copyClient(client)}
+                    aria-label={`Copier le client ${index + 1}`}
+                  >
+                    <ContentCopyRounded />
+                  </IconButton>
+                </span>
+              </Tooltip>
+
+              <Tooltip title="Supprimer ce client" arrow>
+                <IconButton
+                  size="small"
+                  className="address-client__delete"
+                  disabled={isHistoryView}
+                  onClick={() => dispatch(removeAddressClient(client.id))}
+                  aria-label={`Supprimer le client ${index + 1}`}
+                >
+                  {addressClients.length === 1 && !addressClientHasData(client) ? <CloseRounded /> : <DeleteOutlineRounded />}
+                </IconButton>
+              </Tooltip>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 };
 

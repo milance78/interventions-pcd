@@ -1,67 +1,225 @@
 .clients-on-address {
-  position: relative;
-
   width: 100%;
+  min-width: 0;
+  padding: 10px;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  box-sizing: border-box;
 }
 
-.clients-on-address__copy-wrapper {
-  position: absolute;
-
-  top: 9px;
-  right: 7px;
-
+.clients-on-address__header {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
-.clients-on-address__copy-button {
-  width: 32px;
-  height: 32px;
+.clients-on-address__title {
+  display: block;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.clients-on-address__hint {
+  display: block;
+  margin-top: 1px;
+  color: #94a3b8;
+  font-size: 10px;
+  font-weight: 500;
+}
+
+.clients-on-address__add {
+  width: 30px;
+  height: 30px;
+  color: #1d4ed8 !important;
+  background: #dbeafe !important;
+  border: 1px solid #93c5fd !important;
+  border-radius: 8px !important;
+}
+
+.clients-on-address__list {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  max-height: 210px;
+  overflow-y: auto;
+  padding-right: 2px;
+  scrollbar-width: thin;
+}
+
+.clients-on-address__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 54px;
+  color: #64748b;
+  background: #ffffff;
+  border: 1px dashed #94a3b8;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #60a5fa;
+  }
+}
+
+.address-client {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 6px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid #dbe3ee;
+  border-radius: 9px;
+  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
+}
+
+.address-client:not(:has(.address-client__plus)) {
+  min-height: 0;
+}
+
+.address-client:not(:has(.address-client__plus)) .address-client__content {
+  min-height: 34px;
+}
+
+.address-client__number {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-top: 5px;
+  color: #1e40af;
+  background: #dbeafe;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.address-client__content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.address-client__base,
+.address-client__plus {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.address-client__base--copper {
+  grid-template-columns: minmax(150px, 1.45fr) minmax(92px, 0.85fr) minmax(112px, 1fr);
+}
+
+.address-client__base--fiber {
+  grid-template-columns: minmax(145px, 1.35fr) minmax(88px, 0.75fr) minmax(118px, 1.05fr) minmax(76px, 0.65fr);
+}
+
+.address-client__plus--copper {
+  grid-template-columns: repeat(4, minmax(92px, 1fr));
+}
+
+.address-client__plus--fiber {
+  grid-template-columns: repeat(3, minmax(100px, 1fr));
+}
+
+.address-client {
+  .MuiFormControl-root {
+    min-width: 0;
+  }
+
+  .MuiInputBase-root {
+    min-height: 34px;
+    height: 34px;
+    padding-right: 1px;
+    border-radius: 7px;
+  }
+
+  .MuiInputBase-input {
+    min-width: 0;
+    padding: 7px 2px 7px 9px;
+    color: #172033;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .MuiInputLabel-root {
+    transform: translate(10px, 8px) scale(1);
+    color: #64748b;
+    font-size: 11px;
+  }
+
+  .MuiInputLabel-shrink {
+    transform: translate(11px, -7px) scale(0.75);
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #cbd5e1;
+  }
+}
+
+.address-client-field__copy {
+  width: 24px;
+  height: 24px;
+  color: #64748b !important;
 
   svg {
-    width: 23px;
-    height: 23px;
-    overflow: visible;
-  }
-
-  color: #475569 !important;
-  background: rgba(
-    241,
-    245,
-    249,
-    0.94
-  ) !important;
-
-  border: 1px solid #cbd5e1 !important;
-  border-radius: 7px !important;
-
-  transition:
-    color 140ms ease,
-    background-color 140ms ease,
-    border-color 140ms ease,
-    transform 140ms ease !important;
-
-  &:hover {
-    color: #1d4ed8 !important;
-    background: #dbeafe !important;
-    border-color: #93c5fd !important;
-
-    transform: scale(1.05);
-  }
-
-  &.Mui-disabled {
-    color: #a8b1bf !important;
-    background: rgba(
-      241,
-      245,
-      249,
-      0.68
-    ) !important;
-    border-color: #e2e8f0 !important;
+    width: 14px;
+    height: 14px;
   }
 }
 
-.clients-on-address__copy-button--copied {
-  color: #166534 !important;
-  background: #dcfce7 !important;
-  border-color: #86efac !important;
+.address-client__actions {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  align-self: start;
+  gap: 2px;
+
+  .MuiIconButton-root {
+    width: 27px;
+    height: 27px;
+    color: #64748b;
+    border-radius: 7px;
+
+    svg {
+      width: 17px;
+      height: 17px;
+    }
+  }
+}
+
+.address-client__expand {
+  color: #1d4ed8 !important;
+  background: #eff6ff !important;
+}
+
+.address-client__expand--open {
+  color: #6d28d9 !important;
+  background: #f3e8ff !important;
+}
+
+.address-client__delete:hover {
+  color: #b91c1c !important;
+  background: #fee2e2 !important;
+}
+
+@media (max-width: 900px) {
+  .address-client__base--copper,
+  .address-client__base--fiber,
+  .address-client__plus--copper,
+  .address-client__plus--fiber {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

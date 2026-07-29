@@ -29,6 +29,7 @@ const currentData = (state: Intervention): InterventionData => ({
   apartment: state.apartment,
   blockNumber: state.blockNumber,
   clientsOnAddress: state.clientsOnAddress,
+  addressClients: state.addressClients,
   LOMKey: state.LOMKey,
   phone: state.phone,
   displayAllFields: state.displayAllFields,

@@ -1,14 +1,4 @@
 import type { InterventionData } from "../../redux/features/newInterventionSlice";
-import {
-  cleanSmartImportValue as clean,
-  escapeRegExp,
-  extractSection as section,
-  firstMeaningfulValue as first,
-  meaningfulBusinessValue,
-  meaningfulSmartImportValue as meaningful,
-  normalizeSmartImportText as normalizeText,
-  splitLooseColumns as splitLoose,
-} from "./smartImportTextUtils";
 
 export type SmartImportResult = {
   values: Partial<InterventionData>;
@@ -21,6 +11,37 @@ type ParsedSource = Partial<InterventionData> & {
   descriptionEn?: string;
 };
 
+const clean = (value: string | undefined) =>
+  (value ?? "")
+    .replace(/\u00a0/g, " ")
+    .replace(/\uFFFD/g, "'")
+    .replace(/[ \t]+/g, " ")
+    .trim();
+
+const meaningful = (value: string | undefined) => {
+  const result = clean(value);
+  return result && result !== "--" && result !== "-" ? result : "";
+};
+
+const isPlaceholderValue = (value: string | undefined) =>
+  /^(?:preemptive_first_name\s+preemptive_last_name|nom de famille|last name|first name|action)$/i.test(
+    clean(value),
+  );
+
+const meaningfulBusinessValue = (value: string | undefined) => {
+  const result = meaningful(value);
+  return result && !isPlaceholderValue(result) ? result : "";
+};
+
+const first = (...values: Array<string | undefined>) =>
+  values.map(meaningful).find(Boolean) ?? "";
+
+const escapeRegExp = (value: string) =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const normalizeText = (rawText: string) =>
+  rawText.replace(/\r/g, "").replace(/\u00a0/g, " ").replace(/\uFFFD/g, "'");
+
 const detectSource = (text: string): SmartImportResult["sourceType"] => {
   const upper = text.toUpperCase();
   if (upper.includes("SNOW_ID") || upper.includes("SNOW_TITLE")) return "SNOW";
@@ -29,6 +50,26 @@ const detectSource = (text: string): SmartImportResult["sourceType"] => {
   if (upper.includes("FISISINTV") || upper.includes("SERVICE ORDER")) return "ISIS";
   return "UNKNOWN";
 };
+
+const section = (text: string, start: RegExp, ends: RegExp[]): string => {
+  const match = start.exec(text);
+  if (!match) return "";
+  const from = match.index + match[0].length;
+  const rest = text.slice(from);
+  const offsets = ends
+    .map((pattern) => {
+      pattern.lastIndex = 0;
+      return pattern.exec(rest)?.index;
+    })
+    .filter((value): value is number => typeof value === "number");
+  return rest.slice(0, offsets.length ? Math.min(...offsets) : rest.length);
+};
+
+const splitLoose = (line: string) =>
+  line
+    .split(/\t+| {2,}/)
+    .map(clean)
+    .filter(Boolean);
 
 const extractLabelValue = (text: string, labels: string[]): string => {
   const allLines = text.split("\n");

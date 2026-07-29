@@ -12,6 +12,7 @@ import {
 
 import { db } from "./firebaseConfig";
 import type { Intervention, InterventionData } from "../redux/features/newInterventionSlice";
+import { parseLegacyAddressClients, serializeAddressClients } from "../utils/addressClients";
 import {
   interventionActivityValue,
   interventionLogicalKey,
@@ -86,8 +87,14 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
           ? "thirdCure"
           : data.cure ?? data.Cure ?? "noCure";
 
+  const addressClients = Array.isArray(data.addressClients)
+    ? data.addressClients
+    : parseLegacyAddressClients(data.clientsOnAddress ?? "");
+
   return {
     ...dataWithoutLegacyAddress,
+    addressClients,
+    clientsOnAddress: serializeAddressClients(addressClients, data.infrastructure ?? ""),
     snowReceived,
     snowSent,
     isSnowReceivedPending,
