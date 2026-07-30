@@ -43,7 +43,9 @@ import {
   hasMeaningfulDraft,
   markSearchInterventionSaved,
   resumeDraft,
+  recordCure,
   updateField,
+  updateRecordedCureSms,
 } from "../../redux/features/newInterventionSlice";
 import {
   useAppDispatch,
@@ -51,6 +53,7 @@ import {
 } from "../../redux/store";
 import { createInterventionThunk } from "../../redux/thunks/createInterventionThunk";
 import { updateInterventionThunk } from "../../redux/thunks/updateInterventionThunk";
+import { clearTodaysCuresThunk } from "../../redux/thunks/clearTodaysCuresThunk";
 import { updateSearchInterventionThunk } from "../../redux/thunks/updateSearchInterventionThunk";
 import { auth } from "../../firebase/firebaseConfig";
 import {
@@ -265,64 +268,26 @@ const CurrentInterventionPage = () => {
   const commentInputRef = React.useRef<HTMLTextAreaElement | null>(null);
 
 
-  const generatedCureLine = /(?:1er|2(?:e|ème|eme)|3(?:e|ème|eme)) CURE(?: \+ SMS)? fait le (\d{2}\/\d{2}\/\d{4}) à \d{2}:\d{2}h[.;]?/g;
-
-  const buildCureComment = (
-    nextCure: typeof cure,
-    nextSmsEnabled: boolean,
-  ) => {
-    const now = new Date();
-    const today = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}/${now.getFullYear()}`;
-    let workingComment = comment;
-
-    workingComment = workingComment
-      .replace(generatedCureLine, (match, date) => date === today ? "" : match)
-      .replace(/\n{3,}/g, "\n\n")
-      .trimEnd();
-
-    if (nextCure === "noCure") return workingComment.trim();
-
-    const day = String(now.getDate()).padStart(2, "0");
-    const month = String(now.getMonth() + 1).padStart(2, "0");
-    const year = String(now.getFullYear());
-    const hours = String(now.getHours()).padStart(2, "0");
-    const minutes = String(now.getMinutes()).padStart(2, "0");
-    const cureLabel = {
-      firstCure: "1er",
-      secondCure: "2eme",
-      thirdCure: "3eme",
-    }[nextCure];
-    const supportsSms = nextCure === "firstCure" || nextCure === "secondCure";
-    const smsText = supportsSms && nextSmsEnabled ? " + SMS" : "";
-    const cureLine = `${cureLabel} CURE${smsText} fait le ${day}/${month}/${year} à ${hours}:${minutes}h;`;
-
-    if (!workingComment) return cureLine;
-
-    const lastLine = workingComment.split(/\n/).filter(Boolean).at(-1) ?? "";
-    const isAutomaticCureLine = generatedCureLine.test(lastLine);
-    generatedCureLine.lastIndex = 0;
-
-    return `${workingComment}${isAutomaticCureLine ? "\n" : "\n\n"}${cureLine}`;
-  };
-
   const handleCureSelection = (nextCure: typeof cure) => {
     if (isHistoryView) return;
 
-    dispatch(updateField({ field: "cure", value: nextCure }));
-
-    if (nextCure !== "noCure") {
-      dispatch(
-        updateField({
-          field: "addressConfirmation",
-          value: "notConfirmed",
-        }),
-      );
+    if (nextCure === "noCure") {
+      void dispatch(clearTodaysCuresThunk());
+      return;
     }
 
     dispatch(
+      recordCure({
+        cure: nextCure,
+        recordedAt: new Date().toISOString(),
+        smsEnabled,
+      }),
+    );
+
+    dispatch(
       updateField({
-        field: "comment",
-        value: buildCureComment(nextCure, smsEnabled),
+        field: "addressConfirmation",
+        value: "notConfirmed",
       }),
     );
   };
@@ -335,9 +300,9 @@ const CurrentInterventionPage = () => {
 
     if (cure === "firstCure" || cure === "secondCure") {
       dispatch(
-        updateField({
-          field: "comment",
-          value: buildCureComment(cure, nextSmsEnabled),
+        updateRecordedCureSms({
+          cure,
+          smsEnabled: nextSmsEnabled,
         }),
       );
     }

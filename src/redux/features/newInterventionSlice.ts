@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
+import { cureOrder, emptyCureRecords, localDateKey, localTimeKey, removeCureLines, upsertCureLine } from "../../utils/cureRecords";
 
 export type InterventionMode =
   | "NEW"
@@ -9,7 +10,18 @@ export type InterventionMode =
   | "SEARCH_EDIT"
   | "TODAY_EDIT";
 
-export type CureValue = "noCure" | "firstCure" | "secondCure" | "thirdCure";
+export type CureKey = "firstCure" | "secondCure" | "thirdCure";
+export type CureValue = "noCure" | CureKey;
+export interface CureRecord {
+  /** Calendar date in local time, YYYY-MM-DD. */
+  date: string;
+  /** Clock time in local time, HH:mm. */
+  time: string;
+  /** Kept for backward compatibility and precise timestamp reconstruction. */
+  recordedAt: string;
+  smsEnabled: boolean;
+}
+export type CureRecords = Record<CureKey, CureRecord | null>;
 export type AddressConfirmation = "none" | "confirmed" | "notConfirmed";
 export type AddressClientMode = "base" | "plus";
 
@@ -69,6 +81,7 @@ export interface InterventionData {
   comment: string;
   additionalInformation: string;
   cure: CureValue;
+  cureRecords: CureRecords;
   curePendingSince: string | null;
   smsEnabled: boolean;
   status: string;
@@ -94,6 +107,17 @@ interface UpdateFieldPayload {
 }
 
 type ImportedDataPayload = Partial<InterventionData>;
+
+interface RecordCurePayload {
+  cure: CureKey;
+  recordedAt: string;
+  smsEnabled: boolean;
+}
+
+interface UpdateCureSmsPayload {
+  cure: CureKey;
+  smsEnabled: boolean;
+}
 
 interface UpdateAddressClientPayload {
   id: string;
@@ -136,6 +160,7 @@ export const emptyInterventionData: InterventionData = {
   comment: "",
   additionalInformation: "",
   cure: "noCure",
+  cureRecords: emptyCureRecords(),
   curePendingSince: null,
   smsEnabled: loadSmsPreference(),
   status: "",
@@ -202,6 +227,7 @@ const extractData = (state: Intervention): InterventionData => ({
   comment: state.comment,
   additionalInformation: state.additionalInformation,
   cure: state.cure,
+  cureRecords: state.cureRecords,
   curePendingSince: state.curePendingSince,
   smsEnabled: state.smsEnabled,
   status: state.status,
@@ -318,6 +344,97 @@ const NewInterventionSlice = createSlice({
             }
           : null;
       }
+    },
+
+    recordCure: (state, action: PayloadAction<RecordCurePayload>) => {
+      if (state.mode === "VIEW_HISTORY") return;
+
+      const { cure, recordedAt, smsEnabled } = action.payload;
+      const now = new Date(recordedAt);
+      const todayKey = localDateKey(now);
+      const existing = state.cureRecords[cure];
+
+      const currentTime = localTimeKey(now);
+
+      if (!existing) {
+        state.cureRecords[cure] = {
+          date: todayKey,
+          time: currentTime,
+          recordedAt,
+          smsEnabled,
+        };
+      } else if (existing.date === todayKey) {
+        state.cureRecords[cure] = {
+          ...existing,
+          time: currentTime,
+          recordedAt,
+          smsEnabled,
+        };
+      }
+
+      state.cure = cure;
+      state.curePendingSince =
+        cure === "firstCure" || cure === "secondCure"
+          ? state.cureRecords[cure]?.recordedAt ?? existing?.recordedAt ?? null
+          : null;
+      state.comment = upsertCureLine(state.comment, cure, state.cureRecords);
+      refreshDraftMetadata(state);
+    },
+
+    updateRecordedCureSms: (state, action: PayloadAction<UpdateCureSmsPayload>) => {
+      if (state.mode === "VIEW_HISTORY") return;
+      const existing = state.cureRecords[action.payload.cure];
+      if (!existing) return;
+      const todayKey = localDateKey(new Date());
+      if (existing.date !== todayKey) return;
+
+      state.cureRecords[action.payload.cure] = {
+        ...existing,
+        smsEnabled: action.payload.smsEnabled,
+      };
+      state.comment = upsertCureLine(
+        state.comment,
+        action.payload.cure,
+        state.cureRecords,
+      );
+      refreshDraftMetadata(state);
+    },
+
+    clearTodaysCures: (state) => {
+      if (state.mode === "VIEW_HISTORY") return;
+
+      const todayKey = localDateKey(new Date());
+      const curesToDelete = cureOrder.filter(
+        (cure) => state.cureRecords[cure]?.date === todayKey,
+      );
+
+      // Keep a snapshot because the stored date/time is also used to find a
+      // manually altered automatic line in Comment.
+      const recordsBeforeDelete: CureRecords = {
+        firstCure: state.cureRecords.firstCure
+          ? { ...state.cureRecords.firstCure }
+          : null,
+        secondCure: state.cureRecords.secondCure
+          ? { ...state.cureRecords.secondCure }
+          : null,
+        thirdCure: state.cureRecords.thirdCure
+          ? { ...state.cureRecords.thirdCure }
+          : null,
+      };
+
+      state.comment = removeCureLines(
+        state.comment,
+        curesToDelete,
+        recordsBeforeDelete,
+      );
+
+      for (const cure of curesToDelete) {
+        state.cureRecords[cure] = null;
+      }
+
+      state.cure = "noCure";
+      state.curePendingSince = null;
+      refreshDraftMetadata(state);
     },
 
     addAddressClient: (state, action: PayloadAction<AddressClient>) => {
@@ -545,17 +662,20 @@ export const {
   cancelDraft,
   clearCurrentForm,
   clearTask,
+  clearTodaysCures,
   loadDraft,
   loadInterventionForEdit,
   loadInterventionFromHistory,
   loadInterventionFromSearch,
   markSearchInterventionSaved,
+  recordCure,
   removeAddressClient,
   resumeDraft,
   setAddressClients,
   startNewIntervention,
   updateAddressClient,
   updateField,
+  updateRecordedCureSms,
 } = NewInterventionSlice.actions;
 
 export { NewInterventionSlice };

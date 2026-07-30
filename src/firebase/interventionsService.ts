@@ -13,6 +13,7 @@ import {
 import { db } from "./firebaseConfig";
 import type { Intervention, InterventionData } from "../redux/features/newInterventionSlice";
 import { parseLegacyAddressClients, serializeAddressClients } from "../utils/addressClients";
+import { normalizeCureRecords } from "../utils/cureRecords";
 import {
   interventionActivityValue,
   interventionLogicalKey,
@@ -112,6 +113,11 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     additionalInformation:
       data.additionalInformation ?? data.informationsSupplementaires ?? "",
     cure: normalizedCure,
+    cureRecords: normalizeCureRecords(
+      data.cureRecords,
+      normalizedCure,
+      convertTimestampToString(data.curePendingSince),
+    ),
     curePendingSince:
       convertTimestampToString(data.curePendingSince) ?? null,
     smsEnabled: data.smsEnabled ?? data.sms ?? false,

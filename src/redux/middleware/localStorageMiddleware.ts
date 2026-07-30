@@ -45,6 +45,7 @@ const currentData = (state: Intervention): InterventionData => ({
   comment: state.comment,
   additionalInformation: state.additionalInformation,
   cure: state.cure,
+  cureRecords: state.cureRecords,
   curePendingSince: state.curePendingSince,
   smsEnabled: state.smsEnabled,
   status: state.status,
