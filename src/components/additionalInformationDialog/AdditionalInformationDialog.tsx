@@ -1,11 +1,21 @@
 import * as React from "react";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
+import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
+import CheckRounded from "@mui/icons-material/CheckRounded";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
+import Tooltip from "@mui/material/Tooltip";
+import { useAppSelector } from "../../redux/store";
+import {
+  additionalInformationTemplates,
+  buildAdditionalInformationTemplate,
+  type AdditionalInformationTemplateId,
+} from "../../utils/additionalInformationTemplates";
 import "./AdditionalInformationDialog.scss";
 
 type Props = {
@@ -15,16 +25,45 @@ type Props = {
   buttonClassName?: string;
 };
 
+const formatHeaderDate = (date: Date) =>
+  new Intl.DateTimeFormat("fr-BE", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(date);
+
+const formatHeaderTime = (date: Date) =>
+  new Intl.DateTimeFormat("fr-BE", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(date);
+
 const AdditionalInformationDialog = ({ value, editable = false, onChange, buttonClassName = "" }: Props) => {
+  const intervention = useAppSelector((state) => state.newIntervention);
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState(value);
+  const [selectedTemplate, setSelectedTemplate] = React.useState<AdditionalInformationTemplateId | null>(null);
+  const [referenceNumber, setReferenceNumber] = React.useState("");
+  const [headerNow, setHeaderNow] = React.useState(() => new Date());
+  const [copied, setCopied] = React.useState(false);
 
   React.useEffect(() => {
     if (!open) setDraft(value);
   }, [value, open]);
 
+  React.useEffect(() => {
+    if (!open) return undefined;
+    setHeaderNow(new Date());
+    const interval = window.setInterval(() => setHeaderNow(new Date()), 30_000);
+    return () => window.clearInterval(interval);
+  }, [open]);
+
   const close = () => {
     setDraft(value);
+    setSelectedTemplate(null);
+    setReferenceNumber("");
+    setCopied(false);
     setOpen(false);
   };
 
@@ -32,6 +71,49 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     onChange?.(draft.trim());
     setOpen(false);
   };
+
+  const selectTemplate = (templateId: AdditionalInformationTemplateId) => {
+    setSelectedTemplate(templateId);
+    setReferenceNumber("");
+    setCopied(false);
+    setHeaderNow(new Date());
+    setDraft(
+      buildAdditionalInformationTemplate(templateId, {
+        phone: intervention.phone,
+        mainAddress: intervention.mainAddress,
+        addressDetails: intervention.addressDetails,
+        mailbox: intervention.mailbox,
+        floor: intervention.floor,
+        apartment: intervention.apartment,
+        blockNumber: intervention.blockNumber,
+        cureRecords: intervention.cureRecords,
+      }),
+    );
+  };
+
+  const copyDraft = async () => {
+    const text = draft.trim();
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.opacity = "0";
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      document.execCommand("copy");
+      textArea.remove();
+    }
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1400);
+  };
+
+  const selectedDefinition = additionalInformationTemplates.find(
+    (template) => template.id === selectedTemplate,
+  );
 
   return (
     <>
@@ -49,22 +131,72 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
         open={open}
         onClose={close}
         fullWidth
-        maxWidth="md"
+        maxWidth={editable ? "lg" : "md"}
         className="additional-information-dialog"
       >
         <DialogTitle>Informations supplémentaires</DialogTitle>
         <DialogContent>
           {editable ? (
-            <TextField
-              autoFocus
-              value={draft}
-              onChange={(event) => setDraft(event.target.value.replace(/^[ \t]+/, ""))}
-              multiline
-              minRows={10}
-              maxRows={22}
-              fullWidth
-              placeholder="Saisissez les informations supplémentaires…"
-            />
+            <div className="additional-information-workspace">
+              <aside className="additional-information-sidebar" aria-label="Modèles d'informations supplémentaires">
+                <div className="additional-information-sidebar__title">Modèles</div>
+                {additionalInformationTemplates.map((template) => (
+                  <Button
+                    key={template.id}
+                    type="button"
+                    variant={selectedTemplate === template.id ? "contained" : "outlined"}
+                    className="additional-information-template-button"
+                    onClick={() => selectTemplate(template.id)}
+                  >
+                    {template.buttonLabel}
+                  </Button>
+                ))}
+              </aside>
+
+              <section className="additional-information-editor">
+                <header className="additional-information-template-header">
+                  <div className="additional-information-template-datetime">
+                    <span>{formatHeaderDate(headerNow)}</span>
+                    <span>{formatHeaderTime(headerNow)}</span>
+                  </div>
+
+                  <TextField
+                    label={selectedDefinition?.headerInputLabel ?? "Référence"}
+                    value={referenceNumber}
+                    onChange={(event) => setReferenceNumber(event.target.value)}
+                    size="small"
+                    className="additional-information-reference"
+                    disabled={!selectedDefinition}
+                  />
+                </header>
+
+                <div className="additional-information-copyable">
+                  <TextField
+                    autoFocus
+                    value={draft}
+                    onChange={(event) => setDraft(event.target.value.replace(/^[ \t]+/, ""))}
+                    multiline
+                    minRows={16}
+                    maxRows={25}
+                    fullWidth
+                    placeholder="Choisissez un modèle ou saisissez les informations supplémentaires…"
+                  />
+
+                  <Tooltip title={copied ? "Copié" : "Copier le texte"}>
+                    <span className="additional-information-copy-action">
+                      <IconButton
+                        type="button"
+                        aria-label="Copier le contenu"
+                        onClick={copyDraft}
+                        disabled={!draft.trim()}
+                      >
+                        {copied ? <CheckRounded /> : <ContentCopyRounded />}
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </div>
+              </section>
+            </div>
           ) : (
             <div className="additional-information-readonly">
               {value.trim() || "Aucune information supplémentaire."}
