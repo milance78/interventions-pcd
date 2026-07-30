@@ -1912,3 +1912,51 @@
     }
   }
 }
+
+
+/* Compact standard inputs on the right card */
+.current-intervention-page {
+  .right-card .client-name-field {
+    padding-top: 2px;
+
+    .MuiInputBase-root {
+      min-height: 46px;
+      height: 46px;
+      border-radius: 0;
+    }
+
+    .MuiInputBase-input {
+      padding-top: 20px;
+      padding-bottom: 5px;
+    }
+
+    /* Native MUI Standard behaviour: the empty label sits near the
+       underline, then floats up only when focused or populated. */
+    .MuiInputLabel-root {
+      transform: translate(0, 20px) scale(1);
+      transform-origin: top left;
+    }
+
+    .MuiInputLabel-shrink {
+      transform: translate(0, -1.5px) scale(0.75);
+    }
+
+    .MuiInput-underline::before {
+      border-bottom-color: #94a3b8;
+    }
+  }
+}
+
+/* Keep the Standard Nom du client label visible before typing. */
+.current-intervention-page {
+  .right-card .client-name-field {
+    .MuiInput-root {
+      background: transparent;
+    }
+
+    .MuiInputLabel-root {
+      z-index: 1;
+      pointer-events: none;
+    }
+  }
+}

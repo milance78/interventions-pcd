@@ -17,16 +17,29 @@ export const createAddressClient = (id?: string): AddressClient => ({
 });
 
 export const normalizePersonName = (value: string) => {
-  const normalized = clean(value).replace(/\s+/g, " ");
+  const normalized = value.replace(/\s+/g, " ").replace(/^\s+/, "");
   if (!normalized) return "";
+
   return normalized
     .split(" ")
-    .map((part) => part ? `${part.charAt(0).toLocaleUpperCase("fr-FR")}${part.slice(1).toLocaleLowerCase("fr-FR")}` : "")
+    .map((part) =>
+      part
+        ? `${part.charAt(0).toLocaleUpperCase("fr-FR")}${part
+            .slice(1)
+            .toLocaleLowerCase("fr-FR")}`
+        : "",
+    )
     .join(" ");
 };
 
 export const addressClientHasData = (client: AddressClient) =>
-  Object.entries(client).some(([key, value]) => key !== "id" && key !== "mode" && String(value).trim().length > 0);
+  Object.entries(client).some(
+    ([key, value]) =>
+      key !== "id" &&
+      key !== "mode" &&
+      key !== "naInService" &&
+      String(value).trim().length > 0,
+  );
 
 export const parseLegacyAddressClients = (value: string): AddressClient[] => {
   const names = value
@@ -42,49 +55,72 @@ export const parseLegacyAddressClients = (value: string): AddressClient[] => {
   }));
 };
 
+const sentenceCaseDetail = (label: string, value: string, keepCaps = false) => {
+  const cleanedValue = clean(value);
+  if (!cleanedValue) return "";
+
+  if (keepCaps) {
+    return `${label.toLocaleUpperCase("fr-FR")}: ${cleanedValue}`;
+  }
+
+  const normalizedLabel =
+    label.charAt(0).toLocaleLowerCase("fr-FR") + label.slice(1);
+  return `${normalizedLabel}: ${cleanedValue}`;
+};
+
 const joinedDetails = (client: AddressClient, infrastructure: string) => {
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
   const values = isCopper
     ? [
-        client.fullName,
-        client.operator && `Opérateur: ${client.operator}`,
-        client.naInService && `NA en service: ${client.naInService}`,
-        client.clientId && `ID client: ${client.clientId}`,
-        client.na && `NA: ${client.na}`,
-        client.cid && `CID: ${client.cid}`,
-        client.voip && `VOIP: ${client.voip}`,
+        normalizePersonName(client.fullName),
+        sentenceCaseDetail("Opérateur", client.operator),
+        sentenceCaseDetail("NA", client.na, true),
+        sentenceCaseDetail("ID", client.clientId, true),
+        sentenceCaseDetail("CID", client.cid, true),
+        sentenceCaseDetail("VOIP", client.voip, true),
       ]
     : [
-        client.fullName,
-        client.operator && `Opérateur: ${client.operator}`,
-        client.addressDetails && `Détail d'adresse: ${client.addressDetails}`,
-        client.utac && `UTAC: ${client.utac}`,
-        client.cid && `CID: ${client.cid}`,
-        client.clientId && `ID client: ${client.clientId}`,
-        client.voip && `VOIP: ${client.voip}`,
+        normalizePersonName(client.fullName),
+        sentenceCaseDetail("Opérateur", client.operator),
+        sentenceCaseDetail("Détail d'adresse", client.addressDetails),
+        sentenceCaseDetail("UTAC", client.utac, true),
+        sentenceCaseDetail("ID", client.clientId, true),
+        sentenceCaseDetail("CID", client.cid, true),
+        sentenceCaseDetail("VOIP", client.voip, true),
       ];
-  return values.filter(Boolean).join(" — ");
+
+  return values.filter(Boolean).join(", ");
 };
 
-export const serializeAddressClients = (clients: AddressClient[], infrastructure: string) =>
+export const serializeAddressClients = (
+  clients: AddressClient[],
+  infrastructure: string,
+) =>
   clients
     .filter(addressClientHasData)
     .map((client, index) => `${index + 1}. ${joinedDetails(client, infrastructure)};`)
     .join("\n");
 
-export const formatAddressClientsForComment = (clients: AddressClient[], infrastructure: string) => {
+export const formatAddressClientsForComment = (
+  clients: AddressClient[],
+  infrastructure: string,
+) => {
   const active = clients.filter(addressClientHasData);
   if (!active.length) return "";
 
-  const lines = active.map((client, index) => `${index + 1}. ${joinedDetails(client, infrastructure)};`);
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
 
   if (isCopper && active.length === 1) {
-    return `Un client TF à l'adresse: ${joinedDetails(active[0], infrastructure)};`;
+    return `Client à l'adresse: ${joinedDetails(active[0], infrastructure)};`;
   }
 
-  return `${isCopper ? "Clients TF à l'adresse:" : "Clients à l'adresse:"}\n${lines.join("\n")}`;
+  const lines = active.map(
+    (client, index) => `${index + 1}. ${joinedDetails(client, infrastructure)};`,
+  );
+
+  return `Clients à l'adresse:\n${lines.join("\n")}`;
 };
 
-export const normalizeAddressClientMode = (value: unknown): AddressClientMode =>
-  value === "plus" ? "plus" : "base";
+export const normalizeAddressClientMode = (
+  value: unknown,
+): AddressClientMode => (value === "plus" ? "plus" : "base");

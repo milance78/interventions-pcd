@@ -771,6 +771,7 @@ const CurrentInterventionPage = () => {
         <section className="intervention-card right-card">
           <div className="client-name-field copy-field">
             <TextField
+              variant="standard"
               label="Nom du client"
               value={clientName}
               onChange={(event) =>
@@ -793,10 +794,9 @@ const CurrentInterventionPage = () => {
               fullWidth
               disabled={isHistoryView}
               sx={{
-                "& .MuiOutlinedInput-input":
-                  {
-                    paddingRight: "48px",
-                  },
+                "& .MuiInputBase-input": {
+                  paddingRight: "48px",
+                },
               }}
             />
 

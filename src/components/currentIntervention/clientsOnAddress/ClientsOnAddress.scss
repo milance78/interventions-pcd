@@ -1,10 +1,10 @@
 .clients-on-address {
   width: 100%;
   min-width: 0;
-  padding: 10px;
-  background: #f8fafc;
-  border: 1px solid #cbd5e1;
-  border-radius: 12px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
   box-sizing: border-box;
 }
 
@@ -12,8 +12,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 8px;
+  gap: 10px;
+  margin-bottom: 4px;
 }
 
 .clients-on-address__title {
@@ -32,21 +32,21 @@
 }
 
 .clients-on-address__add {
-  width: 30px;
-  height: 30px;
+  width: 28px;
+  height: 28px;
   color: #1d4ed8 !important;
   background: #dbeafe !important;
   border: 1px solid #93c5fd !important;
-  border-radius: 8px !important;
+  border-radius: 7px !important;
 }
 
 .clients-on-address__list {
   display: flex;
   flex-direction: column;
-  gap: 7px;
+  gap: 3px;
   max-height: 210px;
   overflow-y: auto;
-  padding-right: 2px;
+  padding-right: 1px;
   scrollbar-width: thin;
 }
 
@@ -55,11 +55,11 @@
   align-items: center;
   justify-content: center;
   gap: 6px;
-  min-height: 54px;
+  min-height: 42px;
   color: #64748b;
-  background: #ffffff;
+  background: transparent;
   border: 1px dashed #94a3b8;
-  border-radius: 9px;
+  border-radius: 7px;
   font: inherit;
   font-size: 12px;
   cursor: pointer;
@@ -73,65 +73,61 @@
 
 .address-client {
   display: grid;
-  grid-template-columns: 24px minmax(0, 1fr) auto;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
   align-items: start;
-  gap: 6px;
-  padding: 6px;
-  background: #ffffff;
-  border: 1px solid #dbe3ee;
-  border-radius: 9px;
-  box-shadow: 0 2px 5px rgba(15, 23, 42, 0.04);
-}
-
-.address-client:not(:has(.address-client__plus)) {
-  min-height: 0;
-}
-
-.address-client:not(:has(.address-client__plus)) .address-client__content {
-  min-height: 34px;
+  gap: 5px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .address-client__number {
   display: grid;
   place-items: center;
-  width: 22px;
-  height: 22px;
-  margin-top: 5px;
+  width: 20px;
+  height: 20px;
+  margin-top: 12px;
   color: #1e40af;
   background: #dbeafe;
   border-radius: 999px;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
 }
 
 .address-client__content {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 3px;
   min-width: 0;
 }
 
 .address-client__base,
 .address-client__plus {
   display: grid;
-  gap: 6px;
+  gap: 7px;
   min-width: 0;
 }
 
 .address-client__base--copper {
-  grid-template-columns: minmax(150px, 1.45fr) minmax(92px, 0.85fr) minmax(112px, 1fr);
+  grid-template-columns:
+    minmax(145px, 1.45fr)
+    minmax(90px, 0.85fr)
+    minmax(105px, 0.95fr);
 }
 
 .address-client__base--fiber {
-  grid-template-columns: minmax(145px, 1.35fr) minmax(88px, 0.75fr) minmax(118px, 1.05fr) minmax(76px, 0.65fr);
+  grid-template-columns:
+    minmax(145px, 1.35fr)
+    minmax(88px, 0.75fr)
+    minmax(88px, 0.75fr)
+    minmax(118px, 1.05fr);
 }
 
-.address-client__plus--copper {
-  grid-template-columns: repeat(4, minmax(92px, 1fr));
-}
-
+.address-client__plus--copper,
 .address-client__plus--fiber {
-  grid-template-columns: repeat(3, minmax(100px, 1fr));
+  grid-template-columns: repeat(3, minmax(92px, 1fr));
 }
 
 .address-client {
@@ -140,43 +136,51 @@
   }
 
   .MuiInputBase-root {
-    min-height: 34px;
-    height: 34px;
+    min-height: 38px;
+    height: 38px;
     padding-right: 1px;
-    border-radius: 7px;
+    border-radius: 0;
   }
 
   .MuiInputBase-input {
     min-width: 0;
-    padding: 7px 2px 7px 9px;
+    padding: 18px 2px 4px 2px;
     color: #172033;
     font-size: 12px;
     font-weight: 500;
   }
 
+  /* Match MUI's native Standard TextField label positioning:
+     empty label rests beside the underline and only shrinks on focus/value. */
   .MuiInputLabel-root {
-    transform: translate(10px, 8px) scale(1);
+    left: 0;
     color: #64748b;
-    font-size: 11px;
+    font-size: 12px;
+    transform: translate(0, 20px) scale(1);
+    transform-origin: top left;
   }
 
   .MuiInputLabel-shrink {
-    transform: translate(11px, -7px) scale(0.75);
+    transform: translate(0, -1.5px) scale(0.75);
   }
 
-  .MuiOutlinedInput-notchedOutline {
-    border-color: #cbd5e1;
+  .MuiInput-underline::before {
+    border-bottom-color: #cbd5e1;
+  }
+
+  .MuiInput-underline:hover:not(.Mui-disabled, .Mui-error)::before {
+    border-bottom-color: #2563eb;
   }
 }
 
 .address-client-field__copy {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
   color: #64748b !important;
 
   svg {
-    width: 14px;
-    height: 14px;
+    width: 13px;
+    height: 13px;
   }
 }
 
@@ -185,17 +189,18 @@
   flex-direction: row;
   align-items: center;
   align-self: start;
-  gap: 2px;
+  gap: 1px;
+  padding-top: 7px;
 
   .MuiIconButton-root {
-    width: 27px;
-    height: 27px;
+    width: 25px;
+    height: 25px;
     color: #64748b;
-    border-radius: 7px;
+    border-radius: 6px;
 
     svg {
-      width: 17px;
-      height: 17px;
+      width: 16px;
+      height: 16px;
     }
   }
 }
@@ -221,5 +226,18 @@
   .address-client__plus--copper,
   .address-client__plus--fiber {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Keep Standard-variant labels visible while fields are empty.
+   The page-level white InputBase background otherwise covers the non-shrunk label. */
+.address-client {
+  .MuiInput-root {
+    background: transparent;
+  }
+
+  .MuiInputLabel-root {
+    z-index: 1;
+    pointer-events: none;
   }
 }
