@@ -754,3 +754,19 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
     grid-template-columns: 1fr;
   }
 }
+
+/* Monochrome cable-cut illustration, aligned with the other On Hold icons */
+.on-hold-cable-cut-icon {
+  width: 32px !important;
+  height: 32px !important;
+  object-fit: contain;
+  display: block;
+  flex: 0 0 32px;
+  filter: none;
+}
+
+.on-hold-card__status-main .on-hold-cable-cut-icon {
+  width: 23px !important;
+  height: 23px !important;
+  flex: 0 0 23px;
+}

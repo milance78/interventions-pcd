@@ -19,25 +19,15 @@ import {
 
 import "./OnHoldPage.scss";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
+import CableCutMono from "../../assets/icons/CableCutMono.png";
 
 const CableCutIcon = () => (
-  <svg
-    viewBox="0 0 40 28"
+  <img
+    src={CableCutMono}
+    alt=""
     aria-hidden="true"
-    focusable="false"
     className="on-hold-cable-cut-icon"
-  >
-    <path className="on-hold-cable-cut-icon__cable" d="M11 8.7H29" />
-
-    <path className="on-hold-cable-cut-icon__blade" d="M20 17.1 14.8 1.7" />
-    <path className="on-hold-cable-cut-icon__blade" d="M20 17.1 25.2 1.7" />
-
-    <circle className="on-hold-cable-cut-icon__pivot" cx="20" cy="17.1" r="1.75" />
-    <circle className="on-hold-cable-cut-icon__handle" cx="14.9" cy="23" r="3.55" />
-    <circle className="on-hold-cable-cut-icon__handle" cx="25.1" cy="23" r="3.55" />
-    <path className="on-hold-cable-cut-icon__arm" d="M18.7 18.5 16.9 20.3" />
-    <path className="on-hold-cable-cut-icon__arm" d="M21.3 18.5 23.1 20.3" />
-  </svg>
+  />
 );
 
 const tabs: Array<{

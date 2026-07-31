@@ -77,6 +77,8 @@ import CommentCopyActions from "../../components/commentCopyActions/CommentCopyA
 import { normalizeInterventionStrings, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
+import CableCutOn from "../../assets/icons/CableCutOn.png";
+import CableCutOff from "../../assets/icons/CableCutOff.png";
 
 type CopyButtonProps = {
   value: string;
@@ -656,7 +658,12 @@ const CurrentInterventionPage = () => {
                       aria-pressed={isResPending}
                       disabled={isHistoryView}
                     >
-                      RES
+                      <img
+                        src={isResPending ? CableCutOn : CableCutOff}
+                        alt=""
+                        aria-hidden="true"
+                        className="res-pending-button__icon"
+                      />
                     </button>
                   </div>
                 </div>
