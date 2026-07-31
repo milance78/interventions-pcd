@@ -79,48 +79,35 @@
   }
 }
 
-/* One neutral snowflake with its own icon column, then three equal Snow fields. */
+/* Snow uses the exact same icon wrapper and horizontal alignment as all other inputs. */
 .inputs-all .inputs-row--snow {
+  display: block;
+}
+
+.inputs-all .snow-inputs-group {
+  width: 100%;
+}
+
+.inputs-all .snow-inputs-group__fields {
   display: grid;
   grid-template-columns:
-    48px
     minmax(0, 1fr)
     40px
     minmax(0, 1fr)
     40px
     minmax(0, 1fr);
   align-items: center;
-  column-gap: 12px;
+  column-gap: 10px;
   width: 100%;
   min-width: 0;
 }
 
-.inputs-row--snow__icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 40px;
-  height: 40px;
-  margin-left: 0;
-
-  color: #111827;
-  background: #f0f0f0;
-  border-radius: 50%;
-
-  svg {
-    display: block;
-    width: 28px;
-    height: 28px;
-  }
-}
-
-.inputs-all .inputs-row--snow > .snow-pending-input {
+.inputs-all .snow-inputs-group__fields > .snow-pending-input {
   display: contents;
 }
 
-.inputs-all .inputs-row--snow .snow-pending-input__field,
-.inputs-all .inputs-row--snow > .simple-input {
+.inputs-all .snow-inputs-group__fields .snow-pending-input__field,
+.inputs-all .snow-inputs-group__fields > .simple-input {
   min-width: 0;
   width: 100%;
 }
@@ -157,22 +144,14 @@
     }
   }
 
-  .inputs-all .inputs-row--snow {
-    grid-template-columns:
-      48px
-      minmax(0, 1fr)
-      40px;
+  .inputs-all .snow-inputs-group__fields {
+    grid-template-columns: minmax(0, 1fr) 40px;
     row-gap: 8px;
-    column-gap: 12px;
+    column-gap: 10px;
   }
 
-  .inputs-row--snow__icon {
-    grid-row: 1 / span 3;
-    align-self: center;
-  }
-
-  .inputs-all .inputs-row--snow > .simple-input {
-    grid-column: 2 / 4;
+  .inputs-all .snow-inputs-group__fields > .simple-input {
+    grid-column: 1 / 3;
   }
 }
 

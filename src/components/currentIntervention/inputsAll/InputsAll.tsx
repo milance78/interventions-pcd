@@ -49,29 +49,33 @@ const InputsAll = () => {
   return (
     <div className="inputs-all">
       <section className="inputs-row inputs-row--snow">
-        <span className="inputs-row--snow__icon" aria-hidden="true">
-          <AcUnitRounded />
-        </span>
+        <div className="simple-input snow-inputs-group">
+          <div className="icon-container" aria-hidden="true">
+            <AcUnitRounded />
+          </div>
 
-        <SnowPendingInput
-          field="snowReceived"
-          pendingField="isSnowReceivedPending"
-          label="Snow reçu"
-          pendingLabel="Snow reçu en attente"
-        />
+          <div className="snow-inputs-group__fields">
+            <SnowPendingInput
+              field="snowReceived"
+              pendingField="isSnowReceivedPending"
+              label="Snow reçu"
+              pendingLabel="Snow reçu en attente"
+            />
 
-        <SnowPendingInput
-          field="snowSent"
-          pendingField="isSnowSentPending"
-          label="Snow envoyé"
-          pendingLabel="Snow envoyé en attente"
-        />
+            <SnowPendingInput
+              field="snowSent"
+              pendingField="isSnowSentPending"
+              label="Snow envoyé"
+              pendingLabel="Snow envoyé en attente"
+            />
 
-        <SimpleInput
-          field="snowMentioned"
-          label="Snow mentionné"
-          inputType="type2"
-        />
+            <SimpleInput
+              field="snowMentioned"
+              label="Snow mentionné"
+              inputType="type2"
+            />
+          </div>
+        </div>
       </section>
 
       <section className="inputs-row inputs-row--full">
