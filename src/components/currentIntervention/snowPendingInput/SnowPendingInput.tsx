@@ -1,7 +1,9 @@
 import * as React from "react";
 
 import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
-import Snackbar from "@mui/material/Snackbar";
+import Fade from "@mui/material/Fade";
+import Paper from "@mui/material/Paper";
+import Popper from "@mui/material/Popper";
 
 import "./SnowPendingInput.scss";
 
@@ -38,7 +40,32 @@ const SnowPendingInput = ({
   const isPending = useAppSelector((state) =>
     Boolean(state.newIntervention[pendingField]),
   );
-  const [toastOpen, setToastOpen] = React.useState(false);
+
+  const clockButtonRef = React.useRef<HTMLButtonElement | null>(null);
+  const hideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const [notificationOpen, setNotificationOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    return () => {
+      if (hideTimerRef.current) {
+        clearTimeout(hideTimerRef.current);
+      }
+    };
+  }, []);
+
+  const showNotification = () => {
+    if (hideTimerRef.current) {
+      clearTimeout(hideTimerRef.current);
+    }
+
+    setNotificationOpen(true);
+
+    hideTimerRef.current = setTimeout(() => {
+      setNotificationOpen(false);
+    }, 1500);
+  };
 
   const togglePending = () => {
     dispatch(
@@ -47,7 +74,8 @@ const SnowPendingInput = ({
         value: !isPending,
       }),
     );
-    setToastOpen(true);
+
+    showNotification();
   };
 
   return (
@@ -61,6 +89,7 @@ const SnowPendingInput = ({
       </div>
 
       <button
+        ref={clockButtonRef}
         type="button"
         className={`snow-pending-input__clock ${
           isPending ? "snow-pending-input__clock--active" : ""
@@ -73,14 +102,33 @@ const SnowPendingInput = ({
         <AccessTimeRounded aria-hidden="true" />
       </button>
 
-      <Snackbar
-        open={toastOpen}
-        autoHideDuration={1500}
-        onClose={() => setToastOpen(false)}
-        message={pendingLabel}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        ContentProps={{ className: "snow-pending-input__toast" }}
-      />
+      <Popper
+        open={notificationOpen}
+        anchorEl={clockButtonRef.current}
+        placement="top"
+        transition
+        modifiers={[
+          {
+            name: "offset",
+            options: {
+              offset: [0, 10],
+            },
+          },
+        ]}
+        className="snow-pending-input__popper"
+      >
+        {({ TransitionProps }) => (
+          <Fade {...TransitionProps} timeout={140}>
+            <Paper
+              elevation={5}
+              className="snow-pending-input__notification"
+              role="status"
+            >
+              {pendingLabel}
+            </Paper>
+          </Fade>
+        )}
+      </Popper>
     </div>
   );
 };

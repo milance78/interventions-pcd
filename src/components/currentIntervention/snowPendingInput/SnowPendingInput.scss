@@ -1,13 +1,10 @@
 .snow-pending-input {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 42px;
-  align-items: center;
-  gap: 8px;
-  min-width: 0;
+  display: contents;
 }
 
 .snow-pending-input__field {
   min-width: 0;
+  width: 100%;
 
   > * {
     width: 100%;
@@ -18,15 +15,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  justify-self: center;
+
   width: 40px;
   height: 40px;
   padding: 0;
+
   color: #cbd5e1;
   background: transparent;
   border: 0;
   border-radius: 50%;
   outline: none;
+
   cursor: pointer;
+
   transition:
     color 140ms ease,
     background-color 140ms ease,
@@ -60,14 +62,44 @@
   filter: drop-shadow(0 2px 4px rgba(202, 138, 4, 0.28));
 }
 
-.snow-pending-input__toast {
-  min-width: 0 !important;
-  padding: 7px 13px !important;
-  color: #f8fafc !important;
-  background: rgba(30, 41, 59, 0.94) !important;
-  border-radius: 10px !important;
-  font-size: 13px !important;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.2) !important;
+.snow-pending-input__popper {
+  z-index: 1700;
+  pointer-events: none;
+}
+
+.snow-pending-input__notification {
+  position: relative;
+
+  padding: 8px 12px;
+
+  color: #713f12 !important;
+  background: #fff8d8 !important;
+  border: 1px solid #facc15;
+  border-radius: 9px !important;
+
+  font-size: 13px;
+  font-weight: 650;
+  line-height: 1.25;
+  white-space: nowrap;
+
+  box-shadow: 0 8px 20px rgba(113, 63, 18, 0.18) !important;
+
+  &::after {
+    content: "";
+
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+
+    width: 10px;
+    height: 10px;
+
+    background: #fff8d8;
+    border-right: 1px solid #facc15;
+    border-bottom: 1px solid #facc15;
+
+    transform: translateX(-50%) rotate(45deg);
+  }
 }
 
 .snow-pending-input--emphasized {
@@ -77,11 +109,5 @@
 
   .MuiOutlinedInput-notchedOutline {
     border-color: #aeb8c5;
-  }
-}
-
-@media (max-width: 680px) {
-  .snow-pending-input {
-    grid-template-columns: minmax(0, 1fr) 42px;
   }
 }
