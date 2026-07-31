@@ -2032,3 +2032,160 @@
     max-height: 96%;
   }
 }
+
+/* v62: frameless Actions / États en attente with one quiet divider. */
+.current-intervention-page {
+  .intervention-options {
+    padding: 10px 0 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .intervention-options .boolean-inputs-row {
+    gap: 0;
+  }
+
+  .intervention-option-group {
+    min-height: 88px;
+    padding: 4px 18px 4px 0;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+  }
+
+  .intervention-option-group--states {
+    position: relative;
+    padding-right: 0;
+    padding-left: 22px;
+    background: transparent;
+    border: 0;
+  }
+
+  .intervention-option-group--states::before {
+    content: "";
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 1px;
+    background: #d9e2ec;
+  }
+
+  .intervention-option-group__items > .option-button {
+    height: 62px;
+    min-height: 62px;
+    max-height: 62px;
+  }
+
+  .intervention-option-group .boolean-input-icon,
+  .intervention-option-group .boolean-input-icon > *,
+  .intervention-option-group .snow-pending-card__icon,
+  .intervention-option-group .cure-summary-card__icon,
+  .intervention-option-group .res-pending-button__icon,
+  .intervention-option-group .question-action-icon {
+    width: 48px;
+    height: 48px;
+    max-width: 48px;
+    max-height: 48px;
+    object-fit: contain;
+  }
+
+  .intervention-option-group .boolean-input-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .question-action-icon {
+    display: block;
+  }
+
+  .option-button--res,
+  .res-pending-button,
+  .res-pending-button:hover,
+  .res-pending-button--active,
+  .res-pending-button--active:hover,
+  .res-pending-button:active {
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .res-pending-button:hover {
+    background: rgba(249, 115, 22, 0.045) !important;
+  }
+
+  .res-pending-button--active,
+  .res-pending-button--active:hover,
+  .res-pending-button:active {
+    transform: scale(0.97);
+  }
+
+  @media (max-width: 980px) {
+    .intervention-options .boolean-inputs-row {
+      gap: 14px;
+    }
+
+    .intervention-option-group {
+      padding-right: 0;
+    }
+
+    .intervention-option-group--states {
+      padding-top: 16px;
+      padding-left: 0;
+    }
+
+    .intervention-option-group--states::before {
+      top: 0;
+      right: 0;
+      bottom: auto;
+      width: auto;
+      height: 1px;
+    }
+  }
+}
+
+/* v63: restore the regular neutral Action frame for Résiliation. */
+.current-intervention-page {
+  .intervention-option-group__items > .option-button.option-button--res {
+    background: #ffffff !important;
+    border: 1px solid #b8c7df !important;
+    border-radius: 11px !important;
+    box-shadow: 0 3px 8px rgba(30, 64, 175, 0.07) !important;
+    overflow: hidden;
+  }
+
+  .intervention-option-group__items > .option-button.option-button--res:hover {
+    transform: translateY(-2px);
+    background: #f8fbff !important;
+    border-color: #5b87e5 !important;
+    box-shadow: 0 7px 15px rgba(30, 64, 175, 0.15) !important;
+  }
+
+  .option-button--res .res-pending-button,
+  .option-button--res .res-pending-button:hover,
+  .option-button--res .res-pending-button--active,
+  .option-button--res .res-pending-button--active:hover,
+  .option-button--res .res-pending-button:active {
+    width: 100%;
+    height: 100%;
+    padding: 4px;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 10px;
+    box-shadow: none !important;
+  }
+
+  .option-button--res .res-pending-button--active,
+  .option-button--res .res-pending-button--active:hover,
+  .option-button--res .res-pending-button:active {
+    transform: scale(0.97);
+  }
+
+  /* Make only the inactive bulb quieter; the active bulb is unchanged. */
+  .lightbulb-action-icon--off {
+    opacity: 0.56;
+    filter: grayscale(0.22) brightness(1.16);
+  }
+}

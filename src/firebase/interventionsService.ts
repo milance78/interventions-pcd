@@ -72,6 +72,7 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     data.snowSentPending ??
     data.snowEnvoyePending ??
     "";
+  const snowMentioned = data.snowMentioned ?? data.snowMentionne ?? "";
 
   const isSnowReceivedPending = Boolean(
     data.isSnowReceivedPending ?? false,
@@ -119,6 +120,7 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     clientsOnAddress: serializeAddressClients(addressClients, data.infrastructure ?? ""),
     snowReceived,
     snowSent,
+    snowMentioned,
     isSnowReceivedPending,
     isSnowSentPending,
     isResPending: Boolean(

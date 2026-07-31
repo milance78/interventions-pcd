@@ -1,6 +1,10 @@
+import * as React from "react";
+
+import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
+import Snackbar from "@mui/material/Snackbar";
+
 import "./SnowPendingInput.scss";
 
-import Numbers from "@mui/icons-material/Numbers";
 import SimpleInput from "../simpleInput/SimpleInput";
 import {
   updateField,
@@ -34,6 +38,17 @@ const SnowPendingInput = ({
   const isPending = useAppSelector((state) =>
     Boolean(state.newIntervention[pendingField]),
   );
+  const [toastOpen, setToastOpen] = React.useState(false);
+
+  const togglePending = () => {
+    dispatch(
+      updateField({
+        field: pendingField,
+        value: !isPending,
+      }),
+    );
+    setToastOpen(true);
+  };
 
   return (
     <div className={`snow-pending-input ${className}`.trim()}>
@@ -42,31 +57,30 @@ const SnowPendingInput = ({
           field={field}
           label={label}
           inputType="type2"
-          icon={Numbers}
         />
       </div>
 
       <button
         type="button"
-        className={`snow-pending-input__button ${
-          isPending
-            ? "snow-pending-input__button--active"
-            : ""
+        className={`snow-pending-input__clock ${
+          isPending ? "snow-pending-input__clock--active" : ""
         }`}
-        onClick={() =>
-          dispatch(
-            updateField({
-              field: pendingField,
-              value: !isPending,
-            }),
-          )
-        }
+        onClick={togglePending}
         aria-label={pendingLabel}
         title={pendingLabel}
         aria-pressed={isPending}
       >
-        En attente
+        <AccessTimeRounded aria-hidden="true" />
       </button>
+
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={1500}
+        onClose={() => setToastOpen(false)}
+        message={pendingLabel}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        ContentProps={{ className: "snow-pending-input__toast" }}
+      />
     </div>
   );
 };

@@ -148,3 +148,103 @@
     }
   }
 }
+
+/* One shared snowflake for the three SNOW fields. */
+.inputs-all .inputs-row--snow {
+  display: grid;
+  grid-template-columns: 42px repeat(3, minmax(0, 1fr));
+  align-items: center;
+  gap: 10px;
+}
+
+.inputs-row--snow__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  color: #1681d9;
+
+  svg {
+    width: 31px;
+    height: 31px;
+  }
+}
+
+.inputs-all .inputs-row--snow > * {
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 980px) {
+  .inputs-all .inputs-row--snow {
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+
+  .inputs-row--snow__icon {
+    grid-row: 1 / span 3;
+    align-self: start;
+  }
+}
+
+@media (max-width: 680px) {
+  .inputs-all .inputs-row--snow {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+  }
+}
+
+/* v63: one neutral snowflake followed by three equally wide SNOW inputs. */
+.inputs-all .inputs-row--snow {
+  display: grid;
+  grid-template-columns:
+    34px
+    minmax(0, 1fr) 40px
+    minmax(0, 1fr) 40px
+    minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+}
+
+.inputs-all .inputs-row--snow > .snow-pending-input {
+  display: contents;
+}
+
+.inputs-all .inputs-row--snow > .simple-input {
+  min-width: 0;
+  width: 100%;
+}
+
+.inputs-row--snow__icon {
+  align-self: center;
+  justify-self: start;
+  width: 32px;
+  height: 40px;
+  color: #8795a8;
+}
+
+.inputs-row--snow__icon svg {
+  width: 28px;
+  height: 28px;
+}
+
+@media (max-width: 980px) {
+  .inputs-all .inputs-row--snow {
+    grid-template-columns: 34px minmax(0, 1fr) 40px;
+  }
+
+  .inputs-row--snow__icon {
+    grid-row: 1 / span 3;
+    align-self: start;
+  }
+
+  .inputs-all .inputs-row--snow > .simple-input {
+    grid-column: 2 / 4;
+  }
+}
+
+@media (max-width: 680px) {
+  .inputs-all .inputs-row--snow {
+    grid-template-columns: 34px minmax(0, 1fr) 40px;
+  }
+}

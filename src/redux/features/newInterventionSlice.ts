@@ -77,6 +77,7 @@ export interface InterventionData {
   displayAllFields: boolean;
   snowReceived: string;
   snowSent: string;
+  snowMentioned: string;
   isSnowReceivedPending: boolean;
   isSnowSentPending: boolean;
   isResPending: boolean;
@@ -161,6 +162,7 @@ export const emptyInterventionData: InterventionData = {
   displayAllFields: false,
   snowReceived: "",
   snowSent: "",
+  snowMentioned: "",
   isSnowReceivedPending: false,
   isSnowSentPending: false,
   isResPending: false,
@@ -233,6 +235,7 @@ const extractData = (state: Intervention): InterventionData => ({
   displayAllFields: state.displayAllFields,
   snowReceived: state.snowReceived,
   snowSent: state.snowSent,
+  snowMentioned: state.snowMentioned,
   isSnowReceivedPending: state.isSnowReceivedPending,
   isSnowSentPending: state.isSnowSentPending,
   isResPending: state.isResPending,

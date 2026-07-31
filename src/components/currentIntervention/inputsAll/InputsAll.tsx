@@ -1,5 +1,7 @@
 import "./InputsAll.scss";
 
+import AcUnitRounded from "@mui/icons-material/AcUnitRounded";
+
 import {
   Contact,
   House,
@@ -47,6 +49,10 @@ const InputsAll = () => {
   return (
     <div className="inputs-all">
       <section className="inputs-row inputs-row--snow">
+        <span className="inputs-row--snow__icon" aria-hidden="true">
+          <AcUnitRounded />
+        </span>
+
         <SnowPendingInput
           field="snowReceived"
           pendingField="isSnowReceivedPending"
@@ -59,6 +65,12 @@ const InputsAll = () => {
           pendingField="isSnowSentPending"
           label="Snow envoyé"
           pendingLabel="Snow envoyé en attente"
+        />
+
+        <SimpleInput
+          field="snowMentioned"
+          label="Snow mentionné"
+          inputType="type2"
         />
       </section>
 

@@ -67,8 +67,6 @@ import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Addr
 import { ReactComponent as AddressNotConfirmedOffIcon } from "../../assets/svg/Address not confirmed off.svg.tsx";
 import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb off.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
-import { ReactComponent as QuestionMarkOffIcon } from "../../assets/svg/Question mark off.svg.tsx";
-import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
 import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
 import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
 import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
@@ -79,6 +77,8 @@ import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
 import CableCutOn from "../../assets/icons/CableCutOn.png";
 import CableCutOff from "../../assets/icons/CableCutOff.png";
+import QuestionActionOn from "../../assets/icons/QuestionActionOn.png";
+import QuestionActionOff from "../../assets/icons/QuestionActionOff.png";
 
 type CopyButtonProps = {
   value: string;
@@ -625,8 +625,22 @@ const CurrentInterventionPage = () => {
                     <BooleanInput
                       field="isUnclear"
                       label="Question à poser à l'M&P ?"
-                      trueIcon={<QuestionMarkOnIcon />}
-                      falseIcon={<QuestionMarkOffIcon />}
+                      trueIcon={
+                        <img
+                          src={QuestionActionOn}
+                          alt=""
+                          aria-hidden="true"
+                          className="question-action-icon"
+                        />
+                      }
+                      falseIcon={
+                        <img
+                          src={QuestionActionOff}
+                          alt=""
+                          aria-hidden="true"
+                          className="question-action-icon"
+                        />
+                      }
                     />
                   </div>
 
@@ -635,7 +649,7 @@ const CurrentInterventionPage = () => {
                       field="isGoodExample"
                       label="Bon exemple à retenir ?"
                       trueIcon={<LightBulbOnIcon />}
-                      falseIcon={<LightBulbOffIcon />}
+                      falseIcon={<LightBulbOffIcon className="lightbulb-action-icon--off" />}
                     />
                   </div>
 

@@ -40,6 +40,7 @@ const currentData = (state: Intervention): InterventionData => ({
   displayAllFields: state.displayAllFields,
   snowReceived: state.snowReceived,
   snowSent: state.snowSent,
+  snowMentioned: state.snowMentioned,
   isSnowReceivedPending: state.isSnowReceivedPending,
   isSnowSentPending: state.isSnowSentPending,
   isResPending: state.isResPending,

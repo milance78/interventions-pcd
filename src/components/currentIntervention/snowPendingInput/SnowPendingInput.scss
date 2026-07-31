@@ -1,7 +1,7 @@
 .snow-pending-input {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: stretch;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: center;
   gap: 8px;
   min-width: 0;
 }
@@ -14,73 +14,61 @@
   }
 }
 
-.snow-pending-input__button {
-  align-self: stretch;
-  min-width: 82px;
-  padding: 0 12px;
-  color: #806000;
-  background: linear-gradient(145deg, #fffdf3 0%, #fff8d8 55%, #f7e7a2 100%);
-  border: 1px solid #e8ca67;
-  border-radius: 8px;
+.snow-pending-input__clock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  color: #cbd5e1;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
   outline: none;
   cursor: pointer;
-  font: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-  box-shadow:
-    0 4px 8px rgba(133, 99, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  transform: none;
   transition:
-    background-color 120ms ease,
-    border-color 120ms ease,
-    box-shadow 120ms ease,
-    color 120ms ease;
-}
+    color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease,
+    filter 140ms ease;
 
-.snow-pending-input__button:hover {
-  color: #806000;
-  background: linear-gradient(145deg, #fffdf3 0%, #fff8d8 55%, #f7e7a2 100%);
-  border-color: #e8ca67;
-  box-shadow:
-    0 4px 8px rgba(133, 99, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.92);
-  transform: none;
-}
+  svg {
+    width: 31px;
+    height: 31px;
+  }
 
-.snow-pending-input__button:active,
-.snow-pending-input__button--active,
-.snow-pending-input__button--active:hover {
-  color: #6f5200;
-  background: linear-gradient(145deg, #f4df8b 0%, #fff0b8 45%, #fff8d8 100%);
-  border-color: #d7b53f;
-  box-shadow:
-    inset 0 3px 7px rgba(112, 81, 0, 0.26),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.48),
-    0 1px 1px rgba(255, 255, 255, 0.85);
-  transform: translateY(1.5px) scale(0.985);
-}
+  &:hover {
+    color: #d4dbe5;
+    background: rgba(226, 232, 240, 0.34);
+    transform: translateY(-1px);
+  }
 
-.snow-pending-input__button:focus-visible {
-  box-shadow:
-    0 0 0 3px rgba(234, 179, 8, 0.2),
-    0 4px 8px rgba(133, 99, 0, 0.16);
-}
+  &:active {
+    transform: scale(0.94);
+  }
 
-.snow-pending-input__button--active:focus-visible {
-  box-shadow:
-    0 0 0 3px rgba(234, 179, 8, 0.2),
-    inset 0 3px 7px rgba(112, 81, 0, 0.26);
-}
-
-@media (max-width: 680px) {
-  .snow-pending-input {
-    grid-template-columns: minmax(0, 1fr) 84px;
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.24);
   }
 }
 
+.snow-pending-input__clock--active,
+.snow-pending-input__clock--active:hover {
+  color: #facc15;
+  background: transparent;
+  filter: drop-shadow(0 2px 4px rgba(202, 138, 4, 0.28));
+}
+
+.snow-pending-input__toast {
+  min-width: 0 !important;
+  padding: 7px 13px !important;
+  color: #f8fafc !important;
+  background: rgba(30, 41, 59, 0.94) !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.2) !important;
+}
 
 .snow-pending-input--emphasized {
   .MuiOutlinedInput-root {
@@ -89,5 +77,11 @@
 
   .MuiOutlinedInput-notchedOutline {
     border-color: #aeb8c5;
+  }
+}
+
+@media (max-width: 680px) {
+  .snow-pending-input {
+    grid-template-columns: minmax(0, 1fr) 42px;
   }
 }
