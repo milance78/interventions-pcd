@@ -101,12 +101,21 @@ const InputsAll = () => {
         />
       </section>
 
+      <section className="inputs-row inputs-row--structured-address">
+        <SimpleInput field="streetName" label="Rue" inputType="type2" icon={House} className="simple-input--street-name" />
+        <AddressMiniInput field="streetNumber" label="Nº" />
+        <AddressMiniInput field="streetAlpha" label="Alpha" />
+        <AddressMiniInput field="postalCode" label="Code postal" />
+        <AddressMiniInput field="city" label="Ville" />
+      </section>
+
       <section className="inputs-row inputs-row--address-line">
         <SimpleInput
           field="mainAddress"
           label="Adresse principale"
           inputType="type2"
           icon={House}
+          readOnly
           className={`simple-input--main-address ${
             emphasizeMainAddress
               ? "simple-input--emphasized"
@@ -114,42 +123,10 @@ const InputsAll = () => {
           }`}
         />
 
-        <AddressMiniInput
-          field="mailbox"
-          label="Boîte"
-          className={
-            isFiber && hasMailbox
-              ? "address-mini-input--emphasized"
-              : ""
-          }
-        />
-        <AddressMiniInput
-          field="floor"
-          label="Étage"
-          className={
-            isFiber && hasFloor
-              ? "address-mini-input--emphasized"
-              : ""
-          }
-        />
-        <AddressMiniInput
-          field="apartment"
-          label="Appt."
-          className={
-            isFiber && hasApartment
-              ? "address-mini-input--emphasized"
-              : ""
-          }
-        />
-        <AddressMiniInput
-          field="blockNumber"
-          label="Bloc"
-          className={
-            isFiber && hasBlock
-              ? "address-mini-input--emphasized"
-              : ""
-          }
-        />
+        <AddressMiniInput field="mailbox" label="Boîte" className={isFiber && hasMailbox ? "address-mini-input--emphasized" : ""} />
+        <AddressMiniInput field="floor" label="Étage" className={isFiber && hasFloor ? "address-mini-input--emphasized" : ""} />
+        <AddressMiniInput field="apartment" label="Appt." className={isFiber && hasApartment ? "address-mini-input--emphasized" : ""} />
+        <AddressMiniInput field="blockNumber" label="Bloc" className={isFiber && hasBlock ? "address-mini-input--emphasized" : ""} />
       </section>
 
       <section className="inputs-row inputs-row--lom-phone">

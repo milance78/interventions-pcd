@@ -28,6 +28,7 @@ import {
   normalizePersonName,
   serializeAddressClients,
 } from "../../../utils/addressClients";
+import { normalizeNaNumber } from "../../../utils/interventionAddress";
 
 const automaticAddressLine =
   /^(?:Adresse confirmée\.?|Adresse pas encore confirmée\.?)$/i;
@@ -122,7 +123,9 @@ const ClientField = ({
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextValue = normalizeAsName
       ? normalizePersonName(event.target.value)
-      : event.target.value;
+      : field === "na"
+        ? normalizeNaNumber(event.target.value)
+        : event.target.value;
 
     dispatch(
       updateAddressClient({

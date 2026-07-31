@@ -48,6 +48,21 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const [headerNow, setHeaderNow] = React.useState(() => new Date());
   const [copied, setCopied] = React.useState(false);
 
+  const templateSource = React.useMemo(() => ({
+    phone: intervention.phone,
+    mainAddress: intervention.mainAddress,
+    streetName: intervention.streetName,
+    streetNumber: intervention.streetNumber,
+    streetAlpha: intervention.streetAlpha,
+    postalCode: intervention.postalCode,
+    city: intervention.city,
+    mailbox: intervention.mailbox,
+    floor: intervention.floor,
+    apartment: intervention.apartment,
+    blockNumber: intervention.blockNumber,
+    cureRecords: intervention.cureRecords,
+  }), [intervention]);
+
   React.useEffect(() => {
     if (!open) setDraft(value);
   }, [value, open]);
@@ -78,16 +93,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setCopied(false);
     setHeaderNow(new Date());
     setDraft(
-      buildAdditionalInformationTemplate(templateId, {
-        phone: intervention.phone,
-        mainAddress: intervention.mainAddress,
-        addressDetails: intervention.addressDetails,
-        mailbox: intervention.mailbox,
-        floor: intervention.floor,
-        apartment: intervention.apartment,
-        blockNumber: intervention.blockNumber,
-        cureRecords: intervention.cureRecords,
-      }),
+      buildAdditionalInformationTemplate(templateId, templateSource),
     );
   };
 
@@ -169,6 +175,17 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                     disabled={!selectedDefinition}
                   />
                 </header>
+
+                {selectedDefinition && (
+                  <div className="additional-information-dynamic-values" aria-label="Données automatiques du modèle">
+                    {selectedDefinition.dynamicValues(templateSource).map((item) => (
+                      <span className="additional-information-dynamic-value" key={item.label}>
+                        <strong>{item.label}</strong>
+                        <span>{item.value}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
 
                 <div className="additional-information-copyable">
                   <TextField

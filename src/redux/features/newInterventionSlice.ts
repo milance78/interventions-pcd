@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
 import { cureOrder, emptyCureRecords, localDateKey, localTimeKey, removeCureLines, upsertCureLine } from "../../utils/cureRecords";
+import { composeMainAddress, normalizeNaNumber, parseMainAddress } from "../../utils/interventionAddress";
 
 export type InterventionMode =
   | "NEW"
@@ -59,6 +60,11 @@ export interface InterventionData {
   interventionDescription: string;
   clientID: string;
   mainAddress: string;
+  streetName: string;
+  streetNumber: string;
+  streetAlpha: string;
+  postalCode: string;
+  city: string;
   addressDetails: string;
   mailbox: string;
   floor: string;
@@ -138,6 +144,11 @@ export const emptyInterventionData: InterventionData = {
   interventionDescription: "",
   clientID: "",
   mainAddress: "",
+  streetName: "",
+  streetNumber: "",
+  streetAlpha: "",
+  postalCode: "",
+  city: "",
   addressDetails: "",
   mailbox: "",
   floor: "",
@@ -205,6 +216,11 @@ const extractData = (state: Intervention): InterventionData => ({
   interventionDescription: state.interventionDescription,
   clientID: state.clientID,
   mainAddress: state.mainAddress,
+  streetName: state.streetName,
+  streetNumber: state.streetNumber,
+  streetAlpha: state.streetAlpha,
+  postalCode: state.postalCode,
+  city: state.city,
   addressDetails: state.addressDetails,
   mailbox: state.mailbox,
   floor: state.floor,
@@ -297,6 +313,31 @@ const NewInterventionSlice = createSlice({
           InterventionData[InterventionField]
         >
       )[field] = value;
+
+      if (field === "na" && typeof value === "string") {
+        state.na = normalizeNaNumber(value);
+      }
+
+      if (
+        field === "streetName" ||
+        field === "streetNumber" ||
+        field === "streetAlpha" ||
+        field === "postalCode" ||
+        field === "city"
+      ) {
+        state.mainAddress = composeMainAddress(state);
+      }
+
+      // Backward-compatible manual/import update: split a legacy compact address.
+      if (field === "mainAddress" && typeof value === "string") {
+        const parsed = parseMainAddress(value);
+        state.streetName = parsed.streetName;
+        state.streetNumber = parsed.streetNumber;
+        state.streetAlpha = parsed.streetAlpha;
+        state.postalCode = parsed.postalCode;
+        state.city = parsed.city;
+        state.mainAddress = composeMainAddress(parsed);
+      }
 
       if (field === "clientsOnAddress" && typeof value === "string") {
         state.addressClients = parseLegacyAddressClients(value);
@@ -439,7 +480,10 @@ const NewInterventionSlice = createSlice({
 
     addAddressClient: (state, action: PayloadAction<AddressClient>) => {
       if (state.mode === "VIEW_HISTORY") return;
-      state.addressClients.push(action.payload);
+      state.addressClients.push({
+        ...action.payload,
+        na: normalizeNaNumber(action.payload.na ?? ""),
+      });
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
       refreshDraftMetadata(state);
     },
@@ -448,7 +492,11 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
       const client = state.addressClients.find((item) => item.id === action.payload.id);
       if (!client) return;
-      (client as unknown as Record<string, unknown>)[action.payload.field] = action.payload.value;
+      const nextValue =
+        action.payload.field === "na" && typeof action.payload.value === "string"
+          ? normalizeNaNumber(action.payload.value)
+          : action.payload.value;
+      (client as unknown as Record<string, unknown>)[action.payload.field] = nextValue;
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
       refreshDraftMetadata(state);
     },
@@ -462,7 +510,10 @@ const NewInterventionSlice = createSlice({
 
     setAddressClients: (state, action: PayloadAction<AddressClient[]>) => {
       if (state.mode === "VIEW_HISTORY") return;
-      state.addressClients = action.payload;
+      state.addressClients = action.payload.map((client) => ({
+        ...client,
+        na: normalizeNaNumber(client.na ?? ""),
+      }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
       refreshDraftMetadata(state);
     },
@@ -476,9 +527,39 @@ const NewInterventionSlice = createSlice({
         (state as unknown as Record<string, unknown>)[field] = value;
       }
 
+      const importedAddress =
+        action.payload.streetName !== undefined ||
+        action.payload.streetNumber !== undefined ||
+        action.payload.streetAlpha !== undefined ||
+        action.payload.postalCode !== undefined ||
+        action.payload.city !== undefined
+          ? {
+              streetName: String(action.payload.streetName ?? state.streetName),
+              streetNumber: String(action.payload.streetNumber ?? state.streetNumber),
+              streetAlpha: String(action.payload.streetAlpha ?? state.streetAlpha),
+              postalCode: String(action.payload.postalCode ?? state.postalCode),
+              city: String(action.payload.city ?? state.city),
+            }
+          : parseMainAddress(String(action.payload.mainAddress ?? state.mainAddress));
+      state.streetName = importedAddress.streetName;
+      state.streetNumber = importedAddress.streetNumber;
+      state.streetAlpha = importedAddress.streetAlpha;
+      state.postalCode = importedAddress.postalCode;
+      state.city = importedAddress.city;
+      state.mainAddress = composeMainAddress(importedAddress);
+      state.na = normalizeNaNumber(String(state.na ?? ""));
+      state.addressClients = state.addressClients.map((client) => ({
+        ...client,
+        na: normalizeNaNumber(client.na ?? ""),
+      }));
+
       if ((!action.payload.addressClients || action.payload.addressClients.length === 0) && action.payload.clientsOnAddress) {
         state.addressClients = parseLegacyAddressClients(action.payload.clientsOnAddress);
       }
+      state.addressClients = state.addressClients.map((client) => ({
+        ...client,
+        na: normalizeNaNumber(client.na ?? ""),
+      }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
 
       if (state.mode === "NEW" || state.mode === "DRAFT") {
@@ -573,11 +654,32 @@ const NewInterventionSlice = createSlice({
       const addressClients = Array.isArray(draftData.addressClients)
         ? draftData.addressClients
         : parseLegacyAddressClients(draftData.clientsOnAddress ?? "");
+      const parsedDraftAddress =
+        draftData.streetName !== undefined ||
+        draftData.streetNumber !== undefined ||
+        draftData.streetAlpha !== undefined ||
+        draftData.postalCode !== undefined ||
+        draftData.city !== undefined
+          ? {
+              streetName: draftData.streetName ?? "",
+              streetNumber: draftData.streetNumber ?? "",
+              streetAlpha: draftData.streetAlpha ?? "",
+              postalCode: draftData.postalCode ?? "",
+              city: draftData.city ?? "",
+            }
+          : parseMainAddress(draftData.mainAddress ?? "");
+      const normalizedAddressClients = addressClients.map((client) => ({
+        ...client,
+        na: normalizeNaNumber(client.na ?? ""),
+      }));
       const draft = {
         ...emptyInterventionData,
         ...draftData,
-        addressClients,
-        clientsOnAddress: serializeAddressClients(addressClients, draftData.infrastructure ?? ""),
+        ...parsedDraftAddress,
+        mainAddress: composeMainAddress(parsedDraftAddress),
+        na: normalizeNaNumber(draftData.na ?? ""),
+        addressClients: normalizedAddressClients,
+        clientsOnAddress: serializeAddressClients(normalizedAddressClients, draftData.infrastructure ?? ""),
         addressConfirmation,
         documentId: "",
         createdAt: null,

@@ -14,6 +14,7 @@ import { db } from "./firebaseConfig";
 import type { Intervention, InterventionData } from "../redux/features/newInterventionSlice";
 import { parseLegacyAddressClients, serializeAddressClients } from "../utils/addressClients";
 import { normalizeCureRecords } from "../utils/cureRecords";
+import { composeMainAddress, normalizeNaNumber, parseMainAddress } from "../utils/interventionAddress";
 import {
   interventionActivityValue,
   interventionLogicalKey,
@@ -88,12 +89,32 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
           ? "thirdCure"
           : data.cure ?? data.Cure ?? "noCure";
 
-  const addressClients = Array.isArray(data.addressClients)
+  const addressClients = (Array.isArray(data.addressClients)
     ? data.addressClients
-    : parseLegacyAddressClients(data.clientsOnAddress ?? "");
+    : parseLegacyAddressClients(data.clientsOnAddress ?? "")).map((client: any) => ({
+      ...client,
+      na: normalizeNaNumber(String(client.na ?? "")),
+    }));
+  const structuredAddress =
+    data.streetName !== undefined ||
+    data.streetNumber !== undefined ||
+    data.streetAlpha !== undefined ||
+    data.postalCode !== undefined ||
+    data.city !== undefined
+      ? {
+          streetName: String(data.streetName ?? ""),
+          streetNumber: String(data.streetNumber ?? ""),
+          streetAlpha: String(data.streetAlpha ?? ""),
+          postalCode: String(data.postalCode ?? ""),
+          city: String(data.city ?? ""),
+        }
+      : parseMainAddress(String(data.mainAddress ?? ""));
 
   return {
     ...dataWithoutLegacyAddress,
+    ...structuredAddress,
+    mainAddress: composeMainAddress(structuredAddress),
+    na: normalizeNaNumber(String(data.na ?? "")),
     addressClients,
     clientsOnAddress: serializeAddressClients(addressClients, data.infrastructure ?? ""),
     snowReceived,

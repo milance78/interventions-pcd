@@ -301,6 +301,11 @@ const parseNewAddress = (text: string): ParsedSource => {
 
   return {
     infrastructure,
+    streetName: street,
+    streetNumber: number,
+    streetAlpha: alpha,
+    postalCode: zip,
+    city,
     mainAddress: firstLine && secondLine ? `${firstLine}, ${secondLine}` : first(firstLine, secondLine),
     mailbox: meaningful(row["Mail Box"]),
     floor: meaningful(row.Etage),
@@ -512,6 +517,11 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
     clientName,
     interventionDescription: description,
     mainAddress: safe.mainAddress ?? "",
+    streetName: safe.streetName ?? "",
+    streetNumber: safe.streetNumber ?? "",
+    streetAlpha: safe.streetAlpha ?? "",
+    postalCode: safe.postalCode ?? "",
+    city: safe.city ?? "",
     addressDetails: "",
     mailbox: safe.mailbox ?? "",
     floor: safe.floor ?? "",

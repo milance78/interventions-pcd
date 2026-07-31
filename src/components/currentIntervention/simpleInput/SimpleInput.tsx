@@ -23,6 +23,7 @@ interface SimpleInputProps {
   label: string;
   inputType: "type1" | "type2";
   className?: string;
+  readOnly?: boolean;
 }
 
 const SimpleInput = ({
@@ -31,6 +32,7 @@ const SimpleInput = ({
   label,
   inputType,
   className = "",
+  readOnly = false,
 }: SimpleInputProps) => {
   const dispatch = useAppDispatch();
 
@@ -114,6 +116,7 @@ const SimpleInput = ({
             label={label}
             variant="outlined"
             value={stringValue}
+            slotProps={{ input: { readOnly } }}
             onChange={(event) =>
               dispatch(
                 updateField({
