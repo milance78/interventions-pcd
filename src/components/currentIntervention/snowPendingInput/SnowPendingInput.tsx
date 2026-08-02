@@ -75,7 +75,11 @@ const SnowPendingInput = ({
       }),
     );
 
-    showNotification();
+    if (!isPending) {
+      showNotification();
+    } else {
+      setNotificationOpen(false);
+    }
   };
 
   return (

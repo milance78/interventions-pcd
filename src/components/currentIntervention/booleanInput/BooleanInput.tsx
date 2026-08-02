@@ -15,6 +15,7 @@ interface BooleanInputProps {
   label: string;
   trueIcon: React.ReactNode;
   falseIcon: React.ReactNode;
+  onActivated?: () => void;
 }
 
 const BooleanInput = ({
@@ -22,6 +23,7 @@ const BooleanInput = ({
   label,
   trueIcon,
   falseIcon,
+  onActivated,
 }: BooleanInputProps) => {
   const dispatch = useAppDispatch();
 
@@ -30,12 +32,18 @@ const BooleanInput = ({
   );
 
   const toggleValue = () => {
+    const nextValue = !value;
+
     dispatch(
       updateField({
         field,
-        value: !value,
+        value: nextValue,
       }),
     );
+
+    if (nextValue) {
+      onActivated?.();
+    }
   };
 
   return (

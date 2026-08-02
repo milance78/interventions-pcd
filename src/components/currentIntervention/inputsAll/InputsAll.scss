@@ -54,29 +54,6 @@
       width: 70%;
     }
   }
-
-  .inputs-row--structured-address {
-    .simple-input--street-name {
-      flex: 1 1 44%;
-      width: 44%;
-    }
-
-    > .address-mini-input:nth-of-type(1),
-    > .address-mini-input:nth-of-type(2) {
-      flex: 0 1 9%;
-      width: 9%;
-    }
-
-    > .address-mini-input:nth-of-type(3) {
-      flex: 0 1 15%;
-      width: 15%;
-    }
-
-    > .address-mini-input:nth-of-type(4) {
-      flex: 1 1 23%;
-      width: 23%;
-    }
-  }
 }
 
 /* Snow uses the exact same icon wrapper and horizontal alignment as all other inputs. */
@@ -114,12 +91,9 @@
 
 @media (max-width: 980px) {
   .inputs-all {
-    .inputs-row--address-line,
-    .inputs-row--structured-address {
-      flex-wrap: wrap;
-    }
-
     .inputs-row--address-line {
+      flex-wrap: wrap;
+
       .simple-input--main-address {
         flex: 1 1 100%;
         width: 100%;
@@ -128,18 +102,6 @@
       > .address-mini-input {
         flex: 1 1 calc(25% - 8px);
         width: calc(25% - 8px);
-      }
-    }
-
-    .inputs-row--structured-address {
-      .simple-input--street-name {
-        flex: 1 1 100%;
-        width: 100%;
-      }
-
-      > .address-mini-input {
-        flex: 1 1 calc(25% - 8px) !important;
-        width: calc(25% - 8px) !important;
       }
     }
   }

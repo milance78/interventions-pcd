@@ -62,6 +62,39 @@ export const parseMainAddress = (value: string): StructuredMainAddress => {
   return { streetName, streetNumber, streetAlpha, postalCode, city };
 };
 
+const streetStartPattern = /\b(Rue|Avenue|Boulevard|Chaussée|Chaussee|Square|Clos|Place|Quai|Route|Chemin|Allée|Allee|Drève|Dreve|Sentier|Impasse|Laan|Straat|Steenweg|Weg|Plein)\b/i;
+
+/**
+ * Parses the compact NPS clipboard order:
+ * <postal code> <city> <street> <house number> <alpha>.
+ * Returns null when the pasted text does not look like that format.
+ */
+export const parsePastedNpsAddress = (
+  value: string,
+): StructuredMainAddress | null => {
+  const normalized = cleanPart(value);
+  const zipMatch = normalized.match(/^(\d{4})\s+(.+)$/u);
+  if (!zipMatch) return null;
+
+  const postalCode = zipMatch[1];
+  const afterZip = zipMatch[2].trim();
+  const streetMatch = streetStartPattern.exec(afterZip);
+  if (!streetMatch || streetMatch.index == null) return null;
+
+  const city = cleanPart(afterZip.slice(0, streetMatch.index));
+  const streetAndHouse = afterZip.slice(streetMatch.index).trim();
+  const houseMatch = streetAndHouse.match(/^(.*?)\s+(\d+)\s*([\p{L}]*)$/u);
+  if (!houseMatch) return null;
+
+  return {
+    streetName: cleanPart(houseMatch[1]),
+    streetNumber: cleanPart(houseMatch[2]),
+    streetAlpha: cleanPart(houseMatch[3]),
+    postalCode,
+    city,
+  };
+};
+
 export const normalizeNaNumber = (value: string): string => {
   const trimmedLeft = value.replace(/^\s+/, "");
   if (!trimmedLeft) return "";

@@ -2189,3 +2189,75 @@
     filter: grayscale(0.22) brightness(1.16);
   }
 }
+
+
+/* Action activation notices */
+.current-intervention-page {
+  .intervention-option-group--actions .option-button {
+    position: relative;
+    overflow: visible;
+  }
+
+  .intervention-option-group__items > .option-button.option-button--res {
+    overflow: visible !important;
+  }
+
+  .action-toggle-notice {
+    position: absolute;
+    z-index: 20;
+    left: 50%;
+    bottom: calc(100% + 9px);
+    min-width: max-content;
+    max-width: 190px;
+    padding: 7px 10px;
+    border: 1px solid currentColor;
+    border-radius: 9px;
+    transform: translateX(-50%);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.14);
+    font-size: 11px;
+    font-weight: 750;
+    line-height: 1.2;
+    text-align: center;
+    pointer-events: none;
+    animation: action-notice-in 160ms ease-out both;
+  }
+
+  .action-toggle-notice::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    background: inherit;
+    border-right: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: translate(-50%, -4px) rotate(45deg);
+  }
+
+  .action-toggle-notice--question {
+    color: #15803d;
+    background: #f0fdf4;
+  }
+
+  .action-toggle-notice--example {
+    color: #b77900;
+    background: #fffbea;
+  }
+
+  .action-toggle-notice--res {
+    color: #c2410c;
+    background: #fff7ed;
+  }
+}
+
+@keyframes action-notice-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 5px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}

@@ -4,7 +4,6 @@ import AcUnitRounded from "@mui/icons-material/AcUnitRounded";
 
 import {
   Contact,
-  House,
   KeyRound,
   PhoneCall,
   TextInitial,
@@ -13,6 +12,7 @@ import {
 import SimpleInput from "../simpleInput/SimpleInput";
 import SnowPendingInput from "../snowPendingInput/SnowPendingInput";
 import AddressMiniInput from "../addressMiniInput/AddressMiniInput";
+import MainAddressInput from "../mainAddressInput/MainAddressInput";
 
 import { ReactComponent as CIDIcon } from "../../../assets/svg/CID.svg.tsx";
 import { ReactComponent as NAIcon } from "../../../assets/svg/NA.svg.tsx";
@@ -48,36 +48,6 @@ const InputsAll = () => {
 
   return (
     <div className="inputs-all">
-      <section className="inputs-row inputs-row--snow">
-        <div className="simple-input snow-inputs-group">
-          <div className="icon-container" aria-hidden="true">
-            <AcUnitRounded />
-          </div>
-
-          <div className="snow-inputs-group__fields">
-            <SnowPendingInput
-              field="snowReceived"
-              pendingField="isSnowReceivedPending"
-              label="Snow reçu"
-              pendingLabel="Snow reçu en attente"
-            />
-
-            <SnowPendingInput
-              field="snowSent"
-              pendingField="isSnowSentPending"
-              label="Snow envoyé"
-              pendingLabel="Snow envoyé en attente"
-            />
-
-            <SimpleInput
-              field="snowMentioned"
-              label="Snow mentionné"
-              inputType="type2"
-            />
-          </div>
-        </div>
-      </section>
-
       <section className="inputs-row inputs-row--full">
         <SimpleInput
           field="clientID"
@@ -117,34 +87,6 @@ const InputsAll = () => {
         />
       </section>
 
-      <section className="inputs-row inputs-row--structured-address">
-        <SimpleInput field="streetName" label="Rue" inputType="type2" icon={House} className="simple-input--street-name" />
-        <AddressMiniInput field="streetNumber" label="Nº" />
-        <AddressMiniInput field="streetAlpha" label="Alpha" />
-        <AddressMiniInput field="postalCode" label="Code postal" />
-        <AddressMiniInput field="city" label="Ville" />
-      </section>
-
-      <section className="inputs-row inputs-row--address-line">
-        <SimpleInput
-          field="mainAddress"
-          label="Adresse principale"
-          inputType="type2"
-          icon={House}
-          readOnly
-          className={`simple-input--main-address ${
-            emphasizeMainAddress
-              ? "simple-input--emphasized"
-              : ""
-          }`}
-        />
-
-        <AddressMiniInput field="mailbox" label="Boîte" className={isFiber && hasMailbox ? "address-mini-input--emphasized" : ""} />
-        <AddressMiniInput field="floor" label="Étage" className={isFiber && hasFloor ? "address-mini-input--emphasized" : ""} />
-        <AddressMiniInput field="apartment" label="Appt." className={isFiber && hasApartment ? "address-mini-input--emphasized" : ""} />
-        <AddressMiniInput field="blockNumber" label="Bloc" className={isFiber && hasBlock ? "address-mini-input--emphasized" : ""} />
-      </section>
-
       <section className="inputs-row inputs-row--lom-phone">
         <SimpleInput
           field="LOMKey"
@@ -165,6 +107,50 @@ const InputsAll = () => {
           icon={PhoneCall}
           className="simple-input--phone"
         />
+      </section>
+
+
+      <section className="inputs-row inputs-row--address-line">
+        <div className={`simple-input--main-address ${
+          emphasizeMainAddress ? "simple-input--emphasized" : ""
+        }`}>
+          <MainAddressInput />
+        </div>
+
+        <AddressMiniInput field="mailbox" label="Boîte" className={isFiber && hasMailbox ? "address-mini-input--emphasized" : ""} />
+        <AddressMiniInput field="floor" label="Étage" className={isFiber && hasFloor ? "address-mini-input--emphasized" : ""} />
+        <AddressMiniInput field="apartment" label="Appt." className={isFiber && hasApartment ? "address-mini-input--emphasized" : ""} />
+        <AddressMiniInput field="blockNumber" label="Bloc" className={isFiber && hasBlock ? "address-mini-input--emphasized" : ""} />
+      </section>
+
+      <section className="inputs-row inputs-row--snow">
+        <div className="simple-input snow-inputs-group">
+          <div className="icon-container" aria-hidden="true">
+            <AcUnitRounded />
+          </div>
+
+          <div className="snow-inputs-group__fields">
+            <SnowPendingInput
+              field="snowReceived"
+              pendingField="isSnowReceivedPending"
+              label="Snow reçu"
+              pendingLabel="Snow reçu en attente"
+            />
+
+            <SnowPendingInput
+              field="snowSent"
+              pendingField="isSnowSentPending"
+              label="Snow envoyé"
+              pendingLabel="Snow envoyé en attente"
+            />
+
+            <SimpleInput
+              field="snowMentioned"
+              label="Snow mentionné"
+              inputType="type2"
+            />
+          </div>
+        </div>
       </section>
     </div>
   );

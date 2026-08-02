@@ -113,6 +113,14 @@ interface UpdateFieldPayload {
   value: InterventionData[InterventionField];
 }
 
+interface ApplyStructuredMainAddressPayload {
+  streetName: string;
+  streetNumber: string;
+  streetAlpha: string;
+  postalCode: string;
+  city: string;
+}
+
 type ImportedDataPayload = Partial<InterventionData>;
 
 interface RecordCurePayload {
@@ -195,6 +203,12 @@ export const hasMeaningfulDraft = (
       key === "displayAllFields" ||
       key === "cure" ||
       key === "smsEnabled" ||
+      key === "mode" ||
+      key === "isEditing" ||
+      key === "isHistoryView" ||
+      key === "draftSnapshot" ||
+      key === "editSnapshot" ||
+      key === "hasDraft" ||
       (key === "addressConfirmation" && value === "none")
     ) {
       return false;
@@ -388,6 +402,39 @@ const NewInterventionSlice = createSlice({
             }
           : null;
       }
+    },
+
+    updateMainAddressManually: (state, action: PayloadAction<string>) => {
+      if (state.mode === "VIEW_HISTORY") return;
+
+      const value = action.payload;
+      const parsed = parseMainAddress(value);
+
+      state.mainAddress = value;
+      state.streetName = parsed.streetName;
+      state.streetNumber = parsed.streetNumber;
+      state.streetAlpha = parsed.streetAlpha;
+      state.postalCode = parsed.postalCode;
+      state.city = parsed.city;
+
+      refreshDraftMetadata(state);
+    },
+
+    applyPastedMainAddress: (
+      state,
+      action: PayloadAction<ApplyStructuredMainAddressPayload>,
+    ) => {
+      if (state.mode === "VIEW_HISTORY") return;
+
+      const parsed = action.payload;
+      state.streetName = parsed.streetName;
+      state.streetNumber = parsed.streetNumber;
+      state.streetAlpha = parsed.streetAlpha;
+      state.postalCode = parsed.postalCode;
+      state.city = parsed.city;
+      state.mainAddress = composeMainAddress(parsed);
+
+      refreshDraftMetadata(state);
     },
 
     recordCure: (state, action: PayloadAction<RecordCurePayload>) => {
@@ -764,6 +811,7 @@ const NewInterventionSlice = createSlice({
 export const {
   addAddressClient,
   applyImportedData,
+  applyPastedMainAddress,
   cancelDraft,
   clearCurrentForm,
   clearTask,
@@ -780,6 +828,7 @@ export const {
   startNewIntervention,
   updateAddressClient,
   updateField,
+  updateMainAddressManually,
   updateRecordedCureSms,
 } = NewInterventionSlice.actions;
 

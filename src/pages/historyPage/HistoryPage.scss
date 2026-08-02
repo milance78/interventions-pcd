@@ -157,23 +157,107 @@
   letter-spacing: -0.2px;
 }
 
-.history-date-count {
+.history-date-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(78px, auto));
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.history-date-stat {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 9px;
 
-  min-width: 31px;
-  height: 31px;
-  padding: 0 9px;
+  min-height: 31px;
+  padding: 5px 10px;
 
-  color: #ffffff;
-  background: #315fbd;
+  border: 1px solid transparent;
   border-radius: 999px;
 
-  font-size: 13px;
-  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 
-  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.23);
+  small {
+    font-size: 11px;
+    font-weight: 750;
+    letter-spacing: 0.15px;
+  }
+
+  strong {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 23px;
+    height: 23px;
+    padding: 0 6px;
+
+    color: #ffffff;
+    border-radius: 999px;
+
+    font-size: 12px;
+    font-weight: 850;
+  }
+}
+
+.history-date-stat--completed {
+  color: #166534;
+  background: #ecfdf3;
+  border-color: #86efac;
+
+  strong {
+    background: #16a34a;
+  }
+}
+
+.history-date-stat--on-hold {
+  color: #92400e;
+  background: #fff7ed;
+  border-color: #fdba74;
+
+  strong {
+    background: #f59e0b;
+  }
+}
+
+.history-date-stat--transferred {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border-color: #93c5fd;
+
+  strong {
+    background: #2563eb;
+  }
+}
+
+.history-date-stat--total {
+  color: #3730a3;
+  background: #eef2ff;
+  border-color: #a5b4fc;
+
+  strong {
+    background: #4f46e5;
+  }
+}
+
+@media (max-width: 1120px) {
+  .history-date-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .history-date-stats {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .history-date-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .history-interventions-list {

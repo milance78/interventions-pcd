@@ -267,7 +267,52 @@ const CurrentInterventionPage = () => {
   const [revisions, setRevisions] = React.useState<InterventionRevision[]>([]);
   const [revisionsError, setRevisionsError] = React.useState("");
   const [importMessage, setImportMessage] = React.useState("");
+  const [actionNotice, setActionNotice] = React.useState<{
+    key: "question" | "example" | "res";
+    text: string;
+  } | null>(null);
+  const actionNoticeTimerRef = React.useRef<number | null>(null);
   const commentInputRef = React.useRef<HTMLTextAreaElement | null>(null);
+
+  const showActionNotice = (
+    key: "question" | "example" | "res",
+    text: string,
+  ) => {
+    if (actionNoticeTimerRef.current !== null) {
+      window.clearTimeout(actionNoticeTimerRef.current);
+    }
+
+    setActionNotice({ key, text });
+    actionNoticeTimerRef.current = window.setTimeout(() => {
+      setActionNotice(null);
+      actionNoticeTimerRef.current = null;
+    }, 1500);
+  };
+
+  React.useEffect(
+    () => () => {
+      if (actionNoticeTimerRef.current !== null) {
+        window.clearTimeout(actionNoticeTimerRef.current);
+      }
+    },
+    [],
+  );
+
+  const handleResPendingToggle = () => {
+    if (isHistoryView) return;
+
+    const nextValue = !isResPending;
+    dispatch(
+      updateField({
+        field: "isResPending",
+        value: nextValue,
+      }),
+    );
+
+    if (nextValue) {
+      showActionNotice("res", "Résiliation en attente");
+    }
+  };
 
 
   const handleCureSelection = (nextCure: typeof cure) => {
@@ -573,7 +618,11 @@ const CurrentInterventionPage = () => {
 
             <div className="card-header__actions">
               {!isHistoryView && (
-                <SmartImportDialog onImported={setImportMessage} />
+                <SmartImportDialog
+                  onImported={setImportMessage}
+                  autoOpen={mode === "NEW" && !hasMeaningfulDraft(newIntervention)}
+                  focusTrigger={mode === "NEW" && hasMeaningfulDraft(newIntervention)}
+                />
               )}
 
               <span className="editing-badge">
@@ -622,6 +671,11 @@ const CurrentInterventionPage = () => {
 
                 <div className="intervention-option-group__items">
                   <div className="option-button">
+                    {actionNotice?.key === "question" && (
+                      <span className="action-toggle-notice action-toggle-notice--question" role="status">
+                        {actionNotice.text}
+                      </span>
+                    )}
                     <BooleanInput
                       field="isUnclear"
                       label="Question à poser à l'M&P ?"
@@ -641,32 +695,41 @@ const CurrentInterventionPage = () => {
                           className="question-action-icon"
                         />
                       }
+                      onActivated={() =>
+                        showActionNotice("question", "Question M&P")
+                      }
                     />
                   </div>
 
                   <div className="option-button">
+                    {actionNotice?.key === "example" && (
+                      <span className="action-toggle-notice action-toggle-notice--example" role="status">
+                        {actionNotice.text}
+                      </span>
+                    )}
                     <BooleanInput
                       field="isGoodExample"
                       label="Bon exemple à retenir ?"
                       trueIcon={<LightBulbOnIcon />}
                       falseIcon={<LightBulbOffIcon className="lightbulb-action-icon--off" />}
+                      onActivated={() =>
+                        showActionNotice("example", "Example à retenir")
+                      }
                     />
                   </div>
 
                   <div className="option-button option-button--res">
+                    {actionNotice?.key === "res" && (
+                      <span className="action-toggle-notice action-toggle-notice--res" role="status">
+                        {actionNotice.text}
+                      </span>
+                    )}
                     <button
                       type="button"
                       className={`res-pending-button ${
                         isResPending ? "res-pending-button--active" : ""
                       }`}
-                      onClick={() =>
-                        dispatch(
-                          updateField({
-                            field: "isResPending",
-                            value: !isResPending,
-                          }),
-                        )
-                      }
+                      onClick={handleResPendingToggle}
                       aria-label="Résiliation en attente"
                       title="Résiliation en attente"
                       aria-pressed={isResPending}

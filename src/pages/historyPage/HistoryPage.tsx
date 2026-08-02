@@ -482,9 +482,51 @@ const HistoryPage = () => {
                   </h2>
                 </div>
 
-                <span className="history-date-count">
-                  {group.interventions.length}
-                </span>
+                <div
+                  className="history-date-stats"
+                  aria-label="Statistiques du jour"
+                >
+                  <span className="history-date-stat history-date-stat--completed">
+                    <small>Terminé</small>
+                    <strong>
+                      {
+                        group.interventions.filter(
+                          (intervention) =>
+                            intervention.status === "completed",
+                        ).length
+                      }
+                    </strong>
+                  </span>
+
+                  <span className="history-date-stat history-date-stat--on-hold">
+                    <small>En attente</small>
+                    <strong>
+                      {
+                        group.interventions.filter(
+                          (intervention) =>
+                            intervention.status === "on hold",
+                        ).length
+                      }
+                    </strong>
+                  </span>
+
+                  <span className="history-date-stat history-date-stat--transferred">
+                    <small>Transmis</small>
+                    <strong>
+                      {
+                        group.interventions.filter(
+                          (intervention) =>
+                            intervention.status === "transferred",
+                        ).length
+                      }
+                    </strong>
+                  </span>
+
+                  <span className="history-date-stat history-date-stat--total">
+                    <small>Total</small>
+                    <strong>{group.interventions.length}</strong>
+                  </span>
+                </div>
               </header>
 
               <div className="history-interventions-list">
