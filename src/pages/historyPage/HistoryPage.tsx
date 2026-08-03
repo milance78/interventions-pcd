@@ -487,44 +487,42 @@ const HistoryPage = () => {
                   aria-label="Statistiques du jour"
                 >
                   <span className="history-date-stat history-date-stat--completed">
-                    <small>Terminé</small>
-                    <strong>
-                      {
+                    <small>
+                      Terminé: <strong>{
                         group.interventions.filter(
                           (intervention) =>
                             intervention.status === "completed",
                         ).length
-                      }
-                    </strong>
+                      }</strong>
+                    </small>
                   </span>
 
                   <span className="history-date-stat history-date-stat--on-hold">
-                    <small>En attente</small>
-                    <strong>
-                      {
+                    <small>
+                      En attente: <strong>{
                         group.interventions.filter(
                           (intervention) =>
                             intervention.status === "on hold",
                         ).length
-                      }
-                    </strong>
+                      }</strong>
+                    </small>
                   </span>
 
                   <span className="history-date-stat history-date-stat--transferred">
-                    <small>Transmis</small>
-                    <strong>
-                      {
+                    <small>
+                      Transmis: <strong>{
                         group.interventions.filter(
                           (intervention) =>
                             intervention.status === "transferred",
                         ).length
-                      }
-                    </strong>
+                      }</strong>
+                    </small>
                   </span>
 
                   <span className="history-date-stat history-date-stat--total">
-                    <small>Total</small>
-                    <strong>{group.interventions.length}</strong>
+                    <small>
+                      Total: <strong>{group.interventions.length}</strong>
+                    </small>
                   </span>
                 </div>
               </header>

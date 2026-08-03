@@ -73,6 +73,7 @@ import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
 import { normalizeInterventionStrings, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
+import { normalizePersonName } from "../../utils/addressClients";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
 import CableCutOn from "../../assets/icons/CableCutOn.png";
@@ -827,8 +828,9 @@ const CurrentInterventionPage = () => {
                 dispatch(
                   updateField({
                     field: "clientName",
-                    value:
+                    value: normalizePersonName(
                       trimLeadingHorizontalWhitespace(event.target.value),
+                    ),
                   }),
                 )
               }

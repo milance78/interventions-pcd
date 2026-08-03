@@ -23,13 +23,6 @@
   font-weight: 700;
 }
 
-.clients-on-address__hint {
-  display: block;
-  margin-top: 1px;
-  color: #94a3b8;
-  font-size: 10px;
-  font-weight: 500;
-}
 
 .clients-on-address__add {
   width: 28px;
@@ -120,9 +113,9 @@
 .address-client__base--fiber {
   grid-template-columns:
     minmax(145px, 1.35fr)
-    minmax(88px, 0.75fr)
-    minmax(88px, 0.75fr)
-    minmax(118px, 1.05fr);
+    minmax(110px, 1fr)
+    minmax(118px, 1.08fr)
+    minmax(100px, 0.9fr);
 }
 
 .address-client__plus--copper,

@@ -91,7 +91,7 @@
 
   color: #1e40af;
   background: #dbeafe;
-  border: 1px solid #93c5fd;
+  border: 1px solid #bfd7f6;
   border-radius: 999px;
 
   font-size: 13px;
@@ -167,8 +167,8 @@
 .history-date-stat {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 9px;
+  justify-content: center;
+  gap: 0;
 
   min-height: 31px;
   padding: 5px 10px;
@@ -180,66 +180,53 @@
   white-space: nowrap;
 
   small {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 1;
     font-size: 11px;
     font-weight: 750;
     letter-spacing: 0.15px;
   }
 
   strong {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    min-width: 23px;
-    height: 23px;
-    padding: 0 6px;
-
-    color: #ffffff;
-    border-radius: 999px;
-
+    color: inherit;
+    line-height: 1;
     font-size: 12px;
-    font-weight: 850;
+    font-weight: 800;
   }
 }
 
 .history-date-stat--completed {
   color: #166534;
   background: #ecfdf3;
-  border-color: #86efac;
+  border-color: #c8e6d2;
 
-  strong {
-    background: #16a34a;
-  }
+
 }
 
 .history-date-stat--on-hold {
   color: #92400e;
   background: #fff7ed;
-  border-color: #fdba74;
+  border-color: #f1d3a6;
 
-  strong {
-    background: #f59e0b;
-  }
+
 }
 
 .history-date-stat--transferred {
   color: #1d4ed8;
   background: #eff6ff;
-  border-color: #93c5fd;
+  border-color: #bfd7f6;
 
-  strong {
-    background: #2563eb;
-  }
+
 }
 
 .history-date-stat--total {
   color: #3730a3;
   background: #eef2ff;
-  border-color: #a5b4fc;
+  border-color: #d4cff7;
 
-  strong {
-    background: #4f46e5;
-  }
+
 }
 
 @media (max-width: 1120px) {
@@ -373,7 +360,7 @@
 .history-edit-button:hover {
   color: #1d4ed8;
   background: #dbeafe;
-  border-color: #93c5fd;
+  border-color: #bfd7f6;
 }
 
 .history-delete-button:hover {

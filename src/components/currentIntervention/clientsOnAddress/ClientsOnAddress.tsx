@@ -273,9 +273,6 @@ const ClientsOnAddress = () => {
           <span className="clients-on-address__title">
             Clients à l'adresse
           </span>
-          <span className="clients-on-address__hint">
-            {isCopper ? "Cuivre" : "Fibre"} · Entrée = client suivant
-          </span>
         </div>
 
         <Tooltip title="Ajouter un client" arrow>
@@ -326,14 +323,15 @@ const ClientsOnAddress = () => {
                   onKeyDown={(event) => handleNameEnter(event, index)}
                 />
 
-                <ClientField
-                  client={client}
-                  field="operator"
-                  label="Opérateur"
-                />
-
                 {isCopper ? (
-                  <ClientField client={client} field="na" label="NA client" />
+                  <>
+                    <ClientField
+                      client={client}
+                      field="operator"
+                      label="Opérateur"
+                    />
+                    <ClientField client={client} field="na" label="NA client" />
+                  </>
                 ) : (
                   <>
                     <ClientField
@@ -342,6 +340,7 @@ const ClientsOnAddress = () => {
                       label="Détail d'adresse"
                     />
                     <ClientField client={client} field="utac" label="UTAC" />
+                    <ClientField client={client} field="cid" label="CID client" />
                   </>
                 )}
               </div>
@@ -352,13 +351,31 @@ const ClientsOnAddress = () => {
                     isCopper ? "copper" : "fiber"
                   }`}
                 >
-                  <ClientField
-                    client={client}
-                    field="clientId"
-                    label="ID client"
-                  />
-                  <ClientField client={client} field="cid" label="CID client" />
-                  <ClientField client={client} field="voip" label="VOIP" />
+                  {isCopper ? (
+                    <>
+                      <ClientField
+                        client={client}
+                        field="clientId"
+                        label="ID client"
+                      />
+                      <ClientField client={client} field="cid" label="CID client" />
+                      <ClientField client={client} field="voip" label="VOIP" />
+                    </>
+                  ) : (
+                    <>
+                      <ClientField
+                        client={client}
+                        field="operator"
+                        label="Opérateur"
+                      />
+                      <ClientField
+                        client={client}
+                        field="clientId"
+                        label="ID client"
+                      />
+                      <ClientField client={client} field="voip" label="VOIP" />
+                    </>
+                  )}
                 </div>
               )}
             </div>
