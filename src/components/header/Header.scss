@@ -345,3 +345,34 @@
 .header__link--active .header__on-hold-notification {
   border-color: #dbeafe;
 }
+
+.header__display-mode-toggle {
+  min-width: 54px;
+  height: 34px;
+  padding: 0 8px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #64748b;
+
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+
+  svg {
+    width: 17px;
+    height: 17px;
+  }
+
+  &:hover {
+    background: #f8fafc;
+    color: #334155;
+  }
+}

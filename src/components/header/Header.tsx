@@ -1,6 +1,8 @@
 import * as React from "react";
 import AddRounded from "@mui/icons-material/AddRounded";
 import PhoneRounded from "@mui/icons-material/PhoneRounded";
+import GridOnRounded from "@mui/icons-material/GridOnRounded";
+import DashboardCustomizeRounded from "@mui/icons-material/DashboardCustomizeRounded";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -45,12 +47,29 @@ const Header = () => {
   );
 
   const [newDialogOpen, setNewDialogOpen] = React.useState(false);
+  const [spreadsheetMode, setSpreadsheetMode] = React.useState(() =>
+    window.localStorage.getItem("interventions-pcd-display-mode") === "spreadsheet",
+  );
 
   React.useEffect(() => {
     const interval = window.setInterval(() => setNow(new Date()), 1000);
 
     return () => window.clearInterval(interval);
   }, []);
+
+  React.useEffect(() => {
+    document.body.classList.toggle("spreadsheet-mode", spreadsheetMode);
+    window.localStorage.setItem(
+      "interventions-pcd-display-mode",
+      spreadsheetMode ? "spreadsheet" : "normal",
+    );
+
+    return () => document.body.classList.remove("spreadsheet-mode");
+  }, [spreadsheetMode]);
+
+  const toggleSpreadsheetMode = () => {
+    setSpreadsheetMode((current) => !current);
+  };
 
   const openCurrentPage = () => navigate("/intervention-en-cours");
 
@@ -159,6 +178,30 @@ const Header = () => {
       </nav>
 
       <div className="header__right">
+        <button
+          type="button"
+          className="header__display-mode-toggle"
+          onClick={toggleSpreadsheetMode}
+          aria-pressed={spreadsheetMode}
+          aria-label={
+            spreadsheetMode
+              ? "Revenir à l’affichage normal"
+              : "Afficher le mode feuille de calcul"
+          }
+          title={
+            spreadsheetMode
+              ? "Affichage normal"
+              : "Mode feuille de calcul"
+          }
+        >
+          {spreadsheetMode ? (
+            <DashboardCustomizeRounded aria-hidden="true" />
+          ) : (
+            <GridOnRounded aria-hidden="true" />
+          )}
+          <span>{spreadsheetMode ? "Normal" : "XLS"}</span>
+        </button>
+
         <Button
           type="button"
           variant="outlined"

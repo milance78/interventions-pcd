@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import "./App.scss";
+import "./spreadsheetMode.scss";
 import Header from "./components/header/Header";
 import InterventionsLoader from "./components/interventionsLoader/InterventionsLoader";
 import CurrentInterventionPage from "./pages/currentInterventionPage/CurrentInterventionPage";

@@ -1,0 +1,520 @@
+/*
+ * Deliberately plain spreadsheet-like presentation.
+ * Only the presentation changes; React, Redux, Firebase and all workflows stay untouched.
+ */
+body.spreadsheet-mode {
+  --xls-grid: #c8c8c8;
+  --xls-grid-soft: #dedede;
+  --xls-header: #d9eaf7;
+  --xls-header-2: #eaf2f8;
+  --xls-selected: #e2f0d9;
+  --xls-yellow: #fff2cc;
+  --xls-text: #111111;
+
+  background: #ffffff !important;
+  color: var(--xls-text) !important;
+
+  * {
+    font-family: Arial, Helvetica, sans-serif !important;
+    text-shadow: none !important;
+  }
+
+  .app,
+  .main {
+    background: #ffffff !important;
+  }
+
+  .main {
+    position: relative;
+    background-image:
+      linear-gradient(to right, rgba(210, 210, 210, 0.52) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(210, 210, 210, 0.52) 1px, transparent 1px) !important;
+    background-size: 96px 24px !important;
+  }
+
+  /* Fake workbook / ribbon */
+  .header {
+    position: sticky;
+    min-height: 76px;
+    padding: 24px 8px 0;
+    gap: 0;
+    align-items: stretch;
+
+    background: #f3f3f3 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #a6a6a6 !important;
+    box-shadow: none !important;
+  }
+
+  .header::before {
+    content: "Suivi_interventions.xlsx   •   Enregistré";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    padding: 4px 12px;
+    box-sizing: border-box;
+
+    color: #202020;
+    background: #e6e6e6;
+    border-bottom: 1px solid #bfbfbf;
+
+    font-size: 11px;
+    line-height: 15px;
+    text-align: center;
+  }
+
+  .header__datetime {
+    min-width: 104px;
+    padding: 4px 10px;
+    justify-content: center;
+    border-right: 1px solid var(--xls-grid);
+    background: #eeeeee;
+  }
+
+  .header__date,
+  .header__time {
+    color: #222 !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    line-height: 1.25;
+  }
+
+  .header__navigation {
+    justify-content: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    background: #ffffff;
+  }
+
+  .header__link {
+    min-height: 51px;
+    padding: 7px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111 !important;
+    background: #ffffff !important;
+    border: 0 !important;
+    border-right: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    transition: none !important;
+  }
+
+  .header__link:hover {
+    background: #f2f2f2 !important;
+  }
+
+  .header__link--active {
+    color: #111 !important;
+    background: var(--xls-header) !important;
+    box-shadow: inset 0 -3px 0 #70ad47 !important;
+  }
+
+  .header__right {
+    gap: 0;
+    background: #f2f2f2;
+    border-left: 1px solid var(--xls-grid);
+  }
+
+  .header__display-mode-toggle,
+  .header__new-intervention,
+  .header__right button,
+  .header__right .MuiButton-root {
+    min-width: 42px !important;
+    height: 28px !important;
+    margin: 11px 3px !important;
+    padding: 2px 7px !important;
+
+    color: #111 !important;
+    background: #f2f2f2 !important;
+    border: 1px solid #9e9e9e !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
+    transform: none !important;
+  }
+
+  .header__display-mode-toggle:hover,
+  .header__new-intervention:hover,
+  .header__right button:hover,
+  .header__right .MuiButton-root:hover {
+    background: #e2f0d9 !important;
+  }
+
+  .header__display-mode-toggle svg,
+  .header__new-intervention svg,
+  .header__right svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .header__on-hold-notification {
+    width: 18px !important;
+    height: 18px !important;
+    flex-basis: 18px !important;
+    border: 1px solid #999 !important;
+    border-radius: 2px !important;
+    color: #111 !important;
+    background: #fff2cc !important;
+    box-shadow: none !important;
+  }
+
+  /* Every page becomes one flat worksheet */
+  :is(
+    .current-intervention-page,
+    .today-list-page,
+    .history-page,
+    .on-hold-page,
+    .search-results-page,
+    .statistics-page,
+    .templates-page
+  ) {
+    padding: 12px !important;
+    background: transparent !important;
+  }
+
+  :is(
+    .current-intervention-page,
+    .today-list-content,
+    .history-content,
+    .on-hold-list,
+    .search-results-page,
+    .statistics-page,
+    .templates-page
+  ) {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .today-page-title,
+  .history-page-header h1,
+  .on-hold-page__heading h1 {
+    color: #111 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+
+  :is(.today-page-eyebrow, .history-page-eyebrow, .on-hold-page__eyebrow) {
+    display: none !important;
+  }
+
+  /* Flat sections and rows */
+  :is(
+    article,
+    section,
+    .today-intervention-row,
+    .history-intervention-row,
+    .on-hold-card,
+    .revision-card,
+    .current-intervention-page > div,
+    .current-intervention-page form > div
+  ) {
+    box-shadow: none !important;
+  }
+
+  :is(
+    .today-intervention-row,
+    .history-intervention-row,
+    .on-hold-card,
+    .history-date-section,
+    .on-hold-group,
+    .revision-card
+  ) {
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+  }
+
+  :is(.today-intervention-row, .history-intervention-row, .on-hold-card):hover {
+    transform: none !important;
+    background: #fffde9 !important;
+    box-shadow: none !important;
+  }
+
+  .today-interventions-list,
+  .history-interventions-list,
+  .on-hold-grid {
+    gap: 0 !important;
+  }
+
+  /* Headers resemble merged Excel cells */
+  :is(
+    .today-page-header,
+    .history-page-header,
+    .on-hold-page__header,
+    .history-date-header,
+    .on-hold-group__title
+  ) {
+    margin: 0 !important;
+    padding: 7px 9px !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+    background: var(--xls-header) !important;
+    box-shadow: none !important;
+  }
+
+  /* Status counters become simple colored cells */
+  :is(.today-page-counters, .history-date-stats) {
+    gap: 3px !important;
+  }
+
+  :is(.today-total-counter, .history-date-stat, .animated-today-counter) {
+    min-height: 24px !important;
+    padding: 3px 7px !important;
+    border: 1px solid #b7b7b7 !important;
+    border-radius: 0 !important;
+    background: #f2f2f2 !important;
+    box-shadow: none !important;
+    color: #111 !important;
+    font-size: 10px !important;
+  }
+
+  .animated-today-counter__circle,
+  .animated-today-counter__svg {
+    display: none !important;
+  }
+
+  /* Tabs look like worksheet tabs */
+  .on-hold-tabs {
+    gap: 2px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .on-hold-tab {
+    min-height: 31px !important;
+    padding: 4px 9px !important;
+    border: 1px solid #a6a6a6 !important;
+    border-radius: 0 0 3px 3px !important;
+    color: #111 !important;
+    background: #eeeeee !important;
+    box-shadow: none !important;
+    transform: none !important;
+    font-size: 10px !important;
+  }
+
+  .on-hold-tab--active {
+    background: #e2f0d9 !important;
+    border-top-color: #70ad47 !important;
+    box-shadow: inset 0 2px 0 #70ad47 !important;
+  }
+
+  .on-hold-tab__icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* MUI form controls become crude cells */
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiPopover-paper,
+  .MuiMenu-paper {
+    border: 1px solid #888 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
+  }
+
+  .MuiInputBase-root,
+  .MuiOutlinedInput-root,
+  .MuiTextField-root,
+  .MuiFormControl-root,
+  input,
+  textarea,
+  select {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 11px !important;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #a6a6a6 !important;
+    border-width: 1px !important;
+    border-radius: 0 !important;
+  }
+
+  .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline,
+  .MuiInputBase-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #70ad47 !important;
+    border-width: 2px !important;
+  }
+
+  .MuiInputBase-input,
+  .MuiSelect-select,
+  textarea {
+    min-height: 22px !important;
+    padding: 4px 6px !important;
+    color: #111 !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+  }
+
+  .MuiInputLabel-root {
+    color: #333 !important;
+    font-size: 10px !important;
+    font-weight: 400 !important;
+  }
+
+  /* Buttons look like basic form-control buttons */
+  :is(button, .MuiButton-root, .MuiIconButton-root) {
+    border-radius: 1px !important;
+    box-shadow: none !important;
+    text-transform: none !important;
+    transition: none !important;
+  }
+
+  :is(.MuiButton-root, button):not(.header__link) {
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  .MuiButton-contained,
+  .MuiButton-outlined {
+    color: #111 !important;
+    background: #eeeeee !important;
+    border: 1px solid #8d8d8d !important;
+  }
+
+  .MuiButton-contained:hover,
+  .MuiButton-outlined:hover {
+    background: var(--xls-selected) !important;
+  }
+
+  /* Action/status areas become little checkbox-like cells */
+  :is(
+    .current-intervention-actions,
+    .current-intervention-waiting-states,
+    .boolean-input,
+    .today-flags-section,
+    .today-category-section
+  ) {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  :is(
+    .boolean-input button,
+    .today-action-button,
+    .today-edit-button,
+    .today-delete-button,
+    .comment-copy-actions button,
+    .additional-information-copy-action
+  ) {
+    background: #f2f2f2 !important;
+    border: 1px solid #a6a6a6 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Deliberately crude icon treatment */
+  :is(
+    .icon-container,
+    .letter-badge,
+    .snow-status-icon,
+    .today-boolean-icon,
+    .on-hold-card__technology,
+    .on-hold-card__status
+  ) {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .icon-container {
+    background: #f2f2f2 !important;
+    border: 1px solid #b7b7b7 !important;
+  }
+
+  .letter-badge {
+    color: #111 !important;
+    background: #e7e6e6 !important;
+    border: 1px solid #a6a6a6 !important;
+  }
+
+  /* Dialogs become plain data-entry windows */
+  :is(
+    .smart-import-dialog,
+    .additional-information-dialog,
+    .new-intervention-dialog
+  ) {
+    border-radius: 0 !important;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2) !important;
+  }
+
+  :is(
+    .smart-import-dialog__title,
+    .additional-information-dialog .MuiDialogTitle-root,
+    .new-intervention-dialog__title
+  ) {
+    min-height: 26px !important;
+    padding: 5px 8px !important;
+    color: #111 !important;
+    background: var(--xls-header) !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+  }
+
+  .additional-information-workspace {
+    gap: 0 !important;
+  }
+
+  .additional-information-sidebar {
+    border-right: 1px solid var(--xls-grid) !important;
+    background: #f2f2f2 !important;
+  }
+
+  .additional-information-template-button {
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  .additional-information-template-button:hover,
+  .additional-information-template-button--active {
+    background: var(--xls-selected) !important;
+  }
+
+  /* Remove decorative movement and shadows everywhere */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+
+  [class*="shadow"],
+  [class*="gradient"] {
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+
+  /* Narrow screens keep spreadsheet density rather than card stacking */
+  @media (max-width: 900px) {
+    .header {
+      min-width: 900px;
+    }
+
+    .main {
+      min-width: 900px;
+      overflow: auto !important;
+    }
+  }
+}
