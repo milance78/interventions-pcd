@@ -94,8 +94,13 @@ const MainAddressInput = () => {
               paddingRight: "44px",
               color:
                 !focused && hasStructuredDisplay
-                  ? "transparent"
+                  ? "transparent !important"
                   : undefined,
+              WebkitTextFillColor:
+                !focused && hasStructuredDisplay
+                  ? "transparent !important"
+                  : undefined,
+              opacity: !focused && hasStructuredDisplay ? 0 : 1,
               caretColor: focused ? undefined : "transparent",
             },
             "& .MuiOutlinedInput-notchedOutline": {
