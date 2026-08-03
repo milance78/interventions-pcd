@@ -54,3 +54,14 @@ export const writeTextToClipboard = async (value: string) => {
     document.body.removeChild(textarea);
   }
 };
+
+export const removeBlankLines = (value: string) =>
+  value.replace(/\r\n/g, "\n").split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0).join("\n").trim();
+
+export const prepareWctCureText = (value: string) => {
+  const matches = Array.from(value.matchAll(/\b(1er|2(?:e|è)me|3(?:e|è)me)\s+CURE(?:\s+fait)?\s+le\s+(\d{2}\/\d{2}\/\d{4})/giu));
+  const last = matches.at(-1);
+  if (!last) return "";
+  const ordinal = last[1].toLowerCase().startsWith("1") ? "1er" : last[1].toLowerCase().startsWith("2") ? "2eme" : "3eme";
+  return `${ordinal} CURE le ${last[2]}`;
+};

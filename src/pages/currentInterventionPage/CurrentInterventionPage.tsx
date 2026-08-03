@@ -69,10 +69,9 @@ import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb 
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
 import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
 import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
-import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
-import { normalizeInterventionStrings, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
+import { normalizeInterventionStrings, removeBlankLines, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
 import { normalizePersonName } from "../../utils/addressClients";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
@@ -81,11 +80,12 @@ import CableCutOff from "../../assets/icons/CableCutOff.png";
 import QuestionActionOn from "../../assets/icons/QuestionActionOn.png";
 import QuestionActionOff from "../../assets/icons/QuestionActionOff.png";
 
-const RES_EDIT_CONTEXT_KEY = "on-hold:res-edit-context";
+const ON_HOLD_EDIT_CONTEXT_KEY = "on-hold:edit-context";
 const PENDING_TAB_KEY = "on-hold:pending-tab";
 const PENDING_ANCHOR_KEY = "on-hold:pending-anchor";
 
-type ResEditContext = {
+type OnHoldEditContext = {
+  tab: "res" | "snowReceived" | "snowSent";
   anchor: string;
   documentId: string;
   dateKey: string;
@@ -96,16 +96,21 @@ const getLocalDateKey = () => {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 };
 
-const readResEditContext = (): ResEditContext | null => {
+const readOnHoldEditContext = (): OnHoldEditContext | null => {
   try {
-    const raw = window.sessionStorage.getItem(RES_EDIT_CONTEXT_KEY);
+    const raw = window.sessionStorage.getItem(ON_HOLD_EDIT_CONTEXT_KEY);
     if (!raw) return null;
-    const parsed = JSON.parse(raw) as Partial<ResEditContext>;
+    const parsed = JSON.parse(raw) as Partial<OnHoldEditContext>;
+    const tab =
+      parsed.tab === "snowReceived" || parsed.tab === "snowSent"
+        ? parsed.tab
+        : "res";
 
     return typeof parsed.anchor === "string" &&
       typeof parsed.documentId === "string" &&
       typeof parsed.dateKey === "string"
       ? {
+          tab,
           anchor: parsed.anchor,
           documentId: parsed.documentId,
           dateKey: parsed.dateKey,
@@ -165,7 +170,7 @@ const CopyButton = ({
       return;
     }
 
-    await writeTextToClipboard(value);
+    await writeTextToClipboard(removeBlankLines(value));
 
     setCopied(true);
 
@@ -256,11 +261,7 @@ const NpsCopyButton = ({
           disabled={!npsValue.trim()}
           onClick={copyNpsValue}
         >
-          {copied ? (
-            <CheckRounded fontSize="small" />
-          ) : (
-            <NpsCopyIcon />
-          )}
+          {copied ? <CheckRounded fontSize="small" /> : <strong className="nps-copy-button__label">NPS</strong>}
         </IconButton>
       </span>
     </Tooltip>
@@ -473,6 +474,55 @@ const CurrentInterventionPage = () => {
     }
   };
 
+
+  const applyOnHoldConsultationState = (
+    payload: typeof newIntervention,
+    context: OnHoldEditContext,
+  ) => {
+    const completed =
+      payload.status === "completed" || payload.status === "transferred";
+    const onHold = payload.status === "on hold";
+    const today = getLocalDateKey();
+
+    if (context.tab === "res") {
+      return completed
+        ? { ...payload, isResPending: false, resConsultedDate: null }
+        : onHold
+          ? { ...payload, isResPending: true, resConsultedDate: today }
+          : payload;
+    }
+
+    if (context.tab === "snowReceived") {
+      return completed
+        ? {
+            ...payload,
+            isSnowReceivedPending: false,
+            snowReceivedConsultedDate: null,
+          }
+        : onHold
+          ? {
+              ...payload,
+              isSnowReceivedPending: true,
+              snowReceivedConsultedDate: today,
+            }
+          : payload;
+    }
+
+    return completed
+      ? {
+          ...payload,
+          isSnowSentPending: false,
+          snowSentConsultedDate: null,
+        }
+      : onHold
+        ? {
+            ...payload,
+            isSnowSentPending: true,
+            snowSentConsultedDate: today,
+          }
+        : payload;
+  };
+
   const submitActions = async () => {
     const normalized = normalizeInterventionStrings(newIntervention);
     const formIsCompletelyEmpty = !hasMeaningfulDraft(normalized);
@@ -484,29 +534,17 @@ const CurrentInterventionPage = () => {
           }
         : normalized;
 
-    const resEditContext = readResEditContext();
-    const isOpenedFromRes =
-      Boolean(resEditContext) &&
-      resEditContext?.documentId === newIntervention.documentId &&
-      resEditContext?.dateKey === (newIntervention.dateKey ?? "");
+    const onHoldEditContext = readOnHoldEditContext();
+    const isOpenedFromOnHold =
+      Boolean(onHoldEditContext) &&
+      onHoldEditContext?.documentId === newIntervention.documentId &&
+      onHoldEditContext?.dateKey === (newIntervention.dateKey ?? "");
 
-    if (isOpenedFromRes) {
-      if (
-        safePayload.status === "completed" ||
-        safePayload.status === "transferred"
-      ) {
-        safePayload = {
-          ...safePayload,
-          isResPending: false,
-          resConsultedDate: null,
-        };
-      } else if (safePayload.status === "on hold") {
-        safePayload = {
-          ...safePayload,
-          isResPending: true,
-          resConsultedDate: getLocalDateKey(),
-        };
-      }
+    if (isOpenedFromOnHold && onHoldEditContext) {
+      safePayload = applyOnHoldConsultationState(
+        safePayload,
+        onHoldEditContext,
+      );
     }
 
     const result = isEditing
@@ -528,14 +566,14 @@ const CurrentInterventionPage = () => {
       return;
     }
 
-    if (isOpenedFromRes && resEditContext) {
-      window.sessionStorage.removeItem(RES_EDIT_CONTEXT_KEY);
-      window.sessionStorage.setItem(PENDING_TAB_KEY, "res");
+    if (isOpenedFromOnHold && onHoldEditContext) {
+      window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
+      window.sessionStorage.setItem(PENDING_TAB_KEY, onHoldEditContext.tab);
 
-      if (safePayload.status === "on hold" && safePayload.isResPending) {
+      if (safePayload.status === "on hold") {
         window.sessionStorage.setItem(
           PENDING_ANCHOR_KEY,
-          resEditContext.anchor,
+          onHoldEditContext.anchor,
         );
       } else {
         window.sessionStorage.removeItem(PENDING_ANCHOR_KEY);
@@ -607,28 +645,16 @@ const CurrentInterventionPage = () => {
   const addToTodayList = async () => {
     if (mode !== "SEARCH_EDIT" && mode !== "HISTORY_EDIT") return;
 
-    const resEditContext = readResEditContext();
-    const isOpenedFromRes =
-      Boolean(resEditContext) &&
-      resEditContext?.documentId === newIntervention.documentId &&
-      resEditContext?.dateKey === (newIntervention.dateKey ?? "");
+    const onHoldEditContext = readOnHoldEditContext();
+    const isOpenedFromOnHold =
+      Boolean(onHoldEditContext) &&
+      onHoldEditContext?.documentId === newIntervention.documentId &&
+      onHoldEditContext?.dateKey === (newIntervention.dateKey ?? "");
 
     const payload =
-      isOpenedFromRes && newIntervention.status === "on hold"
-        ? {
-            ...newIntervention,
-            isResPending: true,
-            resConsultedDate: getLocalDateKey(),
-          }
-        : isOpenedFromRes &&
-            (newIntervention.status === "completed" ||
-              newIntervention.status === "transferred")
-          ? {
-              ...newIntervention,
-              isResPending: false,
-              resConsultedDate: null,
-            }
-          : newIntervention;
+      isOpenedFromOnHold && onHoldEditContext
+        ? applyOnHoldConsultationState(newIntervention, onHoldEditContext)
+        : newIntervention;
 
     const result = await dispatch(
       updateSearchInterventionThunk(payload),
@@ -646,11 +672,11 @@ const CurrentInterventionPage = () => {
 
     dispatch(markSearchInterventionSaved(result.payload));
 
-    if (isOpenedFromRes && resEditContext) {
-      window.sessionStorage.removeItem(RES_EDIT_CONTEXT_KEY);
-      window.sessionStorage.setItem(PENDING_TAB_KEY, "res");
+    if (isOpenedFromOnHold && onHoldEditContext) {
+      window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
+      window.sessionStorage.setItem(PENDING_TAB_KEY, onHoldEditContext.tab);
 
-      if (payload.status === "on hold" && payload.isResPending) {
+      if (payload.status === "on hold") {
         window.sessionStorage.setItem(
           PENDING_ANCHOR_KEY,
           `${result.payload.dateKey ?? ""}::${result.payload.documentId}`,
@@ -893,8 +919,8 @@ const CurrentInterventionPage = () => {
                         ? "snow-pending-card--filled"
                         : "snow-pending-card--empty"
                     }`}
-                    aria-label="Snow envoyé en attente"
-                    title="Snow envoyé en attente"
+                    aria-label="Snow créé en attente"
+                    title="Snow créé en attente"
                   >
                     {isSnowSentPending && (
                       <SnowSentPendingIcon className="snow-pending-card__icon" />

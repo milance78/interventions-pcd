@@ -24,10 +24,10 @@ const CIDIcon = forwardRef<SVGSVGElement, CIDIconProps>(
         dominantBaseline="middle"
         textAnchor="middle"
         fontFamily="Arial, Helvetica, sans-serif"
-        fontSize="52"
-        fontWeight="800"
+        fontSize="42"
+        fontWeight="500"
         fill="#000"
-        letterSpacing="-2"
+        letterSpacing="-1"
       >
         CID
       </text>

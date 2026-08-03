@@ -45,6 +45,8 @@ const currentData = (state: Intervention): InterventionData => ({
   isSnowSentPending: state.isSnowSentPending,
   isResPending: state.isResPending,
   resConsultedDate: state.resConsultedDate,
+  snowReceivedConsultedDate: state.snowReceivedConsultedDate,
+  snowSentConsultedDate: state.snowSentConsultedDate,
   isUnclear: state.isUnclear,
   addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,

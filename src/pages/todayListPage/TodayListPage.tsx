@@ -29,14 +29,13 @@ import ConfirmDeleteDialog from "../../components/confirmDeleteDialog/ConfirmDel
 
 import { ReactComponent as AddressConfirmedIcon } from "../../assets/svg/Address confirmed.svg.tsx";
 import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Address not confirmed.svg.tsx";
-import { ReactComponent as CIDIcon } from "../../assets/svg/CID.svg.tsx";
 import { ReactComponent as IDIcon } from "../../assets/svg/ID.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
-import { ReactComponent as NAIcon } from "../../assets/svg/NA.svg.tsx";
-import { ReactComponent as OAGIcon } from "../../assets/svg/OAG.svg.tsx";
 import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
 import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
 import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
+import LetterBadge from "../../components/letterBadge/LetterBadge";
+import SnowStatusIcon from "../../components/snowStatusIcon/SnowStatusIcon";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
 
@@ -501,8 +500,7 @@ const TodayListPage = () => {
                     ) && (
                       <TodayIconValue
                         value={intervention.na}
-                        icon={NAIcon}
-                        variant="na"
+                        icon={() => <LetterBadge text="NA" />}
                       />
                     )}
 
@@ -513,8 +511,7 @@ const TodayListPage = () => {
                         value={
                           intervention.oagID
                         }
-                        icon={OAGIcon}
-                        variant="oag"
+                        icon={() => <LetterBadge text="OAG" />}
                       />
                     )}
 
@@ -568,8 +565,7 @@ const TodayListPage = () => {
                     ) && (
                       <TodayIconValue
                         value={intervention.cid}
-                        icon={CIDIcon}
-                        variant="cid"
+                        icon={() => <LetterBadge text="CID" />}
                       />
                     )}
 
@@ -595,16 +591,9 @@ const TodayListPage = () => {
                       />
                     )}
 
-                    {hasValue(
-                      intervention.snowReceived,
-                    ) && (
-                      <TodayIconValue
-                        value={
-                          intervention.snowReceived
-                        }
-                        icon={Numbers}
-                      />
-                    )}
+                    {hasValue(intervention.snowReceived) && <TodayIconValue value={intervention.snowReceived} icon={() => <SnowStatusIcon direction="left" />} />}
+                    {hasValue(intervention.snowSent) && <TodayIconValue value={intervention.snowSent} icon={() => <SnowStatusIcon direction="right" />} />}
+                    {hasValue(intervention.snowMentioned) && <TodayIconValue value={intervention.snowMentioned} icon={() => <SnowStatusIcon direction="none" />} />}
                   </div>
                 )}
 

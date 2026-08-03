@@ -140,8 +140,8 @@ const InputsAll = () => {
             <SnowPendingInput
               field="snowSent"
               pendingField="isSnowSentPending"
-              label="Snow envoyé"
-              pendingLabel="Snow envoyé en attente"
+              label="Snow créé"
+              pendingLabel="Snow créé en attente"
             />
 
             <SimpleInput

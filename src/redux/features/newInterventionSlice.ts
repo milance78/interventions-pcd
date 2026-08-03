@@ -83,6 +83,10 @@ export interface InterventionData {
   isResPending: boolean;
   /** Local calendar date (YYYY-MM-DD) of the latest Résiliation consultation. */
   resConsultedDate: string | null;
+  /** Local calendar date (YYYY-MM-DD) of latest Snow à mon nom consultation. */
+  snowReceivedConsultedDate: string | null;
+  /** Local calendar date (YYYY-MM-DD) of latest Snow créé consultation. */
+  snowSentConsultedDate: string | null;
   isUnclear: boolean;
   addressConfirmation: AddressConfirmation;
   isGoodExample: boolean;
@@ -177,6 +181,8 @@ export const emptyInterventionData: InterventionData = {
   isSnowSentPending: false,
   isResPending: false,
   resConsultedDate: null,
+  snowReceivedConsultedDate: null,
+  snowSentConsultedDate: null,
   isUnclear: false,
   addressConfirmation: "none",
   isGoodExample: false,
@@ -257,6 +263,8 @@ const extractData = (state: Intervention): InterventionData => ({
   isSnowSentPending: state.isSnowSentPending,
   isResPending: state.isResPending,
   resConsultedDate: state.resConsultedDate,
+  snowReceivedConsultedDate: state.snowReceivedConsultedDate,
+  snowSentConsultedDate: state.snowSentConsultedDate,
   isUnclear: state.isUnclear,
   addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,

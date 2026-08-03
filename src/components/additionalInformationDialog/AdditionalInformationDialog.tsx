@@ -11,6 +11,7 @@ import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import { useAppSelector } from "../../redux/store";
+import { prepareNpsText, removeBlankLines, writeTextToClipboard } from "../../utils/textUtils";
 import {
   additionalInformationTemplates,
   buildAdditionalInformationTemplate,
@@ -46,7 +47,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const [selectedTemplate, setSelectedTemplate] = React.useState<AdditionalInformationTemplateId | null>(null);
   const [referenceNumber, setReferenceNumber] = React.useState("");
   const [headerNow, setHeaderNow] = React.useState(() => new Date());
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = React.useState<"normal" | "nps" | null>(null);
 
   const templateSource = React.useMemo(() => ({
     phone: intervention.phone,
@@ -78,7 +79,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setDraft(value);
     setSelectedTemplate(null);
     setReferenceNumber("");
-    setCopied(false);
+    setCopied(null);
     setOpen(false);
   };
 
@@ -90,31 +91,19 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const selectTemplate = (templateId: AdditionalInformationTemplateId) => {
     setSelectedTemplate(templateId);
     setReferenceNumber("");
-    setCopied(false);
+    setCopied(null);
     setHeaderNow(new Date());
     setDraft(
       buildAdditionalInformationTemplate(templateId, templateSource),
     );
   };
 
-  const copyDraft = async () => {
-    const text = draft.trim();
+  const copyDraft = async (mode: "normal" | "nps") => {
+    const text = mode === "nps" ? prepareNpsText(draft) : removeBlankLines(draft);
     if (!text) return;
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      textArea.style.position = "fixed";
-      textArea.style.opacity = "0";
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      document.execCommand("copy");
-      textArea.remove();
-    }
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 1400);
+    await writeTextToClipboard(text);
+    setCopied(mode);
+    window.setTimeout(() => setCopied(null), 1400);
   };
 
   const selectedDefinition = additionalInformationTemplates.find(
@@ -199,15 +188,22 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                     placeholder="Choisissez un modèle ou saisissez les informations supplémentaires…"
                   />
 
-                  <Tooltip title={copied ? "Copié" : "Copier le texte"}>
+                  <Tooltip title={copied === "normal" ? "Copié" : "Copier le texte"}>
                     <span className="additional-information-copy-action">
                       <IconButton
                         type="button"
                         aria-label="Copier le contenu"
-                        onClick={copyDraft}
+                        onClick={() => copyDraft("normal")}
                         disabled={!draft.trim()}
                       >
-                        {copied ? <CheckRounded /> : <ContentCopyRounded />}
+                        {copied === "normal" ? <CheckRounded /> : <ContentCopyRounded />}
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                  <Tooltip title={copied === "nps" ? "NPS copié" : "Copier pour NPS"}>
+                    <span className="additional-information-copy-action additional-information-copy-action--nps">
+                      <IconButton type="button" aria-label="Copier le contenu pour NPS" onClick={() => copyDraft("nps")} disabled={!draft.trim()}>
+                        {copied === "nps" ? <CheckRounded /> : <strong>NPS</strong>}
                       </IconButton>
                     </span>
                   </Tooltip>

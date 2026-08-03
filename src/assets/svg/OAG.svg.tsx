@@ -24,8 +24,8 @@ const OAGIcon = forwardRef<SVGSVGElement, OAGIconProps>(
         dy="0.45em"
         textAnchor="middle"
         fontFamily="Arial, Helvetica, sans-serif"
-        fontSize="36"
-        fontWeight="700"
+        fontSize="38"
+        fontWeight="500"
         fill="#000"
       >
         OAG

@@ -799,3 +799,8 @@
   top: 6px;
   right: 6px;
 }
+
+.today-icon-field { align-items:flex-start; }
+.today-field-icon-box { padding-top:0; height:23px; }
+.today-field-value { line-height:23px; }
+.today-na-icon svg, .today-oag-icon svg, .today-cid-icon svg { transform:none!important; }

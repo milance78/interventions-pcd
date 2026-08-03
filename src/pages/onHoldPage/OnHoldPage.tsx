@@ -43,12 +43,12 @@ const tabs: Array<{
   },
   {
     value: "snowReceived",
-    label: "Snow reçu",
+    label: "Snow à mon nom",
     icon: <AcUnitRounded />,
   },
   {
     value: "snowSent",
-    label: "Snow envoyé",
+    label: "Snow créé",
     icon: <AcUnitRounded />,
   },
   {
@@ -60,7 +60,7 @@ const tabs: Array<{
 ];
 const tabOrder = tabs.map((tab) => tab.value);
 
-const RES_EDIT_CONTEXT_KEY = "on-hold:res-edit-context";
+const ON_HOLD_EDIT_CONTEXT_KEY = "on-hold:edit-context";
 const PENDING_TAB_KEY = "on-hold:pending-tab";
 const PENDING_ANCHOR_KEY = "on-hold:pending-anchor";
 
@@ -211,6 +211,27 @@ const OnHoldPage = () => {
       });
     }
 
+    if (activeTab === "snowReceived" || activeTab === "snowSent") {
+      const today = localDateKey();
+      const consultedField =
+        activeTab === "snowReceived"
+          ? "snowReceivedConsultedDate"
+          : "snowSentConsultedDate";
+
+      return sorted.sort((first, second) => {
+        const firstConsultedToday = first[consultedField] === today;
+        const secondConsultedToday = second[consultedField] === today;
+
+        if (firstConsultedToday !== secondConsultedToday) {
+          return firstConsultedToday ? 1 : -1;
+        }
+
+        return interventionOldestValue(first).localeCompare(
+          interventionOldestValue(second),
+        );
+      });
+    }
+
     return sorted;
   }, [activeTab, interventions]);
 
@@ -239,17 +260,22 @@ const OnHoldPage = () => {
   const openIntervention = (
     intervention: (typeof sortedInterventions)[number],
   ) => {
-    if (activeTab === "res") {
+    if (
+      activeTab === "res" ||
+      activeTab === "snowReceived" ||
+      activeTab === "snowSent"
+    ) {
       window.sessionStorage.setItem(
-        RES_EDIT_CONTEXT_KEY,
+        ON_HOLD_EDIT_CONTEXT_KEY,
         JSON.stringify({
+          tab: activeTab,
           anchor: interventionAnchor(intervention),
           documentId: intervention.documentId,
           dateKey: intervention.dateKey ?? "",
         }),
       );
     } else {
-      window.sessionStorage.removeItem(RES_EDIT_CONTEXT_KEY);
+      window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
     }
 
     dispatch(loadInterventionFromSearch(intervention));
@@ -264,8 +290,8 @@ const OnHoldPage = () => {
     }
 
     if (activeTab === "res") return "RÉSILIATION";
-    if (activeTab === "snowReceived") return "SNOW REÇU";
-    if (activeTab === "snowSent") return "SNOW ENVOYÉ";
+    if (activeTab === "snowReceived") return "SNOW À MON NOM";
+    if (activeTab === "snowSent") return "SNOW CRÉÉ";
     if (activeTab === "questions") return "QUESTION M&P";
 
     return "AUTRE";
@@ -283,7 +309,7 @@ const OnHoldPage = () => {
   };
 
   React.useEffect(() => {
-    if (isRefreshing || activeTab !== "res") return;
+    if (isRefreshing) return;
 
     const pendingAnchor = window.sessionStorage.getItem(PENDING_ANCHOR_KEY);
     if (!pendingAnchor) return;
@@ -345,12 +371,16 @@ const OnHoldPage = () => {
               <span>{getCardLabel(intervention)}</span>
             </span>
 
-            {activeTab === "res" &&
-              intervention.resConsultedDate === localDateKey() && (
-                <span className="on-hold-card__consulted-today">
-                  Consulté aujourd&apos;hui
-                </span>
-              )}
+            {((activeTab === "res" &&
+              intervention.resConsultedDate === localDateKey()) ||
+              (activeTab === "snowReceived" &&
+                intervention.snowReceivedConsultedDate === localDateKey()) ||
+              (activeTab === "snowSent" &&
+                intervention.snowSentConsultedDate === localDateKey())) && (
+              <span className="on-hold-card__consulted-today">
+                Consulté aujourd&apos;hui
+              </span>
+            )}
 
             {overdueCard && (
               <small>
@@ -377,6 +407,14 @@ const OnHoldPage = () => {
               {intervention.oagID || "—"}
             </span>
           </span>
+          {(activeTab === "snowReceived" || activeTab === "snowSent") && (
+            <span className="on-hold-card__snow-ticket">
+              <strong>{activeTab === "snowReceived" ? "Snow à mon nom" : "Snow créé"}</strong>
+              <span title={(activeTab === "snowReceived" ? intervention.snowReceived : intervention.snowSent) || "—"}>
+                {(activeTab === "snowReceived" ? intervention.snowReceived : intervention.snowSent) || "—"}
+              </span>
+            </span>
+          )}
         </span>
 
         <span className="on-hold-card__details">

@@ -189,9 +189,9 @@
 }
 
 .on-hold-tab--cure {
-  --tab-color: #6d28d9;
-  --tab-soft: rgba(109, 40, 217, 0.1);
-  --tab-line: #7c3aed;
+  --tab-color: #7c5ac7;
+  --tab-soft: rgba(124, 90, 199, 0.085);
+  --tab-line: #9272d8;
 }
 
 .on-hold-tab--res {
@@ -796,12 +796,14 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   align-items: center;
   min-height: 27px;
   padding: 0 9px;
-  color: #9a4d0a;
-  background: #fff7ed;
-  border: 1px solid #fed7aa;
+  color: #7e22ce;
+  background: #ffffff;
+  border: 0;
   border-radius: 999px;
   font-size: 10.5px;
   font-weight: 800;
   line-height: 1;
   white-space: nowrap;
 }
+
+.on-hold-card__snow-ticket strong, .on-hold-card__snow-ticket span { color:#c66a12!important; }

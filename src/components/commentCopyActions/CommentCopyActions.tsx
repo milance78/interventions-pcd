@@ -4,10 +4,10 @@ import IconButton from "@mui/material/IconButton";
 import Tooltip from "@mui/material/Tooltip";
 
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
-import { ReactComponent as NpsCopyIcon } from "../../assets/svg/NPS copy.svg.tsx";
 import {
   prepareNpsText,
-  prepareWctText,
+  prepareWctCureText,
+  removeBlankLines,
   writeTextToClipboard,
 } from "../../utils/textUtils";
 
@@ -41,7 +41,7 @@ const CommentCopyActions = ({
   };
 
   const npsValue = prepareNpsText(value);
-  const wctValue = prepareWctText(value);
+  const wctValue = prepareWctCureText(value);
 
   return (
     <div
@@ -55,7 +55,7 @@ const CommentCopyActions = ({
           <IconButton
             size="small"
             disabled={!value.trim()}
-            onClick={(event) => copy("normal", value.trim(), event)}
+            onClick={(event) => copy("normal", removeBlankLines(value), event)}
             aria-label="Copier le commentaire"
           >
             {copied === "normal" ? <CheckRounded /> : <CopyIcon />}
@@ -72,22 +72,22 @@ const CommentCopyActions = ({
             onClick={(event) => copy("nps", npsValue, event)}
             aria-label="Copier le commentaire pour NPS"
           >
-            {copied === "nps" ? <CheckRounded /> : <NpsCopyIcon />}
+            {copied === "nps" ? <CheckRounded /> : <strong>NPS</strong>}
           </IconButton>
         </span>
       </Tooltip>
 
       {showWct && (
-        <Tooltip title={copied === "wct" ? "WCT copié" : "Copier pour WCT"} arrow>
+        <Tooltip title={copied === "wct" ? "WCT copié" : "Copier le dernier CURE pour WCT"} arrow>
           <span>
             <IconButton
               size="small"
               className="comment-copy-actions__wct"
               disabled={!wctValue}
               onClick={(event) => copy("wct", wctValue, event)}
-              aria-label="Copier le commentaire pour WCT"
+              aria-label="Copier le dernier CURE pour WCT"
             >
-              {copied === "wct" ? <CheckRounded /> : <strong>WCT</strong>}
+              {copied === "wct" ? <CheckRounded /> : <strong className="comment-copy-actions__wct-label"><span>WCT</span><span>CURE</span></strong>}
             </IconButton>
           </span>
         </Tooltip>
