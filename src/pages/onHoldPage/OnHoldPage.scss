@@ -770,3 +770,38 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   height: 23px !important;
   flex: 0 0 23px;
 }
+
+
+.on-hold-res-groups {
+  display: grid;
+  gap: 26px;
+}
+
+.on-hold-infrastructure-group {
+  display: grid;
+  gap: 11px;
+
+  h2 {
+    margin: 0 2px;
+    color: #52657e;
+    font-size: 13px;
+    font-weight: 850;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+  }
+}
+
+.on-hold-card__consulted-today {
+  display: inline-flex;
+  align-items: center;
+  min-height: 27px;
+  padding: 0 9px;
+  color: #9a4d0a;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}

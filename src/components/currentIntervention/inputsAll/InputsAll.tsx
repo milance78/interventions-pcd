@@ -133,7 +133,7 @@ const InputsAll = () => {
             <SnowPendingInput
               field="snowReceived"
               pendingField="isSnowReceivedPending"
-              label="Snow reçu"
+              label="Snow à mon nom"
               pendingLabel="Snow reçu en attente"
             />
 

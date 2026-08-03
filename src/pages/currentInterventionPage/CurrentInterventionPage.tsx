@@ -81,6 +81,41 @@ import CableCutOff from "../../assets/icons/CableCutOff.png";
 import QuestionActionOn from "../../assets/icons/QuestionActionOn.png";
 import QuestionActionOff from "../../assets/icons/QuestionActionOff.png";
 
+const RES_EDIT_CONTEXT_KEY = "on-hold:res-edit-context";
+const PENDING_TAB_KEY = "on-hold:pending-tab";
+const PENDING_ANCHOR_KEY = "on-hold:pending-anchor";
+
+type ResEditContext = {
+  anchor: string;
+  documentId: string;
+  dateKey: string;
+};
+
+const getLocalDateKey = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+};
+
+const readResEditContext = (): ResEditContext | null => {
+  try {
+    const raw = window.sessionStorage.getItem(RES_EDIT_CONTEXT_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<ResEditContext>;
+
+    return typeof parsed.anchor === "string" &&
+      typeof parsed.documentId === "string" &&
+      typeof parsed.dateKey === "string"
+      ? {
+          anchor: parsed.anchor,
+          documentId: parsed.documentId,
+          dateKey: parsed.dateKey,
+        }
+      : null;
+  } catch {
+    return null;
+  }
+};
+
 type CopyButtonProps = {
   value: string;
   label: string;
@@ -441,13 +476,38 @@ const CurrentInterventionPage = () => {
   const submitActions = async () => {
     const normalized = normalizeInterventionStrings(newIntervention);
     const formIsCompletelyEmpty = !hasMeaningfulDraft(normalized);
-    const safePayload =
+    let safePayload =
       isEditing && formIsCompletelyEmpty && newIntervention.editSnapshot
         ? {
             ...newIntervention,
             ...newIntervention.editSnapshot,
           }
         : normalized;
+
+    const resEditContext = readResEditContext();
+    const isOpenedFromRes =
+      Boolean(resEditContext) &&
+      resEditContext?.documentId === newIntervention.documentId &&
+      resEditContext?.dateKey === (newIntervention.dateKey ?? "");
+
+    if (isOpenedFromRes) {
+      if (
+        safePayload.status === "completed" ||
+        safePayload.status === "transferred"
+      ) {
+        safePayload = {
+          ...safePayload,
+          isResPending: false,
+          resConsultedDate: null,
+        };
+      } else if (safePayload.status === "on hold") {
+        safePayload = {
+          ...safePayload,
+          isResPending: true,
+          resConsultedDate: getLocalDateKey(),
+        };
+      }
+    }
 
     const result = isEditing
       ? await dispatch(updateInterventionThunk(safePayload))
@@ -465,6 +525,23 @@ const CurrentInterventionPage = () => {
             "L'intervention n'a pas pu être enregistrée.";
 
       window.alert(message);
+      return;
+    }
+
+    if (isOpenedFromRes && resEditContext) {
+      window.sessionStorage.removeItem(RES_EDIT_CONTEXT_KEY);
+      window.sessionStorage.setItem(PENDING_TAB_KEY, "res");
+
+      if (safePayload.status === "on hold" && safePayload.isResPending) {
+        window.sessionStorage.setItem(
+          PENDING_ANCHOR_KEY,
+          resEditContext.anchor,
+        );
+      } else {
+        window.sessionStorage.removeItem(PENDING_ANCHOR_KEY);
+      }
+
+      navigate("/en-attente");
       return;
     }
 
@@ -530,8 +607,31 @@ const CurrentInterventionPage = () => {
   const addToTodayList = async () => {
     if (mode !== "SEARCH_EDIT" && mode !== "HISTORY_EDIT") return;
 
+    const resEditContext = readResEditContext();
+    const isOpenedFromRes =
+      Boolean(resEditContext) &&
+      resEditContext?.documentId === newIntervention.documentId &&
+      resEditContext?.dateKey === (newIntervention.dateKey ?? "");
+
+    const payload =
+      isOpenedFromRes && newIntervention.status === "on hold"
+        ? {
+            ...newIntervention,
+            isResPending: true,
+            resConsultedDate: getLocalDateKey(),
+          }
+        : isOpenedFromRes &&
+            (newIntervention.status === "completed" ||
+              newIntervention.status === "transferred")
+          ? {
+              ...newIntervention,
+              isResPending: false,
+              resConsultedDate: null,
+            }
+          : newIntervention;
+
     const result = await dispatch(
-      updateSearchInterventionThunk(newIntervention),
+      updateSearchInterventionThunk(payload),
     );
 
     if (updateSearchInterventionThunk.rejected.match(result)) {
@@ -545,6 +645,24 @@ const CurrentInterventionPage = () => {
     }
 
     dispatch(markSearchInterventionSaved(result.payload));
+
+    if (isOpenedFromRes && resEditContext) {
+      window.sessionStorage.removeItem(RES_EDIT_CONTEXT_KEY);
+      window.sessionStorage.setItem(PENDING_TAB_KEY, "res");
+
+      if (payload.status === "on hold" && payload.isResPending) {
+        window.sessionStorage.setItem(
+          PENDING_ANCHOR_KEY,
+          `${result.payload.dateKey ?? ""}::${result.payload.documentId}`,
+        );
+      } else {
+        window.sessionStorage.removeItem(PENDING_ANCHOR_KEY);
+      }
+
+      navigate("/en-attente");
+      return;
+    }
+
     navigate("/liste-du-jour");
   };
 

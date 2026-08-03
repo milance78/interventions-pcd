@@ -130,6 +130,10 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
         data.res ??
         false,
     ),
+    resConsultedDate:
+      typeof data.resConsultedDate === "string"
+        ? data.resConsultedDate
+        : null,
     isSnow: isSnowReceivedPending || isSnowSentPending,
     comment,
     addressConfirmation,

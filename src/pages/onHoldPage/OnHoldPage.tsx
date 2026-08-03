@@ -60,6 +60,38 @@ const tabs: Array<{
 ];
 const tabOrder = tabs.map((tab) => tab.value);
 
+const RES_EDIT_CONTEXT_KEY = "on-hold:res-edit-context";
+const PENDING_TAB_KEY = "on-hold:pending-tab";
+const PENDING_ANCHOR_KEY = "on-hold:pending-anchor";
+
+const localDateKey = () => {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+};
+
+const interventionAnchor = (intervention: {
+  documentId: string;
+  dateKey?: string;
+}) => `${intervention.dateKey ?? ""}::${intervention.documentId}`;
+
+const infrastructureKind = (value: string) => {
+  const normalized = value.trim().toLowerCase();
+  return normalized === "fiber" || normalized === "fibre"
+    ? "fiber"
+    : "copper";
+};
+
+const interventionOldestValue = (intervention: {
+  curePendingSince?: string | null;
+  createdAt?: string | null;
+  updatedAt?: string | null;
+  dateKey?: string;
+}) =>
+  intervention.curePendingSince ??
+  intervention.createdAt ??
+  intervention.updatedAt ??
+  (intervention.dateKey ? `${intervention.dateKey}T00:00:00` : "");
+
 type ViewTransitionDocument = Document & {
   startViewTransition?: (update: () => void) => { finished: Promise<void> };
 };
@@ -85,7 +117,16 @@ const OnHoldPage = () => {
   const navigate = useNavigate();
   const history = useAppSelector((state) => state.history.interventions);
   const isRefreshing = useAppSelector((state) => state.history.isRefreshing);
-  const [activeTab, setActiveTab] = React.useState<OnHoldTab>("cure");
+  const [activeTab, setActiveTab] = React.useState<OnHoldTab>(() => {
+    try {
+      const pending = window.sessionStorage.getItem(PENDING_TAB_KEY);
+      return tabOrder.includes(pending as OnHoldTab)
+        ? (pending as OnHoldTab)
+        : "cure";
+    } catch {
+      return "cure";
+    }
+  });
   const scrollContainerRef = React.useRef<HTMLElement | null>(null);
 
   const changeTab = React.useCallback(
@@ -117,26 +158,60 @@ const OnHoldPage = () => {
 
   usePersistentElementScroll("on-hold", scrollContainerRef, !isRefreshing);
 
+  React.useEffect(() => {
+    window.sessionStorage.removeItem(PENDING_TAB_KEY);
+  }, []);
+
   const interventions = React.useMemo(
     () => getOnHoldInterventions(history, activeTab),
     [history, activeTab],
   );
 
   const sortedInterventions = React.useMemo(() => {
-    if (activeTab !== "cure") return interventions;
+    const sorted = [...interventions];
 
-    return [...interventions].sort((first, second) => {
-      const firstOverdue = isCureOverdue(first);
-      const secondOverdue = isCureOverdue(second);
+    if (activeTab === "cure") {
+      return sorted.sort((first, second) => {
+        const infrastructureDifference =
+          (infrastructureKind(first.infrastructure) === "copper" ? 0 : 1) -
+          (infrastructureKind(second.infrastructure) === "copper" ? 0 : 1);
 
-      if (firstOverdue !== secondOverdue) {
-        return firstOverdue ? -1 : 1;
-      }
+        if (infrastructureDifference !== 0) {
+          return infrastructureDifference;
+        }
 
-      return (first.curePendingSince ?? first.updatedAt ?? "").localeCompare(
-        second.curePendingSince ?? second.updatedAt ?? "",
-      );
-    });
+        return interventionOldestValue(first).localeCompare(
+          interventionOldestValue(second),
+        );
+      });
+    }
+
+    if (activeTab === "res") {
+      const today = localDateKey();
+
+      return sorted.sort((first, second) => {
+        const infrastructureDifference =
+          (infrastructureKind(first.infrastructure) === "copper" ? 0 : 1) -
+          (infrastructureKind(second.infrastructure) === "copper" ? 0 : 1);
+
+        if (infrastructureDifference !== 0) {
+          return infrastructureDifference;
+        }
+
+        const firstConsultedToday = first.resConsultedDate === today;
+        const secondConsultedToday = second.resConsultedDate === today;
+
+        if (firstConsultedToday !== secondConsultedToday) {
+          return firstConsultedToday ? 1 : -1;
+        }
+
+        return interventionOldestValue(first).localeCompare(
+          interventionOldestValue(second),
+        );
+      });
+    }
+
+    return sorted;
   }, [activeTab, interventions]);
 
   const overdue =
@@ -148,9 +223,35 @@ const OnHoldPage = () => {
       ? sortedInterventions.filter((item) => !isCureOverdue(item))
       : sortedInterventions;
 
+  const resCopper =
+    activeTab === "res"
+      ? current.filter(
+          (item) => infrastructureKind(item.infrastructure) === "copper",
+        )
+      : [];
+  const resFiber =
+    activeTab === "res"
+      ? current.filter(
+          (item) => infrastructureKind(item.infrastructure) === "fiber",
+        )
+      : [];
+
   const openIntervention = (
     intervention: (typeof sortedInterventions)[number],
   ) => {
+    if (activeTab === "res") {
+      window.sessionStorage.setItem(
+        RES_EDIT_CONTEXT_KEY,
+        JSON.stringify({
+          anchor: interventionAnchor(intervention),
+          documentId: intervention.documentId,
+          dateKey: intervention.dateKey ?? "",
+        }),
+      );
+    } else {
+      window.sessionStorage.removeItem(RES_EDIT_CONTEXT_KEY);
+    }
+
     dispatch(loadInterventionFromSearch(intervention));
     navigate("/intervention-en-cours");
   };
@@ -181,6 +282,29 @@ const OnHoldPage = () => {
     return <MoreHorizRounded />;
   };
 
+  React.useEffect(() => {
+    if (isRefreshing || activeTab !== "res") return;
+
+    const pendingAnchor = window.sessionStorage.getItem(PENDING_ANCHOR_KEY);
+    if (!pendingAnchor) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const target = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-on-hold-anchor]"),
+      ).find((element) => element.dataset.onHoldAnchor === pendingAnchor);
+
+      target?.scrollIntoView({
+        behavior: "auto",
+        block: "center",
+      });
+
+      window.sessionStorage.removeItem(PENDING_TAB_KEY);
+      window.sessionStorage.removeItem(PENDING_ANCHOR_KEY);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [activeTab, isRefreshing, current.length]);
+
   const renderCard = (
     intervention: (typeof sortedInterventions)[number],
     overdueCard = false,
@@ -195,6 +319,7 @@ const OnHoldPage = () => {
         className={`on-hold-card on-hold-card--${activeTab} ${
           overdueCard ? "on-hold-card--overdue" : ""
         }`}
+        data-on-hold-anchor={interventionAnchor(intervention)}
         onClick={() => openIntervention(intervention)}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
@@ -219,6 +344,13 @@ const OnHoldPage = () => {
               {getStatusIcon()}
               <span>{getCardLabel(intervention)}</span>
             </span>
+
+            {activeTab === "res" &&
+              intervention.resConsultedDate === localDateKey() && (
+                <span className="on-hold-card__consulted-today">
+                  Consulté aujourd&apos;hui
+                </span>
+              )}
 
             {overdueCard && (
               <small>
@@ -337,6 +469,26 @@ const OnHoldPage = () => {
               </div>
             )}
           </>
+        ) : activeTab === "res" ? (
+          <div className="on-hold-res-groups">
+            {resCopper.length > 0 && (
+              <section className="on-hold-infrastructure-group">
+                <h2>Cuivre</h2>
+                <div className="on-hold-grid">
+                  {resCopper.map((item) => renderCard(item))}
+                </div>
+              </section>
+            )}
+
+            {resFiber.length > 0 && (
+              <section className="on-hold-infrastructure-group">
+                <h2>Fibre</h2>
+                <div className="on-hold-grid">
+                  {resFiber.map((item) => renderCard(item))}
+                </div>
+              </section>
+            )}
+          </div>
         ) : (
           <div className="on-hold-grid">
             {current.map((item) => renderCard(item))}
