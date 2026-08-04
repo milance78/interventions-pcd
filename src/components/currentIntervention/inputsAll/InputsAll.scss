@@ -103,21 +103,19 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
+  width: 44px;
   height: 36px;
-  padding: 0 5px;
+  padding: 0 2px;
   color: #2563d4;
   background: transparent;
-  border: 1px solid transparent;
-  border-radius: 7px;
+  border: 0;
+  border-radius: 0;
   cursor: pointer;
-  transition: background-color 130ms ease, border-color 130ms ease, transform 130ms ease;
 }
 
 .snow-assign-button:hover:not(:disabled) {
-  background: #eff6ff;
-  border-color: #bfdbfe;
-  transform: translateY(-1px);
+  background: transparent;
+  transform: none;
 }
 
 .snow-assign-button:focus-visible {
@@ -152,9 +150,9 @@
 .snow-assign-button__arrow {
   position: relative;
   display: block;
-  width: 18px;
+  width: 13px;
   height: 8px;
-  margin-left: 2px;
+  margin-left: 1px;
   background: currentColor;
 }
 
