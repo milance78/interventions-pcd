@@ -946,4 +946,63 @@ body.spreadsheet-mode {
   .additional-information-template-button--active {
     background: #ddd !important;
   }
+  .snow-assign-button {
+    width: 42px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    color: #111 !important;
+    background: #ededed !important;
+    border: 1px solid #a6a6a6 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+  }
+
+  .snow-assign-button__bars {
+    display: none !important;
+  }
+
+  .snow-assign-button__arrow {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  .snow-assign-button__arrow::before {
+    content: "→";
+    font: 15px Arial, sans-serif;
+  }
+
+  .snow-assign-button__arrow::after {
+    display: none !important;
+  }
+
+  .address-client__details::after {
+    content: "Détails";
+    font: 10px Arial, sans-serif;
+  }
+
+  .address-client__details svg {
+    display: none !important;
+  }
+
+  .address-client-dialog .MuiDialog-paper {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .address-client-dialog__section + .address-client-dialog__section {
+    border-top: 1px solid var(--xls-grid) !important;
+  }
+
+  .address-client-dialog__grid {
+    gap: 0 !important;
+  }
+
+  .address-client-dialog__grid > .MuiFormControl-root {
+    padding: 4px !important;
+    border-right: 1px solid var(--xls-grid-soft) !important;
+    border-bottom: 1px solid var(--xls-grid-soft) !important;
+  }
+
 }

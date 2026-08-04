@@ -1,6 +1,7 @@
 import "./InputsAll.scss";
 
 import AcUnitRounded from "@mui/icons-material/AcUnitRounded";
+import Tooltip from "@mui/material/Tooltip";
 
 import {
   Contact,
@@ -16,15 +17,19 @@ import MainAddressInput from "../mainAddressInput/MainAddressInput";
 
 import { ReactComponent as CIDIcon } from "../../../assets/svg/CID.svg.tsx";
 import { ReactComponent as NAIcon } from "../../../assets/svg/NA.svg.tsx";
-import { useAppSelector } from "../../../redux/store";
+import { updateField } from "../../../redux/features/newInterventionSlice";
+import { useAppDispatch, useAppSelector } from "../../../redux/store";
 
 const InputsAll = () => {
+  const dispatch = useAppDispatch();
   const {
     infrastructure,
     mailbox,
     floor,
     apartment,
     blockNumber,
+    snowMentioned,
+    isHistoryView,
   } = useAppSelector((state) => state.newIntervention);
 
   const hasMailbox = mailbox.trim().length > 0;
@@ -130,11 +135,50 @@ const InputsAll = () => {
           </div>
 
           <div className="snow-inputs-group__fields">
+            <SimpleInput
+              field="snowMentioned"
+              label="Snow mentionné"
+              inputType="type2"
+            />
+
+            <Tooltip title="Assigner à mon nom" placement="top" arrow>
+              <span className="snow-assign-button__wrapper">
+                <button
+                  type="button"
+                  className="snow-assign-button"
+                  disabled={isHistoryView || !snowMentioned.trim()}
+                  onClick={() => {
+                    dispatch(
+                      updateField({
+                        field: "snowReceived",
+                        value: snowMentioned,
+                      }),
+                    );
+                    dispatch(
+                      updateField({
+                        field: "snowMentioned",
+                        value: "",
+                      }),
+                    );
+                  }}
+                  aria-label="Assigner Snow mentionné à mon nom"
+                >
+                  <span className="snow-assign-button__bars" aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span className="snow-assign-button__arrow" aria-hidden="true" />
+                </button>
+              </span>
+            </Tooltip>
+
             <SnowPendingInput
               field="snowReceived"
               pendingField="isSnowReceivedPending"
               label="Snow à mon nom"
-              pendingLabel="Snow reçu en attente"
+              pendingLabel="Snow à mon nom en attente"
             />
 
             <SnowPendingInput
@@ -142,12 +186,6 @@ const InputsAll = () => {
               pendingField="isSnowSentPending"
               label="Snow créé"
               pendingLabel="Snow créé en attente"
-            />
-
-            <SimpleInput
-              field="snowMentioned"
-              label="Snow mentionné"
-              inputType="type2"
             />
           </div>
         </div>

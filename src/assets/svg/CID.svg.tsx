@@ -24,8 +24,8 @@ const CIDIcon = forwardRef<SVGSVGElement, CIDIconProps>(
         dominantBaseline="middle"
         textAnchor="middle"
         fontFamily="Arial, Helvetica, sans-serif"
-        fontSize="42"
-        fontWeight="500"
+        fontSize="48"
+        fontWeight="600"
         fill="#000"
         letterSpacing="-1"
       >

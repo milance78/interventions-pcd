@@ -554,11 +554,10 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
       const client = state.addressClients.find((item) => item.id === action.payload.id);
       if (!client) return;
-      const nextValue =
-        action.payload.field === "na" && typeof action.payload.value === "string"
-          ? normalizeNaNumber(action.payload.value)
-          : action.payload.value;
-      (client as unknown as Record<string, unknown>)[action.payload.field] = nextValue;
+      // Keep raw input while the user is typing. Field-specific normalization
+      // (for example the leading zero in NA) is applied on blur by the UI.
+      (client as unknown as Record<string, unknown>)[action.payload.field] =
+        action.payload.value;
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
       refreshDraftMetadata(state);
     },

@@ -1,11 +1,16 @@
 import * as React from "react";
 
 import AddRounded from "@mui/icons-material/AddRounded";
+import SearchRounded from "@mui/icons-material/SearchRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
-import ExpandMoreRounded from "@mui/icons-material/ExpandMoreRounded";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import TextField from "@mui/material/TextField";
@@ -121,19 +126,35 @@ const ClientField = ({
   const value = client[field];
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const nextValue = normalizeAsName
-      ? normalizePersonName(event.target.value)
-      : field === "na"
-        ? normalizeNaNumber(event.target.value)
-        : event.target.value;
-
+    // Keep the exact value while typing so users can freely insert, delete and
+    // edit text anywhere in the field without the caret jumping.
     dispatch(
       updateAddressClient({
         id: client.id,
         field,
-        value: nextValue,
+        value: event.target.value,
       }),
     );
+  };
+
+  const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const normalizedValue = normalizeAsName
+      ? normalizePersonName(event.target.value)
+      : field === "na"
+        ? normalizeNaNumber(event.target.value)
+        : event.target.value.trim();
+
+    if (normalizedValue !== event.target.value) {
+      dispatch(
+        updateAddressClient({
+          id: client.id,
+          field,
+          value: normalizedValue,
+        }),
+      );
+    }
+
+    onBlur?.(event);
   };
 
   return (
@@ -145,7 +166,7 @@ const ClientField = ({
       disabled={isHistoryView}
       inputRef={inputRef}
       onKeyDown={onKeyDown}
-      onBlur={onBlur}
+      onBlur={handleBlur}
       onChange={handleChange}
       slotProps={{
         input: {
@@ -165,22 +186,13 @@ const ClientsOnAddress = () => {
   const previousAddressSignatureRef = React.useRef(
     JSON.stringify({ addressClients, infrastructure }),
   );
-  const [expandedClientIds, setExpandedClientIds] = React.useState<Set<string>>(
-    () => new Set(),
-  );
+  const [selectedClientId, setSelectedClientId] = React.useState<string | null>(null);
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
 
   React.useEffect(() => {
     commentRef.current = comment;
   }, [comment]);
 
-  React.useEffect(() => {
-    const clientIds = new Set(addressClients.map((client) => client.id));
-    setExpandedClientIds((current) => {
-      const next = new Set([...current].filter((id) => clientIds.has(id)));
-      return next.size === current.size ? current : next;
-    });
-  }, [addressClients]);
 
   React.useEffect(() => {
     const signature = JSON.stringify({ addressClients, infrastructure });
@@ -235,29 +247,6 @@ const ClientsOnAddress = () => {
     if (addressClients[index]?.fullName.trim()) addClient();
   };
 
-  const toggleExtraInfo = (client: AddressClient) => {
-    setExpandedClientIds((current) => {
-      const next = new Set(current);
-      const isExpanded = next.has(client.id);
-
-      if (isExpanded) {
-        next.delete(client.id);
-      } else {
-        next.add(client.id);
-      }
-
-      dispatch(
-        updateAddressClient({
-          id: client.id,
-          field: "mode",
-          value: isExpanded ? "base" : "plus",
-        }),
-      );
-
-      return next;
-    });
-  };
-
   const copyClient = async (client: AddressClient) => {
     const value = serializeAddressClients([client], infrastructure).replace(
       /^1\.\s*/,
@@ -265,6 +254,9 @@ const ClientsOnAddress = () => {
     );
     if (value) await writeText(value);
   };
+
+  const selectedClient =
+    addressClients.find((client) => client.id === selectedClientId) ?? null;
 
   return (
     <section className="clients-on-address" aria-label="Clients à l'adresse">
@@ -325,91 +317,35 @@ const ClientsOnAddress = () => {
 
                 {isCopper ? (
                   <>
+                    <ClientField client={client} field="na" label="NA client" />
                     <ClientField
                       client={client}
                       field="operator"
                       label="Opérateur"
                     />
-                    <ClientField client={client} field="na" label="NA client" />
                   </>
                 ) : (
                   <>
-                    <ClientField
-                      client={client}
-                      field="addressDetails"
-                      label="Détail d'adresse"
-                    />
                     <ClientField client={client} field="utac" label="UTAC" />
                     <ClientField client={client} field="cid" label="CID client" />
                   </>
                 )}
               </div>
-
-              {expandedClientIds.has(client.id) && (
-                <div
-                  className={`address-client__plus address-client__plus--${
-                    isCopper ? "copper" : "fiber"
-                  }`}
-                >
-                  {isCopper ? (
-                    <>
-                      <ClientField
-                        client={client}
-                        field="clientId"
-                        label="ID client"
-                      />
-                      <ClientField client={client} field="cid" label="CID client" />
-                      <ClientField client={client} field="voip" label="VOIP" />
-                    </>
-                  ) : (
-                    <>
-                      <ClientField
-                        client={client}
-                        field="operator"
-                        label="Opérateur"
-                      />
-                      <ClientField
-                        client={client}
-                        field="clientId"
-                        label="ID client"
-                      />
-                      <ClientField client={client} field="voip" label="VOIP" />
-                    </>
-                  )}
-                </div>
-              )}
             </div>
 
             <div className="address-client__actions">
-              <Tooltip
-                title={
-                  expandedClientIds.has(client.id)
-                    ? "Masquer les infos en plus"
-                    : "Infos en plus"
-                }
-                arrow
-              >
-                <IconButton
-                  size="small"
-                  className={`address-client__expand ${
-                    expandedClientIds.has(client.id)
-                      ? "address-client__expand--open"
-                      : ""
-                  }`}
-                  disabled={isHistoryView}
-                  onClick={() => toggleExtraInfo(client)}
-                  aria-label={
-                    expandedClientIds.has(client.id)
-                      ? "Masquer les informations supplémentaires"
-                      : "Afficher les informations supplémentaires"
-                  }
-                >
-                  {expandedClientIds.has(client.id) ? (
-                    <ExpandMoreRounded />
-                  ) : (
-                    <AddRounded />
-                  )}
-                </IconButton>
+              <Tooltip title="Ouvrir la fiche complète" arrow>
+                <span>
+                  <IconButton
+                    size="small"
+                    className="address-client__details"
+                    disabled={isHistoryView && !addressClientHasData(client)}
+                    onClick={() => setSelectedClientId(client.id)}
+                    aria-label={`Ouvrir les détails du client ${index + 1}`}
+                  >
+                    <SearchRounded />
+                  </IconButton>
+                </span>
               </Tooltip>
 
               <Tooltip title="Copier ce client" arrow>
@@ -445,6 +381,112 @@ const ClientsOnAddress = () => {
           </article>
         ))}
       </div>
+
+      <Dialog
+        open={Boolean(selectedClient)}
+        onClose={() => setSelectedClientId(null)}
+        fullWidth
+        maxWidth="md"
+        className="address-client-dialog"
+        aria-labelledby="address-client-dialog-title"
+      >
+        {selectedClient && (
+          <>
+            <DialogTitle id="address-client-dialog-title">
+              Client à l'adresse · {selectedClient.fullName || "Sans nom"}
+              <IconButton
+                className="address-client-dialog__close"
+                onClick={() => setSelectedClientId(null)}
+                aria-label="Fermer"
+              >
+                <CloseRounded />
+              </IconButton>
+            </DialogTitle>
+
+            <DialogContent dividers>
+              <div
+                className={`address-client-dialog__grid address-client-dialog__grid--${
+                  isCopper ? "copper" : "fiber"
+                }`}
+              >
+                <ClientField
+                  client={selectedClient}
+                  field="fullName"
+                  label="Nom et prénom"
+                  normalizeAsName
+                />
+
+                {isCopper ? (
+                  <>
+                    <ClientField
+                      client={selectedClient}
+                      field="na"
+                      label="NA client"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="operator"
+                      label="Opérateur"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="clientId"
+                      label="ID client"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="cid"
+                      label="CID client"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="voip"
+                      label="VOIP"
+                    />
+                  </>
+                ) : (
+                  <>
+                    <ClientField
+                      client={selectedClient}
+                      field="utac"
+                      label="UTAC"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="cid"
+                      label="CID client"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="addressDetails"
+                      label="Détails d'adresse"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="operator"
+                      label="Opérateur"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="clientId"
+                      label="ID client"
+                    />
+                    <ClientField
+                      client={selectedClient}
+                      field="voip"
+                      label="VOIP"
+                    />
+                  </>
+                )}
+              </div>
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={() => setSelectedClientId(null)}>Fermer</Button>
+            </DialogActions>
+          </>
+        )}
+      </Dialog>
     </section>
   );
 };

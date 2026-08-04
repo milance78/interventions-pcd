@@ -96,8 +96,7 @@
   min-width: 0;
 }
 
-.address-client__base,
-.address-client__plus {
+.address-client__base {
   display: grid;
   gap: 7px;
   min-width: 0;
@@ -106,22 +105,17 @@
 .address-client__base--copper {
   grid-template-columns:
     minmax(145px, 1.45fr)
-    minmax(90px, 0.85fr)
+    minmax(110px, 0.9fr)
     minmax(105px, 0.95fr);
 }
 
 .address-client__base--fiber {
   grid-template-columns:
-    minmax(145px, 1.35fr)
-    minmax(110px, 1fr)
-    minmax(118px, 1.08fr)
-    minmax(100px, 0.9fr);
+    minmax(0, 1fr)
+    calc(26ch + 34px)
+    calc(12ch + 34px);
 }
 
-.address-client__plus--copper,
-.address-client__plus--fiber {
-  grid-template-columns: repeat(3, minmax(92px, 1fr));
-}
 
 .address-client {
   .MuiFormControl-root {
@@ -198,14 +192,9 @@
   }
 }
 
-.address-client__expand {
+.address-client__details {
   color: #1d4ed8 !important;
   background: #eff6ff !important;
-}
-
-.address-client__expand--open {
-  color: #6d28d9 !important;
-  background: #f3e8ff !important;
 }
 
 .address-client__delete:hover {
@@ -215,9 +204,7 @@
 
 @media (max-width: 900px) {
   .address-client__base--copper,
-  .address-client__base--fiber,
-  .address-client__plus--copper,
-  .address-client__plus--fiber {
+  .address-client__base--fiber {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -232,5 +219,67 @@
   .MuiInputLabel-root {
     z-index: 1;
     pointer-events: none;
+  }
+}
+
+.address-client-dialog {
+  .MuiDialog-paper {
+    overflow: visible;
+    border-radius: 16px;
+  }
+
+  .MuiDialogTitle-root {
+    position: relative;
+    padding: 20px 56px 16px 24px;
+    color: #172033;
+    font-size: 20px;
+    font-weight: 750;
+  }
+
+  .MuiDialogContent-root {
+    padding: 22px 24px 26px;
+  }
+
+  .MuiDialogActions-root {
+    padding: 12px 24px 18px;
+  }
+
+  .MuiInputBase-input {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .MuiInputLabel-root {
+    font-size: 15px;
+  }
+}
+
+.address-client-dialog__close {
+  position: absolute !important;
+  top: 10px;
+  right: 12px;
+}
+
+
+.address-client-dialog__grid {
+  display: grid;
+  gap: 20px 22px;
+  align-items: end;
+}
+
+.address-client-dialog__grid--copper,
+.address-client-dialog__grid--fiber {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.address-client-dialog__grid .MuiFormControl-root {
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .address-client-dialog__grid--copper,
+  .address-client-dialog__grid--fiber {
+    grid-template-columns: 1fr;
   }
 }

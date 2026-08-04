@@ -69,10 +69,11 @@
   display: grid;
   grid-template-columns:
     minmax(0, 1fr)
-    40px
+    54px
     minmax(0, 1fr)
     40px
-    minmax(0, 1fr);
+    minmax(0, 1fr)
+    40px;
   align-items: center;
   column-gap: 10px;
   width: 100%;
@@ -87,6 +88,87 @@
 .inputs-all .snow-inputs-group__fields > .simple-input {
   min-width: 0;
   width: 100%;
+}
+
+
+.snow-assign-button__wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 40px;
+}
+
+.snow-assign-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 36px;
+  padding: 0 5px;
+  color: #2563d4;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background-color 130ms ease, border-color 130ms ease, transform 130ms ease;
+}
+
+.snow-assign-button:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  transform: translateY(-1px);
+}
+
+.snow-assign-button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.snow-assign-button:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+.snow-assign-button__bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.snow-assign-button__bars i {
+  display: block;
+  width: 4px;
+  height: 8px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.snow-assign-button__bars i:nth-child(1) { opacity: 0.45; }
+.snow-assign-button__bars i:nth-child(2) { opacity: 0.62; }
+.snow-assign-button__bars i:nth-child(3) { opacity: 0.78; }
+.snow-assign-button__bars i:nth-child(4) { opacity: 1; }
+
+.snow-assign-button__arrow {
+  position: relative;
+  display: block;
+  width: 18px;
+  height: 8px;
+  margin-left: 2px;
+  background: currentColor;
+}
+
+.snow-assign-button__arrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid currentColor;
+  transform: translateY(-50%);
 }
 
 @media (max-width: 980px) {
@@ -112,8 +194,17 @@
     column-gap: 10px;
   }
 
-  .inputs-all .snow-inputs-group__fields > .simple-input {
-    grid-column: 1 / 3;
+  .inputs-all .snow-inputs-group__fields > .simple-input:first-child {
+    grid-column: 1;
+  }
+
+  .snow-assign-button__wrapper {
+    grid-column: 2;
+    width: 40px;
+  }
+
+  .inputs-all .snow-inputs-group__fields > .snow-pending-input {
+    display: contents;
   }
 }
 

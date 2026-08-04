@@ -24,8 +24,8 @@ const NAIcon = forwardRef<SVGSVGElement, NAIconProps>(
         dominantBaseline="middle"
         textAnchor="middle"
         fontFamily="Arial, Helvetica, sans-serif"
-        fontSize="48"
-        fontWeight="500"
+        fontSize="56"
+        fontWeight="600"
         fill="#000"
       >
         NA
