@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
+import { normalizePersonName, parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
 import { cureOrder, emptyCureRecords, localDateKey, localTimeKey, removeCureLines, upsertCureLine } from "../../utils/cureRecords";
 import { composeMainAddress, normalizeNaNumber, parseMainAddress } from "../../utils/interventionAddress";
 
@@ -347,6 +347,10 @@ const NewInterventionSlice = createSlice({
         state.na = normalizeNaNumber(value);
       }
 
+      if (field === "clientName" && typeof value === "string") {
+        state.clientName = normalizePersonName(value);
+      }
+
       if (
         field === "streetName" ||
         field === "streetNumber" ||
@@ -588,6 +592,8 @@ const NewInterventionSlice = createSlice({
         (state as unknown as Record<string, unknown>)[field] = value;
       }
 
+      state.clientName = normalizePersonName(String(state.clientName ?? ""));
+
       const importedAddress =
         action.payload.streetName !== undefined ||
         action.payload.streetNumber !== undefined ||
@@ -645,6 +651,7 @@ const NewInterventionSlice = createSlice({
     ): Intervention => ({
       ...initialState,
       ...action.payload,
+      clientName: normalizePersonName(action.payload.clientName ?? ""),
       isEditing: true,
       isHistoryView: false,
       mode: "TODAY_EDIT",
@@ -662,6 +669,7 @@ const NewInterventionSlice = createSlice({
       return {
         ...initialState,
         ...action.payload,
+        clientName: normalizePersonName(action.payload.clientName ?? ""),
         isEditing: true,
         isHistoryView: false,
         mode: "HISTORY_EDIT",
@@ -679,6 +687,7 @@ const NewInterventionSlice = createSlice({
       return {
         ...initialState,
         ...action.payload,
+        clientName: normalizePersonName(action.payload.clientName ?? ""),
         isEditing: true,
         isHistoryView: false,
         mode: "SEARCH_EDIT",
@@ -693,6 +702,7 @@ const NewInterventionSlice = createSlice({
     ): Intervention => ({
       ...initialState,
       ...action.payload,
+      clientName: normalizePersonName(action.payload.clientName ?? ""),
       isEditing: false,
       isHistoryView: true,
       mode: "VIEW_HISTORY",
@@ -739,6 +749,7 @@ const NewInterventionSlice = createSlice({
         ...parsedDraftAddress,
         mainAddress: composeMainAddress(parsedDraftAddress),
         na: normalizeNaNumber(draftData.na ?? ""),
+        clientName: normalizePersonName(draftData.clientName ?? ""),
         addressClients: normalizedAddressClients,
         clientsOnAddress: serializeAddressClients(normalizedAddressClients, draftData.infrastructure ?? ""),
         addressConfirmation,

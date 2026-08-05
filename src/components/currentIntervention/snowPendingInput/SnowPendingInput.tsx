@@ -1,9 +1,6 @@
 import * as React from "react";
 
 import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
-import Fade from "@mui/material/Fade";
-import Paper from "@mui/material/Paper";
-import Popper from "@mui/material/Popper";
 
 import "./SnowPendingInput.scss";
 
@@ -41,32 +38,6 @@ const SnowPendingInput = ({
     Boolean(state.newIntervention[pendingField]),
   );
 
-  const clockButtonRef = React.useRef<HTMLButtonElement | null>(null);
-  const hideTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
-  const [notificationOpen, setNotificationOpen] = React.useState(false);
-
-  React.useEffect(() => {
-    return () => {
-      if (hideTimerRef.current) {
-        clearTimeout(hideTimerRef.current);
-      }
-    };
-  }, []);
-
-  const showNotification = () => {
-    if (hideTimerRef.current) {
-      clearTimeout(hideTimerRef.current);
-    }
-
-    setNotificationOpen(true);
-
-    hideTimerRef.current = setTimeout(() => {
-      setNotificationOpen(false);
-    }, 1500);
-  };
-
   const togglePending = () => {
     dispatch(
       updateField({
@@ -75,11 +46,6 @@ const SnowPendingInput = ({
       }),
     );
 
-    if (!isPending) {
-      showNotification();
-    } else {
-      setNotificationOpen(false);
-    }
   };
 
   return (
@@ -93,7 +59,6 @@ const SnowPendingInput = ({
       </div>
 
       <button
-        ref={clockButtonRef}
         type="button"
         className={`snow-pending-input__clock ${
           isPending ? "snow-pending-input__clock--active" : ""
@@ -106,33 +71,6 @@ const SnowPendingInput = ({
         <AccessTimeRounded aria-hidden="true" />
       </button>
 
-      <Popper
-        open={notificationOpen}
-        anchorEl={clockButtonRef.current}
-        placement="top"
-        transition
-        modifiers={[
-          {
-            name: "offset",
-            options: {
-              offset: [0, 10],
-            },
-          },
-        ]}
-        className="snow-pending-input__popper"
-      >
-        {({ TransitionProps }) => (
-          <Fade {...TransitionProps} timeout={140}>
-            <Paper
-              elevation={5}
-              className="snow-pending-input__notification"
-              role="status"
-            >
-              {pendingLabel}
-            </Paper>
-          </Fade>
-        )}
-      </Popper>
     </div>
   );
 };

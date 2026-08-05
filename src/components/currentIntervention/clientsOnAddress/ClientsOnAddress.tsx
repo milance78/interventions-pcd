@@ -108,6 +108,7 @@ type ClientFieldProps = {
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
   onBlur?: React.FocusEventHandler<HTMLInputElement>;
   normalizeAsName?: boolean;
+  compact?: boolean;
 };
 
 const ClientField = ({
@@ -118,6 +119,7 @@ const ClientField = ({
   onKeyDown,
   onBlur,
   normalizeAsName = false,
+  compact = false,
 }: ClientFieldProps) => {
   const dispatch = useAppDispatch();
   const isHistoryView = useAppSelector(
@@ -161,7 +163,8 @@ const ClientField = ({
     <TextField
       variant="standard"
       size="small"
-      label={label}
+      label={compact ? undefined : label}
+      placeholder={compact ? label : undefined}
       value={value}
       disabled={isHistoryView}
       inputRef={inputRef}
@@ -169,6 +172,9 @@ const ClientField = ({
       onBlur={handleBlur}
       onChange={handleChange}
       slotProps={{
+        htmlInput: {
+          "aria-label": label,
+        },
         input: {
           endAdornment: <CopyAdornment value={value} label={label} />,
         },
@@ -309,6 +315,7 @@ const ClientsOnAddress = () => {
                   field="fullName"
                   label="Nom et prénom"
                   normalizeAsName
+                  compact
                   inputRef={(element) => {
                     nameRefs.current[client.id] = element;
                   }}
@@ -316,19 +323,19 @@ const ClientsOnAddress = () => {
                 />
 
                 {isCopper ? (
-                  <>
-                    <ClientField client={client} field="na" label="NA client" />
-                    <ClientField
-                      client={client}
-                      field="operator"
-                      label="Opérateur"
-                    />
-                  </>
+                  <ClientField
+                    client={client}
+                    field="na"
+                    label="NA client"
+                    compact
+                  />
                 ) : (
-                  <>
-                    <ClientField client={client} field="utac" label="UTAC" />
-                    <ClientField client={client} field="cid" label="CID client" />
-                  </>
+                  <ClientField
+                    client={client}
+                    field="utac"
+                    label="UTAC"
+                    compact
+                  />
                 )}
               </div>
             </div>

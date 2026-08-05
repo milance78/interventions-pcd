@@ -2263,3 +2263,28 @@
 }
 
 .nps-copy-button__label { font-size:9px; font-weight:800; color:inherit; }
+
+
+/* v-next: compact action notices and consistent third action state */
+.current-intervention-page {
+  .action-toggle-notice {
+    width: auto !important;
+    height: auto !important;
+    min-width: max-content !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 6px 10px !important;
+    box-sizing: border-box;
+    line-height: 1.15 !important;
+    white-space: nowrap;
+  }
+
+  .intervention-option-group__items > .option-button.option-button--res:hover,
+  .intervention-option-group__items > .option-button.option-button--res:has(.res-pending-button--active) {
+    background: #f3f7ff !important;
+    border-color: #5b87e5 !important;
+  }
+}

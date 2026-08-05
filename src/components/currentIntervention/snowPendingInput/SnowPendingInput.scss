@@ -62,45 +62,6 @@
   filter: drop-shadow(0 2px 4px rgba(202, 138, 4, 0.28));
 }
 
-.snow-pending-input__popper {
-  z-index: 1700;
-  pointer-events: none;
-}
-
-.snow-pending-input__notification {
-  position: relative;
-
-  padding: 8px 12px;
-
-  color: #713f12 !important;
-  background: #fff8d8 !important;
-  border: 1px solid #facc15;
-  border-radius: 9px !important;
-
-  font-size: 13px;
-  font-weight: 650;
-  line-height: 1.25;
-  white-space: nowrap;
-
-  box-shadow: 0 8px 20px rgba(113, 63, 18, 0.18) !important;
-
-  &::after {
-    content: "";
-
-    position: absolute;
-    left: 50%;
-    bottom: -6px;
-
-    width: 10px;
-    height: 10px;
-
-    background: #fff8d8;
-    border-right: 1px solid #facc15;
-    border-bottom: 1px solid #facc15;
-
-    transform: translateX(-50%) rotate(45deg);
-  }
-}
 
 .snow-pending-input--emphasized {
   .MuiOutlinedInput-root {
