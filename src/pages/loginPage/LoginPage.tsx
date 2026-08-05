@@ -10,7 +10,11 @@ import { createUserProfile } from "../../firebase/userService";
 import { EyeOff } from "lucide-react";
 import { Eye } from "lucide-react";
 import "./LoginPage.scss";
-const LoginPage = () => {
+type LoginPageProps = {
+  profileDisplayName?: string;
+};
+
+const LoginPage = ({ profileDisplayName = "" }: LoginPageProps) => {
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [username, setUsername] = React.useState("");
@@ -61,9 +65,11 @@ const LoginPage = () => {
     return (
       <div className="login-page">
         <div className="login-page__card">
-          <h2>{"Welcome"}</h2>
-          <p>{user.email}</p>
-          <button onClick={handleLogout}>{"Logout"}</button>
+          <h2 className="login-page__welcome">Bienvenu</h2>
+          <p className="login-page__username">
+            {profileDisplayName || user.displayName || user.email?.split("@")[0]}
+          </p>
+          <button onClick={handleLogout}>Déconnexion</button>
         </div>
       </div>
     );

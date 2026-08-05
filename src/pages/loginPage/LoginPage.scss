@@ -103,3 +103,31 @@
 
   color: #111827 !important;
 }
+
+.login-page__welcome {
+  margin: 0;
+  color: #1f2937;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.login-page__username {
+  margin: -6px 0 2px;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.profile-menu__popup .login-page__card {
+  padding: 22px;
+  gap: 14px;
+}
+
+.profile-menu__popup .login-page__card > button:not(.eye-button):not(.link-button):not(.secondary-button) {
+  background: #334155;
+
+  &:hover {
+    background: #1f2937;
+  }
+}

@@ -5,8 +5,10 @@ import SearchRounded from "@mui/icons-material/SearchRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
+import ContentPasteGoRounded from "@mui/icons-material/ContentPasteGoRounded";
 import DeleteOutlineRounded from "@mui/icons-material/DeleteOutlineRounded";
 import Button from "@mui/material/Button";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -34,6 +36,8 @@ import {
   serializeAddressClients,
 } from "../../../utils/addressClients";
 import { normalizeNaNumber } from "../../../utils/interventionAddress";
+import { parseAddressClientImport } from "../../../features/addressClientImport/addressClientImportParser";
+import CollerWctNpsIcon from "../../../assets/icons/CollerWctNps.png";
 
 const automaticAddressLine =
   /^(?:Adresse confirmée\.?|Adresse pas encore confirmée\.?)$/i;
@@ -50,6 +54,17 @@ const removeAddressClientsBlock = (value: string) =>
     )
     .replace(/^\n+|\n+$/g, "")
     .replace(/\n{3,}/g, "\n\n");
+
+const AddressClientImportIcon = ({ className }: { className: string }) => (
+  <span
+    aria-hidden="true"
+    className={className}
+    style={{
+      WebkitMaskImage: `url(${CollerWctNpsIcon})`,
+      maskImage: `url(${CollerWctNpsIcon})`,
+    }}
+  />
+);
 
 const writeText = async (value: string) => {
   try {
@@ -196,6 +211,10 @@ const ClientsOnAddress = () => {
     JSON.stringify({ addressClients, infrastructure }),
   );
   const [selectedClientId, setSelectedClientId] = React.useState<string | null>(null);
+  const [isImportOpen, setIsImportOpen] = React.useState(false);
+  const [isImportProcessing, setIsImportProcessing] = React.useState(false);
+  const [importFeedback, setImportFeedback] = React.useState("");
+  const importPasteTargetRef = React.useRef<HTMLTextAreaElement | null>(null);
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
 
   React.useEffect(() => {
@@ -266,6 +285,54 @@ const ClientsOnAddress = () => {
 
   const selectedClient =
     addressClients.find((client) => client.id === selectedClientId) ?? null;
+
+  React.useEffect(() => {
+    if (!isImportOpen) return;
+    const timer = window.setTimeout(
+      () => importPasteTargetRef.current?.focus(),
+      80,
+    );
+    return () => window.clearTimeout(timer);
+  }, [isImportOpen]);
+
+  const importAddressClientText = (rawText: string) => {
+    if (!selectedClient || !rawText.trim() || isImportProcessing) return;
+
+    const result = parseAddressClientImport(rawText);
+    if (result.detectedFields.length === 0) {
+      setImportFeedback("Aucune donnée reconnue dans le contenu collé.");
+      return;
+    }
+
+    setIsImportProcessing(true);
+    setImportFeedback("");
+
+    window.setTimeout(() => {
+      Object.entries(result.values).forEach(([field, value]) => {
+        if (!value) return;
+        dispatch(
+          updateAddressClient({
+            id: selectedClient.id,
+            field: field as "cid" | "utac" | "clientId" | "operator",
+            value,
+          }),
+        );
+      });
+
+      setIsImportProcessing(false);
+      setIsImportOpen(false);
+      setImportFeedback(
+        `${result.detectedFields.length} champs remplis automatiquement (${result.sourceType}).`,
+      );
+    }, 70);
+  };
+
+  const handleAddressClientImportPaste = (
+    event: React.ClipboardEvent<HTMLTextAreaElement>,
+  ) => {
+    event.preventDefault();
+    importAddressClientText(event.clipboardData.getData("text/plain"));
+  };
 
   return (
     <section className="clients-on-address" aria-label="Clients à l'adresse">
@@ -422,6 +489,30 @@ const ClientsOnAddress = () => {
             </DialogTitle>
 
             <DialogContent dividers>
+              {!isCopper && !isHistoryView && (
+                <div className="address-client-dialog__import-row">
+                  <Button
+                    type="button"
+                    variant="outlined"
+                    className="address-client-import-trigger"
+                    startIcon={
+                      <AddressClientImportIcon className="address-client-import-trigger__icon" />
+                    }
+                    onClick={() => {
+                      setImportFeedback("");
+                      setIsImportOpen(true);
+                    }}
+                  >
+                    Coller SALY/xACTO
+                  </Button>
+                  {importFeedback && (
+                    <span className="address-client-dialog__import-feedback">
+                      {importFeedback}
+                    </span>
+                  )}
+                </div>
+              )}
+
               <div
                 className={`address-client-dialog__grid address-client-dialog__grid--${
                   isCopper ? "copper" : "fiber"
@@ -504,6 +595,62 @@ const ClientsOnAddress = () => {
             </DialogActions>
           </>
         )}
+      </Dialog>
+
+      <Dialog
+        open={isImportOpen}
+        onClose={() => !isImportProcessing && setIsImportOpen(false)}
+        fullWidth
+        maxWidth="md"
+        className="address-client-import-dialog"
+      >
+        <DialogTitle className="address-client-import-dialog__title">
+          <span>
+            <AddressClientImportIcon className="address-client-import-dialog__title-icon" />
+            Coller SALY/xACTO
+          </span>
+          <IconButton
+            aria-label="Fermer"
+            onClick={() => setIsImportOpen(false)}
+            disabled={isImportProcessing}
+          >
+            <CloseRounded />
+          </IconButton>
+        </DialogTitle>
+
+        <DialogContent className="address-client-import-dialog__content">
+          <textarea
+            ref={importPasteTargetRef}
+            className="address-client-import-dialog__paste-target"
+            aria-label="Coller le contenu SALY ou xACTO"
+            onPaste={handleAddressClientImportPaste}
+            onChange={() => undefined}
+            value=""
+          />
+
+          <div
+            className={`address-client-import-dropzone ${
+              isImportProcessing
+                ? "address-client-import-dropzone--processing"
+                : ""
+            }`}
+          >
+            {isImportProcessing ? (
+              <>
+                <CircularProgress size={38} />
+                <strong>Analyse des données…</strong>
+                <span>FCID, BSS Position, Customer ID et opérateur seront remplis.</span>
+              </>
+            ) : (
+              <>
+                <ContentPasteGoRounded className="address-client-import-dropzone__icon" />
+                <strong>Collez le contenu complet de SALY/xACTO</strong>
+                <span>Appuyez sur Ctrl + V. Le texte brut ne sera pas conservé.</span>
+                <kbd>Ctrl + V</kbd>
+              </>
+            )}
+          </div>
+        </DialogContent>
       </Dialog>
     </section>
   );
