@@ -128,13 +128,16 @@ const ClientField = ({
   const value = client[field];
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // Keep the exact value while typing so users can freely insert, delete and
-    // edit text anywhere in the field without the caret jumping.
+    const nextValue =
+      field === "na"
+        ? normalizeNaNumber(event.target.value)
+        : event.target.value;
+
     dispatch(
       updateAddressClient({
         id: client.id,
         field,
-        value: event.target.value,
+        value: nextValue,
       }),
     );
   };
@@ -288,7 +291,13 @@ const ClientsOnAddress = () => {
         </Tooltip>
       </header>
 
-      <div className="clients-on-address__list">
+      <div
+        className={`clients-on-address__list ${
+          addressClients.length > 3
+            ? "clients-on-address__list--scroll"
+            : ""
+        }`}
+      >
         {addressClients.length === 0 && (
           <button
             type="button"
@@ -400,7 +409,9 @@ const ClientsOnAddress = () => {
         {selectedClient && (
           <>
             <DialogTitle id="address-client-dialog-title">
-              Client à l'adresse · {selectedClient.fullName || "Sans nom"}
+              Client à l'adresse{selectedClient.fullName.trim()
+                ? ` · ${selectedClient.fullName.trim()}`
+                : ""}
               <IconButton
                 className="address-client-dialog__close"
                 onClick={() => setSelectedClientId(null)}

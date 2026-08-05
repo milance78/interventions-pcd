@@ -770,17 +770,6 @@ const CurrentInterventionPage = () => {
                 />
               )}
 
-              <span className="editing-badge">
-                {isSearchEdit
-                  ? "Modification recherchée"
-                  : isHistoryEdit
-                    ? "Modification historique"
-                    : isHistoryView
-                      ? "Historique"
-                      : isEditing
-                        ? "Modification"
-                        : "Création"}
-              </span>
             </div>
           </header>
 
@@ -810,10 +799,6 @@ const CurrentInterventionPage = () => {
           <section className="intervention-options">
             <div className="boolean-inputs-row">
               <div className="intervention-option-group intervention-option-group--actions">
-                <span className="intervention-option-group__label">
-                  Actions
-                </span>
-
                 <div className="intervention-option-group__items">
                   <div className="option-button">
                     {actionNotice?.key === "question" && (
@@ -892,10 +877,6 @@ const CurrentInterventionPage = () => {
               </div>
 
               <div className="intervention-option-group intervention-option-group--states">
-                <span className="intervention-option-group__label">
-                  États en attente
-                </span>
-
                 <div className="intervention-option-group__items">
                   <div
                     className={`option-button snow-pending-card ${

@@ -37,10 +37,15 @@
   display: flex;
   flex-direction: column;
   gap: 3px;
-  max-height: 210px;
-  overflow-y: auto;
+  overflow: visible;
   padding-right: 1px;
   scrollbar-width: thin;
+}
+
+.clients-on-address__list--scroll {
+  max-height: 108px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .clients-on-address__empty {
