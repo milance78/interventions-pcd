@@ -439,7 +439,6 @@ const OnHoldPage = () => {
         <div className="on-hold-page__heading">
           <span className="on-hold-page__eyebrow">SUIVI</span>
           <h1>En attente</h1>
-          <p>Interventions nécessitant un suivi.</p>
         </div>
 
         <div

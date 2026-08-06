@@ -749,17 +749,20 @@ const CurrentInterventionPage = () => {
       <div className="current-intervention-layout">
         <section className="intervention-card left-card">
           <header className="card-header">
-            <h1>
-              {isSearchEdit
-                ? "Intervention trouvée"
-                : isHistoryEdit
-                  ? "Intervention de l'historique"
-                  : isHistoryView
+            <div className="card-header__title">
+              <span className="card-header__eyebrow">INTERVENTIONS</span>
+              <h1>
+                {isSearchEdit
+                  ? "Intervention trouvée"
+                  : isHistoryEdit
                     ? "Intervention de l'historique"
-                    : isEditing
-                      ? "Modifier l'intervention"
-                      : "Nouvelle intervention"}
-            </h1>
+                    : isHistoryView
+                      ? "Intervention de l'historique"
+                      : isEditing
+                        ? "Modifier l'intervention"
+                        : "Nouvelle intervention"}
+              </h1>
+            </div>
 
             <div className="card-header__actions">
               {!isHistoryView && (

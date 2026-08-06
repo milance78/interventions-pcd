@@ -201,14 +201,15 @@ body.spreadsheet-mode {
   h4,
   .today-page-title,
   .history-page-header h1,
-  .on-hold-page__heading h1 {
+  .on-hold-page__heading h1,
+  .card-header h1 {
     color: #111 !important;
     font-size: 15px !important;
     font-weight: 700 !important;
     line-height: 1.2 !important;
   }
 
-  :is(.today-page-eyebrow, .history-page-eyebrow, .on-hold-page__eyebrow) {
+  :is(.today-page-eyebrow, .history-page-eyebrow, .on-hold-page__eyebrow, .card-header__eyebrow) {
     display: none !important;
   }
 
