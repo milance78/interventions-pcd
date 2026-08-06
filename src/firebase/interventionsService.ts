@@ -94,6 +94,7 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     ? data.addressClients
     : parseLegacyAddressClients(data.clientsOnAddress ?? "")).map((client: any) => ({
       ...client,
+      isFuture: Boolean(client.isFuture),
       na: normalizeNaNumber(String(client.na ?? "")),
     }));
   const structuredAddress =

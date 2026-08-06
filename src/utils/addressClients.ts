@@ -14,6 +14,7 @@ export const createAddressClient = (id?: string): AddressClient => ({
   na: "",
   cid: "",
   voip: "",
+  isFuture: false,
 });
 
 export const normalizePersonName = (value: string) => {
@@ -37,8 +38,10 @@ export const addressClientHasData = (client: AddressClient) =>
     ([key, value]) =>
       key !== "id" &&
       key !== "mode" &&
+      key !== "isFuture" &&
       key !== "naInService" &&
-      String(value).trim().length > 0,
+      typeof value === "string" &&
+      value.trim().length > 0,
   );
 
 export const parseLegacyAddressClients = (value: string): AddressClient[] => {

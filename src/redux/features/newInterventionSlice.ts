@@ -38,6 +38,7 @@ export interface AddressClient {
   na: string;
   cid: string;
   voip: string;
+  isFuture: boolean;
 }
 
 const loadSmsPreference = (): boolean => {
@@ -143,7 +144,7 @@ interface UpdateCureSmsPayload {
 interface UpdateAddressClientPayload {
   id: string;
   field: keyof Omit<AddressClient, "id">;
-  value: string | AddressClientMode;
+  value: string | boolean | AddressClientMode;
 }
 
 
@@ -548,6 +549,7 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
       state.addressClients.push({
         ...action.payload,
+        isFuture: Boolean(action.payload.isFuture),
         na: normalizeNaNumber(action.payload.na ?? ""),
       });
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
@@ -577,6 +579,7 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
       state.addressClients = action.payload.map((client) => ({
         ...client,
+        isFuture: Boolean(client.isFuture),
         na: normalizeNaNumber(client.na ?? ""),
       }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
@@ -617,6 +620,7 @@ const NewInterventionSlice = createSlice({
       state.na = normalizeNaNumber(String(state.na ?? ""));
       state.addressClients = state.addressClients.map((client) => ({
         ...client,
+        isFuture: Boolean(client.isFuture),
         na: normalizeNaNumber(client.na ?? ""),
       }));
 
@@ -625,6 +629,7 @@ const NewInterventionSlice = createSlice({
       }
       state.addressClients = state.addressClients.map((client) => ({
         ...client,
+        isFuture: Boolean(client.isFuture),
         na: normalizeNaNumber(client.na ?? ""),
       }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
@@ -741,6 +746,7 @@ const NewInterventionSlice = createSlice({
           : parseMainAddress(draftData.mainAddress ?? "");
       const normalizedAddressClients = addressClients.map((client) => ({
         ...client,
+        isFuture: Boolean(client.isFuture),
         na: normalizeNaNumber(client.na ?? ""),
       }));
       const draft = {

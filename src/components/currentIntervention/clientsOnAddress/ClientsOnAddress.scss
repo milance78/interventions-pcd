@@ -411,3 +411,52 @@
   cursor: wait;
   border-style: solid;
 }
+
+/* v56: future client toggle and delete confirmation */
+.address-client__future {
+  color: #94a3b8 !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: color 120ms ease, opacity 120ms ease !important;
+
+  > span {
+    display: block;
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  &:hover:not(:disabled),
+  &:active:not(:disabled) {
+    color: #64748b !important;
+    background: transparent !important;
+    transform: none !important;
+  }
+}
+
+.address-client__future--active {
+  color: #0f9f8f !important;
+
+  &:hover:not(:disabled),
+  &:active:not(:disabled) {
+    color: #0b7f74 !important;
+  }
+}
+
+.address-client-delete-dialog {
+  .MuiDialog-paper {
+    border-radius: 12px;
+  }
+
+  .MuiDialogTitle-root {
+    padding-bottom: 8px;
+    font-size: 18px;
+    font-weight: 650;
+  }
+
+  .MuiDialogActions-root {
+    padding: 12px 20px 18px;
+  }
+}

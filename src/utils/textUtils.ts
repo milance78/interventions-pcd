@@ -59,9 +59,40 @@ export const removeBlankLines = (value: string) =>
   value.replace(/\r\n/g, "\n").split("\n").map((line) => line.trimEnd()).filter((line) => line.trim().length > 0).join("\n").trim();
 
 export const prepareWctCureText = (value: string) => {
-  const matches = Array.from(value.matchAll(/\b(1er|2(?:e|è)me|3(?:e|è)me)\s+CURE(?:\s+fait)?\s+le\s+(\d{2}\/\d{2}\/\d{4})/giu));
+  const matches = Array.from(value.matchAll(/\b(1er|2(?:e|è)me)\s+CURE(?:\s+fait)?\s+le\s+(\d{2}\/\d{2}\/\d{4})/giu));
   const last = matches.at(-1);
   if (!last) return "";
-  const ordinal = last[1].toLowerCase().startsWith("1") ? "1er" : last[1].toLowerCase().startsWith("2") ? "2eme" : "3eme";
+  const ordinal = last[1].toLowerCase().startsWith("1") ? "1er" : "2eme";
   return `${ordinal} CURE le ${last[2]}`;
+};
+
+
+import type { CureRecords } from "../redux/features/newInterventionSlice";
+
+const cureRecordSortValue = (record: CureRecords["firstCure"]) => {
+  if (!record) return "";
+  return record.recordedAt || `${record.date}T${record.time}`;
+};
+
+export const prepareWctCureFromRecords = (records?: CureRecords | null) => {
+  if (!records) return "";
+
+  const candidates = [
+    { ordinal: "1er", record: records.firstCure },
+    { ordinal: "2eme", record: records.secondCure },
+  ].filter((item) => item.record?.date);
+
+  candidates.sort((a, b) =>
+    cureRecordSortValue(a.record).localeCompare(cureRecordSortValue(b.record)),
+  );
+
+  const latest = candidates.at(-1);
+  if (!latest?.record) return "";
+
+  const [year, month, day] = latest.record.date.split("-");
+  const formattedDate = year && month && day
+    ? `${day}/${month}/${year}`
+    : latest.record.date;
+
+  return `${latest.ordinal} CURE le ${formattedDate}`;
 };

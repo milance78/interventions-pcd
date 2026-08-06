@@ -33,7 +33,6 @@ import {
   createAddressClient,
   formatAddressClientsForComment,
   normalizePersonName,
-  serializeAddressClients,
 } from "../../../utils/addressClients";
 import { normalizeNaNumber } from "../../../utils/interventionAddress";
 import { parseAddressClientImport } from "../../../features/addressClientImport/addressClientImportParser";
@@ -117,7 +116,7 @@ const CopyAdornment = ({ value, label }: CopyAdornmentProps) => {
 
 type ClientFieldProps = {
   client: AddressClient;
-  field: keyof Omit<AddressClient, "id" | "mode">;
+  field: keyof Omit<AddressClient, "id" | "mode" | "isFuture">;
   label: string;
   inputRef?: React.Ref<HTMLInputElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
@@ -211,6 +210,7 @@ const ClientsOnAddress = () => {
     JSON.stringify({ addressClients, infrastructure }),
   );
   const [selectedClientId, setSelectedClientId] = React.useState<string | null>(null);
+  const [deleteClientId, setDeleteClientId] = React.useState<string | null>(null);
   const [isImportOpen, setIsImportOpen] = React.useState(false);
   const [isImportProcessing, setIsImportProcessing] = React.useState(false);
   const [importFeedback, setImportFeedback] = React.useState("");
@@ -273,14 +273,6 @@ const ClientsOnAddress = () => {
     }
 
     if (addressClients[index]?.fullName.trim()) addClient();
-  };
-
-  const copyClient = async (client: AddressClient) => {
-    const value = serializeAddressClients([client], infrastructure).replace(
-      /^1\.\s*/,
-      "",
-    );
-    if (value) await writeText(value);
   };
 
   const selectedClient =
@@ -431,15 +423,27 @@ const ClientsOnAddress = () => {
                 </span>
               </Tooltip>
 
-              <Tooltip title="Copier ce client" arrow>
+              <Tooltip title="Fut à l'adresse" arrow>
                 <span>
                   <IconButton
                     size="small"
-                    disabled={!addressClientHasData(client)}
-                    onClick={() => void copyClient(client)}
-                    aria-label={`Copier le client ${index + 1}`}
+                    className={`address-client__future ${
+                      client.isFuture ? "address-client__future--active" : ""
+                    }`}
+                    disabled={isHistoryView}
+                    onClick={() =>
+                      dispatch(
+                        updateAddressClient({
+                          id: client.id,
+                          field: "isFuture",
+                          value: !client.isFuture,
+                        }),
+                      )
+                    }
+                    aria-label={`Fut à l'adresse pour le client ${index + 1}`}
+                    aria-pressed={Boolean(client.isFuture)}
                   >
-                    <ContentCopyRounded />
+                    <span aria-hidden="true">F</span>
                   </IconButton>
                 </span>
               </Tooltip>
@@ -449,7 +453,7 @@ const ClientsOnAddress = () => {
                   size="small"
                   className="address-client__delete"
                   disabled={isHistoryView}
-                  onClick={() => dispatch(removeAddressClient(client.id))}
+                  onClick={() => setDeleteClientId(client.id)}
                   aria-label={`Supprimer le client ${index + 1}`}
                 >
                   {addressClients.length === 1 &&
@@ -464,6 +468,32 @@ const ClientsOnAddress = () => {
           </article>
         ))}
       </div>
+
+      <Dialog
+        open={Boolean(deleteClientId)}
+        onClose={() => setDeleteClientId(null)}
+        maxWidth="xs"
+        fullWidth
+        className="address-client-delete-dialog"
+        aria-labelledby="address-client-delete-dialog-title"
+      >
+        <DialogTitle id="address-client-delete-dialog-title">
+          Effacer le client ?
+        </DialogTitle>
+        <DialogActions>
+          <Button onClick={() => setDeleteClientId(null)}>Annuler</Button>
+          <Button
+            color="error"
+            variant="contained"
+            onClick={() => {
+              if (deleteClientId) dispatch(removeAddressClient(deleteClientId));
+              setDeleteClientId(null);
+            }}
+          >
+            Effacer
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog
         open={Boolean(selectedClient)}

@@ -1167,6 +1167,7 @@ const CurrentInterventionPage = () => {
             <CommentCopyActions
               value={comment}
               showWct
+              cureRecords={newIntervention.cureRecords}
             />
           </div>
 
@@ -1292,25 +1293,30 @@ const CurrentInterventionPage = () => {
       </div>
 
       {hasDraft && mode !== "NEW" && mode !== "DRAFT" && (
-        <div className="floating-draft-reminder">
-          <WarningAmberRounded />
-          <span>
-            <strong>Brouillon en cours</strong>
-            <small>Une saisie non enregistrée est disponible.</small>
-          </span>
-          <div className="floating-draft-reminder__actions">
-            <button type="button" onClick={handleResumeDraft}>
-              Reprendre
-            </button>
-            <button
+        <aside className="floating-draft-reminder" aria-label="Brouillon disponible">
+          <WarningAmberRounded className="floating-draft-reminder__status" />
+          <strong>Brouillon</strong>
+          <Tooltip title="Reprendre le brouillon" arrow>
+            <IconButton
+              type="button"
+              className="floating-draft-reminder__resume"
+              onClick={handleResumeDraft}
+              aria-label="Reprendre le brouillon"
+            >
+              <HistoryRounded />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="Supprimer le brouillon" arrow>
+            <IconButton
               type="button"
               className="floating-draft-reminder__cancel"
               onClick={handleCancelDraft}
+              aria-label="Supprimer le brouillon"
             >
-              Annuler brouillon
-            </button>
-          </div>
-        </div>
+              <CloseRounded />
+            </IconButton>
+          </Tooltip>
+        </aside>
       )}
 
       <Dialog

@@ -1048,3 +1048,29 @@ body.spreadsheet-mode {
     border: 1px solid #9c9c9c;
   }
 }
+
+/* v56: keep the draft control compact in spreadsheet mode */
+.spreadsheet-mode .floating-draft-reminder {
+  top: 45px;
+  right: 8px;
+  padding: 3px 5px 3px 7px;
+  gap: 4px;
+  color: #222;
+  background: #f2f2f2;
+  border: 1px solid #9a9a9a;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: Arial, sans-serif;
+}
+
+.spreadsheet-mode .floating-draft-reminder .floating-draft-reminder__resume {
+  color: #111 !important;
+  background: #ddd !important;
+  border-radius: 0;
+}
+
+.spreadsheet-mode .floating-draft-reminder .floating-draft-reminder__cancel {
+  color: #111 !important;
+  background: transparent !important;
+  border-radius: 0;
+}

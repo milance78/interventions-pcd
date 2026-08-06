@@ -6,10 +6,13 @@ import Tooltip from "@mui/material/Tooltip";
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import {
   prepareNpsText,
+  prepareWctCureFromRecords,
   prepareWctCureText,
   removeBlankLines,
   writeTextToClipboard,
 } from "../../utils/textUtils";
+
+import type { CureRecords } from "../../redux/features/newInterventionSlice";
 
 import "./CommentCopyActions.scss";
 
@@ -17,12 +20,14 @@ type Props = {
   value: string;
   showWct?: boolean;
   compact?: boolean;
+  cureRecords?: CureRecords | null;
 };
 
 const CommentCopyActions = ({
   value,
   showWct = false,
   compact = false,
+  cureRecords = null,
 }: Props) => {
   const [copied, setCopied] = React.useState<"normal" | "nps" | "wct" | null>(null);
 
@@ -41,7 +46,7 @@ const CommentCopyActions = ({
   };
 
   const npsValue = prepareNpsText(value);
-  const wctValue = prepareWctCureText(value);
+  const wctValue = prepareWctCureFromRecords(cureRecords) || prepareWctCureText(value);
 
   return (
     <div
