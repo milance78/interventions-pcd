@@ -477,7 +477,7 @@ const HistoryPage = () => {
 
     setRenderedGroupCount(1);
     let cancelled = false;
-    let timeoutId: number | null = null;
+    let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
     const appendBatch = () => {
       if (cancelled) return;
