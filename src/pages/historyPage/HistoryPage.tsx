@@ -1,4 +1,5 @@
 import {
+  memo,
   useEffect,
   useMemo,
   useRef,
@@ -7,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import Numbers from "@mui/icons-material/Numbers";
+import CheckRounded from "@mui/icons-material/CheckRounded";
 import {
   Contact,
   House,
@@ -42,10 +44,7 @@ import { loadInterventionFromHistory } from "../../redux/features/newInterventio
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { deleteInterventionThunk } from "../../redux/thunks/deleteInterventionThunk";
 import type { Intervention } from "../../redux/features/newInterventionSlice";
-import {
-  interventionActivityValue,
-  interventionLogicalKey,
-} from "../../utils/interventionIdentity";
+import { buildHistoryViewModel } from "../../utils/historyViewModel";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 import { writeTextToClipboard } from "../../utils/clipboard";
 
@@ -92,13 +91,32 @@ type IconValueProps = {
 };
 
 const IconValue = ({ value, icon: Icon, large = false }: IconValueProps) => {
-  const copyValue = () => {
-    void writeTextToClipboard(value);
+  const [copied, setCopied] = useState(false);
+  const resetTimerRef = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+    }
+  }, []);
+
+  const copyValue = async () => {
+    await writeTextToClipboard(value);
+    setCopied(true);
+
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+    }
+
+    resetTimerRef.current = window.setTimeout(() => {
+      setCopied(false);
+      resetTimerRef.current = null;
+    }, 1200);
   };
 
   return (
     <div
-      className="history-icon-field history-icon-field--copyable"
+      className={`history-icon-field history-icon-field--copyable ${copied ? "is-copied" : ""}`}
       role="button"
       tabIndex={0}
       title="Copier la valeur"
@@ -115,7 +133,7 @@ const IconValue = ({ value, icon: Icon, large = false }: IconValueProps) => {
           large ? "history-large-icon" : ""
         }`}
       >
-        <Icon />
+        {copied ? <CheckRounded className="history-copy-check" /> : <Icon />}
       </div>
 
       <span className="history-field-value">{value}</span>
@@ -274,17 +292,120 @@ const formatMonthTitle = (date: Date | null) => {
 const capitalizeFirstLetter = (value: string) =>
   value.charAt(0).toUpperCase() + value.slice(1);
 
+
+
+type SidebarMonth = {
+  key: string;
+  title: string;
+  dates: ReturnType<typeof buildHistoryViewModel>["navigationGroups"];
+};
+
+type HistoryNavigationProps = {
+  months: SidebarMonth[];
+  onSelectDate: (dateKey: string) => void;
+};
+
+const HistoryNavigation = memo(({
+  months,
+  onSelectDate,
+}: HistoryNavigationProps) => {
+  const [openMonthKey, setOpenMonthKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (months.length === 0) {
+      setOpenMonthKey(null);
+      return;
+    }
+
+    const now = new Date();
+    const currentMonthKey = `${now.getFullYear()}-${now.getMonth()}`;
+    const preferredMonth = months.some(
+      (month) => month.key === currentMonthKey,
+    )
+      ? currentMonthKey
+      : months[0].key;
+
+    setOpenMonthKey((current) =>
+      current && months.some((month) => month.key === current)
+        ? current
+        : preferredMonth,
+    );
+  }, [months]);
+
+  return (
+    <aside className="history-sidebar">
+      <div className="history-sidebar-inner">
+        <div className="history-sidebar-heading">
+          <span>Navigation</span>
+          <h2>Dates</h2>
+        </div>
+
+        <nav className="history-date-navigation">
+          {months.map((month) => {
+            const isOpen = openMonthKey === month.key;
+
+            return (
+              <div
+                key={month.key}
+                className={`history-sidebar-month ${isOpen ? "is-open" : ""}`}
+              >
+                <button
+                  type="button"
+                  className="history-sidebar-month-toggle"
+                  aria-expanded={isOpen}
+                  onClick={() =>
+                    setOpenMonthKey((current) =>
+                      current === month.key ? null : month.key,
+                    )
+                  }
+                >
+                  <span>{month.title}</span>
+                  <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
+                </button>
+
+                <div
+                  className="history-sidebar-dates-shell"
+                  aria-hidden={!isOpen}
+                >
+                  <div className="history-sidebar-dates">
+                    {month.dates.map((group) => (
+                      <button
+                        key={group.key}
+                        type="button"
+                        tabIndex={isOpen ? 0 : -1}
+                        onClick={() => onSelectDate(group.key)}
+                      >
+                        <span>
+                          {capitalizeFirstLetter(formatSidebarDate(group.date))}
+                        </span>
+                        <strong>{group.interventions.length}</strong>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </nav>
+      </div>
+    </aside>
+  );
+}, (previous, next) => previous.months === next.months);
+
+HistoryNavigation.displayName = "HistoryNavigation";
+
 const HistoryPage = () => {
   const [deleteTarget, setDeleteTarget] = useState<{
     documentId: string;
     dateKey: string;
   } | null>(null);
-  const [openMonthKey, setOpenMonthKey] = useState<string | null>(null);
+  const [renderedGroupCount, setRenderedGroupCount] = useState(1);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const {
     interventions,
+    dateKeys,
     isInitialized,
     isRefreshing,
     error: loadError,
@@ -293,6 +414,8 @@ const HistoryPage = () => {
   const isLoading = !isInitialized;
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const renderedGroupCountRef = useRef(renderedGroupCount);
+  renderedGroupCountRef.current = renderedGroupCount;
 
   const dateSectionRefs = useRef<
     Record<string, HTMLElement | null>
@@ -304,81 +427,21 @@ const HistoryPage = () => {
     isInitialized,
   );
 
-  const groupedInterventions = useMemo(() => {
-    const groups = new Map<
-      string,
-      {
-        key: string;
-        date: Date | null;
-        interventions: typeof interventions;
-      }
-    >();
-
-    const uniqueByDateAndTicket = new Map<string, Intervention>();
-
-    interventions.forEach((intervention) => {
-      const interventionDate = getInterventionDate(intervention);
-      const dateKey = getDateKey(interventionDate);
-      const uniqueKey = `${dateKey}:${interventionLogicalKey(intervention)}`;
-      const existing = uniqueByDateAndTicket.get(uniqueKey);
-
-      if (
-        !existing ||
-        interventionActivityValue(intervention) >
-          interventionActivityValue(existing)
-      ) {
-        uniqueByDateAndTicket.set(uniqueKey, intervention);
-      }
-    });
-
-    uniqueByDateAndTicket.forEach((intervention) => {
-      const interventionDate = getInterventionDate(intervention);
-      const dateKey = getDateKey(interventionDate);
-      const currentGroup = groups.get(dateKey);
-
-      if (currentGroup) {
-        currentGroup.interventions.push(intervention);
-      } else {
-        groups.set(dateKey, {
-          key: dateKey,
-          date: interventionDate,
-          interventions: [intervention],
-        });
-      }
-    });
-
-    groups.forEach((group) => {
-      group.interventions.sort((firstIntervention, secondIntervention) => {
-        const firstDate = getActivityDate(firstIntervention);
-        const secondDate = getActivityDate(secondIntervention);
-
-        if (!firstDate && !secondDate) return 0;
-        if (!firstDate) return 1;
-        if (!secondDate) return -1;
-
-        return secondDate.getTime() - firstDate.getTime();
-      });
-    });
-
-    return Array.from(groups.values()).sort((firstGroup, secondGroup) => {
-      if (!firstGroup.date && !secondGroup.date) return 0;
-      if (!firstGroup.date) return 1;
-      if (!secondGroup.date) return -1;
-
-      return secondGroup.date.getTime() - firstGroup.date.getTime();
-    });
-  }, [interventions]);
+  const { groupedInterventions, navigationGroups } = buildHistoryViewModel(
+    interventions,
+    dateKeys,
+  );
 
   const sidebarMonths = useMemo(() => {
     const months = new Map<
       string,
       {
         title: string;
-        dates: typeof groupedInterventions;
+        dates: typeof navigationGroups;
       }
     >();
 
-    groupedInterventions.forEach((group) => {
+    navigationGroups.forEach((group) => {
       const monthKey = group.date
         ? `${group.date.getFullYear()}-${group.date.getMonth()}`
         : "unknown-month";
@@ -401,30 +464,60 @@ const HistoryPage = () => {
       key,
       ...value,
     }));
-  }, [groupedInterventions]);
+  }, [navigationGroups]);
 
+  // Render only the first day before the initial paint. Creating every card in
+  // a large archive synchronously blocks route navigation even when CSS uses
+  // content-visibility. Remaining days are appended after the first paint.
   useEffect(() => {
-    if (sidebarMonths.length === 0) {
-      setOpenMonthKey(null);
+    if (groupedInterventions.length === 0) {
+      setRenderedGroupCount(0);
       return;
     }
 
-    const now = new Date();
-    const currentMonthKey = `${now.getFullYear()}-${now.getMonth()}`;
-    const preferredMonth = sidebarMonths.some(
-      (month) => month.key === currentMonthKey,
-    )
-      ? currentMonthKey
-      : sidebarMonths[0].key;
+    setRenderedGroupCount(1);
+    let cancelled = false;
+    let timeoutId: number | null = null;
 
-    setOpenMonthKey((current) =>
-      current && sidebarMonths.some((month) => month.key === current)
-        ? current
-        : preferredMonth,
-    );
-  }, [sidebarMonths]);
+    const appendBatch = () => {
+      if (cancelled) return;
+
+      setRenderedGroupCount((current) => {
+        const next = Math.min(current + 1, groupedInterventions.length);
+
+        if (next < groupedInterventions.length) {
+          timeoutId = globalThis.setTimeout(appendBatch, 55);
+        }
+
+        return next;
+      });
+    };
+
+    // The zero-delay task runs only after React has painted the page shell,
+    // the first date and the complete Navigation list.
+    timeoutId = globalThis.setTimeout(appendBatch, 0);
+
+    return () => {
+      cancelled = true;
+      if (timeoutId !== null) globalThis.clearTimeout(timeoutId);
+    };
+  }, [groupedInterventions]);
+
+
 
   const scrollToDate = (dateKey: string) => {
+    const groupIndex = groupedInterventions.findIndex(
+      (group) => group.key === dateKey,
+    );
+
+    if (groupIndex >= renderedGroupCountRef.current) {
+      setRenderedGroupCount(groupIndex + 1);
+      window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => scrollToDate(dateKey));
+      });
+      return;
+    }
+
     const scrollContainer = scrollContainerRef.current;
     const targetSection = dateSectionRefs.current[dateKey];
 
@@ -507,7 +600,9 @@ const HistoryPage = () => {
             <div className="history-empty">{loadError}</div>
           )}
 
-          {!isLoading && !loadError && groupedInterventions.map((group) => (
+          {!isLoading && !loadError && groupedInterventions
+            .slice(0, renderedGroupCount)
+            .map((group) => (
             <section
               key={group.key}
               id={`history-${group.key}`}
@@ -866,65 +961,10 @@ const HistoryPage = () => {
           )}
         </div>
 
-        <aside className="history-sidebar">
-          <div className="history-sidebar-inner">
-            <div className="history-sidebar-heading">
-              <span>Navigation</span>
-              <h2>Dates</h2>
-            </div>
-
-            <nav className="history-date-navigation">
-              {sidebarMonths.map((month) => {
-                const isOpen = openMonthKey === month.key;
-
-                return (
-                  <div
-                    key={month.key}
-                    className={`history-sidebar-month ${
-                      isOpen ? "is-open" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      className="history-sidebar-month-toggle"
-                      aria-expanded={isOpen}
-                      onClick={() =>
-                        setOpenMonthKey((current) =>
-                          current === month.key ? null : month.key,
-                        )
-                      }
-                    >
-                      <span>{month.title}</span>
-                      <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
-                    </button>
-
-                    {isOpen && (
-                      <div className="history-sidebar-dates">
-                        {month.dates.map((group) => (
-                          <button
-                            key={group.key}
-                            type="button"
-                            onClick={() => scrollToDate(group.key)}
-                          >
-                            <span>
-                              {capitalizeFirstLetter(
-                                formatSidebarDate(group.date),
-                              )}
-                            </span>
-
-                            <strong>
-                              {group.interventions.length}
-                            </strong>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </nav>
-          </div>
-        </aside>
+        <HistoryNavigation
+          months={sidebarMonths}
+          onSelectDate={scrollToDate}
+        />
       </div>
           <ConfirmDeleteDialog
         open={Boolean(deleteTarget)}

@@ -4,6 +4,7 @@ import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 type HistoryState = {
   interventions: Intervention[];
+  dateKeys: string[];
   isInitialized: boolean;
   isRefreshing: boolean;
   error: string;
@@ -11,6 +12,7 @@ type HistoryState = {
 
 const initialState: HistoryState = {
   interventions: [],
+  dateKeys: [],
   isInitialized: false,
   isRefreshing: false,
   error: "",
@@ -23,6 +25,9 @@ const historySlice = createSlice({
     startHistoryRefresh: (state) => {
       state.isRefreshing = true;
       state.error = "";
+    },
+    setHistoryDateKeys: (state, action: PayloadAction<string[]>) => {
+      state.dateKeys = action.payload;
     },
     setHistory: (state, action: PayloadAction<Intervention[]>) => {
       state.interventions = action.payload;
@@ -37,6 +42,7 @@ const historySlice = createSlice({
     },
     clearHistory: (state) => {
       state.interventions = [];
+      state.dateKeys = [];
       state.isInitialized = true;
       state.isRefreshing = false;
       state.error = "";
@@ -84,6 +90,7 @@ export const {
   clearHistory,
   deleteHistoryIntervention,
   setHistory,
+  setHistoryDateKeys,
   setHistoryError,
   startHistoryRefresh,
   updateHistoryIntervention,

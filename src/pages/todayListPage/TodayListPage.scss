@@ -820,3 +820,29 @@
   outline: 2px solid rgba(37, 99, 235, 0.35);
   outline-offset: 2px;
 }
+
+
+/* Instant-feedback copy affordance */
+.today-icon-field--copyable {
+  cursor: pointer;
+}
+
+.today-icon-field--copyable.is-copied {
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.today-copy-check {
+  color: #16803c;
+  animation: today-copy-check-in 180ms ease-out;
+}
+
+@keyframes today-copy-check-in {
+  from { opacity: 0; transform: scale(0.65); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .today-copy-check {
+    animation: none;
+  }
+}

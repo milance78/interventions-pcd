@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -6,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import Numbers from "@mui/icons-material/Numbers";
+import CheckRounded from "@mui/icons-material/CheckRounded";
 import {
   Contact,
   House,
@@ -119,13 +121,32 @@ const TodayIconValue = ({
   icon: Icon,
   variant = "default",
 }: TodayIconValueProps) => {
-  const copyValue = () => {
-    void writeTextToClipboard(value);
+  const [copied, setCopied] = useState(false);
+  const resetTimerRef = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+    }
+  }, []);
+
+  const copyValue = async () => {
+    await writeTextToClipboard(value);
+    setCopied(true);
+
+    if (resetTimerRef.current !== null) {
+      window.clearTimeout(resetTimerRef.current);
+    }
+
+    resetTimerRef.current = window.setTimeout(() => {
+      setCopied(false);
+      resetTimerRef.current = null;
+    }, 1200);
   };
 
   return (
     <div
-      className="today-icon-field today-icon-field--copyable"
+      className={`today-icon-field today-icon-field--copyable ${copied ? "is-copied" : ""}`}
       role="button"
       tabIndex={0}
       title="Copier la valeur"
@@ -140,7 +161,7 @@ const TodayIconValue = ({
       <div
         className={`today-field-icon-box today-${variant}-icon`}
       >
-        <Icon />
+        {copied ? <CheckRounded className="today-copy-check" /> : <Icon />}
       </div>
 
       <span className="today-field-value">

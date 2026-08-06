@@ -266,12 +266,22 @@ export interface HistoryDay {
   interventions: Intervention[];
 }
 
-export const loadCompleteHistory = async (userId: string): Promise<HistoryDay[]> => {
+export const loadHistoryDateKeys = async (userId: string): Promise<string[]> => {
   const daysSnapshot = await getDocs(collection(db, "users", userId, "days"));
+  return daysSnapshot.docs
+    .map((dayDocument) => dayDocument.id)
+    .sort((a, b) => b.localeCompare(a));
+};
+
+export const loadCompleteHistory = async (
+  userId: string,
+  suppliedDateKeys?: string[],
+): Promise<HistoryDay[]> => {
+  const dateKeys = suppliedDateKeys ?? await loadHistoryDateKeys(userId);
   const days = await Promise.all(
-    daysSnapshot.docs.map(async (dayDocument) => ({
-      dateKey: dayDocument.id,
-      interventions: await loadInterventions(userId, dayDocument.id),
+    dateKeys.map(async (dateKey) => ({
+      dateKey,
+      interventions: await loadInterventions(userId, dateKey),
     })),
   );
   return days

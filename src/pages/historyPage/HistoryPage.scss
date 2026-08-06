@@ -1044,3 +1044,61 @@
   flex: 0 0 auto;
   min-height: auto;
 }
+
+
+/* Instant-feedback copy affordance */
+.history-icon-field--copyable {
+  cursor: pointer;
+}
+
+.history-icon-field--copyable.is-copied {
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.history-copy-check {
+  color: #16803c;
+  animation: history-copy-check-in 180ms ease-out;
+}
+
+@keyframes history-copy-check-in {
+  from { opacity: 0; transform: scale(0.65); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Discreet accordion: the grid row rolls open/closed without abrupt mounting. */
+.history-sidebar-dates-shell {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition:
+    grid-template-rows 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 170ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.history-sidebar-month.is-open .history-sidebar-dates-shell {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.history-sidebar-dates-shell > .history-sidebar-dates {
+  min-height: 0;
+  overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .history-sidebar-dates-shell,
+  .history-copy-check {
+    transition: none;
+    animation: none;
+  }
+}
+
+/* Keep large archives responsive: off-screen days are not laid out or painted
+   until they approach the scroll viewport. */
+.history-date-section {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 920px;
+}
