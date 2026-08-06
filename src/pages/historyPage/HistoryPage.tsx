@@ -16,7 +16,6 @@ import {
   PhoneCall,
   TextInitial,
   Trash2,
-  UserRound,
   FileX2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -48,6 +47,7 @@ import {
   interventionLogicalKey,
 } from "../../utils/interventionIdentity";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
+import { writeTextToClipboard } from "../../utils/clipboard";
 
 const hasValue = (value?: string | null): value is string =>
   Boolean(value?.trim());
@@ -91,33 +91,57 @@ type IconValueProps = {
   large?: boolean;
 };
 
-const IconValue = ({ value, icon: Icon, large = false }: IconValueProps) => (
-  <div className="history-icon-field">
-    <div
-      className={`history-field-icon-box ${
-        large ? "history-large-icon" : ""
-      }`}
-    >
-      <Icon />
-    </div>
+const IconValue = ({ value, icon: Icon, large = false }: IconValueProps) => {
+  const copyValue = () => {
+    void writeTextToClipboard(value);
+  };
 
-    <span className="history-field-value">{value}</span>
-  </div>
-);
+  return (
+    <div
+      className="history-icon-field history-icon-field--copyable"
+      role="button"
+      tabIndex={0}
+      title="Copier la valeur"
+      onClick={copyValue}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          copyValue();
+        }
+      }}
+    >
+      <div
+        className={`history-field-icon-box ${
+          large ? "history-large-icon" : ""
+        }`}
+      >
+        <Icon />
+      </div>
+
+      <span className="history-field-value">{value}</span>
+    </div>
+  );
+};
 
 const StackedField = ({
   label,
   value,
+  compact = false,
 }: {
   label: string;
   value?: string;
+  compact?: boolean;
 }) => (
-  <div className="history-stacked-field">
+  <div
+    className={`history-stacked-field ${
+      compact ? "history-stacked-field-compact" : ""
+    }`}
+  >
     <div className="history-stacked-label">{label}</div>
 
     <div className="history-stacked-value">
-      {value || "-"}
-      {label === "Commentaire" && (
+      {compact ? <strong>{value || "-"}</strong> : value || "-"}
+      {!compact && label === "Commentaire" && (
         <CommentCopyActions value={value ?? ""} compact />
       )}
     </div>
@@ -255,6 +279,7 @@ const HistoryPage = () => {
     documentId: string;
     dateKey: string;
   } | null>(null);
+  const [openMonthKey, setOpenMonthKey] = useState<string | null>(null);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -377,6 +402,27 @@ const HistoryPage = () => {
       ...value,
     }));
   }, [groupedInterventions]);
+
+  useEffect(() => {
+    if (sidebarMonths.length === 0) {
+      setOpenMonthKey(null);
+      return;
+    }
+
+    const now = new Date();
+    const currentMonthKey = `${now.getFullYear()}-${now.getMonth()}`;
+    const preferredMonth = sidebarMonths.some(
+      (month) => month.key === currentMonthKey,
+    )
+      ? currentMonthKey
+      : sidebarMonths[0].key;
+
+    setOpenMonthKey((current) =>
+      current && sidebarMonths.some((month) => month.key === current)
+        ? current
+        : preferredMonth,
+    );
+  }, [sidebarMonths]);
 
   const scrollToDate = (dateKey: string) => {
     const scrollContainer = scrollContainerRef.current;
@@ -716,13 +762,6 @@ const HistoryPage = () => {
                           />
                         )}
 
-                        {hasValue(intervention.clientName) && (
-                          <IconValue
-                            value={intervention.clientName}
-                            icon={UserRound}
-                          />
-                        )}
-
                         {hasValue(
                           intervention.interventionDescription,
                         ) && (
@@ -781,7 +820,13 @@ const HistoryPage = () => {
                         {hasValue(intervention.snowMentioned) && <IconValue value={intervention.snowMentioned} icon={() => <SnowStatusIcon direction="none" />} />}
                       </div>
 
-                      <div className="history-column history-text-column">
+                      <div className="history-column history-text-column history-client-address-column">
+                        <StackedField
+                          label="Nom du client"
+                          value={intervention.clientName}
+                          compact
+                        />
+
                         <StackedField
                           label="Clients à l'adresse"
                           value={intervention.clientsOnAddress}
@@ -829,34 +874,54 @@ const HistoryPage = () => {
             </div>
 
             <nav className="history-date-navigation">
-              {sidebarMonths.map((month) => (
-                <div
-                  key={month.key}
-                  className="history-sidebar-month"
-                >
-                  <h3>{month.title}</h3>
+              {sidebarMonths.map((month) => {
+                const isOpen = openMonthKey === month.key;
 
-                  <div className="history-sidebar-dates">
-                    {month.dates.map((group) => (
-                      <button
-                        key={group.key}
-                        type="button"
-                        onClick={() => scrollToDate(group.key)}
-                      >
-                        <span>
-                          {capitalizeFirstLetter(
-                            formatSidebarDate(group.date),
-                          )}
-                        </span>
+                return (
+                  <div
+                    key={month.key}
+                    className={`history-sidebar-month ${
+                      isOpen ? "is-open" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      className="history-sidebar-month-toggle"
+                      aria-expanded={isOpen}
+                      onClick={() =>
+                        setOpenMonthKey((current) =>
+                          current === month.key ? null : month.key,
+                        )
+                      }
+                    >
+                      <span>{month.title}</span>
+                      <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
+                    </button>
 
-                        <strong>
-                          {group.interventions.length}
-                        </strong>
-                      </button>
-                    ))}
+                    {isOpen && (
+                      <div className="history-sidebar-dates">
+                        {month.dates.map((group) => (
+                          <button
+                            key={group.key}
+                            type="button"
+                            onClick={() => scrollToDate(group.key)}
+                          >
+                            <span>
+                              {capitalizeFirstLetter(
+                                formatSidebarDate(group.date),
+                              )}
+                            </span>
+
+                            <strong>
+                              {group.interventions.length}
+                            </strong>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </nav>
           </div>
         </aside>

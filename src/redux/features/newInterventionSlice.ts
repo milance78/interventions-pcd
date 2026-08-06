@@ -194,7 +194,7 @@ export const emptyInterventionData: InterventionData = {
   cureRecords: emptyCureRecords(),
   curePendingSince: null,
   smsEnabled: loadSmsPreference(),
-  status: "",
+  status: "on hold",
   createdAt: null,
   updatedAt: null,
 };
@@ -219,7 +219,8 @@ export const hasMeaningfulDraft = (
       key === "draftSnapshot" ||
       key === "editSnapshot" ||
       key === "hasDraft" ||
-      (key === "addressConfirmation" && value === "none")
+      (key === "addressConfirmation" && value === "none") ||
+      (key === "status" && value === "on hold")
     ) {
       return false;
     }

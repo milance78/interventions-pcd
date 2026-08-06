@@ -45,6 +45,7 @@ import {
   useAppSelector,
 } from "../../redux/store";
 import { deleteInterventionThunk } from "../../redux/thunks/deleteInterventionThunk";
+import { writeTextToClipboard } from "../../utils/clipboard";
 
 const hasValue = (
   value?: string | null,
@@ -117,19 +118,37 @@ const TodayIconValue = ({
   value,
   icon: Icon,
   variant = "default",
-}: TodayIconValueProps) => (
-  <div className="today-icon-field">
-    <div
-      className={`today-field-icon-box today-${variant}-icon`}
-    >
-      <Icon />
-    </div>
+}: TodayIconValueProps) => {
+  const copyValue = () => {
+    void writeTextToClipboard(value);
+  };
 
-    <span className="today-field-value">
-      {value}
-    </span>
-  </div>
-);
+  return (
+    <div
+      className="today-icon-field today-icon-field--copyable"
+      role="button"
+      tabIndex={0}
+      title="Copier la valeur"
+      onClick={copyValue}
+      onKeyDown={(event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          copyValue();
+        }
+      }}
+    >
+      <div
+        className={`today-field-icon-box today-${variant}-icon`}
+      >
+        <Icon />
+      </div>
+
+      <span className="today-field-value">
+        {value}
+      </span>
+    </div>
+  );
+};
 
 const TodayStackedField = ({
   label,

@@ -804,3 +804,19 @@
 .today-field-icon-box { padding-top:0; height:23px; }
 .today-field-value { line-height:23px; }
 .today-na-icon svg, .today-oag-icon svg, .today-cid-icon svg { transform:none!important; }
+
+
+.today-icon-field--copyable {
+  cursor: copy;
+  border-radius: 5px;
+  transition: background-color 120ms ease;
+}
+
+.today-icon-field--copyable:hover {
+  background: rgba(37, 99, 235, 0.06);
+}
+
+.today-icon-field--copyable:focus-visible {
+  outline: 2px solid rgba(37, 99, 235, 0.35);
+  outline-offset: 2px;
+}
