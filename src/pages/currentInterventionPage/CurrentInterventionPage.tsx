@@ -82,13 +82,14 @@ import QuestionActionOff from "../../assets/icons/QuestionActionOff.png";
 
 const ON_HOLD_EDIT_CONTEXT_KEY = "on-hold:edit-context";
 const PENDING_TAB_KEY = "on-hold:pending-tab";
-const PENDING_ANCHOR_KEY = "on-hold:pending-anchor";
+const SMART_IMPORT_AUTO_OPEN_KEY = "smart-import:auto-open";
 
 type OnHoldEditContext = {
-  tab: "res" | "snowReceived" | "snowSent";
+  tab: "res" | "snowReceived" | "snowSent" | "other";
   anchor: string;
   documentId: string;
   dateKey: string;
+  scrollTop: number;
 };
 
 const getLocalDateKey = () => {
@@ -102,11 +103,15 @@ const readOnHoldEditContext = (): OnHoldEditContext | null => {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<OnHoldEditContext>;
     const tab =
-      parsed.tab === "snowReceived" || parsed.tab === "snowSent"
+      parsed.tab === "res" ||
+      parsed.tab === "snowReceived" ||
+      parsed.tab === "snowSent" ||
+      parsed.tab === "other"
         ? parsed.tab
-        : "res";
+        : null;
 
-    return typeof parsed.anchor === "string" &&
+    return tab &&
+      typeof parsed.anchor === "string" &&
       typeof parsed.documentId === "string" &&
       typeof parsed.dateKey === "string"
       ? {
@@ -114,6 +119,10 @@ const readOnHoldEditContext = (): OnHoldEditContext | null => {
           anchor: parsed.anchor,
           documentId: parsed.documentId,
           dateKey: parsed.dateKey,
+          scrollTop:
+            typeof parsed.scrollTop === "number" && Number.isFinite(parsed.scrollTop)
+              ? parsed.scrollTop
+              : 0,
         }
       : null;
   } catch {
@@ -310,6 +319,22 @@ const CurrentInterventionPage = () => {
   } | null>(null);
   const actionNoticeTimerRef = React.useRef<number | null>(null);
   const commentInputRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const [autoOpenSmartImport] = React.useState(() => {
+    const shouldOpen = window.sessionStorage.getItem(SMART_IMPORT_AUTO_OPEN_KEY) === "1";
+    window.sessionStorage.removeItem(SMART_IMPORT_AUTO_OPEN_KEY);
+    return shouldOpen;
+  });
+  const [onHoldEditContext] = React.useState<OnHoldEditContext | null>(() => {
+    const context = readOnHoldEditContext();
+    window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
+    return context;
+  });
+  const isOpenedFromReviewableOnHold = Boolean(
+    onHoldEditContext &&
+      onHoldEditContext.documentId === newIntervention.documentId &&
+      onHoldEditContext.dateKey === (newIntervention.dateKey ?? "") &&
+      ["res", "snowReceived", "snowSent", "other"].includes(onHoldEditContext.tab),
+  );
 
   const showActionNotice = (
     key: "question" | "example" | "res",
@@ -486,9 +511,9 @@ const CurrentInterventionPage = () => {
 
     if (context.tab === "res") {
       return completed
-        ? { ...payload, isResPending: false, resConsultedDate: null }
+        ? { ...payload, isResPending: false, resReviewedDate: today }
         : onHold
-          ? { ...payload, isResPending: true, resConsultedDate: today }
+          ? { ...payload, isResPending: true, resReviewedDate: today }
           : payload;
     }
 
@@ -497,30 +522,39 @@ const CurrentInterventionPage = () => {
         ? {
             ...payload,
             isSnowReceivedPending: false,
-            snowReceivedConsultedDate: null,
+            snowReceivedReviewedDate: today,
           }
         : onHold
           ? {
               ...payload,
               isSnowReceivedPending: true,
-              snowReceivedConsultedDate: today,
+              snowReceivedReviewedDate: today,
             }
           : payload;
     }
 
-    return completed
-      ? {
-          ...payload,
-          isSnowSentPending: false,
-          snowSentConsultedDate: null,
-        }
-      : onHold
+    if (context.tab === "snowSent") {
+      return completed
         ? {
             ...payload,
-            isSnowSentPending: true,
-            snowSentConsultedDate: today,
+            isSnowSentPending: false,
+            snowSentReviewedDate: today,
           }
-        : payload;
+        : onHold
+          ? {
+              ...payload,
+              isSnowSentPending: true,
+              snowSentReviewedDate: today,
+            }
+          : payload;
+    }
+
+    // "Autre" has no pending flag of its own. It receives the review stamp
+    // only when the explicit Revu action is used.
+    return {
+      ...payload,
+      otherReviewedDate: today,
+    };
   };
 
   const submitActions = async () => {
@@ -534,11 +568,7 @@ const CurrentInterventionPage = () => {
           }
         : normalized;
 
-    const onHoldEditContext = readOnHoldEditContext();
-    const isOpenedFromOnHold =
-      Boolean(onHoldEditContext) &&
-      onHoldEditContext?.documentId === newIntervention.documentId &&
-      onHoldEditContext?.dateKey === (newIntervention.dateKey ?? "");
+    const isOpenedFromOnHold = isOpenedFromReviewableOnHold;
 
     if (isOpenedFromOnHold && onHoldEditContext) {
       safePayload = applyOnHoldConsultationState(
@@ -569,16 +599,7 @@ const CurrentInterventionPage = () => {
     if (isOpenedFromOnHold && onHoldEditContext) {
       window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
       window.sessionStorage.setItem(PENDING_TAB_KEY, onHoldEditContext.tab);
-
-      if (safePayload.status === "on hold") {
-        window.sessionStorage.setItem(
-          PENDING_ANCHOR_KEY,
-          onHoldEditContext.anchor,
-        );
-      } else {
-        window.sessionStorage.removeItem(PENDING_ANCHOR_KEY);
-      }
-
+      window.sessionStorage.setItem("scroll:on-hold", String(onHoldEditContext.scrollTop));
       navigate("/en-attente");
       return;
     }
@@ -645,16 +666,11 @@ const CurrentInterventionPage = () => {
   const addToTodayList = async () => {
     if (mode !== "SEARCH_EDIT" && mode !== "HISTORY_EDIT") return;
 
-    const onHoldEditContext = readOnHoldEditContext();
-    const isOpenedFromOnHold =
-      Boolean(onHoldEditContext) &&
-      onHoldEditContext?.documentId === newIntervention.documentId &&
-      onHoldEditContext?.dateKey === (newIntervention.dateKey ?? "");
+    const isOpenedFromOnHold = isOpenedFromReviewableOnHold;
 
-    const payload =
-      isOpenedFromOnHold && onHoldEditContext
-        ? applyOnHoldConsultationState(newIntervention, onHoldEditContext)
-        : newIntervention;
+    // Adding to today's list is not a review action. In particular it must not
+    // create the "Revu aujourd'hui" stamp.
+    const payload = newIntervention;
 
     const result = await dispatch(
       updateSearchInterventionThunk(payload),
@@ -675,16 +691,7 @@ const CurrentInterventionPage = () => {
     if (isOpenedFromOnHold && onHoldEditContext) {
       window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
       window.sessionStorage.setItem(PENDING_TAB_KEY, onHoldEditContext.tab);
-
-      if (payload.status === "on hold") {
-        window.sessionStorage.setItem(
-          PENDING_ANCHOR_KEY,
-          `${result.payload.dateKey ?? ""}::${result.payload.documentId}`,
-        );
-      } else {
-        window.sessionStorage.removeItem(PENDING_ANCHOR_KEY);
-      }
-
+      window.sessionStorage.setItem("scroll:on-hold", String(onHoldEditContext.scrollTop));
       navigate("/en-attente");
       return;
     }
@@ -768,8 +775,8 @@ const CurrentInterventionPage = () => {
               {!isHistoryView && (
                 <SmartImportDialog
                   onImported={setImportMessage}
-                  autoOpen={mode === "NEW" && !hasMeaningfulDraft(newIntervention)}
-                  focusTrigger={mode === "NEW" && hasMeaningfulDraft(newIntervention)}
+                  autoOpen={autoOpenSmartImport}
+                  focusTrigger={false}
                 />
               )}
 
@@ -1218,10 +1225,12 @@ const CurrentInterventionPage = () => {
                     variant="contained"
                     size="large"
                     onClick={submitActions}
-                    startIcon={<Send />}
-                    className="submit-intervention-button"
+                    startIcon={isOpenedFromReviewableOnHold ? <CheckRounded /> : <Send />}
+                    className={`submit-intervention-button ${
+                      isOpenedFromReviewableOnHold ? "submit-intervention-button--review" : ""
+                    }`}
                   >
-                    Enregistrer
+                    {isOpenedFromReviewableOnHold ? "Revu" : "Enregistrer"}
                   </Button>
 
                   <Button

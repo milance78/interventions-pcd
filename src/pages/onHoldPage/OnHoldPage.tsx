@@ -2,7 +2,6 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { flushSync } from "react-dom";
 import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
-import AcUnitRounded from "@mui/icons-material/AcUnitRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
 import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
@@ -20,6 +19,7 @@ import {
 import "./OnHoldPage.scss";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 import CableCutMono from "../../assets/icons/CableCutMono.png";
+import SnowStatusIcon from "../../components/snowStatusIcon/SnowStatusIcon";
 
 const CableCutIcon = () => (
   <img
@@ -44,12 +44,12 @@ const tabs: Array<{
   {
     value: "snowReceived",
     label: "Snow à mon nom",
-    icon: <AcUnitRounded />,
+    icon: <SnowStatusIcon direction="left" className="on-hold-tab-snow-icon" />,
   },
   {
     value: "snowSent",
     label: "Snow créé",
-    icon: <AcUnitRounded />,
+    icon: <SnowStatusIcon direction="right" className="on-hold-tab-snow-icon" />,
   },
   {
     value: "questions",
@@ -62,7 +62,6 @@ const tabOrder = tabs.map((tab) => tab.value);
 
 const ON_HOLD_EDIT_CONTEXT_KEY = "on-hold:edit-context";
 const PENDING_TAB_KEY = "on-hold:pending-tab";
-const PENDING_ANCHOR_KEY = "on-hold:pending-anchor";
 
 const localDateKey = () => {
   const now = new Date();
@@ -198,8 +197,8 @@ const OnHoldPage = () => {
           return infrastructureDifference;
         }
 
-        const firstConsultedToday = first.resConsultedDate === today;
-        const secondConsultedToday = second.resConsultedDate === today;
+        const firstConsultedToday = first.resReviewedDate === today;
+        const secondConsultedToday = second.resReviewedDate === today;
 
         if (firstConsultedToday !== secondConsultedToday) {
           return firstConsultedToday ? 1 : -1;
@@ -215,8 +214,8 @@ const OnHoldPage = () => {
       const today = localDateKey();
       const consultedField =
         activeTab === "snowReceived"
-          ? "snowReceivedConsultedDate"
-          : "snowSentConsultedDate";
+          ? "snowReceivedReviewedDate"
+          : "snowSentReviewedDate";
 
       return sorted.sort((first, second) => {
         const firstConsultedToday = first[consultedField] === today;
@@ -226,6 +225,20 @@ const OnHoldPage = () => {
           return firstConsultedToday ? 1 : -1;
         }
 
+        return interventionOldestValue(first).localeCompare(
+          interventionOldestValue(second),
+        );
+      });
+    }
+
+    if (activeTab === "other") {
+      const today = localDateKey();
+      return sorted.sort((first, second) => {
+        const firstReviewedToday = first.otherReviewedDate === today;
+        const secondReviewedToday = second.otherReviewedDate === today;
+        if (firstReviewedToday !== secondReviewedToday) {
+          return firstReviewedToday ? 1 : -1;
+        }
         return interventionOldestValue(first).localeCompare(
           interventionOldestValue(second),
         );
@@ -263,7 +276,8 @@ const OnHoldPage = () => {
     if (
       activeTab === "res" ||
       activeTab === "snowReceived" ||
-      activeTab === "snowSent"
+      activeTab === "snowSent" ||
+      activeTab === "other"
     ) {
       window.sessionStorage.setItem(
         ON_HOLD_EDIT_CONTEXT_KEY,
@@ -272,6 +286,7 @@ const OnHoldPage = () => {
           anchor: interventionAnchor(intervention),
           documentId: intervention.documentId,
           dateKey: intervention.dateKey ?? "",
+          scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
         }),
       );
     } else {
@@ -300,36 +315,18 @@ const OnHoldPage = () => {
   const getStatusIcon = () => {
     if (activeTab === "cure") return <PhoneInTalkRounded />;
     if (activeTab === "res") return <CableCutIcon />;
-    if (activeTab === "snowReceived" || activeTab === "snowSent") {
-      return <AcUnitRounded />;
+    if (activeTab === "snowReceived") {
+      return <SnowStatusIcon direction="left" className="on-hold-card-snow-icon" />;
+    }
+    if (activeTab === "snowSent") {
+      return <SnowStatusIcon direction="right" className="on-hold-card-snow-icon" />;
     }
     if (activeTab === "questions") return <HelpOutlineRounded />;
 
     return <MoreHorizRounded />;
   };
 
-  React.useEffect(() => {
-    if (isRefreshing) return;
 
-    const pendingAnchor = window.sessionStorage.getItem(PENDING_ANCHOR_KEY);
-    if (!pendingAnchor) return;
-
-    const frame = window.requestAnimationFrame(() => {
-      const target = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-on-hold-anchor]"),
-      ).find((element) => element.dataset.onHoldAnchor === pendingAnchor);
-
-      target?.scrollIntoView({
-        behavior: "auto",
-        block: "center",
-      });
-
-      window.sessionStorage.removeItem(PENDING_TAB_KEY);
-      window.sessionStorage.removeItem(PENDING_ANCHOR_KEY);
-    });
-
-    return () => window.cancelAnimationFrame(frame);
-  }, [activeTab, isRefreshing, current.length]);
 
   const renderCard = (
     intervention: (typeof sortedInterventions)[number],
@@ -372,13 +369,20 @@ const OnHoldPage = () => {
             </span>
 
             {((activeTab === "res" &&
-              intervention.resConsultedDate === localDateKey()) ||
+              intervention.resReviewedDate === localDateKey()) ||
               (activeTab === "snowReceived" &&
-                intervention.snowReceivedConsultedDate === localDateKey()) ||
+                intervention.snowReceivedReviewedDate === localDateKey()) ||
               (activeTab === "snowSent" &&
-                intervention.snowSentConsultedDate === localDateKey())) && (
-              <span className="on-hold-card__consulted-today">
-                Consulté aujourd&apos;hui
+                intervention.snowSentReviewedDate === localDateKey()) ||
+              (activeTab === "other" &&
+                intervention.otherReviewedDate === localDateKey())) && (
+              <span
+                className="on-hold-card__review-stamp"
+                aria-label="Revu aujourd'hui"
+                title="Revu aujourd'hui"
+              >
+                <span>Revu</span>
+                <span>aujourd&apos;hui</span>
               </span>
             )}
 

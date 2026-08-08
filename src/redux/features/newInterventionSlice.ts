@@ -88,6 +88,12 @@ export interface InterventionData {
   snowReceivedConsultedDate: string | null;
   /** Local calendar date (YYYY-MM-DD) of latest Snow créé consultation. */
   snowSentConsultedDate: string | null;
+  /** Explicit Revu markers. Kept separate from legacy consultation metadata so
+   * the visual stamp can only be created by the Revu action. */
+  resReviewedDate: string | null;
+  snowReceivedReviewedDate: string | null;
+  snowSentReviewedDate: string | null;
+  otherReviewedDate: string | null;
   isUnclear: boolean;
   addressConfirmation: AddressConfirmation;
   isGoodExample: boolean;
@@ -184,6 +190,10 @@ export const emptyInterventionData: InterventionData = {
   resConsultedDate: null,
   snowReceivedConsultedDate: null,
   snowSentConsultedDate: null,
+  resReviewedDate: null,
+  snowReceivedReviewedDate: null,
+  snowSentReviewedDate: null,
+  otherReviewedDate: null,
   isUnclear: false,
   addressConfirmation: "none",
   isGoodExample: false,
@@ -204,31 +214,33 @@ export const hasMeaningfulDraft = (
 ) => {
   if (!intervention) return false;
 
-  return Object.entries(intervention).some(([key, value]) => {
-    if (
-      key === "documentId" ||
-      key === "createdAt" ||
-      key === "updatedAt" ||
-      key === "dateKey" ||
-      key === "displayAllFields" ||
-      key === "cure" ||
-      key === "smsEnabled" ||
-      key === "mode" ||
-      key === "isEditing" ||
-      key === "isHistoryView" ||
-      key === "draftSnapshot" ||
-      key === "editSnapshot" ||
-      key === "hasDraft" ||
-      (key === "addressConfirmation" && value === "none") ||
-      (key === "status" && value === "on hold")
-    ) {
-      return false;
-    }
+  // A brouillon exists as soon as the user has changed any intervention value
+  // from the pristine form. UI-only expansion and the globally persistent SMS
+  // preference are deliberately excluded. If every value is put back to its
+  // pristine value, the brouillon disappears again.
+  const ignored = new Set<keyof InterventionData>([
+    "documentId",
+    "createdAt",
+    "updatedAt",
+    "dateKey",
+    "displayAllFields",
+    "smsEnabled",
+  ]);
 
-    if (typeof value === "boolean") return value;
-    if (Array.isArray(value)) return value.length > 0;
-    return typeof value === "string" && value.trim().length > 0;
-  });
+  return (Object.keys(emptyInterventionData) as Array<keyof InterventionData>).some(
+    (key) => {
+      if (ignored.has(key)) return false;
+
+      const current = intervention[key] ?? emptyInterventionData[key];
+      const initial = emptyInterventionData[key];
+
+      if (Array.isArray(current) || typeof current === "object") {
+        return JSON.stringify(current) !== JSON.stringify(initial);
+      }
+
+      return current !== initial;
+    },
+  );
 };
 
 const extractData = (state: Intervention): InterventionData => ({
@@ -267,6 +279,10 @@ const extractData = (state: Intervention): InterventionData => ({
   resConsultedDate: state.resConsultedDate,
   snowReceivedConsultedDate: state.snowReceivedConsultedDate,
   snowSentConsultedDate: state.snowSentConsultedDate,
+  resReviewedDate: state.resReviewedDate,
+  snowReceivedReviewedDate: state.snowReceivedReviewedDate,
+  snowSentReviewedDate: state.snowSentReviewedDate,
+  otherReviewedDate: state.otherReviewedDate,
   isUnclear: state.isUnclear,
   addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,

@@ -290,7 +290,10 @@ const ClientsOnAddress = () => {
   const importAddressClientText = (rawText: string) => {
     if (!selectedClient || !rawText.trim() || isImportProcessing) return;
 
-    const result = parseAddressClientImport(rawText);
+    const result = parseAddressClientImport(
+      rawText,
+      isCopper ? "cuivre" : "fibre",
+    );
     if (result.detectedFields.length === 0) {
       setImportFeedback("Aucune donnée reconnue dans le contenu collé.");
       return;
@@ -300,12 +303,13 @@ const ClientsOnAddress = () => {
     setImportFeedback("");
 
     window.setTimeout(() => {
-      Object.entries(result.values).forEach(([field, value]) => {
-        if (!value) return;
+      result.detectedFields.forEach((field) => {
+        const value = result.values[field];
+        if (value === undefined) return;
         dispatch(
           updateAddressClient({
             id: selectedClient.id,
-            field: field as "cid" | "utac" | "clientId" | "operator",
+            field: field as "na" | "cid" | "utac" | "clientId" | "operator",
             value,
           }),
         );
@@ -519,7 +523,7 @@ const ClientsOnAddress = () => {
             </DialogTitle>
 
             <DialogContent dividers>
-              {!isCopper && !isHistoryView && (
+              {!isHistoryView && (
                 <div className="address-client-dialog__import-row">
                   <Button
                     type="button"
@@ -533,7 +537,7 @@ const ClientsOnAddress = () => {
                       setIsImportOpen(true);
                     }}
                   >
-                    Coller SALY/xACTO
+                    Coller SALY/xACTO · {isCopper ? "Cuivre" : "Fibre"}
                   </Button>
                   {importFeedback && (
                     <span className="address-client-dialog__import-feedback">
@@ -565,7 +569,7 @@ const ClientsOnAddress = () => {
                     <ClientField
                       client={selectedClient}
                       field="operator"
-                      label="Opérateur"
+                      label="Réseau"
                     />
                     <ClientField
                       client={selectedClient}
@@ -603,7 +607,7 @@ const ClientsOnAddress = () => {
                     <ClientField
                       client={selectedClient}
                       field="operator"
-                      label="Opérateur"
+                      label="Réseau"
                     />
                     <ClientField
                       client={selectedClient}
@@ -637,7 +641,7 @@ const ClientsOnAddress = () => {
         <DialogTitle className="address-client-import-dialog__title">
           <span>
             <AddressClientImportIcon className="address-client-import-dialog__title-icon" />
-            Coller SALY/xACTO
+            Coller SALY/xACTO · {isCopper ? "Cuivre" : "Fibre"}
           </span>
           <IconButton
             aria-label="Fermer"
@@ -652,7 +656,7 @@ const ClientsOnAddress = () => {
           <textarea
             ref={importPasteTargetRef}
             className="address-client-import-dialog__paste-target"
-            aria-label="Coller le contenu SALY ou xACTO"
+            aria-label={`Coller le contenu SALY ou xACTO ${isCopper ? "Cuivre" : "Fibre"}`}
             onPaste={handleAddressClientImportPaste}
             onChange={() => undefined}
             value=""
@@ -669,13 +673,24 @@ const ClientsOnAddress = () => {
               <>
                 <CircularProgress size={38} />
                 <strong>Analyse des données…</strong>
-                <span>FCID, BSS Position, Customer ID et opérateur seront remplis.</span>
+                <span>
+                  {isCopper
+                    ? "NA, CID, ID Client et Réseau seront remplis."
+                    : "UTAC, CID, ID Client et Réseau seront remplis."}
+                </span>
               </>
             ) : (
               <>
                 <ContentPasteGoRounded className="address-client-import-dropzone__icon" />
-                <strong>Collez le contenu complet de SALY/xACTO</strong>
-                <span>Appuyez sur Ctrl + V. Le texte brut ne sera pas conservé.</span>
+                <strong>
+                  Collez le contenu complet de SALY/xACTO · {isCopper ? "Cuivre" : "Fibre"}
+                </strong>
+                <span>
+                  {isCopper
+                    ? "Le parser extrait NA, CID, ID Client et Réseau."
+                    : "Le parser extrait UTAC, CID, ID Client et Réseau."}
+                  {" "}Appuyez sur Ctrl + V. Le texte brut ne sera pas conservé.
+                </span>
                 <kbd>Ctrl + V</kbd>
               </>
             )}

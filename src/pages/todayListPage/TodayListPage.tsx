@@ -14,7 +14,6 @@ import {
   KeyRound,
   NotebookTabs,
   Pencil,
-  FileX2,
   PhoneCall,
   TextInitial,
   Trash2,
@@ -33,13 +32,14 @@ import { ReactComponent as AddressConfirmedIcon } from "../../assets/svg/Address
 import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Address not confirmed.svg.tsx";
 import { ReactComponent as IDIcon } from "../../assets/svg/ID.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
-import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
 import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
 import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
 import LetterBadge from "../../components/letterBadge/LetterBadge";
 import SnowStatusIcon from "../../components/snowStatusIcon/SnowStatusIcon";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
+import QuestionActionOn from "../../assets/icons/QuestionActionOn.png";
+import CableCutOn from "../../assets/icons/CableCutOn.png";
 
 import { loadInterventionForEdit } from "../../redux/features/newInterventionSlice";
 import {
@@ -404,7 +404,12 @@ const TodayListPage = () => {
                     <div className="today-flags-section">
                       {intervention.isUnclear && (
                         <TodayBooleanIcon>
-                          <QuestionMarkOnIcon />
+                          <img
+                            src={QuestionActionOn}
+                            alt="Question pour M&P"
+                            title="Question pour M&P"
+                            className="today-question-action-icon"
+                          />
                         </TodayBooleanIcon>
                       )}
 
@@ -445,10 +450,12 @@ const TodayListPage = () => {
                             }).resPending,
                         ) && (
                         <TodayBooleanIcon>
-                          <span className="today-flag-res" title="Résiliation en attente">
-                            <FileX2 />
-                            <small>RES</small>
-                          </span>
+                          <img
+                            src={CableCutOn}
+                            alt="Résiliation en attente"
+                            title="Résiliation en attente"
+                            className="today-cable-cut-icon"
+                          />
                         </TodayBooleanIcon>
                       )}
 

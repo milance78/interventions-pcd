@@ -806,3 +806,54 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
 }
 
 .on-hold-card__snow-ticket strong, .on-hold-card__snow-ticket span { color:#c66a12!important; }
+
+/* Directional snow icons: same visual language as Liste du jour / Historique. */
+.on-hold-tab-snow-icon,
+.on-hold-card-snow-icon {
+  color: currentColor;
+}
+
+.on-hold-tab-snow-icon {
+  width: 31px;
+  min-width: 31px;
+  height: 29px;
+}
+
+.on-hold-card-snow-icon {
+  width: 29px;
+  min-width: 29px;
+  height: 27px;
+}
+
+/* Explicit review stamp. It is written only by the Revu action. */
+.on-hold-card__review-stamp {
+  width: 76px;
+  height: 76px;
+  margin-top: 1px;
+  box-sizing: border-box;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: #2e7d5a;
+  background: rgba(248, 255, 251, 0.9);
+  border: 2px solid rgba(46, 125, 90, 0.72);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 0 0 3px rgba(46, 125, 90, 0.09),
+    0 2px 5px rgba(31, 93, 67, 0.09);
+  font-size: 10px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
+  transform: rotate(-7deg);
+  user-select: none;
+}
+
+.on-hold-card__review-stamp span:last-child {
+  font-size: 8.5px;
+  letter-spacing: 0.01em;
+}

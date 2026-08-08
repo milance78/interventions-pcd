@@ -143,6 +143,18 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
       typeof data.snowSentConsultedDate === "string"
         ? data.snowSentConsultedDate
         : null,
+    resReviewedDate:
+      typeof data.resReviewedDate === "string" ? data.resReviewedDate : null,
+    snowReceivedReviewedDate:
+      typeof data.snowReceivedReviewedDate === "string"
+        ? data.snowReceivedReviewedDate
+        : null,
+    snowSentReviewedDate:
+      typeof data.snowSentReviewedDate === "string"
+        ? data.snowSentReviewedDate
+        : null,
+    otherReviewedDate:
+      typeof data.otherReviewedDate === "string" ? data.otherReviewedDate : null,
     isSnow: isSnowReceivedPending || isSnowSentPending,
     comment,
     addressConfirmation,

@@ -1,6 +1,7 @@
 import {
   memo,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -18,7 +19,6 @@ import {
   PhoneCall,
   TextInitial,
   Trash2,
-  FileX2,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -32,13 +32,14 @@ import { ReactComponent as AddressConfirmedIcon } from "../../assets/svg/Address
 import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Address not confirmed.svg.tsx";
 import { ReactComponent as IDIcon } from "../../assets/svg/ID.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
-import { ReactComponent as QuestionMarkOnIcon } from "../../assets/svg/Question mark on.svg.tsx";
 import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
 import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
 import LetterBadge from "../../components/letterBadge/LetterBadge";
 import SnowStatusIcon from "../../components/snowStatusIcon/SnowStatusIcon";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
+import QuestionActionOn from "../../assets/icons/QuestionActionOn.png";
+import CableCutOn from "../../assets/icons/CableCutOn.png";
 
 import { loadInterventionFromHistory } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
@@ -310,6 +311,7 @@ const HistoryNavigation = memo(({
   onSelectDate,
 }: HistoryNavigationProps) => {
   const [openMonthKey, setOpenMonthKey] = useState<string | null>(null);
+  const navigationRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (months.length === 0) {
@@ -323,7 +325,7 @@ const HistoryNavigation = memo(({
       (month) => month.key === currentMonthKey,
     )
       ? currentMonthKey
-      : months[0].key;
+      : months[months.length - 1].key;
 
     setOpenMonthKey((current) =>
       current && months.some((month) => month.key === current)
@@ -331,6 +333,23 @@ const HistoryNavigation = memo(({
         : preferredMonth,
     );
   }, [months]);
+
+  useLayoutEffect(() => {
+    const navigation = navigationRef.current;
+    if (
+      !navigation ||
+      months.length === 0 ||
+      openMonthKey !== months[months.length - 1].key
+    ) return;
+
+    // Oldest entries are above, newest are below. Start at the bottom so the
+    // most recent date is always immediately visible.
+    const frame = window.requestAnimationFrame(() => {
+      navigation.scrollTop = navigation.scrollHeight;
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [months, openMonthKey]);
 
   return (
     <aside className="history-sidebar">
@@ -340,7 +359,7 @@ const HistoryNavigation = memo(({
           <h2>Dates</h2>
         </div>
 
-        <nav className="history-date-navigation">
+        <nav ref={navigationRef} className="history-date-navigation">
           {months.map((month) => {
             const isOpen = openMonthKey === month.key;
 
@@ -420,6 +439,7 @@ const HistoryPage = () => {
   const dateSectionRefs = useRef<
     Record<string, HTMLElement | null>
   >({});
+  const pendingScrollDateRef = useRef<string | null>(null);
 
   usePersistentElementScroll(
     "history",
@@ -441,7 +461,7 @@ const HistoryPage = () => {
       }
     >();
 
-    navigationGroups.forEach((group) => {
+    [...navigationGroups].reverse().forEach((group) => {
       const monthKey = group.date
         ? `${group.date.getFullYear()}-${group.date.getMonth()}`
         : "unknown-month";
@@ -505,31 +525,17 @@ const HistoryPage = () => {
 
 
 
-  const scrollToDate = (dateKey: string) => {
-    const groupIndex = groupedInterventions.findIndex(
-      (group) => group.key === dateKey,
-    );
-
-    if (groupIndex >= renderedGroupCountRef.current) {
-      setRenderedGroupCount(groupIndex + 1);
-      window.requestAnimationFrame(() => {
-        window.requestAnimationFrame(() => scrollToDate(dateKey));
-      });
-      return;
-    }
-
+  const performScrollToDate = (dateKey: string) => {
     const scrollContainer = scrollContainerRef.current;
     const targetSection = dateSectionRefs.current[dateKey];
 
-    if (!scrollContainer || !targetSection) return;
+    if (!scrollContainer || !targetSection) return false;
 
     const containerRect = scrollContainer.getBoundingClientRect();
     const targetRect = targetSection.getBoundingClientRect();
-
     const startPosition = scrollContainer.scrollTop;
     const targetPosition =
       startPosition + targetRect.top - containerRect.top - 4;
-
     const distance = targetPosition - startPosition;
     const duration = 260;
     const startTime = performance.now();
@@ -537,22 +543,57 @@ const HistoryPage = () => {
     const animateScroll = (currentTime: number) => {
       const elapsedTime = currentTime - startTime;
       const progress = Math.min(elapsedTime / duration, 1);
-
       const easedProgress =
         progress < 0.5
           ? 2 * progress * progress
           : 1 - Math.pow(-2 * progress + 2, 2) / 2;
 
-      scrollContainer.scrollTop =
-        startPosition + distance * easedProgress;
+      scrollContainer.scrollTop = startPosition + distance * easedProgress;
 
       if (progress < 1) {
-        requestAnimationFrame(animateScroll);
+        window.requestAnimationFrame(animateScroll);
       }
     };
 
-    requestAnimationFrame(animateScroll);
+    window.requestAnimationFrame(animateScroll);
+    return true;
   };
+
+  const scrollToDate = (dateKey: string) => {
+    const groupIndex = groupedInterventions.findIndex(
+      (group) => group.key === dateKey,
+    );
+    if (groupIndex < 0) return;
+
+    pendingScrollDateRef.current = dateKey;
+    setRenderedGroupCount((current) => Math.max(current, groupIndex + 1));
+
+    // If the section already exists there is no reason to wait for another
+    // render. Otherwise useLayoutEffect below performs the scroll exactly once
+    // after React has committed the requested date section.
+    if (groupIndex < renderedGroupCountRef.current && performScrollToDate(dateKey)) {
+      pendingScrollDateRef.current = null;
+    }
+  };
+
+  useLayoutEffect(() => {
+    const pendingDate = pendingScrollDateRef.current;
+    if (!pendingDate) return;
+
+    const groupIndex = groupedInterventions.findIndex(
+      (group) => group.key === pendingDate,
+    );
+    if (groupIndex < 0 || groupIndex >= renderedGroupCount) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      if (performScrollToDate(pendingDate)) {
+        pendingScrollDateRef.current = null;
+      }
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [renderedGroupCount, groupedInterventions]);
+
 
   useEffect(() => {
     if (!isInitialized || groupedInterventions.length === 0) return;
@@ -759,7 +800,12 @@ const HistoryPage = () => {
                         <div className="history-flags-section">
                           {intervention.isUnclear && (
                             <BooleanIcon>
-                              <QuestionMarkOnIcon />
+                              <img
+                                src={QuestionActionOn}
+                                alt="Question pour M&P"
+                                title="Question pour M&P"
+                                className="history-question-action-icon"
+                              />
                             </BooleanIcon>
                           )}
 
@@ -800,13 +846,12 @@ const HistoryPage = () => {
                             }).resPending,
                         ) && (
                             <BooleanIcon>
-                              <span
-                                className="history-flag-res"
+                              <img
+                                src={CableCutOn}
+                                alt="Résiliation en attente"
                                 title="Résiliation en attente"
-                              >
-                                <FileX2 />
-                                <small>RES</small>
-                              </span>
+                                className="history-cable-cut-icon"
+                              />
                             </BooleanIcon>
                           )}
 

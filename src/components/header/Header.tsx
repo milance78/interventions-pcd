@@ -33,6 +33,8 @@ const DialogTransition = React.forwardRef(function DialogTransition(
   return <Grow ref={ref} {...props} timeout={180} />;
 });
 
+const SMART_IMPORT_AUTO_OPEN_KEY = "smart-import:auto-open";
+
 const Header = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -71,7 +73,15 @@ const Header = () => {
     setSpreadsheetMode((current) => !current);
   };
 
-  const openCurrentPage = () => navigate("/intervention-en-cours");
+  const openCurrentPage = (autoOpenSmartImport = false) => {
+    if (autoOpenSmartImport) {
+      window.sessionStorage.setItem(SMART_IMPORT_AUTO_OPEN_KEY, "1");
+    } else {
+      window.sessionStorage.removeItem(SMART_IMPORT_AUTO_OPEN_KEY);
+    }
+
+    navigate("/intervention-en-cours");
+  };
 
   const closeNewInterventionDialog = () => {
     setNewDialogOpen(false);
@@ -84,19 +94,19 @@ const Header = () => {
     }
 
     dispatch(startNewIntervention());
-    openCurrentPage();
+    openCurrentPage(true);
   };
 
   const handleResumeDraft = () => {
     dispatch(resumeDraft());
     closeNewInterventionDialog();
-    openCurrentPage();
+    openCurrentPage(false);
   };
 
   const handleStartFresh = () => {
     dispatch(startNewIntervention());
     closeNewInterventionDialog();
-    openCurrentPage();
+    openCurrentPage(true);
   };
 
   const date = now.toLocaleDateString("fr-BE");
