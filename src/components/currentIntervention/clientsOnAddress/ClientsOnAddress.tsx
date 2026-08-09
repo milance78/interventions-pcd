@@ -447,7 +447,7 @@ const ClientsOnAddress = () => {
                     aria-label={`Fut à l'adresse pour le client ${index + 1}`}
                     aria-pressed={Boolean(client.isFuture)}
                   >
-                    <span aria-hidden="true">F</span>
+                    <span aria-hidden="true">f</span>
                   </IconButton>
                 </span>
               </Tooltip>

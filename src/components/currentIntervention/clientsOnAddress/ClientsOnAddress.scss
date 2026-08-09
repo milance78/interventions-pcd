@@ -168,20 +168,28 @@
 .address-client__actions {
   display: flex;
   flex-direction: row;
-  align-items: center;
-  align-self: center;
-  gap: 1px;
+  align-items: flex-end;
+  align-self: end;
+  gap: 3px;
+  height: 34px;
   padding-top: 0;
 
+  > span {
+    display: flex;
+    align-items: flex-end;
+    height: 34px;
+  }
+
   .MuiIconButton-root {
-    width: 25px;
-    height: 25px;
+    width: 30px;
+    height: 30px;
+    padding: 4px;
     color: #64748b;
-    border-radius: 6px;
+    border-radius: 7px;
 
     svg {
-      width: 16px;
-      height: 16px;
+      width: 20px;
+      height: 20px;
     }
   }
 }
@@ -191,7 +199,12 @@
   background: #eff6ff !important;
 }
 
-.address-client__delete:hover {
+.address-client__details:hover:not(:disabled) {
+  color: #1e40af !important;
+  background: #dbeafe !important;
+}
+
+.address-client__delete:hover:not(:disabled) {
   color: #b91c1c !important;
   background: #fee2e2 !important;
 }
@@ -415,33 +428,48 @@
 /* v56: future client toggle and delete confirmation */
 .address-client__future {
   color: #94a3b8 !important;
-  background: transparent !important;
-  border: 0 !important;
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 7px !important;
   box-shadow: none !important;
   transform: none !important;
-  transition: color 120ms ease, opacity 120ms ease !important;
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    border-color 140ms ease,
+    box-shadow 140ms ease !important;
 
   > span {
-    display: block;
-    font-size: 17px;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    font-size: 20px;
     font-weight: 800;
     line-height: 1;
+    transform: translateY(-1px);
   }
 
   &:hover:not(:disabled),
   &:active:not(:disabled) {
     color: #64748b !important;
-    background: transparent !important;
+    background: #e2e8f0 !important;
+    border-color: #94a3b8 !important;
     transform: none !important;
   }
 }
 
 .address-client__future--active {
-  color: #0f9f8f !important;
+  color: #f0fdf4 !important;
+  background: #166534 !important;
+  border-color: #14532d !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08) !important;
 
   &:hover:not(:disabled),
   &:active:not(:disabled) {
-    color: #0b7f74 !important;
+    color: #ffffff !important;
+    background: #14532d !important;
+    border-color: #14532d !important;
   }
 }
 
