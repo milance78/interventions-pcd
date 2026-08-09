@@ -1184,8 +1184,8 @@
   }
 
   .address-confirmation-button {
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     padding: 0;
     border: 0;
     border-radius: 12px;
@@ -1229,17 +1229,17 @@
   .address-confirmation-icon-stack {
     position: relative;
     display: block;
-    width: 44px;
-    height: 44px;
-    flex: 0 0 44px;
+    width: 52px;
+    height: 52px;
+    flex: 0 0 52px;
   }
 
   .address-confirmation-icon {
     position: absolute;
     inset: 0;
     display: block;
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     overflow: visible;
     pointer-events: none;
     transition: opacity 90ms linear;
