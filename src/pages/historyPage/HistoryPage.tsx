@@ -632,7 +632,7 @@ const HistoryPage = () => {
     // There is deliberately no second corrective scroll: that was the source
     // of the visible "correct date -> wrong date" jump.
     let secondFrame = 0;
-    let finishTimer: ReturnType<typeof setTimeout> | null = null;
+    let finishTimer: number | null = null;
 
     const firstFrame = window.requestAnimationFrame(() => {
       secondFrame = window.requestAnimationFrame(() => {
