@@ -530,10 +530,7 @@ const HistoryPage = () => {
 
 
 
-  const performScrollToDate = (
-    dateKey: string,
-    behavior: ScrollBehavior = "smooth",
-  ) => {
+  const performScrollToDate = (dateKey: string) => {
     const scrollContainer = scrollContainerRef.current;
     const targetSection = dateSectionRefs.current[dateKey];
 
@@ -541,13 +538,45 @@ const HistoryPage = () => {
 
     const containerRect = scrollContainer.getBoundingClientRect();
     const targetRect = targetSection.getBoundingClientRect();
-    const targetPosition =
-      scrollContainer.scrollTop + targetRect.top - containerRect.top - 4;
+    const start = scrollContainer.scrollTop;
+    const target = Math.max(
+      0,
+      start + targetRect.top - containerRect.top - 4,
+    );
+    const distance = target - start;
 
-    scrollContainer.scrollTo({
-      top: Math.max(0, targetPosition),
-      behavior,
-    });
+    if (Math.abs(distance) < 2) {
+      scrollContainer.scrollTop = target;
+      return true;
+    }
+
+    // Native smooth scrolling can fight with sticky headers/layout updates and
+    // appear to stutter or briefly reverse. Keep a fixed start/end point and
+    // animate scrollTop monotonically ourselves instead.
+    const duration = Math.min(620, Math.max(280, Math.abs(distance) * 0.18));
+    const startedAt = performance.now();
+
+    scrollContainer.classList.add("history-content--programmatic-scroll");
+
+    const easeInOutCubic = (progress: number) =>
+      progress < 0.5
+        ? 4 * progress * progress * progress
+        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+    const animate = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / duration);
+      const eased = easeInOutCubic(progress);
+      scrollContainer.scrollTop = start + distance * eased;
+
+      if (progress < 1) {
+        window.requestAnimationFrame(animate);
+      } else {
+        scrollContainer.scrollTop = target;
+        scrollContainer.classList.remove("history-content--programmatic-scroll");
+      }
+    };
+
+    window.requestAnimationFrame(animate);
     return true;
   };
 
@@ -580,7 +609,7 @@ const HistoryPage = () => {
 
     const firstFrame = window.requestAnimationFrame(() => {
       secondFrame = window.requestAnimationFrame(() => {
-        if (!performScrollToDate(pendingDate, "smooth")) return;
+        if (!performScrollToDate(pendingDate)) return;
 
         finishTimer = window.setTimeout(() => {
           pendingScrollDateRef.current = null;

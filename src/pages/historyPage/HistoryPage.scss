@@ -44,6 +44,12 @@
 
   scroll-behavior: auto;
   scroll-padding-top: 4px;
+  overflow-anchor: none;
+}
+
+.history-content--programmatic-scroll {
+  scroll-behavior: auto;
+  overflow-anchor: none;
 }
 
 .history-page-header {
