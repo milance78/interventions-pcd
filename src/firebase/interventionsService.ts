@@ -546,15 +546,90 @@ export const loadLatestInterventions = async (userId: string): Promise<Intervent
   return Array.from(latestByLogicalKey.values());
 };
 
-export const searchInterventions = async (userId: string, searchValue: string): Promise<Intervention[]> => {
-  const normalizedSearchValue = searchValue.trim().toLowerCase();
-  if (!normalizedSearchValue) return [];
+export type SearchCriterion = {
+  label: "Intervention ID" | "OAG ID" | "Snow mentionné" | "Snow à mon nom" | "Snow créé";
+  value: string;
+};
+
+export type SearchInterventionResult = {
+  intervention: Intervention;
+  criterion: SearchCriterion;
+};
+
+type SearchMode = "exact" | "digits";
+
+const prepareSearchValue = (rawValue: string): { value: string; mode: SearchMode } => {
+  const trimmed = rawValue.trim();
+
+  if (trimmed.length === 18) {
+    return { value: trimmed, mode: "exact" };
+  }
+
+  if (trimmed.length === 17) {
+    return { value: `${trimmed}9`, mode: "exact" };
+  }
+
+  return { value: trimmed.replace(/\D/g, ""), mode: "digits" };
+};
+
+const numericPart = (value?: string | null) => (value ?? "").replace(/\D/g, "");
+
+export const searchInterventions = async (
+  userId: string,
+  searchValue: string,
+): Promise<SearchInterventionResult[]> => {
+  const prepared = prepareSearchValue(searchValue);
+  if (!prepared.value) return [];
+
   const active = await loadLatestInterventions(userId);
-  return active
-    .filter((intervention) => {
-      const interventionId = intervention.interventionId?.trim().toLowerCase() ?? "";
-      const oagId = intervention.oagID?.trim().toLowerCase() ?? "";
-      return interventionId === normalizedSearchValue || oagId === normalizedSearchValue;
-    })
-    .sort((first, second) => interventionActivityValue(second).localeCompare(interventionActivityValue(first)));
+
+  const matchMainIdentifier = (candidate?: string | null) => {
+    const trimmedCandidate = candidate?.trim() ?? "";
+    return prepared.mode === "exact"
+      ? trimmedCandidate === prepared.value
+      : numericPart(trimmedCandidate) === prepared.value;
+  };
+
+  const matches: SearchInterventionResult[] = [];
+
+  active.forEach((intervention) => {
+    let criterion: SearchCriterion | null = null;
+
+    if (matchMainIdentifier(intervention.interventionId)) {
+      criterion = {
+        label: "Intervention ID",
+        value: intervention.interventionId.trim(),
+      };
+    } else if (matchMainIdentifier(intervention.oagID)) {
+      criterion = {
+        label: "OAG ID",
+        value: intervention.oagID.trim(),
+      };
+    } else {
+      const snowCandidates: Array<[SearchCriterion["label"], string]> = [
+        ["Snow mentionné", intervention.snowMentioned ?? ""],
+        ["Snow à mon nom", intervention.snowReceived ?? ""],
+        ["Snow créé", intervention.snowSent ?? ""],
+      ];
+
+      const snowMatch = snowCandidates.find(([, value]) => {
+        const digits = numericPart(value);
+        return Boolean(digits) && digits === prepared.value;
+      });
+
+      if (snowMatch) {
+        criterion = { label: snowMatch[0], value: numericPart(snowMatch[1]) };
+      }
+    }
+
+    if (criterion) {
+      matches.push({ intervention, criterion });
+    }
+  });
+
+  return matches.sort((first, second) =>
+    interventionActivityValue(second.intervention).localeCompare(
+      interventionActivityValue(first.intervention),
+    ),
+  );
 };

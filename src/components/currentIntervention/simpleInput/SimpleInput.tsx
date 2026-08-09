@@ -130,11 +130,19 @@ const SimpleInput = ({
             }
             sx={{
               "& .MuiOutlinedInput-root": {
+                minHeight: "40px",
+                height: "40px",
+                boxSizing: "border-box",
                 borderRadius: "4px",
               },
               "& .MuiOutlinedInput-input": {
-                textAlign: "center",
+                height: "40px",
+                boxSizing: "border-box",
+                paddingTop: 0,
+                paddingBottom: 0,
                 paddingRight: "44px",
+                lineHeight: "40px",
+                textAlign: "center",
               },
               "& .MuiOutlinedInput-notchedOutline":
                 {

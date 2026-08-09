@@ -43,6 +43,19 @@
     }
   }
 
+
+  .inputs-row--client-description {
+    .simple-input--client-id {
+      flex: 0 1 30%;
+      width: 30%;
+    }
+
+    .simple-input--intervention-description {
+      flex: 1 1 70%;
+      width: 70%;
+    }
+  }
+
   .inputs-row--lom-phone {
     .simple-input--lom-key {
       flex: 0 1 30%;
@@ -216,10 +229,13 @@
     .inputs-row--half,
     .inputs-row--full,
     .inputs-row--address-line,
-    .inputs-row--lom-phone {
+    .inputs-row--lom-phone,
+    .inputs-row--client-description {
       > *,
       .simple-input--main-address,
       .simple-input--lom-key,
+      .simple-input--client-id,
+      .simple-input--intervention-description,
       .address-mini-input,
       .simple-input--phone {
         flex: 1 1 auto;

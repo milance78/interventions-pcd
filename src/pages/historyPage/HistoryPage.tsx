@@ -419,6 +419,9 @@ const HistoryPage = () => {
     dateKey: string;
   } | null>(null);
   const [renderedGroupCount, setRenderedGroupCount] = useState(1);
+  const [isDateNavigationActive, setIsDateNavigationActive] = useState(false);
+  const isDateNavigationActiveRef = useRef(false);
+  isDateNavigationActiveRef.current = isDateNavigationActive;
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -433,9 +436,6 @@ const HistoryPage = () => {
   const isLoading = !isInitialized;
 
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const renderedGroupCountRef = useRef(renderedGroupCount);
-  renderedGroupCountRef.current = renderedGroupCount;
-
   const dateSectionRefs = useRef<
     Record<string, HTMLElement | null>
   >({});
@@ -502,6 +502,11 @@ const HistoryPage = () => {
     const appendBatch = () => {
       if (cancelled) return;
 
+      if (isDateNavigationActiveRef.current) {
+        timeoutId = globalThis.setTimeout(appendBatch, 55);
+        return;
+      }
+
       setRenderedGroupCount((current) => {
         const next = Math.min(current + 1, groupedInterventions.length);
 
@@ -525,7 +530,10 @@ const HistoryPage = () => {
 
 
 
-  const performScrollToDate = (dateKey: string) => {
+  const performScrollToDate = (
+    dateKey: string,
+    behavior: ScrollBehavior = "smooth",
+  ) => {
     const scrollContainer = scrollContainerRef.current;
     const targetSection = dateSectionRefs.current[dateKey];
 
@@ -533,29 +541,13 @@ const HistoryPage = () => {
 
     const containerRect = scrollContainer.getBoundingClientRect();
     const targetRect = targetSection.getBoundingClientRect();
-    const startPosition = scrollContainer.scrollTop;
     const targetPosition =
-      startPosition + targetRect.top - containerRect.top - 4;
-    const distance = targetPosition - startPosition;
-    const duration = 260;
-    const startTime = performance.now();
+      scrollContainer.scrollTop + targetRect.top - containerRect.top - 4;
 
-    const animateScroll = (currentTime: number) => {
-      const elapsedTime = currentTime - startTime;
-      const progress = Math.min(elapsedTime / duration, 1);
-      const easedProgress =
-        progress < 0.5
-          ? 2 * progress * progress
-          : 1 - Math.pow(-2 * progress + 2, 2) / 2;
-
-      scrollContainer.scrollTop = startPosition + distance * easedProgress;
-
-      if (progress < 1) {
-        window.requestAnimationFrame(animateScroll);
-      }
-    };
-
-    window.requestAnimationFrame(animateScroll);
+    scrollContainer.scrollTo({
+      top: Math.max(0, targetPosition),
+      behavior,
+    });
     return true;
   };
 
@@ -566,34 +558,43 @@ const HistoryPage = () => {
     if (groupIndex < 0) return;
 
     pendingScrollDateRef.current = dateKey;
+    setIsDateNavigationActive(true);
     setRenderedGroupCount((current) => Math.max(current, groupIndex + 1));
-
-    // If the section already exists there is no reason to wait for another
-    // render. Otherwise useLayoutEffect below performs the scroll exactly once
-    // after React has committed the requested date section.
-    if (groupIndex < renderedGroupCountRef.current && performScrollToDate(dateKey)) {
-      pendingScrollDateRef.current = null;
-    }
   };
 
   useLayoutEffect(() => {
     const pendingDate = pendingScrollDateRef.current;
-    if (!pendingDate) return;
+    if (!pendingDate || !isDateNavigationActive) return;
 
     const groupIndex = groupedInterventions.findIndex(
       (group) => group.key === pendingDate,
     );
     if (groupIndex < 0 || groupIndex >= renderedGroupCount) return;
 
-    const frame = window.requestAnimationFrame(() => {
-      if (performScrollToDate(pendingDate)) {
-        pendingScrollDateRef.current = null;
-      }
+    // At this point the target and every section above it are really mounted.
+    // Wait two frames for their final layout, then make one smooth jump.
+    // There is deliberately no second corrective scroll: that was the source
+    // of the visible "correct date -> wrong date" jump.
+    let secondFrame = 0;
+    let finishTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const firstFrame = window.requestAnimationFrame(() => {
+      secondFrame = window.requestAnimationFrame(() => {
+        if (!performScrollToDate(pendingDate, "smooth")) return;
+
+        finishTimer = window.setTimeout(() => {
+          pendingScrollDateRef.current = null;
+          setIsDateNavigationActive(false);
+        }, 700);
+      });
     });
 
-    return () => window.cancelAnimationFrame(frame);
-  }, [renderedGroupCount, groupedInterventions]);
-
+    return () => {
+      window.cancelAnimationFrame(firstFrame);
+      if (secondFrame) window.cancelAnimationFrame(secondFrame);
+      if (finishTimer !== null) window.clearTimeout(finishTimer);
+    };
+  }, [renderedGroupCount, groupedInterventions, isDateNavigationActive]);
 
   useEffect(() => {
     if (!isInitialized || groupedInterventions.length === 0) return;

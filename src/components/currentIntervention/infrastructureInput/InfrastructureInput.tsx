@@ -38,7 +38,7 @@ const InfrastructureInput = () => {
             },
           }}
         >
-          Infrastructure
+          Technologie
         </InputLabel>
       )}
 
@@ -46,13 +46,13 @@ const InfrastructureInput = () => {
         labelId={!isEmpty ? "infrastructure-label" : undefined}
         id="infrastructure-select"
         value={infrastructure}
-        label={!isEmpty ? "Infrastructure" : undefined}
+        label={!isEmpty ? "Technologie" : undefined}
         displayEmpty
         notched={!isEmpty}
         onChange={handleChange}
         renderValue={(selected) =>
           selected === "" ? (
-            <span className="core-select-placeholder">Infrastructure</span>
+            <span className="core-select-placeholder">Technologie</span>
           ) : selected === "fiber" ? (
             "Fibre"
           ) : (
@@ -65,8 +65,9 @@ const InfrastructureInput = () => {
             alignItems: "center",
             minHeight: "0 !important",
             height: "40px",
-            padding: "0 38px 0 13px !important",
+            padding: isEmpty ? "0 38px 0 13px !important" : "0 38px !important",
             boxSizing: "border-box",
+            justifyContent: isEmpty ? "flex-start" : "center",
             lineHeight: "20px",
             fontWeight: 400,
             color: isEmpty ? "#9aa7bb" : "#111827",

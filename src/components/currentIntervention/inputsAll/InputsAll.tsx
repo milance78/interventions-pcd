@@ -53,21 +53,21 @@ const InputsAll = () => {
 
   return (
     <div className="inputs-all">
-      <section className="inputs-row inputs-row--full">
+      <section className="inputs-row inputs-row--client-description">
         <SimpleInput
           field="clientID"
           label="ID client"
           inputType="type2"
           icon={Contact}
+          className="simple-input--client-id"
         />
-      </section>
 
-      <section className="inputs-row inputs-row--full">
         <SimpleInput
           field="interventionDescription"
           label="Description d'intervention"
           inputType="type2"
           icon={TextInitial}
+          className="simple-input--intervention-description"
         />
       </section>
 

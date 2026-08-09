@@ -1,17 +1,37 @@
+import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Pencil } from "lucide-react";
 
-import "../todayListPage/TodayListPage.scss";
+import "../onHoldPage/OnHoldPage.scss";
 import "./SearchResultsPage.scss";
 
-import type { Intervention } from "../../redux/features/newInterventionSlice";
+import type { SearchInterventionResult } from "../../firebase/interventionsService";
 import { loadInterventionFromSearch } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch } from "../../redux/store";
 
 interface SearchLocationState {
   query?: string;
-  results?: Intervention[];
+  results?: SearchInterventionResult[];
 }
+
+const infrastructureLabel = (value?: string) => {
+  const normalized = value?.trim().toLowerCase();
+  if (normalized === "fiber" || normalized === "fibre") return "FIBRE";
+  if (normalized === "copper" || normalized === "cuivre") return "CUIVRE";
+  return value?.trim().toUpperCase() || "—";
+};
+
+
+const statusLabel = (value?: string) => {
+  const labels: Record<string, string> = {
+    completed: "TERMINÉ",
+    "on hold": "EN ATTENTE",
+    transferred: "TRANSMIS",
+    "consult M&P": "VOIR AVEC M&P",
+    "closed by another agent": "FERMÉ PAR UN AUTRE AGENT",
+  };
+
+  return labels[value ?? ""] ?? value?.trim().toUpperCase() ?? "—";
+};
 
 const SearchResultsPage = () => {
   const dispatch = useAppDispatch();
@@ -22,107 +42,112 @@ const SearchResultsPage = () => {
   const results = state?.results ?? [];
   const query = state?.query ?? "";
 
-  const openIntervention = (intervention: Intervention) => {
-    dispatch(loadInterventionFromSearch(intervention));
+  const openIntervention = (result: SearchInterventionResult) => {
+    dispatch(loadInterventionFromSearch(result.intervention));
     navigate("/intervention-en-cours");
   };
 
   return (
-    <main className="today-list-page search-results-page">
-      <div className="today-list-content">
-        <header className="today-page-header">
-          <div className="today-page-title">
-            <span className="today-page-eyebrow">Recherche</span>
-            <h1>Résultats pour « {query} »</h1>
-          </div>
-
-          <div className="today-page-counters">
-            <span className="today-counter today-counter-total">
-              Total <strong>{results.length}</strong>
-            </span>
-          </div>
-        </header>
-
-        <div className="today-interventions-list">
-          {results.map((intervention) => (
-            <article
-              key={`${intervention.dateKey ?? ""}-${intervention.documentId}`}
-              className="today-intervention-row search-result-row"
-              role="button"
-              tabIndex={0}
-              onClick={() => openIntervention(intervention)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") {
-                  event.preventDefault();
-                  openIntervention(intervention);
-                }
-              }}
-            >
-              <div className="search-result-edit-icon">
-                <Pencil size={17} />
-              </div>
-
-              <div className="today-card-column today-category-column">
-                <div className="today-category-section">
-                  {intervention.infrastructure && (
-                    <span className="today-badge today-infrastructure">
-                      {intervention.infrastructure === "copper"
-                        ? "cuivre"
-                        : intervention.infrastructure === "fiber"
-                          ? "fibre"
-                          : intervention.infrastructure}
-                    </span>
-                  )}
-
-                  {intervention.network && (
-                    <span className="today-badge today-network">
-                      {intervention.network}
-                    </span>
-                  )}
-
-                  {intervention.status && (
-                    <span className="today-badge today-status">
-                      {intervention.status}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="today-card-column today-identifiers-column search-result-identifiers">
-                <div><strong>Intervention ID:</strong> {intervention.interventionId || "—"}</div>
-                <div><strong>OAG ID:</strong> {intervention.oagID || "—"}</div>
-                <div><strong>Date:</strong> {intervention.dateKey || "—"}</div>
-                <div><strong>Adresse:</strong> {intervention.mainAddress || "—"}</div>
-              </div>
-
-              <div className="today-card-column today-text-column today-client-address-column">
-                <div className="today-stacked-field today-stacked-field-compact">
-                  <div className="today-stacked-label">Nom du client</div>
-                  <div className="today-stacked-value"><strong>{intervention.clientName || "—"}</strong></div>
-                </div>
-
-                <div className="today-stacked-field">
-                  <div className="today-stacked-label">Clients à l'adresse</div>
-                  <div className="today-stacked-value">{intervention.clientsOnAddress || "—"}</div>
-                </div>
-              </div>
-
-              <div className="today-card-column today-text-column">
-                <div className="today-stacked-field">
-                  <div className="today-stacked-label">Commentaire</div>
-                  <div className="today-stacked-value">{intervention.comment || "—"}</div>
-                </div>
-              </div>
-            </article>
-          ))}
-
-          {results.length === 0 && (
-            <div className="today-empty">
-              Aucun résultat disponible. Lancez une nouvelle recherche.
-            </div>
-          )}
+    <main className="search-results-page">
+      <section className="search-results-page__header">
+        <div>
+          <span className="search-results-page__eyebrow">Recherche</span>
+          <h1>Résultats pour « {query} »</h1>
         </div>
-      </div>
+
+        <span className="search-results-page__count">
+          {results.length} résultat{results.length === 1 ? "" : "s"}
+        </span>
+      </section>
+
+      <section className="search-results-page__list">
+        {results.map((result) => {
+          const { intervention, criterion } = result;
+          const technology = infrastructureLabel(intervention.infrastructure);
+
+          return (
+            <div
+              key={`${intervention.dateKey ?? ""}-${intervention.documentId}-${criterion.label}`}
+              className="search-result-item"
+            >
+              <div className="search-result-criterion">
+                <strong>{criterion.label}:</strong> {criterion.value}
+              </div>
+
+              <article
+                className="on-hold-card search-result-card"
+                role="button"
+                tabIndex={0}
+                onClick={() => openIntervention(result)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    openIntervention(result);
+                  }
+                }}
+              >
+                <span className="on-hold-card__status-column">
+                  <span
+                    className={`on-hold-card__technology ${
+                      technology === "FIBRE"
+                        ? "on-hold-card__technology--fiber"
+                        : "on-hold-card__technology--copper"
+                    }`}
+                  >
+                    {technology}
+                  </span>
+
+                  <span className="on-hold-card__status">
+                    <span className="on-hold-card__status-main search-result-card__status">
+                      <span>{statusLabel(intervention.status)}</span>
+                    </span>
+                  </span>
+                </span>
+
+                <span className="on-hold-card__identity">
+                  <span>
+                    <strong>Intervention ID</strong>
+                    <span title={intervention.interventionId || "—"}>
+                      {intervention.interventionId || "—"}
+                    </span>
+                  </span>
+                  <span>
+                    <strong>OAG ID</strong>
+                    <span title={intervention.oagID || "—"}>
+                      {intervention.oagID || "—"}
+                    </span>
+                  </span>
+                  {criterion.label.startsWith("Snow") && (
+                    <span className="on-hold-card__snow-ticket">
+                      <strong>{criterion.label}</strong>
+                      <span title={criterion.value}>{criterion.value}</span>
+                    </span>
+                  )}
+                </span>
+
+                <span className="on-hold-card__details">
+                  <span>
+                    <strong>Commentaire</strong>
+                    <span>{intervention.comment?.trim() || "—"}</span>
+                  </span>
+                  <span>
+                    <strong>Informations supplémentaires</strong>
+                    <span>{intervention.additionalInformation?.trim() || "—"}</span>
+                  </span>
+                </span>
+
+                <ArrowForwardRounded className="on-hold-card__arrow" />
+              </article>
+            </div>
+          );
+        })}
+
+        {results.length === 0 && (
+          <div className="search-results-page__empty">
+            Aucun résultat disponible. Lancez une nouvelle recherche.
+          </div>
+        )}
+      </section>
     </main>
   );
 };

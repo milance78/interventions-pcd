@@ -51,7 +51,7 @@ const InterventionSearch = () => {
       }
 
       if (results.length === 1) {
-        dispatch(loadInterventionFromSearch(results[0]));
+        dispatch(loadInterventionFromSearch(results[0].intervention));
         setQuery("");
         navigate("/intervention-en-cours");
         return;
@@ -80,7 +80,24 @@ const InterventionSearch = () => {
         className="intervention-search__form"
         onSubmit={submitSearch}
       >
-        <TextField
+        <Tooltip
+          title="Recherche par ID/OAG/Snow"
+          placement="bottom"
+          arrow
+          slotProps={{
+            tooltip: {
+              sx: {
+                color: "#334155",
+                bgcolor: "#ffffff",
+                border: "1px solid #dbe3ee",
+                boxShadow: "0 6px 18px rgba(15, 23, 42, 0.12)",
+                fontSize: "12px",
+              },
+            },
+            arrow: { sx: { color: "#ffffff" } },
+          }}
+        >
+          <TextField
           size="small"
           label="Recherche"
           value={query}
@@ -91,9 +108,10 @@ const InterventionSearch = () => {
           onBlur={() => setQuery((value) => value.trim())}
           className="intervention-search__input"
           inputProps={{
-            "aria-label": "Recherche par Intervention ID ou OAG ID",
+            "aria-label": "Recherche par ID/OAG/Snow",
           }}
         />
+        </Tooltip>
 
         <Tooltip title="Rechercher" arrow>
           <span>

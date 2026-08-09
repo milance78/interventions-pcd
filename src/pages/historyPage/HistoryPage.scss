@@ -1096,9 +1096,8 @@
   }
 }
 
-/* Keep large archives responsive: off-screen days are not laid out or painted
-   until they approach the scroll viewport. */
+/* History days are rendered progressively in React. Keeping their real layout
+   dimensions avoids programmatic scroll drift when jumping from Navigation. */
 .history-date-section {
-  content-visibility: auto;
-  contain-intrinsic-size: auto 920px;
+  content-visibility: visible;
 }

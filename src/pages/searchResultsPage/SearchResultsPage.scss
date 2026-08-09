@@ -1,38 +1,95 @@
-.search-result-row {
-  cursor: pointer;
-  outline: none;
-
-  &:focus-visible {
-    box-shadow:
-      0 0 0 4px rgba(37, 99, 235, 0.18),
-      0 13px 25px rgba(30, 41, 59, 0.12);
-  }
+.search-results-page {
+  width: 100%;
+  height: calc(100vh - 68px);
+  padding: 24px clamp(20px, 4vw, 60px) 34px;
+  box-sizing: border-box;
+  overflow: auto;
+  background:
+    radial-gradient(circle at 12% 10%, rgba(37, 99, 235, 0.13), transparent 32%),
+    linear-gradient(135deg, #edf2f9 0%, #f8fafc 48%, #edf3fa 100%);
 }
 
-.search-result-edit-icon {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-
+.search-results-page__header {
+  width: min(1460px, 100%);
+  margin: 0 auto 20px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  gap: 18px;
 
-  width: 31px;
-  height: 31px;
-
-  color: #1d4ed8;
-  background: #dbeafe;
-  border: 1px solid #93c5fd;
-  border-radius: 8px;
+  h1 {
+    margin: 4px 0 0;
+    color: #172033;
+    font-size: 26px;
+    font-weight: 500;
+  }
 }
 
-.search-result-identifiers {
+.search-results-page__eyebrow {
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 1.05px;
+  text-transform: uppercase;
+}
+
+.search-results-page__count {
+  padding: 8px 13px;
   color: #334155;
-  font-size: 14px;
-  line-height: 1.45;
+  background: #ffffff;
+  border: 1px solid #d5deea;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.search-results-page__list {
+  width: min(1460px, 100%);
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+
+.search-result-item {
+  min-width: 0;
+}
+
+.search-result-criterion {
+  margin: 0 0 7px 4px;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
 
   strong {
-    color: #172033;
+    color: #1e3a5f;
+    font-weight: 800;
   }
+}
+
+.search-result-card {
+  min-height: 188px;
+}
+
+.search-result-card__status {
+  color: #1d4ed8 !important;
+  background: rgba(37, 99, 235, 0.08) !important;
+  border-color: rgba(37, 99, 235, 0.2) !important;
+}
+
+.search-results-page__empty {
+  padding: 32px;
+  color: #64748b;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #d6dfeb;
+  border-radius: 16px;
+  text-align: center;
+}
+
+.search-result-card__status {
+  min-height: 34px;
+  height: auto;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  white-space: normal;
+  line-height: 1.2;
 }
