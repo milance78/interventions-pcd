@@ -4,6 +4,7 @@ export const usePersistentElementScroll = (
   key: string,
   ref: React.RefObject<HTMLElement | null>,
   ready = true,
+  restoreSynchronously = false,
 ) => {
   React.useLayoutEffect(() => {
     if (!ready) return;
@@ -15,9 +16,17 @@ export const usePersistentElementScroll = (
       window.sessionStorage.getItem(`scroll:${key}`) ?? "0",
     );
 
-    window.requestAnimationFrame(() => {
+    const restore = () => {
       element.scrollTop = Number.isFinite(stored) ? stored : 0;
-    });
+    };
+
+    if (restoreSynchronously) {
+      // History keeps enough of its previous DOM mounted on the first render,
+      // so restoring in the layout effect prevents a one-frame visual jump.
+      restore();
+    } else {
+      window.requestAnimationFrame(restore);
+    }
 
     const save = () => {
       window.sessionStorage.setItem(
@@ -32,7 +41,7 @@ export const usePersistentElementScroll = (
       save();
       element.removeEventListener("scroll", save);
     };
-  }, [key, ready, ref]);
+  }, [key, ready, ref, restoreSynchronously]);
 };
 
 export const usePersistentWindowScroll = (

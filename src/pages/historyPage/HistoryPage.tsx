@@ -413,12 +413,26 @@ const HistoryNavigation = memo(({
 
 HistoryNavigation.displayName = "HistoryNavigation";
 
+const getInitialRenderedHistoryGroupCount = () => {
+  if (typeof window === "undefined") return 1;
+
+  const stored = Number(
+    window.sessionStorage.getItem("history:rendered-group-count") ?? "1",
+  );
+
+  return Number.isFinite(stored) && stored > 0
+    ? Math.floor(stored)
+    : 1;
+};
+
 const HistoryPage = () => {
   const [deleteTarget, setDeleteTarget] = useState<{
     documentId: string;
     dateKey: string;
   } | null>(null);
-  const [renderedGroupCount, setRenderedGroupCount] = useState(1);
+  const [renderedGroupCount, setRenderedGroupCount] = useState(
+    getInitialRenderedHistoryGroupCount,
+  );
   const [isDateNavigationActive, setIsDateNavigationActive] = useState(false);
   const isDateNavigationActiveRef = useRef(false);
   isDateNavigationActiveRef.current = isDateNavigationActive;
@@ -445,6 +459,7 @@ const HistoryPage = () => {
     "history",
     scrollContainerRef,
     isInitialized,
+    true,
   );
 
   const { groupedInterventions, navigationGroups } = buildHistoryViewModel(
@@ -492,10 +507,16 @@ const HistoryPage = () => {
   useEffect(() => {
     if (groupedInterventions.length === 0) {
       setRenderedGroupCount(0);
+      window.sessionStorage.setItem("history:rendered-group-count", "0");
       return;
     }
 
-    setRenderedGroupCount(1);
+    // Keep the amount that was already rendered on the previous visit.
+    // Resetting this to 1 after mount caused the small visible jump when
+    // returning to Historique. slice() safely clamps values above the length.
+    setRenderedGroupCount((current) =>
+      Math.max(1, Math.min(current, groupedInterventions.length)),
+    );
     let cancelled = false;
     let timeoutId: ReturnType<typeof setTimeout> | null = null;
 
@@ -528,6 +549,12 @@ const HistoryPage = () => {
     };
   }, [groupedInterventions]);
 
+  useEffect(() => {
+    window.sessionStorage.setItem(
+      "history:rendered-group-count",
+      String(renderedGroupCount),
+    );
+  }, [renderedGroupCount]);
 
 
   const performScrollToDate = (dateKey: string) => {
