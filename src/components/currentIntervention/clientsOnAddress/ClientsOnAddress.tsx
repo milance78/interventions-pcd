@@ -116,7 +116,7 @@ const CopyAdornment = ({ value, label }: CopyAdornmentProps) => {
 
 type ClientFieldProps = {
   client: AddressClient;
-  field: keyof Omit<AddressClient, "id" | "mode" | "isFuture">;
+  field: keyof Omit<AddressClient, "id" | "mode" | "isFuture" | "isSameClient">;
   label: string;
   inputRef?: React.Ref<HTMLInputElement>;
   onKeyDown?: React.KeyboardEventHandler<HTMLDivElement>;
@@ -278,6 +278,24 @@ const ClientsOnAddress = () => {
   const selectedClient =
     addressClients.find((client) => client.id === selectedClientId) ?? null;
 
+  const clientHasAdditionalInformation = React.useCallback(
+    (client: AddressClient) => {
+      const additionalValues = isCopper
+        ? [client.operator, client.clientId, client.cid, client.voip, client.addressDetails]
+        : [client.cid, client.addressDetails, client.operator, client.clientId, client.voip, client.na];
+      return additionalValues.some((value) => value?.trim());
+    },
+    [isCopper],
+  );
+
+  const openClientDetails = (client: AddressClient) => {
+    setSelectedClientId(client.id);
+    setImportFeedback("");
+    if (!isHistoryView && !clientHasAdditionalInformation(client)) {
+      window.requestAnimationFrame(() => setIsImportOpen(true));
+    }
+  };
+
   React.useEffect(() => {
     if (!isImportOpen) return;
     const timer = window.setTimeout(
@@ -301,6 +319,10 @@ const ClientsOnAddress = () => {
 
     setIsImportProcessing(true);
     setImportFeedback("");
+
+    // Keep this inside the paste user gesture so Clipboard API permissions are
+    // reliable. The raw SALY/xACTO content is replaced by ID client.
+    void writeText(result.values.clientId ?? "");
 
     window.setTimeout(() => {
       result.detectedFields.forEach((field) => {
@@ -374,6 +396,54 @@ const ClientsOnAddress = () => {
 
         {addressClients.map((client, index) => (
           <article className="address-client" key={client.id}>
+            <div className="address-client__relationship-controls">
+              <Tooltip title="Fut à l'adresse" arrow placement="left">
+                <span>
+                  <IconButton
+                    size="small"
+                    className={`address-client__future ${
+                      client.isFuture ? "address-client__future--active" : ""
+                    }`}
+                    disabled={isHistoryView}
+                    onClick={() =>
+                      dispatch(updateAddressClient({
+                        id: client.id,
+                        field: "isFuture",
+                        value: !client.isFuture,
+                      }))
+                    }
+                    aria-label={`Fut à l'adresse pour le client ${index + 1}`}
+                    aria-pressed={Boolean(client.isFuture)}
+                  >
+                    <span aria-hidden="true">f</span>
+                  </IconButton>
+                </span>
+              </Tooltip>
+
+              <Tooltip title="Même client à l'adresse" arrow placement="left">
+                <span>
+                  <IconButton
+                    size="small"
+                    className={`address-client__same ${
+                      client.isSameClient ? "address-client__same--active" : ""
+                    }`}
+                    disabled={isHistoryView}
+                    onClick={() =>
+                      dispatch(updateAddressClient({
+                        id: client.id,
+                        field: "isSameClient",
+                        value: !client.isSameClient,
+                      }))
+                    }
+                    aria-label={`Même client à l'adresse pour le client ${index + 1}`}
+                    aria-pressed={Boolean(client.isSameClient)}
+                  >
+                    <span aria-hidden="true">=</span>
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </div>
+
             <div className="address-client__number">{index + 1}</div>
 
             <div className="address-client__content">
@@ -419,35 +489,10 @@ const ClientsOnAddress = () => {
                     size="small"
                     className="address-client__details"
                     disabled={isHistoryView && !addressClientHasData(client)}
-                    onClick={() => setSelectedClientId(client.id)}
+                    onClick={() => openClientDetails(client)}
                     aria-label={`Ouvrir les détails du client ${index + 1}`}
                   >
                     <SearchRounded />
-                  </IconButton>
-                </span>
-              </Tooltip>
-
-              <Tooltip title="Fut à l'adresse" arrow>
-                <span>
-                  <IconButton
-                    size="small"
-                    className={`address-client__future ${
-                      client.isFuture ? "address-client__future--active" : ""
-                    }`}
-                    disabled={isHistoryView}
-                    onClick={() =>
-                      dispatch(
-                        updateAddressClient({
-                          id: client.id,
-                          field: "isFuture",
-                          value: !client.isFuture,
-                        }),
-                      )
-                    }
-                    aria-label={`Fut à l'adresse pour le client ${index + 1}`}
-                    aria-pressed={Boolean(client.isFuture)}
-                  >
-                    <span aria-hidden="true">f</span>
                   </IconButton>
                 </span>
               </Tooltip>

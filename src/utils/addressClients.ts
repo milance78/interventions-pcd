@@ -15,6 +15,7 @@ export const createAddressClient = (id?: string): AddressClient => ({
   cid: "",
   voip: "",
   isFuture: false,
+  isSameClient: false,
 });
 
 export const normalizePersonName = (value: string) => {
@@ -39,6 +40,7 @@ export const addressClientHasData = (client: AddressClient) =>
       key !== "id" &&
       key !== "mode" &&
       key !== "isFuture" &&
+      key !== "isSameClient" &&
       key !== "naInService" &&
       typeof value === "string" &&
       value.trim().length > 0,

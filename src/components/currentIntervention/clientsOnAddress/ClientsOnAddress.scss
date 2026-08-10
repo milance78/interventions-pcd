@@ -508,3 +508,92 @@
     padding: 12px 20px 18px;
   }
 }
+
+/* Relationship toggles live before the client number. */
+.address-client {
+  grid-template-columns: 24px 22px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.address-client__relationship-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 24px;
+  align-self: center;
+
+  > span {
+    display: flex;
+    width: 22px;
+    height: 22px;
+  }
+
+  .MuiIconButton-root {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 6px;
+  }
+}
+
+.address-client__number {
+  margin-top: 0;
+}
+
+.address-client__future > span,
+.address-client__same > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  line-height: 1;
+}
+
+.address-client__future > span {
+  font-size: 16px;
+}
+
+.address-client__same {
+  color: #9b9bb7 !important;
+  background: #fbfbfe !important;
+  border: 1px solid #d8d8e6 !important;
+  box-shadow: 0 1px 2px rgba(30, 27, 75, 0.07) !important;
+  transform: translateY(0) !important;
+  transition: color 130ms ease, background-color 130ms ease, border-color 130ms ease, box-shadow 130ms ease, transform 100ms ease !important;
+
+  > span {
+    font-family: "Trebuchet MS", system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  &:hover:not(:disabled) {
+    color: #6f6f96 !important;
+    background: #f3f2fb !important;
+    border-color: #c5c4dc !important;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1.5px) !important;
+    box-shadow: inset 0 2px 3px rgba(49, 46, 129, 0.13) !important;
+  }
+}
+
+.address-client__same--active {
+  color: #5b4ca0 !important;
+  background: #e9e6f7 !important;
+  border-color: #9185c4 !important;
+  box-shadow: inset 0 2px 3px rgba(91, 76, 160, 0.16), 0 0 0 1px rgba(91, 76, 160, 0.06) !important;
+  transform: translateY(1px) !important;
+
+  &:hover:not(:disabled) {
+    color: #4e408f !important;
+    background: #e1ddf3 !important;
+    border-color: #8174b8 !important;
+    transform: translateY(1px) !important;
+  }
+}

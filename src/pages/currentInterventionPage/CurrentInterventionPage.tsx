@@ -21,7 +21,7 @@ import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
 import Snackbar from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 import "./CurrentInterventionPage.scss";
@@ -85,7 +85,7 @@ const PENDING_TAB_KEY = "on-hold:pending-tab";
 const SMART_IMPORT_AUTO_OPEN_KEY = "smart-import:auto-open";
 
 type OnHoldEditContext = {
-  tab: "res" | "snowReceived" | "snowSent" | "other";
+  tab: "cure" | "res" | "snowReceived" | "snowSent" | "questions" | "other";
   anchor: string;
   documentId: string;
   dateKey: string;
@@ -103,9 +103,11 @@ const readOnHoldEditContext = (): OnHoldEditContext | null => {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<OnHoldEditContext>;
     const tab =
+      parsed.tab === "cure" ||
       parsed.tab === "res" ||
       parsed.tab === "snowReceived" ||
       parsed.tab === "snowSent" ||
+      parsed.tab === "questions" ||
       parsed.tab === "other"
         ? parsed.tab
         : null;
@@ -280,6 +282,7 @@ const NpsCopyButton = ({
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const newIntervention = useAppSelector(
     (state) => state.newIntervention,
@@ -319,20 +322,28 @@ const CurrentInterventionPage = () => {
   } | null>(null);
   const actionNoticeTimerRef = React.useRef<number | null>(null);
   const commentInputRef = React.useRef<HTMLTextAreaElement | null>(null);
-  const [autoOpenSmartImport] = React.useState(() => {
-    const shouldOpen = window.sessionStorage.getItem(SMART_IMPORT_AUTO_OPEN_KEY) === "1";
-    window.sessionStorage.removeItem(SMART_IMPORT_AUTO_OPEN_KEY);
-    return shouldOpen;
-  });
+  window.sessionStorage.removeItem(SMART_IMPORT_AUTO_OPEN_KEY);
+  const routeState = location.state as { autoOpenSmartImport?: boolean } | null;
+  const autoOpenSmartImport = routeState?.autoOpenSmartImport === true;
+
+  React.useEffect(() => {
+    if (autoOpenSmartImport) {
+      navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [autoOpenSmartImport, location.pathname, navigate]);
   const [onHoldEditContext] = React.useState<OnHoldEditContext | null>(() => {
     const context = readOnHoldEditContext();
     window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
     return context;
   });
-  const isOpenedFromReviewableOnHold = Boolean(
+  const isOpenedFromOnHold = Boolean(
     onHoldEditContext &&
       onHoldEditContext.documentId === newIntervention.documentId &&
-      onHoldEditContext.dateKey === (newIntervention.dateKey ?? "") &&
+      onHoldEditContext.dateKey === (newIntervention.dateKey ?? ""),
+  );
+  const isOpenedFromReviewableOnHold = Boolean(
+    isOpenedFromOnHold &&
+      onHoldEditContext &&
       ["res", "snowReceived", "snowSent", "other"].includes(onHoldEditContext.tab),
   );
 
@@ -504,57 +515,57 @@ const CurrentInterventionPage = () => {
     payload: typeof newIntervention,
     context: OnHoldEditContext,
   ) => {
-    const completed =
-      payload.status === "completed" || payload.status === "transferred";
+    const completed = payload.status === "completed" || payload.status === "transferred";
     const onHold = payload.status === "on hold";
     const today = getLocalDateKey();
 
+    if (completed) {
+      // Once an intervention opened from En attente is completed/transferred,
+      // it must disappear from every En attente section, not only the tab it
+      // came from.
+      return {
+        ...payload,
+        cure: "noCure" as const,
+        curePendingSince: null,
+        isSnowReceivedPending: false,
+        isSnowSentPending: false,
+        isSnow: false,
+        isResPending: false,
+        isUnclear: false,
+        ...(context.tab === "res" ? { resReviewedDate: today } : {}),
+        ...(context.tab === "snowReceived" ? { snowReceivedReviewedDate: today } : {}),
+        ...(context.tab === "snowSent" ? { snowSentReviewedDate: today } : {}),
+        ...(context.tab === "other" ? { otherReviewedDate: today } : {}),
+        ...(context.tab === "cure" ? { cureReviewedDate: today } : {}),
+        ...(context.tab === "questions" ? { questionReviewedDate: today } : {}),
+      };
+    }
+
     if (context.tab === "res") {
-      return completed
-        ? { ...payload, isResPending: false, resReviewedDate: today }
-        : onHold
-          ? { ...payload, isResPending: true, resReviewedDate: today }
-          : payload;
+      return onHold ? { ...payload, isResPending: true, resReviewedDate: today } : payload;
     }
 
     if (context.tab === "snowReceived") {
-      return completed
-        ? {
-            ...payload,
-            isSnowReceivedPending: false,
-            snowReceivedReviewedDate: today,
-          }
-        : onHold
-          ? {
-              ...payload,
-              isSnowReceivedPending: true,
-              snowReceivedReviewedDate: today,
-            }
-          : payload;
+      return onHold
+        ? { ...payload, isSnowReceivedPending: true, isSnow: true, snowReceivedReviewedDate: today }
+        : payload;
     }
 
     if (context.tab === "snowSent") {
-      return completed
-        ? {
-            ...payload,
-            isSnowSentPending: false,
-            snowSentReviewedDate: today,
-          }
-        : onHold
-          ? {
-              ...payload,
-              isSnowSentPending: true,
-              snowSentReviewedDate: today,
-            }
-          : payload;
+      return onHold
+        ? { ...payload, isSnowSentPending: true, isSnow: true, snowSentReviewedDate: today }
+        : payload;
     }
 
-    // "Autre" has no pending flag of its own. It receives the review stamp
-    // only when the explicit Revu action is used.
-    return {
-      ...payload,
-      otherReviewedDate: today,
-    };
+    if (context.tab === "cure") {
+      return onHold ? { ...payload, cureReviewedDate: today } : payload;
+    }
+
+    if (context.tab === "questions") {
+      return onHold ? { ...payload, isUnclear: true, questionReviewedDate: today } : payload;
+    }
+
+    return { ...payload, otherReviewedDate: today };
   };
 
   const submitActions = async () => {
@@ -567,8 +578,6 @@ const CurrentInterventionPage = () => {
             ...newIntervention.editSnapshot,
           }
         : normalized;
-
-    const isOpenedFromOnHold = isOpenedFromReviewableOnHold;
 
     if (isOpenedFromOnHold && onHoldEditContext) {
       safePayload = applyOnHoldConsultationState(
@@ -666,11 +675,13 @@ const CurrentInterventionPage = () => {
   const addToTodayList = async () => {
     if (mode !== "SEARCH_EDIT" && mode !== "HISTORY_EDIT") return;
 
-    const isOpenedFromOnHold = isOpenedFromReviewableOnHold;
-
-    // Adding to today's list is not a review action. In particular it must not
-    // create the "Revu aujourd'hui" stamp.
-    const payload = newIntervention;
+    // When an intervention comes from En attente, adding it to today's list is
+    // also an explicit review: it stays in the same pending section (if status
+    // remains En attente) and receives the Revu aujourd'hui marker.
+    const payload =
+      isOpenedFromOnHold && onHoldEditContext
+        ? applyOnHoldConsultationState(newIntervention, onHoldEditContext)
+        : newIntervention;
 
     const result = await dispatch(
       updateSearchInterventionThunk(payload),

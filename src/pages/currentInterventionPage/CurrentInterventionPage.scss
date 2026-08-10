@@ -2395,3 +2395,21 @@
 .submit-intervention-button--review {
   min-width: 132px;
 }
+
+/* Softer action tone: Enregistrer/Revu now belongs to the same visual family
+   as Ajouter à la liste du jour instead of using the old saturated blue. */
+.current-intervention-submit-buttons .submit-intervention-button,
+.current-intervention-submit-buttons .submit-intervention-button--review {
+  color: #166534 !important;
+  border: 1px solid #8bc99d !important;
+  background: linear-gradient(145deg, #eef9f1 0%, #d9f0e0 100%) !important;
+  box-shadow: 0 6px 15px rgba(22, 101, 52, 0.12) !important;
+}
+
+.current-intervention-submit-buttons .submit-intervention-button:hover,
+.current-intervention-submit-buttons .submit-intervention-button--review:hover {
+  color: #14532d !important;
+  border-color: #68b47f !important;
+  background: linear-gradient(145deg, #f5fcf7 0%, #d1ebd9 100%) !important;
+  box-shadow: 0 7px 17px rgba(22, 101, 52, 0.15) !important;
+}

@@ -62,6 +62,8 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     apartment: intervention.apartment,
     blockNumber: intervention.blockNumber,
     cureRecords: intervention.cureRecords,
+    infrastructure: intervention.infrastructure,
+    addressClients: intervention.addressClients,
   }), [intervention]);
 
   React.useEffect(() => {
@@ -106,7 +108,15 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     window.setTimeout(() => setCopied(null), 1400);
   };
 
-  const selectedDefinition = additionalInformationTemplates.find(
+  const isFiber = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim());
+  const visibleTemplates = React.useMemo(
+    () => additionalInformationTemplates.filter(
+      (template) => template.id !== "wioIncorrectAddress" || isFiber,
+    ),
+    [isFiber],
+  );
+
+  const selectedDefinition = visibleTemplates.find(
     (template) => template.id === selectedTemplate,
   );
 
@@ -135,7 +145,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
             <div className="additional-information-workspace">
               <aside className="additional-information-sidebar" aria-label="Modèles d'informations supplémentaires">
                 <div className="additional-information-sidebar__title">Modèles</div>
-                {additionalInformationTemplates.map((template) => (
+                {visibleTemplates.map((template) => (
                   <Button
                     key={template.id}
                     type="button"

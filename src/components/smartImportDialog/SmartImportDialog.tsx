@@ -46,7 +46,6 @@ const SmartImportDialog = ({
   const [processing, setProcessing] = React.useState(false);
   const pasteTargetRef = React.useRef<HTMLTextAreaElement | null>(null);
   const triggerRef = React.useRef<HTMLButtonElement | null>(null);
-  const initialOpenHandledRef = React.useRef(false);
 
   React.useEffect(() => {
     if (!open) return;
@@ -55,9 +54,6 @@ const SmartImportDialog = ({
   }, [open]);
 
   React.useEffect(() => {
-    if (initialOpenHandledRef.current) return;
-    initialOpenHandledRef.current = true;
-
     if (autoOpen && !disabled) {
       setOpen(true);
       return;

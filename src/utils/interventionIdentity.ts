@@ -23,17 +23,16 @@ export const interventionLogicalKey = (
 };
 
 export const isSameLogicalIntervention = (
-  first: Pick<
-    Intervention,
-    "documentId" | "interventionId" | "oagID"
-  >,
-  second: Pick<
-    Intervention,
-    "documentId" | "interventionId" | "oagID"
-  >,
-) =>
-  interventionLogicalKey(first) ===
-  interventionLogicalKey(second);
+  first: Pick<Intervention, "documentId" | "interventionId" | "oagID">,
+  second: Pick<Intervention, "documentId" | "interventionId" | "oagID">,
+) => {
+  // documentId/caseId is immutable and therefore remains a reliable identity
+  // even when Edit changes Intervention ID or OAG ID.
+  if (first.documentId && second.documentId && first.documentId === second.documentId) {
+    return true;
+  }
+  return interventionLogicalKey(first) === interventionLogicalKey(second);
+};
 
 export const interventionActivityValue = (
   intervention: Pick<

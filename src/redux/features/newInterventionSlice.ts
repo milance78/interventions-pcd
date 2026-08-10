@@ -39,6 +39,7 @@ export interface AddressClient {
   cid: string;
   voip: string;
   isFuture: boolean;
+  isSameClient: boolean;
 }
 
 const loadSmsPreference = (): boolean => {
@@ -94,6 +95,8 @@ export interface InterventionData {
   snowReceivedReviewedDate: string | null;
   snowSentReviewedDate: string | null;
   otherReviewedDate: string | null;
+  cureReviewedDate: string | null;
+  questionReviewedDate: string | null;
   isUnclear: boolean;
   addressConfirmation: AddressConfirmation;
   isGoodExample: boolean;
@@ -194,6 +197,8 @@ export const emptyInterventionData: InterventionData = {
   snowReceivedReviewedDate: null,
   snowSentReviewedDate: null,
   otherReviewedDate: null,
+  cureReviewedDate: null,
+  questionReviewedDate: null,
   isUnclear: false,
   addressConfirmation: "none",
   isGoodExample: false,
@@ -283,6 +288,8 @@ const extractData = (state: Intervention): InterventionData => ({
   snowReceivedReviewedDate: state.snowReceivedReviewedDate,
   snowSentReviewedDate: state.snowSentReviewedDate,
   otherReviewedDate: state.otherReviewedDate,
+  cureReviewedDate: state.cureReviewedDate,
+  questionReviewedDate: state.questionReviewedDate,
   isUnclear: state.isUnclear,
   addressConfirmation: state.addressConfirmation,
   isGoodExample: state.isGoodExample,
@@ -567,6 +574,7 @@ const NewInterventionSlice = createSlice({
       state.addressClients.push({
         ...action.payload,
         isFuture: Boolean(action.payload.isFuture),
+        isSameClient: Boolean(action.payload.isSameClient),
         na: normalizeNaNumber(action.payload.na ?? ""),
       });
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
@@ -597,6 +605,7 @@ const NewInterventionSlice = createSlice({
       state.addressClients = action.payload.map((client) => ({
         ...client,
         isFuture: Boolean(client.isFuture),
+        isSameClient: Boolean(client.isSameClient),
         na: normalizeNaNumber(client.na ?? ""),
       }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
@@ -638,6 +647,7 @@ const NewInterventionSlice = createSlice({
       state.addressClients = state.addressClients.map((client) => ({
         ...client,
         isFuture: Boolean(client.isFuture),
+        isSameClient: Boolean(client.isSameClient),
         na: normalizeNaNumber(client.na ?? ""),
       }));
 
@@ -647,6 +657,7 @@ const NewInterventionSlice = createSlice({
       state.addressClients = state.addressClients.map((client) => ({
         ...client,
         isFuture: Boolean(client.isFuture),
+        isSameClient: Boolean(client.isSameClient),
         na: normalizeNaNumber(client.na ?? ""),
       }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
@@ -764,6 +775,7 @@ const NewInterventionSlice = createSlice({
       const normalizedAddressClients = addressClients.map((client) => ({
         ...client,
         isFuture: Boolean(client.isFuture),
+        isSameClient: Boolean(client.isSameClient),
         na: normalizeNaNumber(client.na ?? ""),
       }));
       const draft = {

@@ -74,13 +74,10 @@ const Header = () => {
   };
 
   const openCurrentPage = (autoOpenSmartImport = false) => {
-    if (autoOpenSmartImport) {
-      window.sessionStorage.setItem(SMART_IMPORT_AUTO_OPEN_KEY, "1");
-    } else {
-      window.sessionStorage.removeItem(SMART_IMPORT_AUTO_OPEN_KEY);
-    }
-
-    navigate("/intervention-en-cours");
+    window.sessionStorage.removeItem(SMART_IMPORT_AUTO_OPEN_KEY);
+    navigate("/intervention-en-cours", {
+      state: autoOpenSmartImport ? { autoOpenSmartImport: true } : undefined,
+    });
   };
 
   const closeNewInterventionDialog = () => {

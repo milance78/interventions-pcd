@@ -273,25 +273,16 @@ const OnHoldPage = () => {
   const openIntervention = (
     intervention: (typeof sortedInterventions)[number],
   ) => {
-    if (
-      activeTab === "res" ||
-      activeTab === "snowReceived" ||
-      activeTab === "snowSent" ||
-      activeTab === "other"
-    ) {
-      window.sessionStorage.setItem(
-        ON_HOLD_EDIT_CONTEXT_KEY,
-        JSON.stringify({
-          tab: activeTab,
-          anchor: interventionAnchor(intervention),
-          documentId: intervention.documentId,
-          dateKey: intervention.dateKey ?? "",
-          scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
-        }),
-      );
-    } else {
-      window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
-    }
+    window.sessionStorage.setItem(
+      ON_HOLD_EDIT_CONTEXT_KEY,
+      JSON.stringify({
+        tab: activeTab,
+        anchor: interventionAnchor(intervention),
+        documentId: intervention.documentId,
+        dateKey: intervention.dateKey ?? "",
+        scrollTop: scrollContainerRef.current?.scrollTop ?? 0,
+      }),
+    );
 
     dispatch(loadInterventionFromSearch(intervention));
     navigate("/intervention-en-cours");
@@ -375,7 +366,11 @@ const OnHoldPage = () => {
               (activeTab === "snowSent" &&
                 intervention.snowSentReviewedDate === localDateKey()) ||
               (activeTab === "other" &&
-                intervention.otherReviewedDate === localDateKey())) && (
+                intervention.otherReviewedDate === localDateKey()) ||
+              (activeTab === "cure" &&
+                intervention.cureReviewedDate === localDateKey()) ||
+              (activeTab === "questions" &&
+                intervention.questionReviewedDate === localDateKey())) && (
               <span
                 className="on-hold-card__review-stamp"
                 aria-label="Revu aujourd'hui"

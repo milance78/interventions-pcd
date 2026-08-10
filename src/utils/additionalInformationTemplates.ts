@@ -1,4 +1,4 @@
-import type { CureRecord, CureRecords } from "../redux/features/newInterventionSlice";
+import type { AddressClient, CureRecord, CureRecords } from "../redux/features/newInterventionSlice";
 
 export type AdditionalInformationTemplateId =
   | "bciThreeCures"
@@ -18,6 +18,8 @@ export interface AdditionalInformationTemplateSource {
   apartment: string;
   blockNumber: string;
   cureRecords: CureRecords;
+  infrastructure: string;
+  addressClients: AddressClient[];
 }
 
 export interface AdditionalInformationDynamicValue {
@@ -145,21 +147,21 @@ export const additionalInformationTemplates: AdditionalInformationTemplateDefini
   },
   {
     id: "wioIncorrectAddress",
-    buttonLabel: 'WIO "Adresse incorrecte en S6"',
+    buttonLabel: 'WIO "Adresse incorrecte en W6"',
     headerInputLabel: "Numéro WIO",
     dynamicValues: (source) => {
       const address = getStructuredAddress(source);
       return [
-        { label: "Rue", value: valueOrDash(address.street) },
-        { label: "N°", value: valueOrDash(address.houseNumber) },
-        { label: "Alpha", value: valueOrDash(address.houseAlpha) },
-        { label: "Boîte", value: valueOrDash(source.mailbox) },
-        { label: "Étage", value: valueOrDash(source.floor) },
-        { label: "Appartement", value: valueOrDash(source.apartment) },
-        { label: "Bloc", value: valueOrDash(source.blockNumber) },
-        { label: "Code postal", value: valueOrDash(address.postalCode) },
-        { label: "Ville", value: valueOrDash(address.city) },
-      ];
+        { label: "Rue", value: address.street.trim() },
+        { label: "N°", value: address.houseNumber.trim() },
+        { label: "Alpha", value: address.houseAlpha.trim() },
+        { label: "Boîte", value: source.mailbox.trim() },
+        { label: "Étage", value: source.floor.trim() },
+        { label: "Appartement", value: source.apartment.trim() },
+        { label: "Bloc", value: source.blockNumber.trim() },
+        { label: "Code postal", value: address.postalCode.trim() },
+        { label: "Ville", value: address.city.trim() },
+      ].filter((item) => item.value);
     },
   },
 ];
@@ -181,5 +183,34 @@ export const buildAdditionalInformationTemplate = (
   }
 
   const address = getStructuredAddress(source);
-  return `Rue : ${valueOrDash(address.street)}\nNuméro de maison : ${valueOrDash(address.houseNumber)}\nAlpha du Numéro de maison: ${valueOrDash(address.houseAlpha)}\nBoite : ${valueOrDash(source.mailbox)}\nEtage : ${valueOrDash(source.floor)}\nAppartement : ${valueOrDash(source.apartment)}\nBloc : ${valueOrDash(source.blockNumber)}\nCode postal : ${valueOrDash(address.postalCode)}\nVille : ${valueOrDash(address.city)}`;
+  const addressLines = [
+    ["Rue", address.street],
+    ["Numéro de maison", address.houseNumber],
+    ["Alpha du Numéro de maison", address.houseAlpha],
+    ["Boite", source.mailbox],
+    ["Etage", source.floor],
+    ["Appartement", source.apartment],
+    ["Bloc", source.blockNumber],
+    ["Code postal", address.postalCode],
+    ["Ville", address.city],
+  ]
+    .filter(([, value]) => value.trim())
+    .map(([label, value]) => `${label} : ${value.trim()}`)
+    .join("\n");
+
+  const clients = source.addressClients.filter((client) =>
+    [client.fullName, client.utac, client.cid, client.clientId, client.operator, client.addressDetails, client.voip]
+      .some((value) => value?.trim()),
+  );
+
+  let occupationText = "";
+  if (clients.length === 1) {
+    const client = clients[0];
+    occupationText = `Bonjour, l'UTAC ${client.utac?.trim() || "___"} à l'adresse est actuellement occupé par un autre client, dont le CID est ${client.cid?.trim() || "___"}. Merci de vérifier`;
+  } else if (clients.length >= 2) {
+    const cids = clients.map((client) => client.cid?.trim() || "___").join(", ");
+    occupationText = `Bonjour, tous les UTAC à l'adresse sont actuellement occupés par des autres clients, dont les CID sont: ${cids}. Merci de vérifier`;
+  }
+
+  return [occupationText, addressLines].filter(Boolean).join("\n\n");
 };

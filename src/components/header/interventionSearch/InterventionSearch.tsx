@@ -46,6 +46,7 @@ const InterventionSearch = () => {
       const results = await searchInterventions(user.uid, normalizedQuery);
 
       if (results.length === 0) {
+        setQuery("");
         setErrorMessage("Aucune intervention trouvée");
         return;
       }
@@ -57,6 +58,7 @@ const InterventionSearch = () => {
         return;
       }
 
+      setQuery("");
       navigate("/recherche", {
         state: {
           query: normalizedQuery,

@@ -95,6 +95,7 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     : parseLegacyAddressClients(data.clientsOnAddress ?? "")).map((client: any) => ({
       ...client,
       isFuture: Boolean(client.isFuture),
+      isSameClient: Boolean(client.isSameClient),
       na: normalizeNaNumber(String(client.na ?? "")),
     }));
   const structuredAddress =
@@ -155,6 +156,10 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
         : null,
     otherReviewedDate:
       typeof data.otherReviewedDate === "string" ? data.otherReviewedDate : null,
+    cureReviewedDate:
+      typeof data.cureReviewedDate === "string" ? data.cureReviewedDate : null,
+    questionReviewedDate:
+      typeof data.questionReviewedDate === "string" ? data.questionReviewedDate : null,
     isSnow: isSnowReceivedPending || isSnowSentPending,
     comment,
     addressConfirmation,
@@ -346,8 +351,18 @@ export const hydrateOccurrencesWithLatestState = (
 };
 
 export const deleteIntervention = async (userId: string, date: string, documentId: string) => {
-  await deleteDoc(doc(getInterventionsReference(userId, date), documentId));
-  await setDoc(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
+  const snapshotRef = doc(getInterventionsReference(userId, date), documentId);
+  const snapshot = await getDoc(snapshotRef);
+  const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
+  const batch = writeBatch(db);
+
+  batch.delete(snapshotRef);
+  // A deletion from Historique is a real deletion of the intervention from the
+  // searchable active index as well. Otherwise the active document survives
+  // and the deleted card keeps reappearing in Recherche.
+  batch.delete(doc(getActiveReference(userId), caseId));
+  batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
+  await batch.commit();
   updateSummaryInBackground(userId, date);
 };
 
@@ -503,47 +518,10 @@ export const loadDailySummary = async (userId: string, date: string) => {
 
 export const loadLatestInterventions = async (userId: string): Promise<Intervention[]> => {
   const activeSnapshot = await getDocs(getActiveReference(userId));
-  const active = activeSnapshot.docs.map((item) => {
+  return activeSnapshot.docs.map((item) => {
     const data = item.data();
     return mapIntervention(item.id, data.currentDateKey ?? "", data);
   });
-
-  // Non-destructive compatibility migration: dated legacy snapshots stay untouched.
-  // We merge them with the new active collection, so old data remains searchable even
-  // after the user has already created records in the V2 structure.
-  const history = (await loadCompleteHistory(userId)).flatMap((day) => day.interventions);
-  const latestByLogicalKey = new Map<string, Intervention>();
-
-  [...history, ...active].forEach((item) => {
-    const key = interventionLogicalKey(item);
-    const current = latestByLogicalKey.get(key);
-    if (!current || interventionActivityValue(item) > interventionActivityValue(current)) {
-      latestByLogicalKey.set(key, item);
-    }
-  });
-
-  const activeCaseIds = new Set(active.map((item) => item.documentId));
-  const missingFromActive = Array.from(latestByLogicalKey.values()).filter(
-    (item) => !activeCaseIds.has(item.documentId),
-  );
-
-  if (missingFromActive.length > 0) {
-    const batch = writeBatch(db);
-    missingFromActive.forEach((item) => {
-      const caseId = item.documentId;
-      batch.set(doc(getActiveReference(userId), caseId), {
-        ...stripUiFields(item),
-        caseId,
-        currentDateKey: item.dateKey ?? "",
-        createdAt: item.createdAt,
-        updatedAt: item.updatedAt ?? item.createdAt,
-        migratedFromLegacy: true,
-      }, { merge: true });
-    });
-    await batch.commit();
-  }
-
-  return Array.from(latestByLogicalKey.values());
 };
 
 export type SearchCriterion = {
@@ -583,11 +561,26 @@ export const searchInterventions = async (
 
   const active = await loadLatestInterventions(userId);
 
+  const rawTrimmed = searchValue.trim();
+  const rawHasLetters = /[A-Za-z]/.test(rawTrimmed);
+
   const matchMainIdentifier = (candidate?: string | null) => {
     const trimmedCandidate = candidate?.trim() ?? "";
-    return prepared.mode === "exact"
-      ? trimmedCandidate === prepared.value
-      : numericPart(trimmedCandidate) === prepared.value;
+    if (!trimmedCandidate) return false;
+
+    if (prepared.mode === "exact") {
+      return trimmedCandidate === prepared.value;
+    }
+
+    // Numeric fallback is intended for genuinely numeric identifiers.
+    // Do not collapse two different alphanumeric OAG values to the same digit
+    // sequence (e.g. ...Z9US9 versus ...U9CS9). If the user supplied letters,
+    // an alphanumeric identifier must match literally. Snow still uses digits.
+    if (rawHasLetters && /[A-Za-z]/.test(trimmedCandidate)) {
+      return trimmedCandidate.toLowerCase() === rawTrimmed.toLowerCase();
+    }
+
+    return numericPart(trimmedCandidate) === prepared.value;
   };
 
   const matches: SearchInterventionResult[] = [];
@@ -627,7 +620,24 @@ export const searchInterventions = async (
     }
   });
 
-  return matches.sort((first, second) =>
+  // The active index may contain legacy stale documents created by older
+  // versions of the app. Before exposing a Search result, verify that its
+  // current dated occurrence still exists. This also makes old deletions from
+  // Historique disappear from Recherche without requiring a manual migration.
+  const verified = (
+    await Promise.all(
+      matches.map(async (result) => {
+        const dateKey = result.intervention.dateKey ?? "";
+        if (!dateKey || !result.intervention.documentId) return null;
+        const snapshot = await getDoc(
+          doc(getInterventionsReference(userId, dateKey), result.intervention.documentId),
+        );
+        return snapshot.exists() ? result : null;
+      }),
+    )
+  ).filter((result): result is SearchInterventionResult => Boolean(result));
+
+  return verified.sort((first, second) =>
     interventionActivityValue(second.intervention).localeCompare(
       interventionActivityValue(first.intervention),
     ),
