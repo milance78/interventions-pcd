@@ -5,12 +5,10 @@ import DeleteSweepRounded from "@mui/icons-material/DeleteSweepRounded";
 import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
-import CallRounded from "@mui/icons-material/CallRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
 import Send from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
-import ButtonGroup from "@mui/material/ButtonGroup";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -67,12 +65,12 @@ import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Addr
 import { ReactComponent as AddressNotConfirmedOffIcon } from "../../assets/svg/Address not confirmed off.svg.tsx";
 import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb off.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
-import { ReactComponent as SnowSentPendingIcon } from "../../assets/svg/Snow sent pending.svg.tsx";
-import { ReactComponent as SnowReceivedPendingIcon } from "../../assets/svg/Snow received pending.svg.tsx";
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
+import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
 import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
 import { normalizeInterventionStrings, removeBlankLines, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
 import { normalizePersonName } from "../../utils/addressClients";
+import { cureOrder, localDateKey } from "../../utils/cureRecords";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
 import CableCutOn from "../../assets/icons/CableCutOn.png";
@@ -279,6 +277,24 @@ const NpsCopyButton = ({
   );
 };
 
+
+type SnowTrailIconProps = {
+  direction: "left" | "right";
+  active: boolean;
+};
+
+const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => (
+  <span
+    className={`snow-trail-icon snow-trail-icon--${direction} ${
+      active ? "snow-trail-icon--active" : "snow-trail-icon--off"
+    }`}
+    aria-hidden="true"
+  >
+    <span className="snow-trail-icon__flake" aria-hidden="true"><SnowOnIcon /></span>
+    <span className="snow-trail-icon__sign">snow</span>
+  </span>
+);
+
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -299,10 +315,13 @@ const CurrentInterventionPage = () => {
     comment,
     additionalInformation,
     cure,
+    cureRecords,
     smsEnabled,
     isSnowReceivedPending,
     isSnowSentPending,
     isResPending,
+    addressClients,
+    infrastructure,
     addressConfirmation,
     isEditing,
     isHistoryView,
@@ -317,11 +336,13 @@ const CurrentInterventionPage = () => {
   const [revisionsError, setRevisionsError] = React.useState("");
   const [importMessage, setImportMessage] = React.useState("");
   const [actionNotice, setActionNotice] = React.useState<{
-    key: "question" | "example" | "res";
+    key: "question" | "example" | "res" | "snowReceived" | "snowSent" | "cure";
     text: string;
   } | null>(null);
   const actionNoticeTimerRef = React.useRef<number | null>(null);
   const commentInputRef = React.useRef<HTMLTextAreaElement | null>(null);
+  const [resClientDialogOpen, setResClientDialogOpen] = React.useState(false);
+  const [resEligibleClients, setResEligibleClients] = React.useState<typeof addressClients>([]);
   window.sessionStorage.removeItem(SMART_IMPORT_AUTO_OPEN_KEY);
   const routeState = location.state as { autoOpenSmartImport?: boolean } | null;
   const autoOpenSmartImport = routeState?.autoOpenSmartImport === true;
@@ -348,7 +369,7 @@ const CurrentInterventionPage = () => {
   );
 
   const showActionNotice = (
-    key: "question" | "example" | "res",
+    key: "question" | "example" | "res" | "snowReceived" | "snowSent" | "cure",
     text: string,
   ) => {
     if (actionNoticeTimerRef.current !== null) {
@@ -371,34 +392,94 @@ const CurrentInterventionPage = () => {
     [],
   );
 
+  const removeAutomaticResLine = (value: string) =>
+    value
+      .replace(/(?:^|\n\n?)RES en attente(?::|,)?[^\n]*/gi, "")
+      .replace(/^\n+|\n+$/g, "")
+      .replace(/\n{3,}/g, "\n\n");
+
+  const buildResPendingLine = (client: (typeof addressClients)[number]) => {
+    const parts: string[] = [];
+    if (client.fullName.trim()) {
+      parts.push(`client ${client.fullName.trim()}`);
+    }
+    const isCopperTechnology = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
+    const identifier = isCopperTechnology ? client.na.trim() : client.utac.trim();
+    if (identifier) {
+      parts.push(`${isCopperTechnology ? "NA" : "UTAC"} ${identifier}`);
+    }
+    return `RES en attente${parts.length ? `: ${parts.join(", ")}` : ""}`;
+  };
+
+  const activateResForClient = (client: (typeof addressClients)[number] | null) => {
+    const cleaned = removeAutomaticResLine(comment);
+    const resLine = client ? buildResPendingLine(client) : "RES en attente";
+    const nextComment = cleaned ? `${cleaned}\n\n${resLine}` : resLine;
+    dispatch(updateField({ field: "comment", value: nextComment }));
+    dispatch(updateField({ field: "isResPending", value: true }));
+    showActionNotice("res", "Résiliation en attente");
+  };
+
   const handleResPendingToggle = () => {
     if (isHistoryView) return;
 
-    const nextValue = !isResPending;
-    dispatch(
-      updateField({
-        field: "isResPending",
-        value: nextValue,
-      }),
+    if (isResPending) {
+      dispatch(updateField({ field: "isResPending", value: false }));
+      const cleaned = removeAutomaticResLine(comment);
+      if (cleaned !== comment) {
+        dispatch(updateField({ field: "comment", value: cleaned }));
+      }
+      return;
+    }
+
+    const eligible = addressClients.filter(
+      (client) => !client.isFuture && !client.isSameClient,
     );
 
-    if (nextValue) {
-      showActionNotice("res", "Résiliation en attente");
+    if (eligible.length === 0) {
+      activateResForClient(null);
+      return;
     }
+
+    if (eligible.length === 1) {
+      activateResForClient(eligible[0]);
+      return;
+    }
+
+    setResEligibleClients(eligible);
+    setResClientDialogOpen(true);
   };
 
+  const todayKeyForCure = localDateKey(new Date());
+  const todaysCureKey = cureOrder.find(
+    (key) => cureRecords[key]?.date === todayKeyForCure,
+  ) ?? null;
+  const nextCureKey = cureOrder.find((key) => !cureRecords[key]) ?? null;
+  const pendingCureKey =
+    todaysCureKey === "firstCure" || todaysCureKey === "secondCure"
+      ? todaysCureKey
+      : nextCureKey === "firstCure" || nextCureKey === "secondCure"
+        ? nextCureKey
+        : null;
+  const isUnifiedCureActive = Boolean(todaysCureKey);
 
-  const handleCureSelection = (nextCure: typeof cure) => {
+  const handleUnifiedCureToggle = () => {
     if (isHistoryView) return;
 
-    if (nextCure === "noCure") {
+    if (todaysCureKey) {
       void dispatch(clearTodaysCuresThunk());
+      showActionNotice("cure", "CURE retiré");
+      return;
+    }
+
+    if (!nextCureKey) {
+      showActionNotice("cure", "3 CURE déjà enregistrés");
       return;
     }
 
     dispatch(
       recordCure({
-        cure: nextCure,
+        cure: nextCureKey,
         recordedAt: new Date().toISOString(),
         smsEnabled,
       }),
@@ -410,7 +491,33 @@ const CurrentInterventionPage = () => {
         value: "notConfirmed",
       }),
     );
+    showActionNotice(
+      "cure",
+      nextCureKey === "firstCure"
+        ? "CURE 1 en attente"
+        : nextCureKey === "secondCure"
+          ? "CURE 2 en attente"
+          : "CURE 3",
+    );
   };
+
+  const toggleSnowPending = (
+    field: "isSnowReceivedPending" | "isSnowSentPending",
+  ) => {
+    if (isHistoryView) return;
+    const current = field === "isSnowReceivedPending"
+      ? isSnowReceivedPending
+      : isSnowSentPending;
+    const next = !current;
+    dispatch(updateField({ field, value: next }));
+    showActionNotice(
+      field === "isSnowReceivedPending" ? "snowReceived" : "snowSent",
+      next
+        ? (field === "isSnowReceivedPending" ? "Snow à mon nom en attente" : "Snow créé en attente")
+        : (field === "isSnowReceivedPending" ? "Snow à mon nom retiré" : "Snow créé retiré"),
+    );
+  };
+
 
   const handleSmsToggle = () => {
     if (isHistoryView) return;
@@ -818,9 +925,9 @@ const CurrentInterventionPage = () => {
           </div>
 
           <section className="intervention-options">
-            <div className="boolean-inputs-row">
-              <div className="intervention-option-group intervention-option-group--actions">
-                <div className="intervention-option-group__items">
+            <div className="boolean-inputs-row boolean-inputs-row--unified">
+              <div className="intervention-option-group intervention-option-group--unified">
+                <div className="intervention-option-group__items intervention-option-group__items--six">
                   <div className="option-button">
                     {actionNotice?.key === "question" && (
                       <span className="action-toggle-notice action-toggle-notice--question" role="status">
@@ -894,69 +1001,92 @@ const CurrentInterventionPage = () => {
                       />
                     </button>
                   </div>
-                </div>
-              </div>
 
-              <div className="intervention-option-group intervention-option-group--states">
-                <div className="intervention-option-group__items">
-                  <div
-                    className={`option-button snow-pending-card ${
-                      isSnowReceivedPending
-                        ? "snow-pending-card--filled"
-                        : "snow-pending-card--empty"
-                    }`}
-                    aria-label="Snow reçu en attente"
-                    title="Snow reçu en attente"
-                  >
-                    {isSnowReceivedPending && (
-                      <SnowReceivedPendingIcon className="snow-pending-card__icon" />
+                  <div className="option-button option-button--snow-state">
+                    {actionNotice?.key === "snowReceived" && (
+                      <span className="action-toggle-notice action-toggle-notice--snow" role="status">
+                        {actionNotice.text}
+                      </span>
                     )}
+                    <button
+                      type="button"
+                      className={`pending-state-button ${
+                        isSnowReceivedPending ? "pending-state-button--active" : ""
+                      }`}
+                      onClick={() => toggleSnowPending("isSnowReceivedPending")}
+                      aria-label="Snow à mon nom en attente"
+                      title="Snow à mon nom en attente"
+                      aria-pressed={isSnowReceivedPending}
+                      disabled={isHistoryView}
+                    >
+                      <SnowTrailIcon direction="left" active={isSnowReceivedPending} />
+                    </button>
                   </div>
 
-
-
-                  <div
-                    className={`option-button snow-pending-card ${
-                      isSnowSentPending
-                        ? "snow-pending-card--filled"
-                        : "snow-pending-card--empty"
-                    }`}
-                    aria-label="Snow créé en attente"
-                    title="Snow créé en attente"
-                  >
-                    {isSnowSentPending && (
-                      <SnowSentPendingIcon className="snow-pending-card__icon" />
+                  <div className="option-button option-button--snow-state">
+                    {actionNotice?.key === "snowSent" && (
+                      <span className="action-toggle-notice action-toggle-notice--snow" role="status">
+                        {actionNotice.text}
+                      </span>
                     )}
+                    <button
+                      type="button"
+                      className={`pending-state-button ${
+                        isSnowSentPending ? "pending-state-button--active" : ""
+                      }`}
+                      onClick={() => toggleSnowPending("isSnowSentPending")}
+                      aria-label="Snow créé en attente"
+                      title="Snow créé en attente"
+                      aria-pressed={isSnowSentPending}
+                      disabled={isHistoryView}
+                    >
+                      <SnowTrailIcon direction="right" active={isSnowSentPending} />
+                    </button>
                   </div>
 
-                  <div
-                    className={`option-button cure-summary-card ${
-                      cure === "firstCure" || cure === "secondCure"
-                        ? "cure-summary-card--filled"
-                        : "cure-summary-card--empty"
-                    }`}
-                    aria-live="polite"
-                    aria-label={
-                      cure === "firstCure"
-                        ? "CURE 1"
-                        : cure === "secondCure"
-                          ? "CURE 2"
-                          : "Emplacement CURE vide"
-                    }
-                  >
-                    {(cure === "firstCure" || cure === "secondCure") && (
-                      <img
-                        src={
-                          cure === "firstCure"
-                            ? VoiceMessageCall1
-                            : VoiceMessageCall2
-                        }
-                        alt=""
-                        aria-hidden="true"
-                        className="cure-summary-card__icon"
-                        draggable={false}
-                      />
+                  <div className="option-button option-button--cure-state">
+                    {actionNotice?.key === "cure" && (
+                      <span className="action-toggle-notice action-toggle-notice--cure" role="status">
+                        {actionNotice.text}
+                      </span>
                     )}
+                    <button
+                      type="button"
+                      className={`pending-state-button cure-summary-card ${
+                        isUnifiedCureActive ? "pending-state-button--active cure-summary-card--filled" : "cure-summary-card--empty"
+                      }`}
+                      onClick={handleUnifiedCureToggle}
+                      aria-label={
+                        pendingCureKey === "secondCure"
+                          ? "CURE 2 en attente"
+                          : "CURE 1 en attente"
+                      }
+                      title={
+                        pendingCureKey === "secondCure"
+                          ? "CURE 2 en attente"
+                          : "CURE 1 en attente"
+                      }
+                      aria-pressed={isUnifiedCureActive}
+                      disabled={isHistoryView}
+                    >
+                      {pendingCureKey ? (
+                        <img
+                          src={
+                            pendingCureKey === "firstCure"
+                              ? VoiceMessageCall1
+                              : VoiceMessageCall2
+                          }
+                          alt=""
+                          aria-hidden="true"
+                          className={`cure-summary-card__icon ${
+                            isUnifiedCureActive ? "" : "cure-summary-card__icon--off"
+                          }`}
+                          draggable={false}
+                        />
+                      ) : (
+                        <PhoneInTalkRounded className={`cure-summary-card__fallback ${isUnifiedCureActive ? "cure-summary-card__fallback--active" : ""}`} />
+                      )}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -1007,70 +1137,21 @@ const CurrentInterventionPage = () => {
             <ClientsOnAddress />
           </div>
 
-          <div className="cure-selector" aria-label="Sélection CURE">
-            <ButtonGroup
-              size="small"
-              aria-label="Niveau CURE"
-              className="cure-selector__buttons"
+          <div className="cure-selector" aria-label="CURE et SMS">
+            <Button
+              type="button"
+              variant={isUnifiedCureActive ? "contained" : "outlined"}
+              className={`cure-selector__button cure-selector__button--unified ${
+                isUnifiedCureActive ? "cure-selector__button--active" : ""
+              }`}
+              disabled={isHistoryView}
+              onClick={handleUnifiedCureToggle}
+              aria-pressed={isUnifiedCureActive}
+              startIcon={<PhoneInTalkRounded sx={{ fontSize: 18 }} />}
             >
-              {[
-                {
-                  value: "noCure",
-                  label: (
-                    <span className="no-cure-phone-icon" aria-hidden="true">
-                      <CallRounded className="no-cure-phone-icon__phone" />
-                      <CloseRounded className="no-cure-phone-icon__cross" />
-                    </span>
-                  ),
-                },
-                {
-                  value: "firstCure",
-                  label: (
-                    <>
-                      <span>1.</span>
-                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
-                    </>
-                  ),
-                },
-                {
-                  value: "secondCure",
-                  label: (
-                    <>
-                      <span>2.</span>
-                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
-                    </>
-                  ),
-                },
-                {
-                  value: "thirdCure",
-                  label: (
-                    <>
-                      <span>3.</span>
-                      <PhoneInTalkRounded sx={{ fontSize: 18 }} />
-                    </>
-                  ),
-                },
-              ].map(({ value, label }) => (
-                <Button
-                  key={value}
-                  type="button"
-                  variant={cure === value ? "contained" : "outlined"}
-                  className={`cure-selector__button ${
-                    cure === value ? "cure-selector__button--active" : ""
-                  }`}
-                  disabled={isHistoryView}
-                  onClick={() => handleCureSelection(value as typeof cure)}
-                  sx={{ "& .MuiButton-startIcon": { margin: 0 }, gap: "4px" }}
-                  aria-label={
-                    value === "noCure"
-                      ? "No CURE"
-                      : `${value === "firstCure" ? "1er" : value === "secondCure" ? "2ème" : "3ème"} CURE`
-                  }
-                >
-                  {label}
-                </Button>
-              ))}
-            </ButtonGroup>
+              CURE
+            </Button>
+
             <Button
               type="button"
               variant={smsEnabled ? "contained" : "outlined"}
@@ -1338,6 +1419,49 @@ const CurrentInterventionPage = () => {
           </Tooltip>
         </aside>
       )}
+
+      <Dialog
+        open={resClientDialogOpen}
+        onClose={() => setResClientDialogOpen(false)}
+        fullWidth
+        maxWidth="sm"
+        aria-labelledby="res-client-dialog-title"
+      >
+        <DialogTitle id="res-client-dialog-title">
+          Client concerné par la résiliation
+        </DialogTitle>
+        <DialogContent dividers>
+          <div className="res-client-choice-list">
+            {resEligibleClients.map((client) => {
+              const originalIndex = addressClients.findIndex((item) => item.id === client.id);
+              const isCopperTechnology = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
+              const identifier = isCopperTechnology ? client.na.trim() : client.utac.trim();
+              return (
+                <button
+                  type="button"
+                  className="res-client-choice"
+                  key={client.id}
+                  onClick={() => {
+                    activateResForClient(client);
+                    setResClientDialogOpen(false);
+                  }}
+                >
+                  <span className="res-client-choice__index">{originalIndex + 1}</span>
+                  <span className="res-client-choice__name">
+                    {client.fullName.trim() || "Client sans nom"}
+                  </span>
+                  <span className="res-client-choice__identifier">
+                    {isCopperTechnology ? "NA" : "UTAC"} {identifier || "—"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setResClientDialogOpen(false)}>Annuler</Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog
         open={historyDialogOpen}

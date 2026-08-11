@@ -6,6 +6,7 @@ import Tooltip from "@mui/material/Tooltip";
 import {
   Contact,
   KeyRound,
+  Link,
   PhoneCall,
   TextInitial,
 } from "lucide-react";
@@ -189,6 +190,16 @@ const InputsAll = () => {
             />
           </div>
         </div>
+      </section>
+
+      <section className="inputs-row inputs-row--wct-link">
+        <SimpleInput
+          field="wctLink"
+          label="WCT link"
+          inputType="type2"
+          icon={Link}
+          className="simple-input--wct-link"
+        />
       </section>
     </div>
   );

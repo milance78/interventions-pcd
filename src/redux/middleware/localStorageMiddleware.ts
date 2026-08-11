@@ -37,6 +37,7 @@ const currentData = (state: Intervention): InterventionData => ({
   addressClients: state.addressClients,
   LOMKey: state.LOMKey,
   phone: state.phone,
+  wctLink: state.wctLink,
   displayAllFields: state.displayAllFields,
   snowReceived: state.snowReceived,
   snowSent: state.snowSent,

@@ -162,6 +162,7 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
       typeof data.questionReviewedDate === "string" ? data.questionReviewedDate : null,
     isSnow: isSnowReceivedPending || isSnowSentPending,
     comment,
+    wctLink: String(data.wctLink ?? ""),
     addressConfirmation,
     additionalInformation:
       data.additionalInformation ?? data.informationsSupplementaires ?? "",

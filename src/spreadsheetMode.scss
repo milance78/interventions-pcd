@@ -1074,3 +1074,318 @@ body.spreadsheet-mode {
   background: transparent !important;
   border-radius: 0;
 }
+
+
+/* v78: strict monochrome spreadsheet skin */
+body.spreadsheet-mode {
+  --xls-grid: #bcbcbc;
+  --xls-grid-soft: #d5d5d5;
+  --xls-header: #e9e9e9;
+  --xls-header-2: #f3f3f3;
+  --xls-selected: #e1e1e1;
+  --xls-yellow: #ececec;
+
+  * {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* No coloured accents. */
+  :is(
+    .header *,
+    .current-intervention-page *,
+    .today-list-page *,
+    .history-page *,
+    .on-hold-page *,
+    .search-results-page *,
+    .statistics-page *,
+    .templates-page *
+  ) {
+    color: #111 !important;
+    border-color: var(--xls-grid) !important;
+  }
+
+  :is(
+    .header__link--active,
+    .on-hold-tab--active,
+    .MuiButton-contained,
+    .MuiButton-outlined,
+    button,
+    .MuiIconButton-root,
+    [class*="active"],
+    [class*="filled"],
+    [class*="confirmed"],
+    [class*="pending"]
+  ) {
+    background-color: #ececec !important;
+    background-image: none !important;
+  }
+
+  /* Disable every hover/focus decoration. */
+  *:hover,
+  *:focus,
+  *:focus-visible,
+  *:active {
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    outline-color: #777 !important;
+  }
+
+  /* No pictograms in XLS mode, including Smart Import artwork. */
+  :is(
+    svg,
+    img,
+    .icon-container,
+    .address-client-import-trigger__icon,
+    .smart-import-trigger__icon,
+    .smart-import-dialog__icon,
+    [class*="icon-stack"],
+    [class*="icon__"],
+    [class$="__icon"]
+  ) {
+    display: none !important;
+  }
+
+  /* Adjacent controls: one continuous cage. */
+  :is(
+    .intervention-core-fields,
+    .inputs-all,
+    .inputs-row,
+    .snow-inputs-group__fields,
+    .current-intervention-layout,
+    .right-card,
+    .left-card,
+    .today-intervention-row,
+    .history-intervention-row,
+    .header,
+    .header__navigation,
+    .header__right
+  ) {
+    gap: 0 !important;
+  }
+
+  .current-intervention-layout {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .intervention-card {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  .intervention-core-fields > *,
+  .inputs-row > *,
+  .client-name-field,
+  .clients-address-field,
+  .comment-field,
+  .additional-information-dialog-trigger,
+  .status-wrapper {
+    margin: 0 !important;
+  }
+
+  .MuiFormControl-root,
+  .MuiTextField-root,
+  .simple-input,
+  .address-mini-input,
+  .snow-pending-input__field {
+    margin: 0 !important;
+  }
+
+  .MuiOutlinedInput-root,
+  .MuiInput-root,
+  .MuiInputBase-root {
+    border: 1px solid var(--xls-grid) !important;
+  }
+
+  .MuiInput-underline::before,
+  .MuiInput-underline::after {
+    border-bottom: 0 !important;
+  }
+
+  /* Multiline fields show spreadsheet rows. */
+  textarea,
+  .MuiInputBase-inputMultiline {
+    line-height: 22px !important;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 21px,
+        var(--xls-grid-soft) 21px,
+        var(--xls-grid-soft) 22px
+      ) !important;
+    background-size: 100% 22px !important;
+  }
+
+  /* Copy buttons are only tiny empty cells attached to the field corner. */
+  .simple-input__copy-button,
+  .copy-field-button,
+  .address-client-field__copy,
+  .comment-copy-actions button {
+    width: 18px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+
+  .simple-input__copy-button::before,
+  .simple-input__copy-button::after,
+  .copy-field-button::before,
+  .copy-field-button::after,
+  .address-client-field__copy::before,
+  .address-client-field__copy::after,
+  .comment-copy-actions button::before,
+  .comment-copy-actions button::after {
+    content: "" !important;
+    display: none !important;
+  }
+
+  .copy-field {
+    position: relative !important;
+  }
+
+  .copy-field .copy-field-button-wrapper,
+  .copy-field .comment-copy-actions {
+    margin: 0 !important;
+  }
+
+  /* Remove all tooltip/animation chrome in spreadsheet mode. */
+  .MuiTooltip-popper,
+  .action-toggle-notice,
+  .copy-feedback,
+  [role="tooltip"] {
+    display: none !important;
+  }
+
+  /* Header cells share boundaries. */
+  .header {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .header__datetime,
+  .header__link,
+  .header__right > *,
+  .header__right .MuiInputBase-root,
+  .header__right .MuiFormControl-root {
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-left: 0 !important;
+  }
+
+  /* Circular badges become square cells. */
+  :is(
+    .address-client__number,
+    .animated-today-counter,
+    .today-total-counter,
+    .history-date-stat,
+    .letter-badge,
+    [class*="badge"],
+    [class*="counter"]
+  ) {
+    border-radius: 0 !important;
+  }
+}
+
+body.spreadsheet-mode {
+  :is(
+    .header *,
+    .current-intervention-page *,
+    .today-list-page *,
+    .history-page *,
+    .on-hold-page *,
+    .search-results-page *,
+    .statistics-page *,
+    .templates-page *
+  ) {
+    background-image: none !important;
+  }
+
+  :is(
+    .current-intervention-page *,
+    .today-list-page *,
+    .history-page *,
+    .on-hold-page *,
+    .search-results-page *,
+    .statistics-page *,
+    .templates-page *
+  ):not(input):not(textarea):not(.MuiInputBase-input) {
+    --mui-palette-primary-main: #555;
+  }
+}
+
+/* v79 — true contiguous Excel cage */
+body.spreadsheet-mode {
+  :is(.intervention-card,.left-card,.right-card,.intervention-core-fields,.inputs-all,.inputs-row,
+      .snow-inputs-group,.snow-inputs-group__fields,.clients-on-address,.address-client,
+      .today-intervention-row,.history-intervention-row,.search-result-card,
+      .comment-field,.additional-information-field,.client-name-field) {
+    gap:0 !important;
+    row-gap:0 !important;
+    column-gap:0 !important;
+  }
+
+  :is(.intervention-card,.left-card,.right-card,.intervention-core-fields,.inputs-all,.inputs-row,
+      .snow-inputs-group,.snow-inputs-group__fields,.clients-on-address,.address-client,
+      .today-intervention-row,.history-intervention-row,.search-result-card) > * {
+    margin:0 !important;
+  }
+
+  /* Neighbouring bordered cells overlap one border instead of drawing two separated rules. */
+  :is(.MuiFormControl-root,.MuiTextField-root,.simple-input,.address-mini-input,
+      .snow-pending-input__field,.client-name-field,.comment-field,.additional-information-field,
+      .status-wrapper,.address-client__field) {
+    margin:0 !important;
+  }
+
+  .MuiOutlinedInput-root,
+  .MuiInput-root,
+  .MuiInputBase-root,
+  textarea,
+  .comment-field,
+  .additional-information-field {
+    background-color:#fff !important;
+  }
+
+  /* Large text areas are ruled row-by-row like spreadsheet cells. */
+  textarea,
+  .MuiInputBase-inputMultiline,
+  .comment-field textarea,
+  .additional-information-field textarea,
+  [class*="comment"] textarea,
+  [class*="additional"] textarea {
+    line-height:22px !important;
+    padding-top:0 !important;
+    padding-bottom:0 !important;
+    background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 21px,var(--xls-grid) 21px,var(--xls-grid) 22px) !important;
+    background-size:100% 22px !important;
+  }
+
+  /* Adjacent MUI cells share a single boundary. */
+  .inputs-row > * + *,
+  .intervention-core-fields > * + *,
+  .snow-inputs-group__fields > * + *,
+  .address-client > * + *,
+  .header__navigation > * + *,
+  .header__right > * + * {
+    margin-left:-1px !important;
+  }
+
+  .inputs-all > * + *,
+  .intervention-card > * + *,
+  .clients-on-address > * + * {
+    margin-top:-1px !important;
+  }
+}

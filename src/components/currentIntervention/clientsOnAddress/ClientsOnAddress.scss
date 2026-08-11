@@ -678,3 +678,60 @@
   background: #d1caed !important;
   border-color: #6657aa !important;
 }
+
+
+/* v78: compact paired FUT / MÊME control */
+.address-client__relationship-controls {
+  gap: 2px;
+}
+
+.address-client__future,
+.address-client__same {
+  > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    line-height: 1;
+    font-size: 8.5px;
+    font-weight: 400;
+    opacity: .64;
+  }
+}
+
+.address-client__future {
+  border-radius: 4px 4px 0 0 !important;
+}
+
+.address-client__same {
+  border-radius: 0 0 4px 4px !important;
+}
+
+.address-client__future--active {
+  color: #0b7149 !important;
+  background: #bfe6cf !important;
+  border-color: #2f8f63 !important;
+}
+.address-client__same--active {
+  color: #4b388f !important;
+  background: #d3cdf0 !important;
+  border-color: #725fb6 !important;
+}
+.address-client__future--active > span,
+.address-client__same--active > span {
+  opacity: 1;
+  font-weight: 400;
+}
+
+/* v79 — FUT / MÊME inactive states equally readable */
+.address-client__future:not(.address-client__future--active),
+.address-client__same:not(.address-client__same--active) {
+  color:#68717b !important;
+  background:#eef0f2 !important;
+  border-color:#b7bdc4 !important;
+}
+.address-client__future:not(.address-client__future--active) > span,
+.address-client__same:not(.address-client__same--active) > span {
+  opacity:.82 !important;
+  color:inherit !important;
+}

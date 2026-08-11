@@ -76,6 +76,7 @@ export interface InterventionData {
   addressClients: AddressClient[];
   LOMKey: string;
   phone: string;
+  wctLink: string;
   displayAllFields: boolean;
   snowReceived: string;
   snowSent: string;
@@ -183,6 +184,7 @@ export const emptyInterventionData: InterventionData = {
   addressClients: [],
   LOMKey: "",
   phone: "",
+  wctLink: "",
   displayAllFields: false,
   snowReceived: "",
   snowSent: "",
@@ -274,6 +276,7 @@ const extractData = (state: Intervention): InterventionData => ({
   addressClients: state.addressClients,
   LOMKey: state.LOMKey,
   phone: state.phone,
+  wctLink: state.wctLink,
   displayAllFields: state.displayAllFields,
   snowReceived: state.snowReceived,
   snowSent: state.snowSent,
@@ -564,8 +567,15 @@ const NewInterventionSlice = createSlice({
         state.cureRecords[cure] = null;
       }
 
-      state.cure = "noCure";
-      state.curePendingSince = null;
+      const latestRemainingCure = [...cureOrder]
+        .reverse()
+        .find((cure) => Boolean(state.cureRecords[cure])) ?? null;
+
+      state.cure = latestRemainingCure ?? "noCure";
+      state.curePendingSince =
+        latestRemainingCure === "firstCure" || latestRemainingCure === "secondCure"
+          ? state.cureRecords[latestRemainingCure]?.recordedAt ?? null
+          : null;
       refreshDraftMetadata(state);
     },
 
