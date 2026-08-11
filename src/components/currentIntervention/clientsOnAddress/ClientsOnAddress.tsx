@@ -415,7 +415,7 @@ const ClientsOnAddress = () => {
                     aria-label={`Fut à l'adresse pour le client ${index + 1}`}
                     aria-pressed={Boolean(client.isFuture)}
                   >
-                    <span aria-hidden="true">f</span>
+                    <span aria-hidden="true">fut</span>
                   </IconButton>
                 </span>
               </Tooltip>
@@ -438,7 +438,7 @@ const ClientsOnAddress = () => {
                     aria-label={`Même client à l'adresse pour le client ${index + 1}`}
                     aria-pressed={Boolean(client.isSameClient)}
                   >
-                    <span aria-hidden="true">=</span>
+                    <span aria-hidden="true">même</span>
                   </IconButton>
                 </span>
               </Tooltip>

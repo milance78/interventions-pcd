@@ -55,7 +55,7 @@ const CommentCopyActions = ({
       }`}
       onClick={(event) => event.stopPropagation()}
     >
-      <Tooltip title={copied === "normal" ? "Copié" : "Copier"} arrow>
+      <Tooltip title={copied === "normal" ? "Copié" : "Copier"} arrow placement="left">
         <span>
           <IconButton
             size="small"
@@ -68,7 +68,7 @@ const CommentCopyActions = ({
         </span>
       </Tooltip>
 
-      <Tooltip title={copied === "nps" ? "NPS copié" : "Copier pour NPS"} arrow>
+      <Tooltip title={copied === "nps" ? "NPS copié" : "Copier pour NPS"} arrow placement="left">
         <span>
           <IconButton
             size="small"
@@ -83,7 +83,7 @@ const CommentCopyActions = ({
       </Tooltip>
 
       {showWct && (
-        <Tooltip title={copied === "wct" ? "WCT copié" : "Copier le dernier CURE pour WCT"} arrow>
+        <Tooltip title={copied === "wct" ? "WCT copié" : "Copier le dernier CURE pour WCT"} arrow placement="left">
           <span>
             <IconButton
               size="small"
