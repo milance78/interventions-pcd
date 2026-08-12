@@ -2707,3 +2707,12 @@
 .intervention-option-group__items--six .pending-state-button:not(.pending-state-button--active) .snow-trail-icon__sign {
   opacity: 1 !important;
 }
+
+/* v85 — postponed status calendar */
+.status-input-shell { width:100%; }
+.postponed-date-line { margin-top:7px; display:flex; align-items:center; justify-content:center; gap:4px; color:#6b21a8; font-size:12px; font-weight:600; }
+.postponed-date-line .MuiIconButton-root { color:#7e22ce; }
+.postpone-calendar-dialog .MuiPaper-root { border-radius:18px; min-width:340px; }
+.postpone-calendar-dialog .MuiDialogTitle-root { display:flex; align-items:center; gap:9px; font-weight:700; color:#334155; }
+.postpone-calendar-input { width:100%; box-sizing:border-box; margin-top:8px; padding:14px 16px; border:1px solid #cbd5e1; border-radius:12px; font:inherit; color:#334155; background:#fff; outline:none; }
+.postpone-calendar-input:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.12); }

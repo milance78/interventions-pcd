@@ -735,3 +735,29 @@
   opacity:.82 !important;
   color:inherit !important;
 }
+
+/* v85 — larger, more legible FUT / MÊME paired square */
+.address-client { grid-template-columns: 42px 22px minmax(0, 1fr) auto; }
+.address-client__relationship-controls {
+  width: 40px;
+  height: 40px;
+  gap: 2px;
+}
+.address-client__relationship-controls > span {
+  width: 40px;
+  height: 19px;
+}
+.address-client__relationship-controls .MuiIconButton-root {
+  width: 40px;
+  height: 19px;
+  min-width: 40px;
+  min-height: 19px;
+}
+.address-client__future > span,
+.address-client__same > span {
+  font-size: 10.5px !important;
+  color: #59636e !important;
+  opacity: .95 !important;
+}
+.address-client__future--active > span { color:#075f3e !important; }
+.address-client__same--active > span { color:#3f2d82 !important; }

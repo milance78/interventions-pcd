@@ -808,9 +808,8 @@ const CurrentInterventionPage = () => {
 
     if (isOpenedFromOnHold && onHoldEditContext) {
       window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
-      window.sessionStorage.setItem(PENDING_TAB_KEY, onHoldEditContext.tab);
-      window.sessionStorage.setItem("scroll:on-hold", String(onHoldEditContext.scrollTop));
-      navigate("/en-attente");
+      // Ajouter à la liste du jour always closes the review flow on Liste du jour.
+      navigate("/liste-du-jour");
       return;
     }
 

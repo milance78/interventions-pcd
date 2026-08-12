@@ -109,6 +109,7 @@ export interface InterventionData {
   curePendingSince: string | null;
   smsEnabled: boolean;
   status: string;
+  postponedDate: string | null;
   createdAt: string | null;
   updatedAt: string | null;
   dateKey?: string;
@@ -212,6 +213,7 @@ export const emptyInterventionData: InterventionData = {
   curePendingSince: null,
   smsEnabled: loadSmsPreference(),
   status: "on hold",
+  postponedDate: null,
   createdAt: null,
   updatedAt: null,
 };
@@ -304,6 +306,7 @@ const extractData = (state: Intervention): InterventionData => ({
   curePendingSince: state.curePendingSince,
   smsEnabled: state.smsEnabled,
   status: state.status,
+  postponedDate: state.postponedDate,
   createdAt: state.createdAt,
   updatedAt: state.updatedAt,
   dateKey: state.dateKey,

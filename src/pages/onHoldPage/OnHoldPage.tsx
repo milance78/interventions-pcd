@@ -4,7 +4,7 @@ import { flushSync } from "react-dom";
 import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
-import MoreHorizRounded from "@mui/icons-material/MoreHorizRounded";
+import EventRepeatRounded from "@mui/icons-material/EventRepeatRounded";
 import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
 
 import { useAppDispatch, useAppSelector } from "../../redux/store";
@@ -56,7 +56,7 @@ const tabs: Array<{
     label: "Questions M&P",
     icon: <HelpOutlineRounded />,
   },
-  { value: "other", label: "Autre", icon: <MoreHorizRounded /> },
+  { value: "other", label: "Postposé", icon: <EventRepeatRounded /> },
 ];
 const tabOrder = tabs.map((tab) => tab.value);
 
@@ -170,6 +170,7 @@ const OnHoldPage = () => {
     const sorted = [...interventions];
 
     if (activeTab === "cure") {
+      const today = localDateKey();
       return sorted.sort((first, second) => {
         const infrastructureDifference =
           (infrastructureKind(first.infrastructure) === "copper" ? 0 : 1) -
@@ -178,6 +179,10 @@ const OnHoldPage = () => {
         if (infrastructureDifference !== 0) {
           return infrastructureDifference;
         }
+
+        const firstReviewedToday = first.cureReviewedDate === today;
+        const secondReviewedToday = second.cureReviewedDate === today;
+        if (firstReviewedToday !== secondReviewedToday) return firstReviewedToday ? 1 : -1;
 
         return interventionOldestValue(first).localeCompare(
           interventionOldestValue(second),
@@ -232,17 +237,9 @@ const OnHoldPage = () => {
     }
 
     if (activeTab === "other") {
-      const today = localDateKey();
-      return sorted.sort((first, second) => {
-        const firstReviewedToday = first.otherReviewedDate === today;
-        const secondReviewedToday = second.otherReviewedDate === today;
-        if (firstReviewedToday !== secondReviewedToday) {
-          return firstReviewedToday ? 1 : -1;
-        }
-        return interventionOldestValue(first).localeCompare(
-          interventionOldestValue(second),
-        );
-      });
+      return sorted.sort((first, second) =>
+        (first.postponedDate ?? "9999-12-31").localeCompare(second.postponedDate ?? "9999-12-31"),
+      );
     }
 
     return sorted;
@@ -252,10 +249,7 @@ const OnHoldPage = () => {
     activeTab === "cure"
       ? sortedInterventions.filter((item) => isCureOverdue(item))
       : [];
-  const current =
-    activeTab === "cure"
-      ? sortedInterventions.filter((item) => !isCureOverdue(item))
-      : sortedInterventions;
+  const current = sortedInterventions;
 
   const resCopper =
     activeTab === "res"
@@ -269,6 +263,14 @@ const OnHoldPage = () => {
           (item) => infrastructureKind(item.infrastructure) === "fiber",
         )
       : [];
+
+  const groupedByInfrastructure = (activeTab === "cure" || activeTab === "res" || activeTab === "snowReceived" || activeTab === "snowSent");
+  const groupedCopper = groupedByInfrastructure
+    ? current.filter((item) => infrastructureKind(item.infrastructure) === "copper")
+    : [];
+  const groupedFiber = groupedByInfrastructure
+    ? current.filter((item) => infrastructureKind(item.infrastructure) === "fiber")
+    : [];
 
   const openIntervention = (
     intervention: (typeof sortedInterventions)[number],
@@ -300,7 +302,7 @@ const OnHoldPage = () => {
     if (activeTab === "snowSent") return "SNOW CRÉÉ";
     if (activeTab === "questions") return "QUESTION M&P";
 
-    return "AUTRE";
+    return "POSTPOSÉ";
   };
 
   const getStatusIcon = () => {
@@ -314,7 +316,7 @@ const OnHoldPage = () => {
     }
     if (activeTab === "questions") return <HelpOutlineRounded />;
 
-    return <MoreHorizRounded />;
+    return <EventRepeatRounded />;
   };
 
 
@@ -414,6 +416,12 @@ const OnHoldPage = () => {
               </span>
             </span>
           )}
+          {activeTab === "other" && intervention.postponedDate && (
+            <span className="on-hold-card__snow-ticket">
+              <strong>Postposé au</strong>
+              <span>{intervention.postponedDate.split("-").reverse().join("/")}</span>
+            </span>
+          )}
         </span>
 
         <span className="on-hold-card__details">
@@ -475,52 +483,21 @@ const OnHoldPage = () => {
           <div className="on-hold-empty">
             Aucune intervention dans cette liste.
           </div>
-        ) : activeTab === "cure" ? (
-          <>
-            {overdue.length > 0 && (
-              <div className="on-hold-group">
-                <div className="on-hold-group__title on-hold-group__title--overdue">
-                  <span>Échéance dépassée</span>
-                  <strong>{overdue.length}</strong>
-                </div>
-                <div className="on-hold-grid">
-                  {overdue.map((item) => renderCard(item, true))}
-                </div>
-              </div>
-            )}
-
-            {overdue.length > 0 && current.length > 0 && (
-              <div className="on-hold-separator" aria-hidden="true" />
-            )}
-
-            {current.length > 0 && (
-              <div className="on-hold-group">
-                <div className="on-hold-group__title">
-                  <span>Dans le délai</span>
-                  <strong>{current.length}</strong>
-                </div>
-                <div className="on-hold-grid">
-                  {current.map((item) => renderCard(item))}
-                </div>
-              </div>
-            )}
-          </>
-        ) : activeTab === "res" ? (
+        ) : groupedByInfrastructure ? (
           <div className="on-hold-res-groups">
-            {resCopper.length > 0 && (
+            {groupedCopper.length > 0 && (
               <section className="on-hold-infrastructure-group">
                 <h2>Cuivre</h2>
                 <div className="on-hold-grid">
-                  {resCopper.map((item) => renderCard(item))}
+                  {groupedCopper.map((item) => renderCard(item, activeTab === "cure" && isCureOverdue(item)))}
                 </div>
               </section>
             )}
-
-            {resFiber.length > 0 && (
+            {groupedFiber.length > 0 && (
               <section className="on-hold-infrastructure-group">
                 <h2>Fibre</h2>
                 <div className="on-hold-grid">
-                  {resFiber.map((item) => renderCard(item))}
+                  {groupedFiber.map((item) => renderCard(item, activeTab === "cure" && isCureOverdue(item)))}
                 </div>
               </section>
             )}

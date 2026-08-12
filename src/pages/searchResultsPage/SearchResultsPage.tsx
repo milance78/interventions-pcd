@@ -26,6 +26,7 @@ const statusLabel = (value?: string) => {
     completed: "TERMINÉ",
     "on hold": "EN ATTENTE",
     transferred: "TRANSMIS",
+    postponed: "POSTPOSÉ",
     "consult M&P": "VOIR AVEC M&P",
     "closed by another agent": "FERMÉ PAR UN AUTRE AGENT",
   };

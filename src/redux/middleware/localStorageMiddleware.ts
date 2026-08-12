@@ -65,6 +65,7 @@ const currentData = (state: Intervention): InterventionData => ({
   curePendingSince: state.curePendingSince,
   smsEnabled: state.smsEnabled,
   status: state.status,
+  postponedDate: state.postponedDate,
   createdAt: null,
   updatedAt: null,
   dateKey: undefined,

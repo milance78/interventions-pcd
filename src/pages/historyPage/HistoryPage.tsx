@@ -71,6 +71,7 @@ const displayStatus = (value: string) => {
     "on hold": "en attente",
     completed: "terminé",
     transferred: "transmis",
+    postponed: "postposé",
     "consult M&P": "voir avec M&P",
     "closed by another agent": "fermé par un autre agent",
   };

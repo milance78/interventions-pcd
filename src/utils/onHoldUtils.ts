@@ -376,17 +376,10 @@ export const getOnHoldInterventions = (
     );
   }
 
-  // "Autre" is the catch-all list for interventions explicitly put on hold
-  // without a CURE, SNOW, résiliation or M&P question marker.
+  // Postposé contains only interventions explicitly postponed to a date.
   return latest.filter(
     (intervention) =>
-      intervention.status === "on hold" &&
-      intervention.cure !== "firstCure" &&
-      intervention.cure !== "secondCure" &&
-      !intervention.isSnowSentPending &&
-      !intervention.isSnowReceivedPending &&
-      !intervention.isResPending &&
-      !intervention.isUnclear,
+      intervention.status === "postponed" && Boolean(intervention.postponedDate),
   );
 };
 

@@ -97,18 +97,19 @@ const joinedDetails = (client: AddressClient, infrastructure: string) => {
   return values.filter(Boolean).join(", ");
 };
 
-const copperCommentDetails = (client: AddressClient) => {
+const simpleClientCommentDetails = (client: AddressClient, infrastructure: string) => {
+  const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
+  const parts: string[] = [];
   const fullName = normalizePersonName(client.fullName);
-  const values = [
-    fullName ? `Nom: ${fullName}` : "",
-    sentenceCaseDetail("NA", client.na, true),
-    sentenceCaseDetail("Opérateur", client.operator),
-    sentenceCaseDetail("ID", client.clientId, true),
-    sentenceCaseDetail("CID", client.cid, true),
-    sentenceCaseDetail("VOIP", client.voip, true),
-  ];
+  if (fullName) parts.push(fullName);
 
-  return values.filter(Boolean).join(", ");
+  const serviceValue = clean(isCopper ? client.na : client.utac);
+  if (serviceValue) parts.push(`${isCopper ? "NA" : "UTAC"}: ${serviceValue}`);
+
+  const operator = clean(client.operator);
+  if (operator) parts.push(`chez ${operator}`);
+
+  return parts.join(", ");
 };
 
 export const serializeAddressClients = (
@@ -129,19 +130,22 @@ export const formatAddressClientsForComment = (
 
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
 
-  if (isCopper && active.length === 1) {
-    return `Un TF à l'adresse, ${copperCommentDetails(active[0])};`;
+  if (active.length === 1) {
+    const details = simpleClientCommentDetails(active[0], infrastructure);
+    const header = isCopper
+      ? "Un TF à l'adresse:"
+      : "L'UTAC à l'adresse occupé par:";
+    return details ? `${header} ${details};` : header;
   }
 
-  const lines = active.map((client, index) =>
-    isCopper
-      ? `${index + 1}. ${copperCommentDetails(client)};`
-      : `${index + 1}. ${joinedDetails(client, infrastructure)};`,
-  );
+  const lines = active.map((client, index) => {
+    const details = simpleClientCommentDetails(client, infrastructure);
+    return `${index + 1}. ${details}${details ? ";" : ""}`;
+  });
 
   return isCopper
-    ? `Les clients TF à l'adresse:\n${lines.join("\n")}`
-    : `Clients à l'adresse:\n${lines.join("\n")}`;
+    ? `Clients TF à l'adresse:\n${lines.join("\n")}`
+    : `Les UTAC à l'adresse occupés par:\n${lines.join("\n")}`;
 };
 
 export const normalizeAddressClientMode = (
