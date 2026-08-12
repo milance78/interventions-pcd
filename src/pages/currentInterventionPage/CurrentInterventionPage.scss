@@ -2690,3 +2690,20 @@
   background:linear-gradient(180deg,#b9844d,#95633a) !important;
   border-color:#81532f !important;
 }
+
+/* v80 — one clearly visible neutral tone for all six inactive status pictograms */
+.intervention-option-group__items--six .boolean-input:not(.active) .boolean-input-icon,
+.intervention-option-group__items--six .boolean-input:not(.active) .boolean-input-icon > *,
+.intervention-option-group__items--six .boolean-input:not(.active) .question-action-icon,
+.intervention-option-group__items--six .lightbulb-action-icon--off,
+.intervention-option-group__items--six .res-pending-button:not(.res-pending-button--active) .res-pending-button__icon,
+.intervention-option-group__items--six .pending-state-button:not(.pending-state-button--active) .snow-trail-icon,
+.intervention-option-group__items--six .cure-summary-card:not(.pending-state-button--active) .cure-summary-card__icon,
+.intervention-option-group__items--six .cure-summary-card:not(.pending-state-button--active) .cure-summary-card__fallback {
+  opacity: .82 !important;
+  filter: grayscale(1) contrast(1.28) brightness(.88) !important;
+}
+.intervention-option-group__items--six .pending-state-button:not(.pending-state-button--active) .snow-trail-icon__flake,
+.intervention-option-group__items--six .pending-state-button:not(.pending-state-button--active) .snow-trail-icon__sign {
+  opacity: 1 !important;
+}
