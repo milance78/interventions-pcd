@@ -2716,3 +2716,46 @@
 .postpone-calendar-dialog .MuiDialogTitle-root { display:flex; align-items:center; gap:9px; font-weight:700; color:#334155; }
 .postpone-calendar-input { width:100%; box-sizing:border-box; margin-top:8px; padding:14px 16px; border:1px solid #cbd5e1; border-radius:12px; font:inherit; color:#334155; background:#fff; outline:none; }
 .postpone-calendar-input:focus { border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.12); }
+
+/* v87 — unified interaction for all six pending-state cells */
+.current-intervention-page .intervention-option-group__items--six > .option-button { transition: transform 130ms ease, background-color 150ms ease, border-color 150ms ease, box-shadow 150ms ease !important; }
+.current-intervention-page .intervention-option-group__items--six > .option-button:hover { transform: translateY(-2px) !important; background:#f1f5f9 !important; border-color:#aeb9c8 !important; box-shadow:0 6px 13px rgba(51,65,85,.09) !important; }
+.current-intervention-page .intervention-option-group__items--six :is(.boolean-input,.res-pending-button,.pending-state-button,.cure-summary-card),
+.current-intervention-page .intervention-option-group__items--six :is(.boolean-input,.res-pending-button,.pending-state-button,.cure-summary-card):hover { transform:translateY(0) scale(1) !important; transition:transform 85ms ease !important; }
+.current-intervention-page .intervention-option-group__items--six :is(.boolean-input,.res-pending-button,.pending-state-button,.cure-summary-card):active { transform:translateY(2px) scale(.975) !important; }
+.current-intervention-page .intervention-option-group__items--six .boolean-input:not(.active) .boolean-input-icon,
+.current-intervention-page .intervention-option-group__items--six .res-pending-button:not(.res-pending-button--active) .res-pending-button__icon,
+.current-intervention-page .intervention-option-group__items--six .pending-state-button:not(.pending-state-button--active) .snow-trail-icon,
+.current-intervention-page .intervention-option-group__items--six .cure-summary-card:not(.pending-state-button--active) .cure-summary-card__icon,
+.current-intervention-page .intervention-option-group__items--six .cure-summary-card:not(.pending-state-button--active) .cure-summary-card__fallback { opacity:.68 !important; filter:grayscale(1) brightness(.78) contrast(.88) !important; }
+.current-intervention-page .intervention-option-group__items--six .boolean-input:not(.active) .question-action-icon { opacity:.72 !important; filter:grayscale(1) brightness(.63) contrast(.82) !important; }
+.current-intervention-page .intervention-option-group__items--six .pending-state-button:not(.pending-state-button--active) .snow-trail-icon__flake,
+.current-intervention-page .intervention-option-group__items--six .pending-state-button:not(.pending-state-button--active) .snow-trail-icon__sign { opacity:1 !important; }
+.current-intervention-page .intervention-option-group__items--six .boolean-input.active .boolean-input-icon,
+.current-intervention-page .intervention-option-group__items--six .res-pending-button--active .res-pending-button__icon,
+.current-intervention-page .intervention-option-group__items--six .pending-state-button--active .snow-trail-icon,
+.current-intervention-page .intervention-option-group__items--six .pending-state-button--active .cure-summary-card__icon,
+.current-intervention-page .intervention-option-group__items--six .pending-state-button--active .cure-summary-card__fallback { opacity:1 !important; filter:none !important; }
+.current-intervention-page .intervention-option-group__items--six > .option-button:hover :is(.boolean-input,.res-pending-button,.pending-state-button,.cure-summary-card) { background:rgba(148,163,184,.055) !important; }
+
+/* v88 — question icon: active artwork must stay green.
+   The `active` class lives on `.boolean-input`, not on the <img>, so older
+   `.question-action-icon:not(.active)` rules incorrectly grayscaled both states. */
+.current-intervention-page .intervention-option-group__items--six
+  .boolean-input.active .question-action-icon {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+.current-intervention-page .intervention-option-group__items--six
+  .boolean-input:not(.active) .question-action-icon {
+  opacity: .68 !important;
+  filter: grayscale(1) brightness(.78) contrast(.88) !important;
+}
+
+/* v89 — visually normalize the inactive bulb with the other five OFF pictograms. */
+.current-intervention-page .intervention-option-group__items--six
+  .boolean-input:not(.active) .lightbulb-action-icon--off {
+  opacity: .38 !important;
+  filter: grayscale(1) brightness(1.18) contrast(.78) !important;
+}

@@ -475,7 +475,6 @@ const CurrentInterventionPage = () => {
 
     if (todaysCureKey) {
       void dispatch(clearTodaysCuresThunk());
-      showActionNotice("cure", "CURE retiré");
       return;
     }
 
@@ -517,12 +516,14 @@ const CurrentInterventionPage = () => {
       : isSnowSentPending;
     const next = !current;
     dispatch(updateField({ field, value: next }));
-    showActionNotice(
-      field === "isSnowReceivedPending" ? "snowReceived" : "snowSent",
-      next
-        ? (field === "isSnowReceivedPending" ? "Snow à mon nom en attente" : "Snow créé en attente")
-        : (field === "isSnowReceivedPending" ? "Snow à mon nom retiré" : "Snow créé retiré"),
-    );
+    if (next) {
+      showActionNotice(
+        field === "isSnowReceivedPending" ? "snowReceived" : "snowSent",
+        field === "isSnowReceivedPending"
+          ? "Snow à mon nom en attente"
+          : "Snow créé en attente",
+      );
+    }
   };
 
 
