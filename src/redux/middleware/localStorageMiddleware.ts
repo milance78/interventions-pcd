@@ -2,7 +2,9 @@ import type { Middleware } from "@reduxjs/toolkit";
 
 import {
   clearDraftFromStorage,
+  loadCurrentSessionFromStorage,
   loadDraftFromStorage,
+  saveCurrentSessionToStorage,
   saveDraftToStorage,
 } from "../../localStorage/localStorage";
 import {
@@ -98,14 +100,13 @@ export const localStorageMiddleware: Middleware =
       }
     }
 
-    const draft = intervention.mode === "VIEW_HISTORY" ||
-      intervention.mode === "SEARCH_EDIT" ||
-      intervention.mode === "HISTORY_EDIT" ||
-      intervention.mode === "TODAY_EDIT"
-      ? intervention.draftSnapshot
-      : currentData(intervention);
+    // Always persist the complete Current Intervention session. This is
+    // independent from whether it qualifies as a visible brouillon. Closing
+    // or reloading the browser must restore the exact form that was on screen.
+    saveCurrentSessionToStorage(intervention);
 
-    if (hasMeaningfulDraft(draft)) {
+    const draft = intervention.draftSnapshot;
+    if (intervention.hasDraft && draft && hasMeaningfulDraft(draft)) {
       saveDraftToStorage(draft);
     } else {
       clearDraftFromStorage();
@@ -114,4 +115,4 @@ export const localStorageMiddleware: Middleware =
     return result;
   };
 
-export { loadDraftFromStorage };
+export { loadCurrentSessionFromStorage, loadDraftFromStorage };

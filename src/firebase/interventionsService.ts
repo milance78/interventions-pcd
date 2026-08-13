@@ -207,6 +207,8 @@ const mapIntervention = (
     isHistoryView: false,
     mode: "VIEW_HISTORY",
     draftSnapshot: null,
+    draftMode: null,
+    draftEditSnapshot: null,
     editSnapshot: null,
     hasDraft: false,
   } as Intervention;
@@ -219,6 +221,8 @@ const stripUiFields = (intervention: Intervention) => {
     isHistoryView: _isHistoryView,
     mode: _mode,
     draftSnapshot: _draftSnapshot,
+    draftMode: _draftMode,
+    draftEditSnapshot: _draftEditSnapshot,
     editSnapshot: _editSnapshot,
     hasDraft: _hasDraft,
     createdAt: _createdAt,

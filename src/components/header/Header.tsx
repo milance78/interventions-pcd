@@ -127,15 +127,6 @@ const Header = () => {
         </NavLink>
 
         <NavLink
-          to="/liste-du-jour"
-          className={({ isActive }) =>
-            `header__link ${isActive ? "header__link--active" : ""}`
-          }
-        >
-          Liste du jour
-        </NavLink>
-
-        <NavLink
           to="/en-attente"
           className={({ isActive }) =>
             `header__link header__link--on-hold ${
@@ -154,6 +145,15 @@ const Header = () => {
               <PhoneRounded aria-hidden="true" />
             </span>
           )}
+        </NavLink>
+
+        <NavLink
+          to="/liste-du-jour"
+          className={({ isActive }) =>
+            `header__link ${isActive ? "header__link--active" : ""}`
+          }
+        >
+          Liste du jour
         </NavLink>
 
         <NavLink

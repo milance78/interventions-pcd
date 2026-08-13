@@ -174,7 +174,7 @@ const SimpleInput = ({
                 ? "Copier"
                 : "Champ vide"
           }
-          placement="top"
+          placement="left"
           arrow
         >
           <span className="simple-input__copy-wrapper">

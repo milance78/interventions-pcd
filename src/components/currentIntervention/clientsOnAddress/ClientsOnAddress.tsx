@@ -97,7 +97,7 @@ const CopyAdornment = ({ value, label }: CopyAdornmentProps) => {
 
   return (
     <InputAdornment position="end">
-      <Tooltip title={copied ? "Copié" : `Copier ${label}`} arrow>
+      <Tooltip title={copied ? "Copié" : `Copier ${label}`} placement="left" arrow>
         <span>
           <IconButton
             size="small"

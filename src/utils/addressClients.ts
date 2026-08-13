@@ -22,15 +22,16 @@ export const normalizePersonName = (value: string) => {
   const normalized = value.replace(/\s+/g, " ").replace(/^\s+/, "");
   if (!normalized) return "";
 
+  const capitalizeSegment = (segment: string) =>
+    segment
+      ? `${segment.charAt(0).toLocaleUpperCase("fr-FR")}${segment
+          .slice(1)
+          .toLocaleLowerCase("fr-FR")}`
+      : "";
+
   return normalized
     .split(" ")
-    .map((part) =>
-      part
-        ? `${part.charAt(0).toLocaleUpperCase("fr-FR")}${part
-            .slice(1)
-            .toLocaleLowerCase("fr-FR")}`
-        : "",
-    )
+    .map((part) => part.split("-").map(capitalizeSegment).join("-"))
     .join(" ");
 };
 
@@ -133,8 +134,8 @@ export const formatAddressClientsForComment = (
   if (active.length === 1) {
     const details = simpleClientCommentDetails(active[0], infrastructure);
     const header = isCopper
-      ? "Un TF à l'adresse:"
-      : "L'UTAC à l'adresse occupé par:";
+      ? "Un TF à l'adresse"
+      : "L'UTAC à l'adresse occupé par";
     return details ? `${header} ${details};` : header;
   }
 

@@ -195,6 +195,80 @@ const parseCustomerSection = (text: string) => {
   };
 };
 
+const normalizeBelgianMobile = (value: string) => {
+  const digits = value.replace(/\D/g, "");
+  if (/^00324\d{8}$/.test(digits)) return `0${digits.slice(4)}`;
+  if (/^324\d{8}$/.test(digits)) return `0${digits.slice(3)}`;
+  if (/^04\d{8}$/.test(digits)) return digits;
+  return "";
+};
+
+const extractPreferredContactPhone = (block: string) => {
+  const compactCandidates = block.match(/(?:\+32|0032)4\d{8}\b|\b04\d{8}\b/g) ?? [];
+  for (const candidate of compactCandidates) {
+    const normalized = normalizeBelgianMobile(candidate);
+    if (normalized && !/^0+$/.test(normalized)) return normalized;
+  }
+
+  const candidates = block.match(/(?:\+32|0032|0)\s*4(?:[\s./()-]*\d){8}/g) ?? [];
+  for (const candidate of candidates) {
+    const normalized = normalizeBelgianMobile(candidate);
+    if (normalized && !/^0+$/.test(normalized)) return normalized;
+  }
+
+  const generic = block.match(/(?:\+|00)?\d[\d\s()./-]{7,}\d/g) ?? [];
+  for (const candidate of generic) {
+    const digits = candidate.replace(/\D/g, "");
+    if (digits.length >= 9 && !/^0+$/.test(digits)) return digits;
+  }
+  return "";
+};
+
+const extractFiberServiceId = (text: string) => {
+  const matches = [...text.matchAll(/Access\s+TYPE\s*=\s*Fiber[\s\S]{0,260}?Service\s+ID\s*=\s*(\d{9,15})/gi)];
+  return meaningful(matches[0]?.[1]);
+};
+
+const parseServiceOrderAddress = (text: string): ParsedSource => {
+  const block = section(
+    text,
+    /(?:^|\n)\s*Informations ['’]Service Order['’]/i,
+    [
+      /(?:^|\n)\s*Stop Servicing Copper Date\b/i,
+      /(?:^|\n)\s*Actions d'ordre\b/i,
+      /(?:^|\n)\s*Order Viewer Links\b/i,
+    ],
+  );
+  if (!block) return {};
+
+  const addressMatch = block.match(
+    /Nouvelle adresse\s+Nom de la rue\s+(.+?)\s*,\s*N[°o] de maison\s+([^\n,]+)[\s\S]{0,160}?Code postal\s+(\d{4})\s*,\s*Nom de la ville\s+([^\n,]+)/i,
+  );
+  if (!addressMatch) return {};
+
+  const streetName = meaningful(addressMatch[1]);
+  const houseRaw = meaningful(addressMatch[2]);
+  const streetNumber = meaningful(houseRaw.match(/^\d+/)?.[0]);
+  const streetAlpha = meaningful(houseRaw.replace(/^\d+/, ""));
+  const postalCode = meaningful(addressMatch[3]);
+  const city = meaningful(addressMatch[4].replace(/\s*,\s*Pays.*$/i, ""));
+  const LOMKey = meaningful(block.match(/LOM Key\s*:\s*([^\n]+)/i)?.[1]);
+  const house = `${streetNumber}${streetAlpha}`;
+  const firstLine = clean(`${streetName} ${house}`);
+  const secondLine = clean(`${postalCode} ${city}`);
+
+  return {
+    infrastructure: "fiber",
+    streetName,
+    streetNumber,
+    streetAlpha,
+    postalCode,
+    city,
+    mainAddress: firstLine && secondLine ? `${firstLine}, ${secondLine}` : first(firstLine, secondLine),
+    LOMKey,
+  };
+};
+
 const parseContactSection = (text: string) => {
   const block = section(
     text,
@@ -202,9 +276,10 @@ const parseContactSection = (text: string) => {
     [/(?:^|\n)\s*Informations d'intervention\b/i, /(?:^|\n)\s*Adresse d'installation\b/i],
   );
   const { valueLine } = getFirstDataLineAfterHeaders(block, ["Nom de la personne de contact", "N° de GSM"]);
-  const phone = meaningful(valueLine.match(/(?:\+|00)?\d[\d\s()./-]{7,}\d/)?.[0]?.replace(/\s+/g, ""));
+  const phone = extractPreferredContactPhone(block);
   const emailIndex = valueLine.search(/[\w.+-]+@[\w.-]+\.[A-Za-z]{2,}/);
-  const beforePhone = phone ? valueLine.slice(0, valueLine.indexOf(phone)) : emailIndex >= 0 ? valueLine.slice(0, emailIndex) : valueLine;
+  const firstRawPhone = valueLine.match(/(?:\+|00)?\d[\d\s()./-]{7,}\d/)?.[0] ?? "";
+  const beforePhone = firstRawPhone ? valueLine.slice(0, valueLine.indexOf(firstRawPhone)) : emailIndex >= 0 ? valueLine.slice(0, emailIndex) : valueLine;
   const cells = splitLoose(beforePhone);
   const contactName = meaningful(cells.length >= 3 ? cells[cells.length - 1] : "");
 
@@ -396,8 +471,13 @@ const parseSafe = (text: string): ParsedSource => {
   const contactName = meaningful(contact.contactName);
   const fallbackName = clean(`${customer.firstName ?? ""} ${customer.lastName ?? ""}`);
 
+  const standardAddress = parseNewAddress(text);
+  const serviceOrderAddress = parseServiceOrderAddress(text);
+  const address = meaningful(standardAddress.mainAddress) ? standardAddress : serviceOrderAddress;
+  const fiberServiceId = extractFiberServiceId(text);
+
   return {
-    ...parseNewAddress(text),
+    ...address,
     interventionId,
     oagID,
     clientID: first(
@@ -405,6 +485,7 @@ const parseSafe = (text: string): ParsedSource => {
       extractBusinessLabelValue(text, ["ID client"]),
     ),
     na: explicitNaCid,
+    cid: fiberServiceId,
     clientName: first(contactName, fallbackName),
     phone: meaningful(contact.phone),
     descriptionFr,
@@ -499,6 +580,7 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
   // English Work Item descriptions are used only as a fallback.
   const description = meaningful(safe.descriptionFr) || meaningful(work.descriptionEn);
   const na = infrastructure === "fiber" ? "" : first(safe.na, work.na);
+  const cid = infrastructure === "fiber" ? first(safe.cid) : first(safe.cid);
   const hasAnyAddressDetail = Boolean(
     meaningful(safe.mailbox) ||
       meaningful(safe.floor) ||
@@ -514,6 +596,7 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
     oagID: first(work.oagID, safe.oagID),
     clientID,
     na,
+    cid,
     clientName,
     interventionDescription: description,
     mainAddress: safe.mainAddress ?? "",

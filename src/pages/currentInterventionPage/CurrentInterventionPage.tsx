@@ -39,6 +39,7 @@ import {
   clearCurrentForm,
   clearTask,
   hasMeaningfulDraft,
+  isSameInterventionData,
   markSearchInterventionSaved,
   resumeDraft,
   recordCure,
@@ -199,7 +200,7 @@ const CopyButton = ({
             ? "Copier"
             : "Champ vide"
       }
-      placement="top"
+      placement="left"
       arrow
     >
       <span className="copy-field-button-wrapper">
@@ -328,6 +329,12 @@ const CurrentInterventionPage = () => {
     hasDraft,
     mode,
   } = newIntervention;
+
+  const isDisplayedDraft = Boolean(
+    newIntervention.hasDraft &&
+      newIntervention.draftSnapshot &&
+      isSameInterventionData(newIntervention, newIntervention.draftSnapshot),
+  );
 
   const [clearDialogOpen, setClearDialogOpen] = React.useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = React.useState(false);
@@ -770,7 +777,7 @@ const CurrentInterventionPage = () => {
       return;
     }
 
-    if (isEditing && hasDraft) {
+    if (isEditing && hasDraft && !isDisplayedDraft) {
       dispatch(resumeDraft());
     } else {
       dispatch(clearTask());
@@ -1392,7 +1399,7 @@ const CurrentInterventionPage = () => {
         </section>
       </div>
 
-      {hasDraft && mode !== "NEW" && mode !== "DRAFT" && (
+      {hasDraft && !isDisplayedDraft && (
         <aside className="floating-draft-reminder" aria-label="Brouillon disponible">
           <WarningAmberRounded className="floating-draft-reminder__status" />
           <strong>Brouillon</strong>

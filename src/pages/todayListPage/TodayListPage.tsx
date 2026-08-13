@@ -8,6 +8,7 @@ import {
 } from "react";
 import Numbers from "@mui/icons-material/Numbers";
 import CheckRounded from "@mui/icons-material/CheckRounded";
+import Tooltip from "@mui/material/Tooltip";
 import {
   Contact,
   House,
@@ -146,11 +147,11 @@ const TodayIconValue = ({
   };
 
   return (
-    <div
+    <Tooltip title={copied ? "Copié" : "Copier"} placement="left" arrow>
+      <div
       className={`today-icon-field today-icon-field--copyable ${copied ? "is-copied" : ""}`}
       role="button"
       tabIndex={0}
-      title="Copier la valeur"
       onClick={copyValue}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -168,7 +169,8 @@ const TodayIconValue = ({
       <span className="today-field-value">
         {value}
       </span>
-    </div>
+      </div>
+    </Tooltip>
   );
 };
 

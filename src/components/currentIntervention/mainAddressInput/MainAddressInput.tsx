@@ -131,7 +131,7 @@ const MainAddressInput = () => {
 
         <Tooltip
           title={copied ? "Copié" : mainAddress.trim() ? "Copier" : "Champ vide"}
-          placement="top"
+          placement="left"
           arrow
         >
           <span className="simple-input__copy-wrapper">

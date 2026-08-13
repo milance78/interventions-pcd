@@ -198,7 +198,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                     placeholder="Choisissez un modèle ou saisissez les informations supplémentaires…"
                   />
 
-                  <Tooltip title={copied === "normal" ? "Copié" : "Copier le texte"}>
+                  <Tooltip title={copied === "normal" ? "Copié" : "Copier le texte"} placement="left" arrow>
                     <span className="additional-information-copy-action">
                       <IconButton
                         type="button"
@@ -210,7 +210,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                       </IconButton>
                     </span>
                   </Tooltip>
-                  <Tooltip title={copied === "nps" ? "NPS copié" : "Copier pour NPS"}>
+                  <Tooltip title={copied === "nps" ? "NPS copié" : "Copier pour NPS"} placement="left" arrow>
                     <span className="additional-information-copy-action additional-information-copy-action--nps">
                       <IconButton type="button" aria-label="Copier le contenu pour NPS" onClick={() => copyDraft("nps")} disabled={!draft.trim()}>
                         {copied === "nps" ? <CheckRounded /> : <strong>NPS</strong>}

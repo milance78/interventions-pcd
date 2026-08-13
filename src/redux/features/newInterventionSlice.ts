@@ -120,6 +120,8 @@ export interface Intervention extends InterventionData {
   isHistoryView: boolean;
   mode: InterventionMode;
   draftSnapshot: InterventionData | null;
+  draftMode: InterventionMode | null;
+  draftEditSnapshot: InterventionData | null;
   editSnapshot: InterventionData | null;
   hasDraft: boolean;
 }
@@ -312,38 +314,91 @@ const extractData = (state: Intervention): InterventionData => ({
   dateKey: state.dateKey,
 });
 
+export const isSameInterventionData = (
+  firstValue: Partial<InterventionData> | null | undefined,
+  secondValue: Partial<InterventionData> | null | undefined,
+) => {
+  if (!firstValue || !secondValue) return false;
+  const ignored = new Set<keyof InterventionData>(["updatedAt"]);
+  return (Object.keys(emptyInterventionData) as Array<keyof InterventionData>).every((key) => {
+    if (ignored.has(key)) return true;
+    const firstItem = firstValue[key] ?? emptyInterventionData[key];
+    const secondItem = secondValue[key] ?? emptyInterventionData[key];
+    if (typeof firstItem === "object" || typeof secondItem === "object") {
+      return JSON.stringify(firstItem) === JSON.stringify(secondItem);
+    }
+    return firstItem === secondItem;
+  });
+};
+
 const refreshDraftMetadata = (state: Intervention) => {
-  if (state.mode !== "NEW" && state.mode !== "DRAFT") return;
   const draft = extractData(state);
-  state.hasDraft = hasMeaningfulDraft(draft);
-  state.mode = state.hasDraft ? "DRAFT" : "NEW";
-  state.draftSnapshot = state.hasDraft
-    ? { ...draft, documentId: "", createdAt: null, updatedAt: null, dateKey: undefined }
-    : null;
+
+  if (state.mode === "NEW" || state.mode === "DRAFT") {
+    const hasDraft = hasMeaningfulDraft(draft);
+    state.hasDraft = hasDraft;
+    state.mode = hasDraft ? "DRAFT" : "NEW";
+    state.draftSnapshot = hasDraft
+      ? { ...draft, documentId: "", createdAt: null, updatedAt: null, dateKey: undefined }
+      : null;
+    state.draftMode = hasDraft ? "DRAFT" : null;
+    state.draftEditSnapshot = null;
+    return;
+  }
+
+  if (state.mode === "VIEW_HISTORY" || !state.editSnapshot) return;
+
+  const changed = !isSameInterventionData(draft, state.editSnapshot);
+  if (changed) {
+    state.hasDraft = true;
+    state.draftSnapshot = draft;
+    state.draftMode = state.mode;
+    state.draftEditSnapshot = state.editSnapshot;
+    return;
+  }
+
+  // If this draft belongs to the currently displayed edit and every value was
+  // restored to its original baseline, it is no longer a brouillon. Preserve
+  // any unrelated background draft instead.
+  if (state.draftMode === state.mode && state.draftEditSnapshot) {
+    state.hasDraft = false;
+    state.draftSnapshot = null;
+    state.draftMode = null;
+    state.draftEditSnapshot = null;
+  }
 };
 
 const captureCurrentDraft = (state: Intervention) => {
-  if (state.mode !== "NEW" && state.mode !== "DRAFT") {
+  if (state.mode === "NEW" || state.mode === "DRAFT") {
+    const currentDraft = extractData(state);
+    const hasDraft = hasMeaningfulDraft(currentDraft);
     return {
-      draftSnapshot: state.draftSnapshot,
-      hasDraft: state.hasDraft,
+      hasDraft,
+      draftSnapshot: hasDraft
+        ? { ...currentDraft, documentId: "", createdAt: null, updatedAt: null, dateKey: undefined }
+        : null,
+      draftMode: hasDraft ? ("DRAFT" as InterventionMode) : null,
+      draftEditSnapshot: null,
     };
   }
 
-  const currentDraft = extractData(state);
-  const hasDraft = hasMeaningfulDraft(currentDraft);
+  if (state.mode !== "VIEW_HISTORY" && state.editSnapshot) {
+    const currentData = extractData(state);
+    if (!isSameInterventionData(currentData, state.editSnapshot)) {
+      return {
+        hasDraft: true,
+        draftSnapshot: currentData,
+        draftMode: state.mode,
+        draftEditSnapshot: state.editSnapshot,
+      };
+    }
+  }
 
   return {
-    hasDraft,
-    draftSnapshot: hasDraft
-      ? {
-          ...currentDraft,
-          documentId: "",
-          createdAt: null,
-          updatedAt: null,
-          dateKey: undefined,
-        }
-      : null,
+    draftSnapshot: state.draftSnapshot,
+    draftMode: state.draftMode,
+    draftEditSnapshot: state.draftEditSnapshot,
+    hasDraft: state.hasDraft,
   };
 };
 
@@ -353,6 +408,8 @@ export const initialState: Intervention = {
   isHistoryView: false,
   mode: "NEW",
   draftSnapshot: null,
+  draftMode: null,
+  draftEditSnapshot: null,
   editSnapshot: null,
   hasDraft: false,
 };
@@ -435,20 +492,7 @@ const NewInterventionSlice = createSlice({
           state.isSnowReceivedPending || state.isSnowSentPending;
       }
 
-      if (state.mode === "NEW" || state.mode === "DRAFT") {
-        const draft = extractData(state);
-        state.hasDraft = hasMeaningfulDraft(draft);
-        state.mode = state.hasDraft ? "DRAFT" : "NEW";
-        state.draftSnapshot = state.hasDraft
-          ? {
-              ...draft,
-              documentId: "",
-              createdAt: null,
-              updatedAt: null,
-              dateKey: undefined,
-            }
-          : null;
-      }
+      refreshDraftMetadata(state);
     },
 
     updateMainAddressManually: (state, action: PayloadAction<string>) => {
@@ -675,36 +719,25 @@ const NewInterventionSlice = createSlice({
       }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
 
-      if (state.mode === "NEW" || state.mode === "DRAFT") {
-        const draft = extractData(state);
-        state.hasDraft = hasMeaningfulDraft(draft);
-        state.mode = state.hasDraft ? "DRAFT" : "NEW";
-        state.draftSnapshot = state.hasDraft
-          ? {
-              ...draft,
-              documentId: "",
-              createdAt: null,
-              updatedAt: null,
-              dateKey: undefined,
-            }
-          : null;
-      }
+      refreshDraftMetadata(state);
     },
 
     loadInterventionForEdit: (
       state,
       action: PayloadAction<Intervention>,
-    ): Intervention => ({
-      ...initialState,
-      ...action.payload,
-      clientName: normalizePersonName(action.payload.clientName ?? ""),
-      isEditing: true,
-      isHistoryView: false,
-      mode: "TODAY_EDIT",
-      draftSnapshot: state.draftSnapshot,
-      editSnapshot: extractData(action.payload),
-      hasDraft: state.hasDraft,
-    }),
+    ): Intervention => {
+      const draftState = captureCurrentDraft(state);
+      return {
+        ...initialState,
+        ...action.payload,
+        clientName: normalizePersonName(action.payload.clientName ?? ""),
+        isEditing: true,
+        isHistoryView: false,
+        mode: "TODAY_EDIT",
+        editSnapshot: extractData(action.payload),
+        ...draftState,
+      };
+    },
 
     loadInterventionFromHistory: (
       state,
@@ -813,6 +846,8 @@ const NewInterventionSlice = createSlice({
         ...draft,
         mode: hasDraft ? "DRAFT" : "NEW",
         draftSnapshot: hasDraft ? draft : null,
+        draftMode: hasDraft ? "DRAFT" : null,
+        draftEditSnapshot: null,
         hasDraft,
       };
     },
@@ -820,26 +855,44 @@ const NewInterventionSlice = createSlice({
     resumeDraft: (state): Intervention => {
       const draft = state.draftSnapshot;
       if (!draft || !hasMeaningfulDraft(draft)) {
-        return { ...initialState };
+        return { ...initialState, smsEnabled: state.smsEnabled };
       }
+
+      const targetMode = state.draftMode ?? "DRAFT";
+      const isEditMode =
+        targetMode === "TODAY_EDIT" ||
+        targetMode === "HISTORY_EDIT" ||
+        targetMode === "SEARCH_EDIT";
 
       return {
         ...initialState,
         ...draft,
-        mode: "DRAFT",
+        isEditing: isEditMode,
+        isHistoryView: false,
+        mode: targetMode,
         draftSnapshot: draft,
+        draftMode: targetMode,
+        draftEditSnapshot: state.draftEditSnapshot,
+        editSnapshot: isEditMode ? state.draftEditSnapshot : null,
         hasDraft: true,
+        smsEnabled: state.smsEnabled,
       };
     },
 
     startNewIntervention: (state): Intervention => ({
       ...initialState,
       smsEnabled: state.smsEnabled,
+      draftSnapshot: state.draftSnapshot,
+      draftMode: state.draftMode,
+      draftEditSnapshot: state.draftEditSnapshot,
+      hasDraft: state.hasDraft,
     }),
 
     cancelDraft: (state): Intervention => ({
       ...state,
       draftSnapshot: null,
+      draftMode: null,
+      draftEditSnapshot: null,
       hasDraft: false,
     }),
 
@@ -856,6 +909,14 @@ const NewInterventionSlice = createSlice({
           state.mode === "NEW" || state.mode === "DRAFT"
             ? null
             : state.draftSnapshot,
+        draftMode:
+          state.mode === "NEW" || state.mode === "DRAFT"
+            ? null
+            : state.draftMode,
+        draftEditSnapshot:
+          state.mode === "NEW" || state.mode === "DRAFT"
+            ? null
+            : state.draftEditSnapshot,
         editSnapshot: state.editSnapshot,
         hasDraft:
           state.mode === "NEW" || state.mode === "DRAFT"
@@ -868,6 +929,36 @@ const NewInterventionSlice = createSlice({
         ...initialState,
         ...preserved,
         smsEnabled: state.smsEnabled,
+      };
+    },
+
+    restoreSession: (
+      _state,
+      action: PayloadAction<Partial<Intervention>>,
+    ): Intervention => {
+      const restored = action.payload;
+      const restoredClients = Array.isArray(restored.addressClients)
+        ? restored.addressClients.map((client) => ({
+            ...client,
+            isFuture: Boolean(client.isFuture),
+            isSameClient: Boolean(client.isSameClient),
+            na: normalizeNaNumber(client.na ?? ""),
+            fullName: normalizePersonName(client.fullName ?? ""),
+          }))
+        : [];
+
+      return {
+        ...initialState,
+        ...restored,
+        clientName: normalizePersonName(restored.clientName ?? ""),
+        addressClients: restoredClients,
+        clientsOnAddress: serializeAddressClients(
+          restoredClients,
+          restored.infrastructure ?? "",
+        ),
+        smsEnabled: typeof restored.smsEnabled === "boolean"
+          ? restored.smsEnabled
+          : loadSmsPreference(),
       };
     },
 
@@ -894,6 +985,7 @@ export const {
   recordCure,
   removeAddressClient,
   resumeDraft,
+  restoreSession,
   setAddressClients,
   startNewIntervention,
   updateAddressClient,

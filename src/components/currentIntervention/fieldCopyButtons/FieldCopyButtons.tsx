@@ -46,7 +46,7 @@ export const FieldCopyButton = ({ value, label }: FieldCopyButtonProps) => {
   return (
     <Tooltip
       title={copied ? "Copié" : canCopy ? "Copier" : "Champ vide"}
-      placement="top"
+      placement="left"
       arrow
     >
       <span className="copy-field-button-wrapper">

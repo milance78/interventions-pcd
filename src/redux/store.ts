@@ -2,11 +2,15 @@ import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import newInterventionReducer, {
   loadDraft,
+  restoreSession,
+  type Intervention,
+  type InterventionData,
 } from "./features/newInterventionSlice";
 import interventionsListReducer from "./features/interventionsListSlice";
 import statisticsReducer from "./features/statisticsSlice";
 import historyReducer from "./features/historySlice";
 import {
+  loadCurrentSessionFromStorage,
   loadDraftFromStorage,
   localStorageMiddleware,
 } from "./middleware/localStorageMiddleware";
@@ -20,9 +24,14 @@ export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(localStorageMiddleware),
 });
-const savedDraft = loadDraftFromStorage();
-if (savedDraft) {
-  store.dispatch(loadDraft(savedDraft));
+const savedSession = loadCurrentSessionFromStorage<Intervention>();
+if (savedSession) {
+  store.dispatch(restoreSession(savedSession));
+} else {
+  const savedDraft = loadDraftFromStorage<Partial<InterventionData>>();
+  if (savedDraft) {
+    store.dispatch(loadDraft(savedDraft));
+  }
 }
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

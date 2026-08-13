@@ -10,6 +10,7 @@ import {
 } from "react";
 import Numbers from "@mui/icons-material/Numbers";
 import CheckRounded from "@mui/icons-material/CheckRounded";
+import Tooltip from "@mui/material/Tooltip";
 import {
   Contact,
   House,
@@ -117,11 +118,11 @@ const IconValue = ({ value, icon: Icon, large = false }: IconValueProps) => {
   };
 
   return (
-    <div
+    <Tooltip title={copied ? "Copié" : "Copier"} placement="left" arrow>
+      <div
       className={`history-icon-field history-icon-field--copyable ${copied ? "is-copied" : ""}`}
       role="button"
       tabIndex={0}
-      title="Copier la valeur"
       onClick={copyValue}
       onKeyDown={(event) => {
         if (event.key === "Enter" || event.key === " ") {
@@ -139,7 +140,8 @@ const IconValue = ({ value, icon: Icon, large = false }: IconValueProps) => {
       </div>
 
       <span className="history-field-value">{value}</span>
-    </div>
+      </div>
+    </Tooltip>
   );
 };
 
@@ -414,17 +416,7 @@ const HistoryNavigation = memo(({
 
 HistoryNavigation.displayName = "HistoryNavigation";
 
-const getInitialRenderedHistoryGroupCount = () => {
-  if (typeof window === "undefined") return 1;
-
-  const stored = Number(
-    window.sessionStorage.getItem("history:rendered-group-count") ?? "1",
-  );
-
-  return Number.isFinite(stored) && stored > 0
-    ? Math.floor(stored)
-    : 1;
-};
+const getInitialRenderedHistoryGroupCount = () => 1;
 
 const HistoryPage = () => {
   const [deleteTarget, setDeleteTarget] = useState<{
@@ -549,13 +541,6 @@ const HistoryPage = () => {
       if (timeoutId !== null) globalThis.clearTimeout(timeoutId);
     };
   }, [groupedInterventions]);
-
-  useEffect(() => {
-    window.sessionStorage.setItem(
-      "history:rendered-group-count",
-      String(renderedGroupCount),
-    );
-  }, [renderedGroupCount]);
 
 
   const performScrollToDate = (dateKey: string) => {
