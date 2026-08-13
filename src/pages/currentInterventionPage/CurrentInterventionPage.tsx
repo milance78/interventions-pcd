@@ -33,6 +33,10 @@ import NetworkInput from "../../components/currentIntervention/networkInput/Netw
 import SimpleInput from "../../components/currentIntervention/simpleInput/SimpleInput";
 import StatusInput from "../../components/currentIntervention/status/StatusInput";
 import SmartImportDialog from "../../components/smartImportDialog/SmartImportDialog";
+import snowAMonNomOff from "../../assets/snow/snow-a-mon-nom-off.png";
+import snowAMonNomOn from "../../assets/snow/snow-a-mon-nom-on.png";
+import snowCreeOff from "../../assets/snow/snow-cree-off.png";
+import snowCreeOn from "../../assets/snow/snow-cree-on.png";
 
 import {
   cancelDraft,
@@ -284,17 +288,22 @@ type SnowTrailIconProps = {
   active: boolean;
 };
 
-const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => (
-  <span
-    className={`snow-trail-icon snow-trail-icon--${direction} ${
-      active ? "snow-trail-icon--active" : "snow-trail-icon--off"
-    }`}
-    aria-hidden="true"
-  >
-    <span className="snow-trail-icon__flake" aria-hidden="true"><SnowOnIcon /></span>
-    <span className="snow-trail-icon__sign">snow</span>
-  </span>
-);
+const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => {
+  const src = direction === "left"
+    ? (active ? snowAMonNomOn : snowAMonNomOff)
+    : (active ? snowCreeOn : snowCreeOff);
+
+  return (
+    <span
+      className={`snow-trail-icon snow-trail-icon--${direction} ${
+        active ? "snow-trail-icon--active" : "snow-trail-icon--off"
+      }`}
+      aria-hidden="true"
+    >
+      <img className="snow-trail-icon__png" src={src} alt="" draggable={false} />
+    </span>
+  );
+};
 
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();

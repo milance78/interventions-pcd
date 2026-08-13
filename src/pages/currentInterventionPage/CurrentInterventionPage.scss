@@ -2759,3 +2759,27 @@
   opacity: .38 !important;
   filter: grayscale(1) brightness(1.18) contrast(.78) !important;
 }
+
+/* v89 — final compact PNG snow pending icons */
+.current-intervention-page .snow-trail-icon {
+  width: 54px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+}
+.current-intervention-page .snow-trail-icon__png {
+  display: block;
+  width: 54px;
+  height: 48px;
+  object-fit: contain;
+  object-position: center;
+  pointer-events: none;
+  user-select: none;
+}
+.current-intervention-page .snow-trail-icon--off,
+.current-intervention-page .snow-trail-icon--active {
+  opacity: 1 !important;
+  filter: none !important;
+}
