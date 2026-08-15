@@ -60,9 +60,9 @@ import {
   type InterventionRevision,
 } from "../../firebase/interventionsService";
 
-import { ReactComponent as AddressConfirmedIcon } from "../../assets/svg/Address confirmed.svg.tsx";
-import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Address not confirmed.svg.tsx";
-import { ReactComponent as AddressNotConfirmedOffIcon } from "../../assets/svg/Address not confirmed off.svg.tsx";
+import AddressConfirmedArtwork from "../../assets/svg/Address confirmed.png";
+import AddressNotConfirmedArtwork from "../../assets/svg/Address not confirmed.png";
+import AddressNotConfirmedOffArtwork from "../../assets/svg/Address not confirmed off.png";
 import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb off.svg.tsx";
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
@@ -504,6 +504,18 @@ const CurrentInterventionPage = () => {
   const handleUnifiedCureToggle = () => {
     if (isHistoryView) return;
 
+    // CURE and address confirmation are strictly independent controls.
+    // Preserve the exact address state that existed before this CURE click.
+    const addressStateBeforeCure = addressConfirmation;
+    const preserveAddressState = () => {
+      dispatch(
+        updateField({
+          field: "addressConfirmation",
+          value: addressStateBeforeCure,
+        }),
+      );
+    };
+
     // OFF -> CURE + SMS
     if (!todaysCureKey) {
       if (!nextCureKey) {
@@ -519,6 +531,7 @@ const CurrentInterventionPage = () => {
           smsEnabled: true,
         }),
       );
+      preserveAddressState();
       showActionNotice(
         "cure",
         nextCureKey === "firstCure"
@@ -539,6 +552,7 @@ const CurrentInterventionPage = () => {
           smsEnabled: false,
         }),
       );
+      preserveAddressState();
       showActionNotice(
         "cure",
         todaysCureKey === "firstCure"
@@ -554,6 +568,7 @@ const CurrentInterventionPage = () => {
     // belonging to today; all previous dates remain immutable.
     dispatch(updateField({ field: "smsEnabled", value: false }));
     void dispatch(clearTodaysCuresThunk());
+    preserveAddressState();
   };
 
   const toggleSnowPending = (
@@ -1140,14 +1155,23 @@ const CurrentInterventionPage = () => {
                       disabled={isHistoryView}
                     >
                       <span className="address-cycle-button__stack" aria-hidden="true">
-                        <AddressNotConfirmedOffIcon
+                        <img
+                          src={AddressNotConfirmedOffArtwork}
+                          alt=""
                           className={`address-cycle-button__icon address-cycle-button__icon--off ${addressConfirmation === "none" ? "address-cycle-button__icon--current" : ""}`}
+                          draggable={false}
                         />
-                        <AddressNotConfirmedIcon
+                        <img
+                          src={AddressNotConfirmedArtwork}
+                          alt=""
                           className={`address-cycle-button__icon ${addressConfirmation === "notConfirmed" ? "address-cycle-button__icon--current" : ""}`}
+                          draggable={false}
                         />
-                        <AddressConfirmedIcon
+                        <img
+                          src={AddressConfirmedArtwork}
+                          alt=""
                           className={`address-cycle-button__icon ${addressConfirmation === "confirmed" ? "address-cycle-button__icon--current" : ""}`}
+                          draggable={false}
                         />
                       </span>
                     </button>

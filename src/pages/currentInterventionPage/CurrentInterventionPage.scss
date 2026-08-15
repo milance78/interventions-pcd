@@ -3619,3 +3619,105 @@
     filter: grayscale(1) brightness(1.08) contrast(.78) !important;
   }
 }
+
+/* v105 — surgical icon corrections after visual review */
+.current-intervention-page {
+  /* Old wooden boards, slightly reduced; completely opaque in both states. */
+  .snow-trail-icon__wood-board {
+    width: 66px !important;
+    right: -4px !important;
+    bottom: 0 !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: grayscale(1) brightness(1.10) contrast(.76) !important;
+  }
+
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  /* The source CURE PNGs are now internally enlarged; keep the envelope untouched. */
+  .intervention-option-group__items--six .cure-summary-card__icon {
+    width: 78px !important;
+    height: 78px !important;
+    object-fit: contain !important;
+  }
+
+  /* Address OFF uses only the rounded border contained in the artwork itself. */
+  .address-cycle-button__icon--off {
+    box-shadow: none !important;
+  }
+
+  /* Keep the OFF bulb light internally; do not re-darken the source SVG. */
+  .intervention-option-group__items--six
+    .boolean-input:not(.active) .lightbulb-action-icon--off {
+    opacity: .78 !important;
+    filter: grayscale(1) brightness(1.13) contrast(.70) !important;
+  }
+}
+
+
+/* v106 — direct Address raster rendering + optically larger Résiliation. */
+.current-intervention-page {
+  /* Direct PNGs preserve the artwork's complete rounded lower border. */
+  .address-cycle-button__stack .address-cycle-button__icon {
+    object-fit: contain !important;
+    object-position: center !important;
+    clip-path: none !important;
+    mask: none !important;
+  }
+
+  .address-cycle-button__stack .address-cycle-button__icon--off {
+    box-shadow: none !important;
+  }
+
+  /* Résiliation was still optically undersized beside the other six icons. */
+  .intervention-option-group__items--six .res-pending-button__icon {
+    width: 77px !important;
+    height: 77px !important;
+    object-fit: contain !important;
+  }
+}
+
+/* v107 — final Snow opacity + complete OFF address border correction */
+.current-intervention-page {
+  /* The wooden board itself is now a clean opaque asset. Keep it compact and
+     slightly overlapping the lower-right of the snowflake. */
+  .snow-trail-icon__wood-board {
+    width: 62px !important;
+    right: -2px !important;
+    bottom: 0 !important;
+    opacity: 1 !important;
+    object-fit: contain !important;
+  }
+
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: grayscale(1) brightness(1.10) contrast(.76) !important;
+  }
+
+  /* OFF address uses the rebuilt no-shadow raster with a physically complete
+     rounded lower edge. Never crop/mask it in CSS. */
+  .address-cycle-button__stack,
+  .address-cycle-button__stack .address-cycle-button__icon {
+    overflow: visible !important;
+    clip-path: none !important;
+    mask: none !important;
+  }
+
+  .address-cycle-button__stack .address-cycle-button__icon--off {
+    object-fit: contain !important;
+    object-position: center !important;
+    box-shadow: none !important;
+  }
+}

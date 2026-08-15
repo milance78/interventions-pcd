@@ -28,13 +28,7 @@ const AddressNotConfirmedOffIcon = forwardRef<SVGSVGElement, AddressNotConfirmed
         height="256"
         preserveAspectRatio="xMidYMid meet"
       />
-      <path
-        d="M35 236 H145"
-        stroke="#9FA4AA"
-        strokeWidth="5"
-        strokeLinecap="round"
-      />
-    </svg>
+</svg>
   ),
 );
 
