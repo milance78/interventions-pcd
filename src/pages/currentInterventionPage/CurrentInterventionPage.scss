@@ -3721,3 +3721,70 @@
     box-shadow: none !important;
   }
 }
+
+
+/* v110 — final visual correction: preserve white Snow lettering and a clean pale bulb. */
+.current-intervention-page {
+  .snow-trail-icon__wood-board,
+  .snow-trail-icon--off .snow-trail-icon__wood-board,
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+  }
+
+  /* The OFF bulb already contains the intended pale palette in its SVG.
+     Do not wash it out or darken its internal details with inherited filters. */
+  .intervention-option-group__items--six
+    .boolean-input:not(.active) .lightbulb-action-icon--off {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+
+/* v111 — clean Snow boards + exact OFF bulb rendering. */
+.current-intervention-page {
+  .intervention-option-group__items--six
+    > .option-button:nth-child(2)
+    .boolean-input:not(.active)
+    .boolean-input-icon,
+  .intervention-option-group__items--six
+    > .option-button:nth-child(2)
+    .boolean-input:not(.active)
+    .boolean-input-icon > *,
+  .intervention-option-group__items--six
+    > .option-button:nth-child(2)
+    .boolean-input:not(.active)
+    .lightbulb-action-icon--off {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .snow-trail-icon__wood-board,
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    width: 70px !important;
+    right: -4px !important;
+    bottom: -1px !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
+
+/* v112 — use the user's reference wooden signs verbatim as opaque PNG assets. */
+.current-intervention-page {
+  .snow-trail-icon__wood-board,
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    width: 74px !important;
+    height: auto !important;
+    right: -4px !important;
+    bottom: -1px !important;
+    opacity: 1 !important;
+    filter: none !important;
+    object-fit: contain !important;
+  }
+
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    opacity: .62 !important;
+    filter: grayscale(1) brightness(1.12) contrast(.82) !important;
+  }
+}
