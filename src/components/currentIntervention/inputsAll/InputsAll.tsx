@@ -17,6 +17,8 @@ import AddressMiniInput from "../addressMiniInput/AddressMiniInput";
 import MainAddressInput from "../mainAddressInput/MainAddressInput";
 
 import { ReactComponent as CIDIcon } from "../../../assets/svg/CID.svg.tsx";
+import { ReactComponent as IDIcon } from "../../../assets/svg/ID.svg.tsx";
+import { ReactComponent as OAGIcon } from "../../../assets/svg/OAG.svg.tsx";
 import { ReactComponent as NAIcon } from "../../../assets/svg/NA.svg.tsx";
 import { updateField } from "../../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
@@ -54,6 +56,23 @@ const InputsAll = () => {
 
   return (
     <div className="inputs-all">
+      <section className="inputs-row inputs-row--half inputs-row--identity">
+        <SimpleInput
+          field="interventionId"
+          label="ID de l'intervention"
+          inputType="type2"
+          icon={IDIcon}
+          className="simple-input--identity simple-input--identity-id"
+        />
+
+        <SimpleInput
+          field="oagID"
+          label="OAG ID"
+          inputType="type2"
+          icon={OAGIcon}
+          className="simple-input--identity simple-input--identity-oag"
+        />
+      </section>
       <section className="inputs-row inputs-row--client-description">
         <SimpleInput
           field="clientID"

@@ -3222,3 +3222,38 @@
 .current-intervention-page .left-card .intervention-core-fields > .MuiFormControl-root:nth-child(2) .MuiOutlinedInput-root:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
   border-color: #9e9e9e !important;
 }
+
+
+/* v99 — final alignment/spacing polish for the left side. */
+.current-intervention-page {
+  /* With ID/OAG moved below, the core area contains only Technologie + Réseau. */
+  .intervention-core-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  /* More breathing room between every technical input row. */
+  .technical-inputs {
+    gap: 11px !important;
+    padding-top: 12px !important;
+  }
+
+  /* The bulb artwork sits optically low; lift only its painting, not the button. */
+  .intervention-option-group__items--six .lightbulb-action-icon--off,
+  .intervention-option-group__items--six .option-button:nth-child(2) .boolean-input svg {
+    transform: translateY(-4px) !important;
+  }
+
+  /* Pictograms themselves are the visual surface: no extra square tile behind CURE/Address. */
+  .intervention-option-group__items--six .cure-summary-card,
+  .intervention-option-group__items--six .address-cycle-button,
+  .intervention-option-group__items--six .cure-summary-card:hover,
+  .intervention-option-group__items--six .address-cycle-button:hover,
+  .intervention-option-group__items--six .cure-summary-card.pending-state-button--active,
+  .intervention-option-group__items--six .address-cycle-button.pending-state-button--active {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+}
