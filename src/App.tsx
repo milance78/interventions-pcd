@@ -1,4 +1,5 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import * as React from "react";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 
 import "./App.scss";
 import "./spreadsheetMode.scss";
@@ -11,9 +12,21 @@ import SearchResultsPage from "./pages/searchResultsPage/SearchResultsPage";
 import TemplatesPage from "./pages/templatesPage/TemplatesPage";
 import TodayListPage from "./pages/todayListPage/TodayListPage";
 import OnHoldPage from "./pages/onHoldPage/OnHoldPage";
+import { setCurrentRecoveryMarker } from "./localStorage/localStorage";
+
+const CurrentRouteRecoveryMarker = () => {
+  const location = useLocation();
+
+  React.useEffect(() => {
+    setCurrentRecoveryMarker(location.pathname === "/intervention-en-cours");
+  }, [location.pathname]);
+
+  return null;
+};
 
 const App = () => (
   <div className="app">
+    <CurrentRouteRecoveryMarker />
     <Header />
     <InterventionsLoader />
 

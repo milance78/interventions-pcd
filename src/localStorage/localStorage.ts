@@ -1,5 +1,6 @@
 const DRAFT_STORAGE_KEY = "taches-pcd-draft";
 const CURRENT_SESSION_KEY = "interventions-pcd:current-session-v2";
+const CURRENT_RECOVERY_KEY = "interventions-pcd:recover-current-on-launch-v1";
 
 const safeParse = <T,>(raw: string | null): T | null => {
   if (!raw) return null;
@@ -52,6 +53,26 @@ const loadCurrentSessionFromStorage = <T = unknown,>(): T | null => {
   }
 };
 
+const setCurrentRecoveryMarker = (active: boolean) => {
+  try {
+    if (active) {
+      window.localStorage.setItem(CURRENT_RECOVERY_KEY, "true");
+    } else {
+      window.localStorage.removeItem(CURRENT_RECOVERY_KEY);
+    }
+  } catch {
+    // Ignore storage errors.
+  }
+};
+
+const shouldRecoverCurrentOnLaunch = (): boolean => {
+  try {
+    return window.localStorage.getItem(CURRENT_RECOVERY_KEY) === "true";
+  } catch {
+    return false;
+  }
+};
+
 const clearCurrentSessionFromStorage = () => {
   try {
     window.localStorage.removeItem(CURRENT_SESSION_KEY);
@@ -67,4 +88,6 @@ export {
   loadDraftFromStorage,
   saveCurrentSessionToStorage,
   saveDraftToStorage,
+  setCurrentRecoveryMarker,
+  shouldRecoverCurrentOnLaunch,
 };

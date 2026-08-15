@@ -7,6 +7,7 @@ import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
+import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
 import Send from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -65,7 +66,6 @@ import {
 } from "../../firebase/interventionsService";
 
 import { ReactComponent as AddressConfirmedIcon } from "../../assets/svg/Address confirmed.svg.tsx";
-import { ReactComponent as AddressConfirmedOffIcon } from "../../assets/svg/Address confirmed off.svg.tsx";
 import { ReactComponent as AddressNotConfirmedIcon } from "../../assets/svg/Address not confirmed.svg.tsx";
 import { ReactComponent as AddressNotConfirmedOffIcon } from "../../assets/svg/Address not confirmed off.svg.tsx";
 import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb off.svg.tsx";
@@ -477,43 +477,60 @@ const CurrentInterventionPage = () => {
       : nextCureKey === "firstCure" || nextCureKey === "secondCure"
         ? nextCureKey
         : null;
-  const isUnifiedCureActive = Boolean(todaysCureKey);
+  const todaysCureRecord = todaysCureKey ? cureRecords[todaysCureKey] : null;
+  const cureCycleState: "off" | "sms" | "noSms" = !todaysCureKey
+    ? "off"
+    : todaysCureRecord?.smsEnabled
+      ? "sms"
+      : "noSms";
+  const isUnifiedCureActive = cureCycleState !== "off";
 
   const handleUnifiedCureToggle = () => {
     if (isHistoryView) return;
 
-    if (todaysCureKey) {
-      void dispatch(clearTodaysCuresThunk());
+    // OFF -> CURE + SMS
+    if (!todaysCureKey) {
+      if (!nextCureKey) {
+        showActionNotice("cure", "3 CURE déjà enregistrés");
+        return;
+      }
+
+      dispatch(updateField({ field: "smsEnabled", value: true }));
+      dispatch(
+        recordCure({
+          cure: nextCureKey,
+          recordedAt: new Date().toISOString(),
+          smsEnabled: true,
+        }),
+      );
+      dispatch(updateField({ field: "addressConfirmation", value: "notConfirmed" }));
+      showActionNotice(
+        "cure",
+        nextCureKey === "firstCure"
+          ? "CURE 1 + SMS en attente"
+          : nextCureKey === "secondCure"
+            ? "CURE 2 + SMS en attente"
+            : "CURE 3 + SMS",
+      );
       return;
     }
 
-    if (!nextCureKey) {
-      showActionNotice("cure", "3 CURE déjà enregistrés");
+    // CURE + SMS -> CURE without SMS, preserving today's date/time record.
+    if (todaysCureRecord?.smsEnabled) {
+      dispatch(updateField({ field: "smsEnabled", value: false }));
+      dispatch(
+        updateRecordedCureSms({
+          cure: todaysCureKey,
+          smsEnabled: false,
+        }),
+      );
       return;
     }
 
-    dispatch(
-      recordCure({
-        cure: nextCureKey,
-        recordedAt: new Date().toISOString(),
-        smsEnabled,
-      }),
-    );
-
-    dispatch(
-      updateField({
-        field: "addressConfirmation",
-        value: "notConfirmed",
-      }),
-    );
-    showActionNotice(
-      "cure",
-      nextCureKey === "firstCure"
-        ? "CURE 1 en attente"
-        : nextCureKey === "secondCure"
-          ? "CURE 2 en attente"
-          : "CURE 3",
-    );
+    // CURE without SMS -> OFF. clearTodaysCuresThunk only removes records
+    // belonging to today; all previous dates remain immutable.
+    dispatch(updateField({ field: "smsEnabled", value: false }));
+    void dispatch(clearTodaysCuresThunk());
   };
 
   const toggleSnowPending = (
@@ -536,24 +553,6 @@ const CurrentInterventionPage = () => {
   };
 
 
-  const handleSmsToggle = () => {
-    if (isHistoryView) return;
-
-    const nextSmsEnabled = !smsEnabled;
-    dispatch(updateField({ field: "smsEnabled", value: nextSmsEnabled }));
-
-    if (cure === "firstCure" || cure === "secondCure") {
-      dispatch(
-        updateRecordedCureSms({
-          cure,
-          smsEnabled: nextSmsEnabled,
-        }),
-      );
-    }
-  };
-
-  type AddressConfirmationStatus = "confirmed" | "notConfirmed";
-
   const confirmedAddressText = "Adresse confirmée.";
   const notConfirmedAddressText = "Adresse pas encore confirmée.";
   const automaticAddressLine =
@@ -574,24 +573,23 @@ const CurrentInterventionPage = () => {
   const focusCommentAt = (cursorPosition: number) => {
     window.requestAnimationFrame(() => {
       const textarea = commentInputRef.current;
-
       if (!textarea) return;
-
       textarea.focus();
       textarea.setSelectionRange(cursorPosition, cursorPosition);
     });
   };
 
-  const handleAddressConfirmationToggle = (
-    nextStatus: AddressConfirmationStatus,
-  ) => {
+  const handleAddressConfirmationCycle = () => {
     if (isHistoryView) return;
 
+    const nextAddressConfirmation =
+      addressConfirmation === "none"
+        ? "notConfirmed"
+        : addressConfirmation === "notConfirmed"
+          ? "confirmed"
+          : "none";
     const commentWasCompletelyEmpty = comment.length === 0;
     const commentWithoutStatus = removeAutomaticAddressLines(comment);
-    const nextAddressConfirmation =
-      addressConfirmation === nextStatus ? "none" : nextStatus;
-
     let nextComment = commentWithoutStatus;
 
     if (nextAddressConfirmation !== "none") {
@@ -599,18 +597,12 @@ const CurrentInterventionPage = () => {
         nextAddressConfirmation === "confirmed"
           ? confirmedAddressText
           : notConfirmedAddressText;
-
       nextComment = commentWithoutStatus
         ? `${addressText}\n\n${commentWithoutStatus}`
         : `${addressText}\n\n`;
     }
 
-    dispatch(
-      updateField({
-        field: "addressConfirmation",
-        value: nextAddressConfirmation,
-      }),
-    );
+    dispatch(updateField({ field: "addressConfirmation", value: nextAddressConfirmation }));
 
     if (nextAddressConfirmation === "confirmed") {
       dispatch(updateField({ field: "cure", value: "noCure" }));
@@ -619,21 +611,13 @@ const CurrentInterventionPage = () => {
       dispatch(updateField({ field: "isSnowSentPending", value: false }));
       dispatch(updateField({ field: "isSnow", value: false }));
     }
-    dispatch(
-      updateField({
-        field: "comment",
-        value: nextComment,
-      }),
-    );
 
-    if (
-      commentWasCompletelyEmpty &&
-      nextAddressConfirmation !== "none"
-    ) {
+    dispatch(updateField({ field: "comment", value: nextComment }));
+
+    if (commentWasCompletelyEmpty && nextAddressConfirmation !== "none") {
       focusCommentAt(nextComment.length);
     }
   };
-
 
   const applyOnHoldConsultationState = (
     payload: typeof newIntervention,
@@ -1102,6 +1086,46 @@ const CurrentInterventionPage = () => {
                       ) : (
                         <PhoneInTalkRounded className={`cure-summary-card__fallback ${isUnifiedCureActive ? "cure-summary-card__fallback--active" : ""}`} />
                       )}
+
+                      {cureCycleState === "sms" && (
+                        <span className="cure-summary-card__mail" aria-hidden="true">
+                          <MailOutlineRounded />
+                        </span>
+                      )}
+                    </button>
+                  </div>
+
+                  <div className="option-button option-button--address-state">
+                    <button
+                      type="button"
+                      className={`pending-state-button address-cycle-button ${
+                        addressConfirmation !== "none" ? "pending-state-button--active address-cycle-button--active" : ""
+                      }`}
+                      onClick={handleAddressConfirmationCycle}
+                      aria-label={
+                        addressConfirmation === "confirmed"
+                          ? "Adresse confirmée"
+                          : addressConfirmation === "notConfirmed"
+                            ? "Adresse pas encore confirmée"
+                            : "Adresse non définie"
+                      }
+                      title={
+                        addressConfirmation === "confirmed"
+                          ? "Adresse confirmée"
+                          : addressConfirmation === "notConfirmed"
+                            ? "Adresse pas encore confirmée"
+                            : "Adresse pas encore confirmée"
+                      }
+                      aria-pressed={addressConfirmation !== "none"}
+                      disabled={isHistoryView}
+                    >
+                      {addressConfirmation === "confirmed" ? (
+                        <AddressConfirmedIcon className="address-cycle-button__icon" />
+                      ) : addressConfirmation === "notConfirmed" ? (
+                        <AddressNotConfirmedIcon className="address-cycle-button__icon" />
+                      ) : (
+                        <AddressNotConfirmedOffIcon className="address-cycle-button__icon address-cycle-button__icon--off" />
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1153,7 +1177,7 @@ const CurrentInterventionPage = () => {
             <ClientsOnAddress />
           </div>
 
-          <div className="cure-selector" aria-label="CURE et SMS">
+          <div className="cure-selector" aria-label="CURE">
             <Button
               type="button"
               variant={isUnifiedCureActive ? "contained" : "outlined"}
@@ -1165,85 +1189,8 @@ const CurrentInterventionPage = () => {
               aria-pressed={isUnifiedCureActive}
               startIcon={<PhoneInTalkRounded sx={{ fontSize: 18 }} />}
             >
-              CURE
+              {cureCycleState === "sms" ? "CURE + SMS" : "CURE"}
             </Button>
-
-            <Button
-              type="button"
-              variant={smsEnabled ? "contained" : "outlined"}
-              className={`sms-toggle-button ${
-                smsEnabled ? "sms-toggle-button--active" : ""
-              }`}
-              disabled={isHistoryView}
-              onClick={handleSmsToggle}
-              aria-pressed={smsEnabled}
-            >
-              +SMS
-            </Button>
-
-            <div className="address-confirmation-controls" aria-label="Confirmation de l’adresse">
-              <button
-                type="button"
-                className={`address-confirmation-button ${
-                  addressConfirmation === "confirmed"
-                    ? "address-confirmation-button--active"
-                    : ""
-                }`}
-                disabled={isHistoryView}
-                onClick={() => handleAddressConfirmationToggle("confirmed")}
-                aria-label="Adresse confirmée"
-                aria-pressed={addressConfirmation === "confirmed"}
-                title="Adresse confirmée"
-              >
-                <span className="address-confirmation-icon-stack" aria-hidden="true">
-                  <AddressConfirmedOffIcon
-                    className={`address-confirmation-icon address-confirmation-icon--off ${
-                      addressConfirmation === "confirmed"
-                        ? "address-confirmation-icon--hidden"
-                        : "address-confirmation-icon--visible"
-                    }`}
-                  />
-                  <AddressConfirmedIcon
-                    className={`address-confirmation-icon address-confirmation-icon--on ${
-                      addressConfirmation === "confirmed"
-                        ? "address-confirmation-icon--visible"
-                        : "address-confirmation-icon--hidden"
-                    }`}
-                  />
-                </span>
-              </button>
-
-              <button
-                type="button"
-                className={`address-confirmation-button ${
-                  addressConfirmation === "notConfirmed"
-                    ? "address-confirmation-button--active"
-                    : ""
-                }`}
-                disabled={isHistoryView}
-                onClick={() => handleAddressConfirmationToggle("notConfirmed")}
-                aria-label="Adresse pas encore confirmée"
-                aria-pressed={addressConfirmation === "notConfirmed"}
-                title="Adresse pas encore confirmée"
-              >
-                <span className="address-confirmation-icon-stack" aria-hidden="true">
-                  <AddressNotConfirmedOffIcon
-                    className={`address-confirmation-icon address-confirmation-icon--off ${
-                      addressConfirmation === "notConfirmed"
-                        ? "address-confirmation-icon--hidden"
-                        : "address-confirmation-icon--visible"
-                    }`}
-                  />
-                  <AddressNotConfirmedIcon
-                    className={`address-confirmation-icon address-confirmation-icon--on ${
-                      addressConfirmation === "notConfirmed"
-                        ? "address-confirmation-icon--visible"
-                        : "address-confirmation-icon--hidden"
-                    }`}
-                  />
-                </span>
-              </button>
-            </div>
           </div>
 
           <div className="comment-field copy-field">

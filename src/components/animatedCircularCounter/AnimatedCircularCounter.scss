@@ -17,9 +17,9 @@
 
 .animated-today-counter__circle {
   position: relative;
-  width: 78px;
-  height: 78px;
-  flex: 0 0 78px;
+  width: 72px;
+  height: 72px;
+  flex: 0 0 72px;
 
   display: inline-flex;
   align-items: center;
@@ -67,7 +67,7 @@
 
   color: #253047;
   font-size: 18px;
-  font-weight: 850;
+  font-weight: 400;
   line-height: 1;
 }
 
@@ -92,9 +92,9 @@
   }
 
   .animated-today-counter__circle {
-    width: 68px;
-    height: 68px;
-    flex-basis: 68px;
+    width: 63px;
+    height: 63px;
+    flex-basis: 63px;
   }
 
   .animated-today-counter__track {
