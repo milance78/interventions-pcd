@@ -352,7 +352,7 @@ const CurrentInterventionPage = () => {
   const [revisionsError, setRevisionsError] = React.useState("");
   const [importMessage, setImportMessage] = React.useState("");
   const [actionNotice, setActionNotice] = React.useState<{
-    key: "question" | "example" | "res" | "snowReceived" | "snowSent" | "cure";
+    key: "question" | "example" | "res" | "snowReceived" | "snowSent" | "cure" | "address";
     text: string;
   } | null>(null);
   const actionNoticeTimerRef = React.useRef<number | null>(null);
@@ -385,7 +385,7 @@ const CurrentInterventionPage = () => {
   );
 
   const showActionNotice = (
-    key: "question" | "example" | "res" | "snowReceived" | "snowSent" | "cure",
+    key: "question" | "example" | "res" | "snowReceived" | "snowSent" | "cure" | "address",
     text: string,
   ) => {
     if (actionNoticeTimerRef.current !== null) {
@@ -524,6 +524,14 @@ const CurrentInterventionPage = () => {
           smsEnabled: false,
         }),
       );
+      showActionNotice(
+        "cure",
+        todaysCureKey === "firstCure"
+          ? "CURE 1 en attente"
+          : todaysCureKey === "secondCure"
+            ? "CURE 2 en attente"
+            : "CURE 3",
+      );
       return;
     }
 
@@ -603,6 +611,12 @@ const CurrentInterventionPage = () => {
     }
 
     dispatch(updateField({ field: "addressConfirmation", value: nextAddressConfirmation }));
+
+    if (nextAddressConfirmation === "notConfirmed") {
+      showActionNotice("address", "Adresse pas encore confirmée");
+    } else if (nextAddressConfirmation === "confirmed") {
+      showActionNotice("address", "Adresse confirmée");
+    }
 
     if (nextAddressConfirmation === "confirmed") {
       dispatch(updateField({ field: "cure", value: "noCure" }));
@@ -1096,6 +1110,11 @@ const CurrentInterventionPage = () => {
                   </div>
 
                   <div className="option-button option-button--address-state">
+                    {actionNotice?.key === "address" && (
+                      <span className="action-toggle-notice action-toggle-notice--address" role="status">
+                        {actionNotice.text}
+                      </span>
+                    )}
                     <button
                       type="button"
                       className={`pending-state-button address-cycle-button ${
@@ -1175,22 +1194,6 @@ const CurrentInterventionPage = () => {
 
           <div className="clients-address-field">
             <ClientsOnAddress />
-          </div>
-
-          <div className="cure-selector" aria-label="CURE">
-            <Button
-              type="button"
-              variant={isUnifiedCureActive ? "contained" : "outlined"}
-              className={`cure-selector__button cure-selector__button--unified ${
-                isUnifiedCureActive ? "cure-selector__button--active" : ""
-              }`}
-              disabled={isHistoryView}
-              onClick={handleUnifiedCureToggle}
-              aria-pressed={isUnifiedCureActive}
-              startIcon={<PhoneInTalkRounded sx={{ fontSize: 18 }} />}
-            >
-              {cureCycleState === "sms" ? "CURE + SMS" : "CURE"}
-            </Button>
           </div>
 
           <div className="comment-field copy-field">

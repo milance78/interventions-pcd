@@ -2849,3 +2849,147 @@
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
   }
 }
+
+
+/* v91 — seven bottom status pictograms: frameless, stable hover, En-attente-like press */
+.current-intervention-page .intervention-option-group__items--six > .option-button {
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  transition: background-color 145ms ease, transform 110ms ease !important;
+}
+
+/* No lift/jump on hover. Only a very soft common wash. */
+.current-intervention-page .intervention-option-group__items--six > .option-button:hover {
+  transform: none !important;
+  background: rgba(49, 90, 134, 0.045) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Remove the individual button frames too: the pictograms themselves are the controls. */
+.current-intervention-page .intervention-option-group__items--six :is(
+  .boolean-input,
+  .res-pending-button,
+  .pending-state-button,
+  .cure-summary-card,
+  .address-cycle-button
+) {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  border-radius: 10px !important;
+  transition:
+    transform 110ms ease,
+    background-color 145ms ease,
+    filter 145ms ease !important;
+}
+
+/* Same subtle hover response for all seven; no movement. */
+.current-intervention-page .intervention-option-group__items--six > .option-button:hover :is(
+  .boolean-input,
+  .res-pending-button,
+  .pending-state-button,
+  .cure-summary-card,
+  .address-cycle-button
+) {
+  transform: none !important;
+  background: rgba(49, 90, 134, 0.035) !important;
+  box-shadow: none !important;
+}
+
+/* Press exactly in the spirit of En attente: tiny downward movement, almost no scaling. */
+.current-intervention-page .intervention-option-group__items--six :is(
+  .boolean-input,
+  .res-pending-button,
+  .pending-state-button,
+  .cure-summary-card,
+  .address-cycle-button
+):active:not(:disabled) {
+  transform: translateY(1px) scale(0.992) !important;
+}
+
+/* Active state may tint softly, but must never recreate a frame. */
+.current-intervention-page .intervention-option-group__items--six .boolean-input.active,
+.current-intervention-page .intervention-option-group__items--six .res-pending-button--active,
+.current-intervention-page .intervention-option-group__items--six .pending-state-button--active,
+.current-intervention-page .intervention-option-group__items--six .address-cycle-button--active {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: rgba(49, 90, 134, 0.035) !important;
+}
+
+/* CURE is now controlled only from the seven-icon strip; Commentaire takes the freed height. */
+.current-intervention-page .right-card .comment-field {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+}
+
+/* v92 — final polish for the seven lower status pictograms */
+.current-intervention-page {
+  /* Résiliation must be as frameless as the other six controls, including all
+     older, more-specific hover/active rules that existed before v91. */
+  .intervention-option-group__items--six > .option-button.option-button--res,
+  .intervention-option-group__items--six > .option-button.option-button--res:hover,
+  .intervention-option-group__items--six > .option-button.option-button--res:has(.res-pending-button--active),
+  .option-button--res .res-pending-button,
+  .option-button--res .res-pending-button:hover,
+  .option-button--res .res-pending-button--active,
+  .option-button--res .res-pending-button--active:hover,
+  .option-button--res .res-pending-button:active {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Smaller notice shadow: it must visually stop above the next icon row. */
+  .action-toggle-notice {
+    box-shadow: 0 3px 7px rgba(15, 23, 42, 0.09) !important;
+  }
+
+  .action-toggle-notice--address {
+    color: #315f84;
+    background: #edf5fb;
+    border-color: #b7d0e5;
+  }
+
+  /* Slightly larger pictograms across the whole strip. */
+  .intervention-option-group__items--six .question-action-icon {
+    width: 54px !important;
+    height: 54px !important;
+    object-fit: contain;
+  }
+
+  .intervention-option-group__items--six .boolean-input svg,
+  .intervention-option-group__items--six .lightbulb-action-icon--off {
+    width: 52px !important;
+    height: 52px !important;
+  }
+
+  .intervention-option-group__items--six .res-pending-button__icon {
+    width: 54px !important;
+    height: 54px !important;
+    object-fit: contain;
+  }
+
+  .intervention-option-group__items--six .snow-trail-icon,
+  .intervention-option-group__items--six .snow-trail-icon__png {
+    width: 60px !important;
+    height: 54px !important;
+  }
+
+  /* CURE and Address now occupy the same visual 54 × 54 footprint. */
+  .intervention-option-group__items--six .cure-summary-card__icon,
+  .intervention-option-group__items--six .cure-summary-card__fallback,
+  .intervention-option-group__items--six .address-cycle-button__icon {
+    width: 54px !important;
+    height: 54px !important;
+    object-fit: contain;
+  }
+
+  .intervention-option-group__items--six .cure-summary-card__fallback {
+    font-size: 54px !important;
+  }
+}
