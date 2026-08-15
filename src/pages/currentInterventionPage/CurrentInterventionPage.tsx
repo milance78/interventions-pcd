@@ -33,10 +33,6 @@ import InputsAll from "../../components/currentIntervention/inputsAll/InputsAll"
 import NetworkInput from "../../components/currentIntervention/networkInput/NetworkInput";
 import StatusInput from "../../components/currentIntervention/status/StatusInput";
 import SmartImportDialog from "../../components/smartImportDialog/SmartImportDialog";
-import snowAMonNomOff from "../../assets/snow/snow-a-mon-nom-off.png";
-import snowAMonNomOn from "../../assets/snow/snow-a-mon-nom-on.png";
-import snowCreeOff from "../../assets/snow/snow-cree-off.png";
-import snowCreeOn from "../../assets/snow/snow-cree-on.png";
 
 import {
   cancelDraft,
@@ -71,6 +67,9 @@ import { ReactComponent as LightBulbOffIcon } from "../../assets/svg/Light bulb 
 import { ReactComponent as LightBulbOnIcon } from "../../assets/svg/Light bulb on.svg.tsx";
 import { ReactComponent as CopyIcon } from "../../assets/svg/Copy.svg.tsx";
 import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
+import { ReactComponent as SnowOffIcon } from "../../assets/svg/Snow off.svg.tsx";
+import snowBoardLeft from "../../assets/snow/snow-board-left.png";
+import snowBoardRight from "../../assets/snow/snow-board-right.png";
 import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
 import { normalizeInterventionStrings, removeBlankLines, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
 import { normalizePersonName } from "../../utils/addressClients";
@@ -287,22 +286,26 @@ type SnowTrailIconProps = {
   active: boolean;
 };
 
-const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => {
-  const src = direction === "left"
-    ? (active ? snowAMonNomOn : snowAMonNomOff)
-    : (active ? snowCreeOn : snowCreeOff);
-
-  return (
-    <span
-      className={`snow-trail-icon snow-trail-icon--${direction} ${
-        active ? "snow-trail-icon--active" : "snow-trail-icon--off"
-      }`}
-      aria-hidden="true"
-    >
-      <img className="snow-trail-icon__png" src={src} alt="" draggable={false} />
-    </span>
-  );
-};
+const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => (
+  <span
+    className={`snow-trail-icon snow-trail-icon--${direction} ${
+      active ? "snow-trail-icon--active" : "snow-trail-icon--off"
+    }`}
+    aria-hidden="true"
+  >
+    {active ? (
+      <SnowOnIcon className="snow-trail-icon__flake-svg" />
+    ) : (
+      <SnowOffIcon className="snow-trail-icon__flake-svg" />
+    )}
+    <img
+      src={direction === "left" ? snowBoardLeft : snowBoardRight}
+      alt=""
+      className="snow-trail-icon__wood-board"
+      draggable={false}
+    />
+  </span>
+);
 
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();
@@ -516,7 +519,6 @@ const CurrentInterventionPage = () => {
           smsEnabled: true,
         }),
       );
-      dispatch(updateField({ field: "addressConfirmation", value: "notConfirmed" }));
       showActionNotice(
         "cure",
         nextCureKey === "firstCure"
@@ -1137,13 +1139,17 @@ const CurrentInterventionPage = () => {
                       aria-pressed={addressConfirmation !== "none"}
                       disabled={isHistoryView}
                     >
-                      {addressConfirmation === "confirmed" ? (
-                        <AddressConfirmedIcon className="address-cycle-button__icon" />
-                      ) : addressConfirmation === "notConfirmed" ? (
-                        <AddressNotConfirmedIcon className="address-cycle-button__icon" />
-                      ) : (
-                        <AddressNotConfirmedOffIcon className="address-cycle-button__icon address-cycle-button__icon--off" />
-                      )}
+                      <span className="address-cycle-button__stack" aria-hidden="true">
+                        <AddressNotConfirmedOffIcon
+                          className={`address-cycle-button__icon address-cycle-button__icon--off ${addressConfirmation === "none" ? "address-cycle-button__icon--current" : ""}`}
+                        />
+                        <AddressNotConfirmedIcon
+                          className={`address-cycle-button__icon ${addressConfirmation === "notConfirmed" ? "address-cycle-button__icon--current" : ""}`}
+                        />
+                        <AddressConfirmedIcon
+                          className={`address-cycle-button__icon ${addressConfirmation === "confirmed" ? "address-cycle-button__icon--current" : ""}`}
+                        />
+                      </span>
                     </button>
                   </div>
                 </div>

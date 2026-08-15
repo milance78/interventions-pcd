@@ -3257,3 +3257,365 @@
     box-shadow: none !important;
   }
 }
+
+
+/* v100 — final seven-icon visual normalization */
+.current-intervention-page {
+  /* Equal outside breathing room and equal inter-icon rhythm across all seven cells. */
+  .intervention-option-group--unified {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  .intervention-option-group__items--six {
+    grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+    column-gap: 10px !important;
+  }
+  .intervention-option-group__items--six > .option-button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 !important;
+  }
+
+  /* Address is the visual reference. Enlarge the other artwork enough to match it optically. */
+  .intervention-option-group__items--six .question-action-icon {
+    width: 62px !important;
+    height: 62px !important;
+  }
+  .intervention-option-group__items--six .boolean-input svg,
+  .intervention-option-group__items--six .lightbulb-action-icon--off {
+    width: 62px !important;
+    height: 62px !important;
+  }
+  .intervention-option-group__items--six .res-pending-button__icon {
+    width: 62px !important;
+    height: 62px !important;
+  }
+  .intervention-option-group__items--six .cure-summary-card__icon,
+  .intervention-option-group__items--six .cure-summary-card__fallback {
+    width: 60px !important;
+    height: 60px !important;
+  }
+  .intervention-option-group__items--six .cure-summary-card__fallback {
+    font-size: 60px !important;
+  }
+  .intervention-option-group__items--six .snow-trail-icon,
+  .intervention-option-group__items--six .snow-trail-icon__png {
+    width: 74px !important;
+    height: 62px !important;
+    object-fit: contain !important;
+  }
+
+  /* Bulb stays optically aligned with the question mark after the size increase. */
+  .intervention-option-group__items--six .lightbulb-action-icon--off,
+  .intervention-option-group__items--six .option-button:nth-child(2) .boolean-input svg {
+    transform: translateY(-5px) !important;
+  }
+
+  /* One perceived OFF grey for the three assets that were visibly too pale. */
+  .intervention-option-group__items--six .boolean-input:not(.active) .question-action-icon {
+    opacity: .84 !important;
+    filter: grayscale(1) brightness(.74) contrast(.88) !important;
+  }
+  .intervention-option-group__items--six .boolean-input:not(.active) .lightbulb-action-icon--off {
+    opacity: .56 !important;
+    filter: grayscale(1) brightness(1.02) contrast(.82) !important;
+  }
+  .intervention-option-group__items--six .address-cycle-button:not(.address-cycle-button--active) .address-cycle-button__icon--off {
+    opacity: .80 !important;
+    filter: grayscale(1) brightness(.80) contrast(.88) !important;
+  }
+
+  /* Address no longer remounts a different SVG at every click. The three states are
+     permanently mounted in one painting box, so state changes cannot blink/reflow. */
+  .address-cycle-button {
+    contain: layout paint !important;
+    isolation: isolate;
+  }
+  .address-cycle-button__stack {
+    position: relative;
+    display: block;
+    width: 58px;
+    height: 58px;
+    flex: 0 0 58px;
+  }
+  .address-cycle-button__stack .address-cycle-button__icon {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 58px !important;
+    height: 58px !important;
+    margin: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+  .address-cycle-button__stack .address-cycle-button__icon--current {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+
+
+/* v101 — Snow redraw, seven-state surface harmony, CURE mail and spacing polish */
+.current-intervention-page {
+  /* Slightly more vertical air between the grouped technical input rows. */
+  .technical-inputs {
+    gap: 15px !important;
+  }
+
+  /* Every status cell uses the same subtle hover/ON wash as Résiliation. */
+  .intervention-option-group__items--six > .option-button {
+    border-radius: 13px !important;
+    background: transparent !important;
+    transition: background-color 145ms ease !important;
+  }
+
+  .intervention-option-group__items--six > .option-button:hover,
+  .intervention-option-group__items--six > .option-button:has(.boolean-input.active),
+  .intervention-option-group__items--six > .option-button:has(.res-pending-button--active),
+  .intervention-option-group__items--six > .option-button:has(.pending-state-button--active),
+  .intervention-option-group__items--six > .option-button:has(.address-cycle-button--active) {
+    background: rgba(49, 90, 134, 0.055) !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+
+  /* Snow: transparent compact composition, with the project's dual-hexagon
+     snowflake and a larger wooden trail sign overlapping its lower-right edge. */
+  .option-button--snow-state,
+  .option-button--snow-state .pending-state-button,
+  .option-button--snow-state .pending-state-button:hover,
+  .option-button--snow-state .pending-state-button--active {
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .snow-trail-icon,
+  .intervention-option-group__items--six .snow-trail-icon {
+    position: relative !important;
+    display: block !important;
+    width: 78px !important;
+    height: 66px !important;
+    overflow: visible !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .snow-trail-icon__flake-svg {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 58px !important;
+    height: 58px !important;
+    display: block;
+    overflow: visible;
+  }
+
+  .snow-trail-icon__wood-sign {
+    position: absolute;
+    z-index: 2;
+    right: -2px;
+    bottom: 1px;
+    width: 62px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    color: #fff9ef;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,.075) 0 2px,
+        rgba(98,51,17,.055) 2px 4px
+      ),
+      linear-gradient(180deg, #d9a45f 0%, #c48842 53%, #ad6c30 100%);
+    filter: drop-shadow(0 1px 1px rgba(95,52,19,.22));
+    text-shadow: 0 1px 1px rgba(75,39,12,.55);
+  }
+
+  .snow-trail-icon--right .snow-trail-icon__wood-sign {
+    clip-path: polygon(0 0, 78% 0, 100% 50%, 78% 100%, 0 100%);
+    padding: 0 10px 0 4px;
+  }
+
+  .snow-trail-icon--left .snow-trail-icon__wood-sign {
+    clip-path: polygon(22% 0, 100% 0, 100% 100%, 22% 100%, 0 50%);
+    padding: 0 4px 0 10px;
+  }
+
+  .snow-trail-icon__wood-label {
+    display: block;
+    white-space: nowrap;
+    font-size: 10px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -.1px;
+    transform: translateY(.3px);
+  }
+
+  .snow-trail-icon__wood-post {
+    position: absolute;
+    left: 50%;
+    top: 23px;
+    width: 8px;
+    height: 13px;
+    transform: translateX(-50%);
+    border-radius: 0 0 2px 2px;
+    background: linear-gradient(90deg, #8b5325, #bd7b36 50%, #7e481f);
+    z-index: -1;
+  }
+
+  /* OFF Snow stays purely transparent and shares the same pale neutral grey. */
+  .snow-trail-icon--off .snow-trail-icon__flake-svg {
+    opacity: .72 !important;
+    filter: grayscale(1) brightness(.93) contrast(.9) !important;
+  }
+  .snow-trail-icon--off .snow-trail-icon__wood-sign {
+    color: #f4f4f4;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        rgba(255,255,255,.05) 0 2px,
+        rgba(90,90,90,.025) 2px 4px
+      ),
+      linear-gradient(180deg, #cfd2d5 0%, #bfc3c7 55%, #b0b5ba 100%);
+    filter: none !important;
+    text-shadow: 0 1px 1px rgba(95,95,95,.28);
+  }
+  .snow-trail-icon--off .snow-trail-icon__wood-post {
+    background: #b7bbc0;
+  }
+
+  /* CURE is intentionally slightly larger than the other pictograms. */
+  .intervention-option-group__items--six .cure-summary-card {
+    width: 72px !important;
+    height: 72px !important;
+    min-width: 72px !important;
+    min-height: 72px !important;
+    overflow: visible !important;
+  }
+  .intervention-option-group__items--six .cure-summary-card__icon,
+  .intervention-option-group__items--six .cure-summary-card__fallback {
+    width: 68px !important;
+    height: 68px !important;
+    object-fit: contain !important;
+  }
+  .intervention-option-group__items--six .cure-summary-card__fallback {
+    font-size: 68px !important;
+  }
+
+  /* Larger warm-yellow envelope; its upper-left corner overlaps the phone's
+     lower-right corner while leaving the CURE number badge visible. */
+  .cure-summary-card__mail {
+    right: -1px !important;
+    bottom: 4px !important;
+    width: 31px !important;
+    height: 24px !important;
+    color: #6b4a06 !important;
+    background: linear-gradient(145deg, #ffe07a 0%, #f5c94d 55%, #e6ad29 100%) !important;
+    border: 1px solid #bd8518 !important;
+    border-radius: 5px !important;
+    box-shadow: 0 1px 2px rgba(112, 73, 8, .16) !important;
+    z-index: 3;
+  }
+  .cure-summary-card__mail svg {
+    width: 21px !important;
+    height: 21px !important;
+  }
+
+  /* The inactive Address asset itself carries no external shadow. */
+  .address-cycle-button:not(.address-cycle-button--active)
+  .address-cycle-button__icon--off {
+    box-shadow: none !important;
+    filter: grayscale(1) brightness(.82) contrast(.9) !important;
+  }
+}
+
+
+/* v102 — restore the original wooden trail boards and enlarge only the CURE phone */
+.current-intervention-page {
+  .snow-trail-icon__wood-sign,
+  .snow-trail-icon__wood-label,
+  .snow-trail-icon__wood-post {
+    display: none !important;
+  }
+
+  .snow-trail-icon__wood-board {
+    position: absolute;
+    z-index: 3;
+    right: -8px;
+    bottom: -2px;
+    width: 76px;
+    height: auto;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    filter: none;
+  }
+
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    opacity: .68;
+    filter: grayscale(1) brightness(1.08) contrast(.78);
+  }
+
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    opacity: 1;
+    filter: none;
+  }
+
+  /* Keep the envelope exactly where it is; enlarge only the blue phone artwork behind it. */
+  .intervention-option-group__items--six .cure-summary-card__icon,
+  .intervention-option-group__items--six .cure-summary-card__fallback {
+    width: 78px !important;
+    height: 78px !important;
+  }
+
+  .intervention-option-group__items--six .cure-summary-card__fallback {
+    font-size: 78px !important;
+  }
+}
+
+
+/* v104 — isolate state toggles and visually normalize bulb/resignation. */
+.current-intervention-page {
+  /* The OFF Address keeps a real lower edge; no drop shadow is used. */
+  .intervention-option-group__items--six
+    .address-cycle-button:not(.address-cycle-button--active)
+    .address-cycle-button__icon--off {
+    opacity: .82 !important;
+    filter: grayscale(1) brightness(.88) contrast(.92) !important;
+    box-shadow: none !important;
+  }
+
+  /* Resiliation and bulb were optically smaller than the rest. */
+  .intervention-option-group__items--six .res-pending-button__icon {
+    width: 69px !important;
+    height: 69px !important;
+    object-fit: contain !important;
+  }
+
+  .intervention-option-group__items--six .boolean-input svg,
+  .intervention-option-group__items--six .lightbulb-action-icon--off {
+    width: 69px !important;
+    height: 69px !important;
+  }
+
+  /* Preserve the earlier vertical optical alignment after enlargement. */
+  .intervention-option-group__items--six .lightbulb-action-icon--off,
+  .intervention-option-group__items--six .option-button:nth-child(2) .boolean-input svg {
+    transform: translateY(-5px) !important;
+  }
+
+  /* OFF bulb uses pale neutral strokes from the SVG itself; avoid CSS re-darkening. */
+  .intervention-option-group__items--six
+    .boolean-input:not(.active) .lightbulb-action-icon--off {
+    opacity: .74 !important;
+    filter: grayscale(1) brightness(1.08) contrast(.78) !important;
+  }
+}
