@@ -3788,3 +3788,71 @@
     filter: grayscale(1) brightness(1.12) contrast(.82) !important;
   }
 }
+
+
+/* v113 — final snow board sizing/opacity + clearer OFF bulb details */
+.current-intervention-page {
+  .snow-trail-icon__wood-board,
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    width: 59px !important;
+    height: auto !important;
+    right: -1px !important;
+    bottom: 0 !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  /* OFF is pale grey, but NEVER transparent. */
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: grayscale(1) brightness(1.32) contrast(.68) !important;
+  }
+}
+
+
+/* v114 — Créé board same visual height as À mon nom; preserve v113 opacity fix. */
+.current-intervention-page {
+  .snow-trail-icon__wood-board {
+    object-fit: contain !important;
+    opacity: 1 !important;
+  }
+
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: none !important;
+  }
+
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+  }
+
+  .snow-trail-icon--created .snow-trail-icon__wood-board,
+  .snow-trail-icon--right .snow-trail-icon__wood-board {
+    height: 31px !important;
+    width: auto !important;
+  }
+}
+
+
+/* v115 — both Snow wooden boards share one canvas, size and position. */
+.current-intervention-page {
+  .snow-trail-icon--left .snow-trail-icon__wood-board,
+  .snow-trail-icon--right .snow-trail-icon__wood-board,
+  .snow-trail-icon--active .snow-trail-icon__wood-board,
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    width: 59px !important;
+    height: auto !important;
+    right: -1px !important;
+    bottom: 0 !important;
+    opacity: 1 !important;
+    object-fit: contain !important;
+  }
+
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    filter: none !important;
+  }
+
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    filter: grayscale(1) brightness(1.32) contrast(.68) !important;
+  }
+}
