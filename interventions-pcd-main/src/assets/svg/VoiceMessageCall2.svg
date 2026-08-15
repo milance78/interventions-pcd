@@ -1,0 +1,151 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="34" y1="24" x2="222" y2="232" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#11C7DE"/>
+      <stop offset="0.48" stop-color="#137DDF"/>
+      <stop offset="1" stop-color="#342A96"/>
+    </linearGradient>
+
+    <linearGradient id="handset" x1="64" y1="54" x2="190" y2="210" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="0.55" stop-color="#F7F9FE"/>
+      <stop offset="1" stop-color="#DCE5F6"/>
+    </linearGradient>
+
+    <linearGradient id="handsetEdge" x1="80" y1="72" x2="176" y2="208" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F5F8FF"/>
+      <stop offset="1" stop-color="#C9D5EC"/>
+    </linearGradient>
+
+    <linearGradient id="signal" x1="116" y1="91" x2="181" y2="158" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#D4F7FF"/>
+      <stop offset="1" stop-color="#8DDBFF"/>
+    </linearGradient>
+
+    <linearGradient id="badgeText" x1="184" y1="40" x2="214" y2="94" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1664E8"/>
+      <stop offset="1" stop-color="#173BAA"/>
+    </linearGradient>
+
+    <radialGradient id="badgeFill" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse"
+                    gradientTransform="translate(190 55) rotate(45) scale(58)">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EEF3FC"/>
+    </radialGradient>
+
+    <filter id="tileShadow" x="6" y="8" width="244" height="244" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="10" stdDeviation="9" flood-color="#152B6A" flood-opacity="0.25"/>
+    </filter>
+
+    <filter id="badgeShadow" x="154" y="18" width="90" height="90" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="#123776" flood-opacity="0.25"/>
+    </filter>
+
+    <filter id="handsetShadow" x="36" y="39" width="176" height="186" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="7" stdDeviation="6" flood-color="#153677" flood-opacity="0.28"/>
+    </filter>
+
+    <clipPath id="tileClip">
+      <rect x="18" y="18" width="220" height="220" rx="54"/>
+    </clipPath>
+  </defs>
+
+  <g filter="url(#tileShadow)">
+    <rect x="18" y="18" width="220" height="220" rx="54" fill="url(#bg)"/>
+  </g>
+
+  <g clip-path="url(#tileClip)">
+    <ellipse cx="71" cy="42" rx="95" ry="54" fill="#47E8F5" fill-opacity="0.13"/>
+    <ellipse cx="211" cy="218" rx="104" ry="78" fill="#160D69" fill-opacity="0.16"/>
+  </g>
+
+  <g filter="url(#handsetShadow)">
+    <path d="M71.5 59.5
+             C63.7 58.5 57.2 61.9 52.2 69.3
+             C43.9 81.6 42.6 96.4 46.8 111.6
+             C53.3 135.0 67.5 157.1 87.3 176.3
+             C107.0 195.4 129.1 208.6 151.6 213.4
+             C166.0 216.5 178.9 214.3 188.9 206.6
+             C196.1 201.0 199.2 194.5 198.3 187.1
+             C197.7 181.8 194.5 177.7 189.4 175.5
+             L171.4 167.8
+             C165.8 165.4 160.3 167.1 157.1 171.9
+             L149.7 183.0
+             C147.7 186.0 144.5 187.3 141.1 186.2
+             C128.3 182.1 115.1 173.9 102.5 161.6
+             C89.8 149.2 81.0 136.3 76.4 123.4
+             C75.2 120.0 76.4 116.7 79.3 114.6
+             L90.3 106.8
+             C95.0 103.5 96.5 97.9 93.9 92.4
+             L85.5 74.8
+             C83.0 69.5 78.7 60.4 71.5 59.5Z"
+          fill="url(#handset)"/>
+
+    <path d="M64.0 70.5
+             C59.3 77.0 58.3 84.8 61.4 92.9
+             L70.0 111.2
+             C72.2 115.7 77.1 117.2 81.2 114.4
+             L90.5 108.0
+             C95.1 104.9 96.7 99.1 94.1 93.8
+             L85.5 76.1
+             C81.4 67.7 70.3 61.8 64.0 70.5Z"
+          fill="#FDFEFF"/>
+
+    <path d="M157.5 172.1
+             L150.2 183.3
+             C147.5 187.5 149.2 192.8 153.7 195.1
+             L171.8 204.1
+             C180.1 208.3 188.3 204.8 193.2 198.3
+             C199.4 190.0 193.9 180.4 185.6 176.9
+             L170.8 170.5
+             C165.7 168.3 160.6 169.0 157.5 172.1Z"
+          fill="#FDFEFF"/>
+
+    <path d="M74.1 62.8
+             C73.3 62.7 72.4 62.7 71.5 62.8
+             C65.9 63.3 61.9 66.0 58.6 70.9
+             C53.0 79.1 51.5 88.7 53.4 99.0
+             C50.0 87.8 51.4 77.0 57.6 67.8
+             C61.3 62.3 66.8 59.6 72.8 60.4
+             L74.1 62.8Z"
+          fill="#FFFFFF" fill-opacity="0.95"/>
+
+    <path d="M48.2 111.4
+             C55.5 134.9 69.7 156.0 89.6 175.0
+             C109.1 193.5 130.3 205.9 151.8 210.2
+             C165.2 212.9 176.3 210.9 185.1 204.7
+             C177.0 213.6 164.8 217.2 151.0 214.3
+             C128.2 209.5 105.8 196.1 86.0 176.8
+             C66.2 157.5 52.1 135.5 45.5 112.0
+             L48.2 111.4Z"
+          fill="url(#handsetEdge)" fill-opacity="0.72"/>
+  </g>
+
+  <g fill="#8297C3">
+    <circle cx="67" cy="77" r="2.5"/><circle cx="75" cy="81" r="2.5"/>
+    <circle cx="64" cy="86" r="2.5"/><circle cx="72" cy="90" r="2.5"/>
+    <circle cx="80" cy="94" r="2.5"/><circle cx="84" cy="85" r="2.5"/>
+    <circle cx="164" cy="184" r="2.5"/><circle cx="172" cy="188" r="2.5"/>
+    <circle cx="180" cy="192" r="2.5"/><circle cx="168" cy="197" r="2.5"/>
+    <circle cx="176" cy="201" r="2.5"/><circle cx="184" cy="205" r="2.5"/>
+  </g>
+
+  <g stroke="url(#signal)" stroke-width="9" stroke-linecap="round">
+    <path d="M116 108C135 111 151 127 154 146"/>
+    <path d="M119 92C148 96 171 120 175 149"/>
+    <path d="M115 126C125 128 133 136 135 146"/>
+  </g>
+  <circle cx="113" cy="148" r="6" fill="#A8E9FF"/>
+
+  <g filter="url(#badgeShadow)">
+    <circle cx="196" cy="61" r="37" fill="url(#badgeFill)"/>
+    <circle cx="196" cy="61" r="35" stroke="white" stroke-width="4"/>
+  </g>
+
+  <text x="196" y="77"
+        text-anchor="middle"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="53"
+        font-weight="800"
+        fill="url(#badgeText)">2</text>
+</svg>

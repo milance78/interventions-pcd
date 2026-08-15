@@ -1,0 +1,253 @@
+.inputs-all {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+
+  .inputs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    min-width: 0;
+
+    > * {
+      min-width: 0;
+    }
+  }
+
+  .inputs-row--half {
+    > * {
+      flex: 1 1 50%;
+    }
+  }
+
+  .inputs-row--full {
+    > * {
+      flex: 1 1 100%;
+      width: 100%;
+    }
+  }
+
+  .inputs-row--address-line {
+    .simple-input--main-address {
+      flex: 1 1 72%;
+      width: 72%;
+    }
+
+    > .address-mini-input {
+      flex: 0 1 7%;
+      width: 7%;
+    }
+  }
+
+
+  .inputs-row--client-description {
+    .simple-input--client-id {
+      flex: 0 1 30%;
+      width: 30%;
+    }
+
+    .simple-input--intervention-description {
+      flex: 1 1 70%;
+      width: 70%;
+    }
+  }
+
+  .inputs-row--lom-phone {
+    .simple-input--lom-key {
+      flex: 0 1 30%;
+      width: 30%;
+    }
+
+    .simple-input--phone {
+      flex: 1 1 70%;
+      width: 70%;
+    }
+  }
+}
+
+/* Snow uses the exact same icon wrapper and horizontal alignment as all other inputs. */
+.inputs-all .inputs-row--snow {
+  display: block;
+}
+
+.inputs-all .snow-inputs-group {
+  width: 100%;
+}
+
+.inputs-all .snow-inputs-group__fields {
+  display: grid;
+  grid-template-columns:
+    minmax(0, 1fr)
+    54px
+    minmax(0, 1fr)
+    40px
+    minmax(0, 1fr)
+    40px;
+  align-items: center;
+  column-gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.inputs-all .snow-inputs-group__fields > .snow-pending-input {
+  display: contents;
+}
+
+.inputs-all .snow-inputs-group__fields .snow-pending-input__field,
+.inputs-all .snow-inputs-group__fields > .simple-input {
+  min-width: 0;
+  width: 100%;
+}
+
+
+.snow-assign-button__wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 40px;
+}
+
+.snow-assign-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 36px;
+  padding: 0 2px;
+  color: #2563d4;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.snow-assign-button:hover:not(:disabled) {
+  background: transparent;
+  transform: none;
+}
+
+.snow-assign-button:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+}
+
+.snow-assign-button:disabled {
+  color: #cbd5e1;
+  cursor: default;
+}
+
+.snow-assign-button__bars {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.snow-assign-button__bars i {
+  display: block;
+  width: 4px;
+  height: 8px;
+  border-radius: 1px;
+  background: currentColor;
+}
+
+.snow-assign-button__bars i:nth-child(1) { opacity: 0.45; }
+.snow-assign-button__bars i:nth-child(2) { opacity: 0.62; }
+.snow-assign-button__bars i:nth-child(3) { opacity: 0.78; }
+.snow-assign-button__bars i:nth-child(4) { opacity: 1; }
+
+.snow-assign-button__arrow {
+  position: relative;
+  display: block;
+  width: 13px;
+  height: 8px;
+  margin-left: 1px;
+  background: currentColor;
+}
+
+.snow-assign-button__arrow::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -8px;
+  width: 0;
+  height: 0;
+  border-top: 10px solid transparent;
+  border-bottom: 10px solid transparent;
+  border-left: 10px solid currentColor;
+  transform: translateY(-50%);
+}
+
+@media (max-width: 980px) {
+  .inputs-all {
+    .inputs-row--address-line {
+      flex-wrap: wrap;
+
+      .simple-input--main-address {
+        flex: 1 1 100%;
+        width: 100%;
+      }
+
+      > .address-mini-input {
+        flex: 1 1 calc(25% - 8px);
+        width: calc(25% - 8px);
+      }
+    }
+  }
+
+  .inputs-all .snow-inputs-group__fields {
+    grid-template-columns: minmax(0, 1fr) 40px;
+    row-gap: 8px;
+    column-gap: 10px;
+  }
+
+  .inputs-all .snow-inputs-group__fields > .simple-input:first-child {
+    grid-column: 1;
+  }
+
+  .snow-assign-button__wrapper {
+    grid-column: 2;
+    width: 40px;
+  }
+
+  .inputs-all .snow-inputs-group__fields > .snow-pending-input {
+    display: contents;
+  }
+}
+
+@media (max-width: 680px) {
+  .inputs-all {
+    .inputs-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .inputs-row--half,
+    .inputs-row--full,
+    .inputs-row--address-line,
+    .inputs-row--lom-phone,
+    .inputs-row--client-description {
+      > *,
+      .simple-input--main-address,
+      .simple-input--lom-key,
+      .simple-input--client-id,
+      .simple-input--intervention-description,
+      .address-mini-input,
+      .simple-input--phone {
+        flex: 1 1 auto;
+        width: 100%;
+      }
+    }
+  }
+}
+
+.inputs-all .inputs-row--wct-link {
+  display: block;
+}
+.inputs-all .inputs-row--wct-link > * {
+  width: 100%;
+}

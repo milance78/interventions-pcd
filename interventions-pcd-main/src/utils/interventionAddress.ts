@@ -1,0 +1,105 @@
+export interface StructuredMainAddress {
+  streetName: string;
+  streetNumber: string;
+  streetAlpha: string;
+  postalCode: string;
+  city: string;
+}
+
+const cleanPart = (value: string | null | undefined) =>
+  String(value ?? "").replace(/\s+/g, " ").trim();
+
+export const emptyStructuredMainAddress = (): StructuredMainAddress => ({
+  streetName: "",
+  streetNumber: "",
+  streetAlpha: "",
+  postalCode: "",
+  city: "",
+});
+
+export const composeMainAddress = (
+  address: Partial<StructuredMainAddress>,
+): string => {
+  const streetName = cleanPart(address.streetName);
+  const streetNumber = cleanPart(address.streetNumber);
+  const streetAlpha = cleanPart(address.streetAlpha);
+  const postalCode = cleanPart(address.postalCode);
+  const city = cleanPart(address.city);
+
+  const house = `${streetNumber}${streetAlpha}`.trim();
+  const firstLine = [streetName, house].filter(Boolean).join(" ");
+  const secondLine = [postalCode, city].filter(Boolean).join(" ");
+
+  return [firstLine, secondLine].filter(Boolean).join(", ");
+};
+
+/** Best-effort migration for interventions that only contain mainAddress. */
+export const parseMainAddress = (value: string): StructuredMainAddress => {
+  const normalized = cleanPart(value);
+  if (!normalized) return emptyStructuredMainAddress();
+
+  let firstLine = normalized;
+  let postalCode = "";
+  let city = "";
+
+  const postalMatch = normalized.match(/(?:,\s*|\s+)(\d{4})\s+(.+)$/u);
+  if (postalMatch?.index !== undefined) {
+    firstLine = normalized.slice(0, postalMatch.index).replace(/,\s*$/, "").trim();
+    postalCode = postalMatch[1];
+    city = postalMatch[2].trim();
+  }
+
+  let streetName = firstLine;
+  let streetNumber = "";
+  let streetAlpha = "";
+  const houseMatch = firstLine.match(/^(.*?)[,\s]+(\d+)\s*([\p{L}]*)$/u);
+  if (houseMatch) {
+    streetName = houseMatch[1].replace(/,\s*$/, "").trim();
+    streetNumber = houseMatch[2];
+    streetAlpha = houseMatch[3] ?? "";
+  }
+
+  return { streetName, streetNumber, streetAlpha, postalCode, city };
+};
+
+const streetStartPattern = /\b(Rue|Avenue|Boulevard|Chaussée|Chaussee|Square|Clos|Place|Quai|Route|Chemin|Allée|Allee|Drève|Dreve|Sentier|Impasse|Laan|Straat|Steenweg|Weg|Plein)\b/i;
+
+/**
+ * Parses the compact NPS clipboard order:
+ * <postal code> <city> <street> <house number> <alpha>.
+ * Returns null when the pasted text does not look like that format.
+ */
+export const parsePastedNpsAddress = (
+  value: string,
+): StructuredMainAddress | null => {
+  const normalized = cleanPart(value);
+  const zipMatch = normalized.match(/^(\d{4})\s+(.+)$/u);
+  if (!zipMatch) return null;
+
+  const postalCode = zipMatch[1];
+  const afterZip = zipMatch[2].trim();
+  const streetMatch = streetStartPattern.exec(afterZip);
+  if (!streetMatch || streetMatch.index == null) return null;
+
+  const city = cleanPart(afterZip.slice(0, streetMatch.index));
+  const streetAndHouse = afterZip.slice(streetMatch.index).trim();
+  const houseMatch = streetAndHouse.match(/^(.*?)\s+(\d+)\s*([\p{L}]*)$/u);
+  if (!houseMatch) return null;
+
+  return {
+    streetName: cleanPart(houseMatch[1]),
+    streetNumber: cleanPart(houseMatch[2]),
+    streetAlpha: cleanPart(houseMatch[3]),
+    postalCode,
+    city,
+  };
+};
+
+export const normalizeNaNumber = (value: string): string => {
+  const trimmedLeft = value.replace(/^\s+/, "");
+  if (!trimmedLeft) return "";
+
+  // Keep the user's content, but guarantee exactly one leading zero.
+  const withoutLeadingZeros = trimmedLeft.replace(/^0+/, "");
+  return `0${withoutLeadingZeros}`;
+};

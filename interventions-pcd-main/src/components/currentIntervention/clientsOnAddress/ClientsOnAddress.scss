@@ -1,0 +1,763 @@
+.clients-on-address {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+.clients-on-address__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.clients-on-address__title {
+  display: block;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+
+.clients-on-address__add {
+  width: 28px;
+  height: 28px;
+  color: #1d4ed8 !important;
+  background: #dbeafe !important;
+  border: 1px solid #93c5fd !important;
+  border-radius: 7px !important;
+}
+
+.clients-on-address__list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow: visible;
+  padding-right: 1px;
+  scrollbar-width: thin;
+}
+
+.clients-on-address__list--scroll {
+  max-height: 108px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.clients-on-address__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 42px;
+  color: #64748b;
+  background: transparent;
+  border: 1px dashed #94a3b8;
+  border-radius: 7px;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-color: #60a5fa;
+  }
+}
+
+.address-client {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.address-client__number {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-top: 7px;
+  color: #1e40af;
+  background: #dbeafe;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.address-client__content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.address-client__base {
+  display: grid;
+  gap: 7px;
+  min-width: 0;
+}
+
+.address-client__base--copper,
+.address-client__base--fiber {
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+}
+
+
+.address-client {
+  .MuiFormControl-root {
+    min-width: 0;
+    width: 100%;
+    margin: 0;
+  }
+
+  .MuiInput-root {
+    min-height: 34px;
+    height: 34px;
+    background: transparent;
+    border-radius: 0;
+  }
+
+  .MuiInputBase-input {
+    min-width: 0;
+    height: 34px;
+    padding: 5px 2px 4px;
+    box-sizing: border-box;
+    color: #172033;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+
+  .MuiInputBase-input::placeholder {
+    color: #64748b;
+    opacity: 1;
+    font-size: 14px;
+    font-weight: 400;
+  }
+
+  .MuiInput-underline::before {
+    border-bottom-color: #cbd5e1;
+  }
+
+  .MuiInput-underline:hover:not(.Mui-disabled, .Mui-error)::before {
+    border-bottom-color: #2563eb;
+  }
+}
+
+.address-client-field__copy {
+  width: 22px;
+  height: 22px;
+  color: #64748b !important;
+
+  svg {
+    width: 13px;
+    height: 13px;
+  }
+}
+
+.address-client__actions {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  align-self: end;
+  gap: 3px;
+  height: 34px;
+  padding-top: 0;
+
+  > span {
+    display: flex;
+    align-items: flex-end;
+    height: 34px;
+  }
+
+  .MuiIconButton-root {
+    width: 27px;
+    height: 27px;
+    padding: 5px;
+    color: #64748b;
+    border-radius: 7px;
+
+    svg {
+      width: 17px;
+      height: 17px;
+    }
+  }
+}
+
+.address-client__details {
+  color: #1d4ed8 !important;
+  background: #eff6ff !important;
+}
+
+.address-client__details:hover:not(:disabled) {
+  color: #1e40af !important;
+  background: #dbeafe !important;
+}
+
+.address-client__delete:hover:not(:disabled) {
+  color: #b91c1c !important;
+  background: #fee2e2 !important;
+}
+
+@media (max-width: 900px) {
+  .address-client__base--copper,
+  .address-client__base--fiber {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.address-client-dialog {
+  .MuiDialog-paper {
+    overflow: visible;
+    border-radius: 16px;
+  }
+
+  .MuiDialogTitle-root {
+    position: relative;
+    padding: 20px 56px 16px 24px;
+    color: #172033;
+    font-size: 20px;
+    font-weight: 750;
+  }
+
+  .MuiDialogContent-root {
+    padding: 22px 24px 26px;
+  }
+
+  .MuiDialogActions-root {
+    padding: 12px 24px 18px;
+  }
+
+  .MuiInputBase-input {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .MuiInputLabel-root {
+    font-size: 15px;
+  }
+}
+
+.address-client-dialog__close {
+  position: absolute !important;
+  top: 10px;
+  right: 12px;
+}
+
+
+.address-client-dialog__grid {
+  display: grid;
+  gap: 20px 22px;
+  align-items: end;
+}
+
+.address-client-dialog__grid--copper,
+.address-client-dialog__grid--fiber {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.address-client-dialog__grid .MuiFormControl-root {
+  min-width: 0;
+  width: 100%;
+}
+
+@media (max-width: 720px) {
+  .address-client-dialog__grid--copper,
+  .address-client-dialog__grid--fiber {
+    grid-template-columns: 1fr;
+  }
+}
+
+.address-client-dialog__import-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 22px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.address-client-import-trigger {
+  min-height: 44px !important;
+  padding: 7px 15px !important;
+  color: #5b21b6 !important;
+  background: linear-gradient(135deg, #faf5ff, #eef2ff) !important;
+  border-color: #c4b5fd !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  text-transform: none !important;
+
+  &:hover {
+    background: linear-gradient(135deg, #f3e8ff, #e0e7ff) !important;
+    border-color: #8b5cf6 !important;
+  }
+}
+
+.address-client-dialog__import-feedback {
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.address-client-import-trigger__icon,
+.address-client-import-dialog__title-icon {
+  display: inline-block;
+  flex: 0 0 auto;
+  color: inherit;
+  background-color: currentColor;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+}
+
+.address-client-import-trigger__icon {
+  width: 29px;
+  height: 29px;
+}
+
+.address-client-import-dialog__title-icon {
+  width: 34px;
+  height: 34px;
+}
+
+.address-client-import-dialog {
+  .MuiPaper-root {
+    overflow: hidden;
+    border: 1px solid #d8d4fe;
+    border-radius: 18px;
+    box-shadow: 0 28px 74px rgba(30, 27, 75, 0.26);
+  }
+}
+
+.address-client-import-dialog__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px 20px !important;
+  color: #312e81;
+  background: linear-gradient(135deg, #faf5ff, #eef2ff);
+  border-bottom: 1px solid #ddd6fe;
+
+  > span {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    font-weight: 750;
+  }
+}
+
+.address-client-import-dialog__content {
+  position: relative;
+  padding: 24px !important;
+  background: #f8fafc;
+}
+
+.address-client-import-dialog__paste-target {
+  position: absolute;
+  inset: 24px;
+  z-index: 2;
+  width: calc(100% - 48px);
+  height: calc(100% - 48px);
+  opacity: 0;
+  cursor: paste;
+}
+
+.address-client-import-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 330px;
+  padding: 32px;
+  text-align: center;
+  background: #fff;
+  border: 2px dashed #a5b4fc;
+  border-radius: 15px;
+  cursor: text;
+
+  strong {
+    margin-top: 14px;
+    color: #1e293b;
+    font-size: 18px;
+  }
+
+  span {
+    max-width: 470px;
+    margin-top: 8px;
+    color: #64748b;
+    line-height: 1.5;
+  }
+
+  kbd {
+    margin-top: 20px;
+    padding: 8px 14px;
+    color: #4338ca;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-bottom-width: 3px;
+    border-radius: 8px;
+    font: 700 14px/1 system-ui, sans-serif;
+  }
+}
+
+.address-client-import-dropzone__icon {
+  width: 52px !important;
+  height: 52px !important;
+  color: #7c3aed;
+}
+
+.address-client-import-dropzone--processing {
+  cursor: wait;
+  border-style: solid;
+}
+
+/* v56: future client toggle and delete confirmation */
+.address-client__future {
+  color: #b3bcc7 !important;
+  background: #fbfcfd !important;
+  border: 1px solid #d7dde4 !important;
+  border-radius: 7px !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+  transform: translateY(0) !important;
+  transition:
+    color 130ms ease,
+    background-color 130ms ease,
+    border-color 130ms ease,
+    box-shadow 130ms ease,
+    transform 100ms ease !important;
+
+  > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 18px;
+    font-weight: 700;
+    font-style: italic;
+    line-height: 1;
+    transform: translateY(0);
+  }
+
+  &:hover:not(:disabled) {
+    color: #8f9aa7 !important;
+    background: #f5f7f9 !important;
+    border-color: #c4ccd5 !important;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1.5px) !important;
+    box-shadow: inset 0 2px 3px rgba(15, 23, 42, 0.12) !important;
+  }
+}
+
+.address-client__future--active {
+  color: #218653 !important;
+  background: #e3f1e8 !important;
+  border-color: #6da383 !important;
+  box-shadow:
+    inset 0 2px 3px rgba(33, 134, 83, 0.16),
+    0 0 0 1px rgba(33, 134, 83, 0.07) !important;
+  transform: translateY(1px) !important;
+
+  > span {
+    font-weight: 700;
+  }
+
+  &:hover:not(:disabled) {
+    color: #197345 !important;
+    background: #d9ebdf !important;
+    border-color: #5b9474 !important;
+    transform: translateY(1px) !important;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(2px) !important;
+    box-shadow: inset 0 3px 4px rgba(35, 122, 87, 0.18) !important;
+  }
+}
+
+.address-client-delete-dialog {
+  .MuiDialog-paper {
+    border-radius: 12px;
+  }
+
+  .MuiDialogTitle-root {
+    padding-bottom: 8px;
+    font-size: 18px;
+    font-weight: 650;
+  }
+
+  .MuiDialogActions-root {
+    padding: 12px 20px 18px;
+  }
+}
+
+/* Relationship toggles live before the client number. */
+.address-client {
+  grid-template-columns: 24px 22px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.address-client__relationship-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  width: 24px;
+  align-self: center;
+
+  > span {
+    display: flex;
+    width: 22px;
+    height: 22px;
+  }
+
+  .MuiIconButton-root {
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 6px;
+  }
+}
+
+.address-client__number {
+  margin-top: 0;
+}
+
+.address-client__future > span,
+.address-client__same > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  line-height: 1;
+}
+
+.address-client__future > span {
+  font-size: 16px;
+}
+
+.address-client__same {
+  color: #9b9bb7 !important;
+  background: #fbfbfe !important;
+  border: 1px solid #d8d8e6 !important;
+  box-shadow: 0 1px 2px rgba(30, 27, 75, 0.07) !important;
+  transform: translateY(0) !important;
+  transition: color 130ms ease, background-color 130ms ease, border-color 130ms ease, box-shadow 130ms ease, transform 100ms ease !important;
+
+  > span {
+    font-family: "Trebuchet MS", system-ui, sans-serif;
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  &:hover:not(:disabled) {
+    color: #6f6f96 !important;
+    background: #f3f2fb !important;
+    border-color: #c5c4dc !important;
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(1.5px) !important;
+    box-shadow: inset 0 2px 3px rgba(49, 46, 129, 0.13) !important;
+  }
+}
+
+.address-client__same--active {
+  color: #5b4ca0 !important;
+  background: #e9e6f7 !important;
+  border-color: #9185c4 !important;
+  box-shadow: inset 0 2px 3px rgba(91, 76, 160, 0.16), 0 0 0 1px rgba(91, 76, 160, 0.06) !important;
+  transform: translateY(1px) !important;
+
+  &:hover:not(:disabled) {
+    color: #4e408f !important;
+    background: #e1ddf3 !important;
+    border-color: #8174b8 !important;
+    transform: translateY(1px) !important;
+  }
+}
+
+/* v76: paired FUT / MÊME relationship control */
+.address-client {
+  grid-template-columns: 34px 22px minmax(0, 1fr) auto;
+}
+
+.address-client__relationship-controls {
+  width: 32px;
+  height: 32px;
+  gap: 2px;
+  align-self: center;
+
+  > span {
+    display: flex;
+    width: 32px;
+    height: 15px;
+  }
+
+  .MuiIconButton-root {
+    width: 32px;
+    height: 15px;
+    min-width: 32px;
+    min-height: 15px;
+    padding: 0;
+  }
+}
+
+.address-client__future {
+  border-radius: 7px 7px 0 0 !important;
+
+  > span {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 9px;
+    font-weight: 800;
+    font-style: normal;
+    letter-spacing: 0.015em;
+    text-transform: lowercase;
+  }
+}
+
+.address-client__same {
+  border-radius: 0 0 7px 7px !important;
+
+  > span {
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    text-transform: lowercase;
+  }
+}
+
+.address-client__future--active {
+  color: #126b45 !important;
+  background: #cfeadb !important;
+  border-color: #398963 !important;
+  box-shadow:
+    inset 0 2px 3px rgba(18, 107, 69, 0.23),
+    0 0 0 1px rgba(18, 107, 69, 0.08) !important;
+}
+
+.address-client__future--active:hover:not(:disabled) {
+  color: #0f5d3c !important;
+  background: #c2e3d1 !important;
+  border-color: #2f7c58 !important;
+}
+
+.address-client__same--active {
+  color: #47368f !important;
+  background: #dcd6f3 !important;
+  border-color: #7465b5 !important;
+  box-shadow:
+    inset 0 2px 3px rgba(71, 54, 143, 0.22),
+    0 0 0 1px rgba(71, 54, 143, 0.08) !important;
+}
+
+.address-client__same--active:hover:not(:disabled) {
+  color: #3e2f81 !important;
+  background: #d1caed !important;
+  border-color: #6657aa !important;
+}
+
+
+/* v78: compact paired FUT / MÊME control */
+.address-client__relationship-controls {
+  gap: 2px;
+}
+
+.address-client__future,
+.address-client__same {
+  > span {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    line-height: 1;
+    font-size: 8.5px;
+    font-weight: 400;
+    opacity: .64;
+  }
+}
+
+.address-client__future {
+  border-radius: 4px 4px 0 0 !important;
+}
+
+.address-client__same {
+  border-radius: 0 0 4px 4px !important;
+}
+
+.address-client__future--active {
+  color: #0b7149 !important;
+  background: #bfe6cf !important;
+  border-color: #2f8f63 !important;
+}
+.address-client__same--active {
+  color: #4b388f !important;
+  background: #d3cdf0 !important;
+  border-color: #725fb6 !important;
+}
+.address-client__future--active > span,
+.address-client__same--active > span {
+  opacity: 1;
+  font-weight: 400;
+}
+
+/* v79 — FUT / MÊME inactive states equally readable */
+.address-client__future:not(.address-client__future--active),
+.address-client__same:not(.address-client__same--active) {
+  color:#68717b !important;
+  background:#eef0f2 !important;
+  border-color:#b7bdc4 !important;
+}
+.address-client__future:not(.address-client__future--active) > span,
+.address-client__same:not(.address-client__same--active) > span {
+  opacity:.82 !important;
+  color:inherit !important;
+}
+
+/* v85 — larger, more legible FUT / MÊME paired square */
+.address-client { grid-template-columns: 42px 22px minmax(0, 1fr) auto; }
+.address-client__relationship-controls {
+  width: 40px;
+  height: 40px;
+  gap: 2px;
+}
+.address-client__relationship-controls > span {
+  width: 40px;
+  height: 19px;
+}
+.address-client__relationship-controls .MuiIconButton-root {
+  width: 40px;
+  height: 19px;
+  min-width: 40px;
+  min-height: 19px;
+}
+.address-client__future > span,
+.address-client__same > span {
+  font-size: 10.5px !important;
+  color: #59636e !important;
+  opacity: .95 !important;
+}
+.address-client__future--active > span { color:#075f3e !important; }
+.address-client__same--active > span { color:#3f2d82 !important; }

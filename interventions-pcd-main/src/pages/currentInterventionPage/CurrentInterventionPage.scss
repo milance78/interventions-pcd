@@ -3076,18 +3076,3 @@
     backface-visibility: hidden;
   }
 }
-
-/* v94 — separators aligned exactly with the card-header rule */
-.current-intervention-page {
-  .intervention-core-fields {
-    /* Header rule -> first input = 16px card gap + 6px section inset = 22px.
-       Keep the same 22px from the last core input to the lower rule. */
-    padding: 6px 0 22px !important;
-  }
-
-  .intervention-core-fields::after,
-  .intervention-options::before {
-    height: 1px !important;
-    background: #dbe4f0 !important;
-  }
-}

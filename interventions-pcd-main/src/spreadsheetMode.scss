@@ -1,0 +1,1875 @@
+/*
+ * Deliberately plain spreadsheet-like presentation.
+ * Only the presentation changes; React, Redux, Firebase and all workflows stay untouched.
+ */
+body.spreadsheet-mode {
+  --xls-grid: #c8c8c8;
+  --xls-grid-soft: #dedede;
+  --xls-header: #d9eaf7;
+  --xls-header-2: #eaf2f8;
+  --xls-selected: #e2f0d9;
+  --xls-yellow: #fff2cc;
+  --xls-text: #111111;
+
+  background: #ffffff !important;
+  color: var(--xls-text) !important;
+
+  * {
+    font-family: Arial, Helvetica, sans-serif !important;
+    text-shadow: none !important;
+  }
+
+  .app,
+  .main {
+    background: #ffffff !important;
+  }
+
+  .main {
+    position: relative;
+    background-image:
+      linear-gradient(to right, rgba(210, 210, 210, 0.52) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(210, 210, 210, 0.52) 1px, transparent 1px) !important;
+    background-size: 96px 24px !important;
+  }
+
+  /* Fake workbook / ribbon */
+  .header {
+    position: sticky;
+    min-height: 76px;
+    padding: 24px 8px 0;
+    gap: 0;
+    align-items: stretch;
+
+    background: #f3f3f3 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #a6a6a6 !important;
+    box-shadow: none !important;
+  }
+
+  .header::before {
+    content: "Suivi_interventions.xlsx   •   Enregistré";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 24px;
+    padding: 4px 12px;
+    box-sizing: border-box;
+
+    color: #202020;
+    background: #e6e6e6;
+    border-bottom: 1px solid #bfbfbf;
+
+    font-size: 11px;
+    line-height: 15px;
+    text-align: center;
+  }
+
+  .header__datetime {
+    min-width: 104px;
+    padding: 4px 10px;
+    justify-content: center;
+    border-right: 1px solid var(--xls-grid);
+    background: #eeeeee;
+  }
+
+  .header__date,
+  .header__time {
+    color: #222 !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    line-height: 1.25;
+  }
+
+  .header__navigation {
+    justify-content: flex-start;
+    gap: 0;
+    overflow-x: auto;
+    background: #ffffff;
+  }
+
+  .header__link {
+    min-height: 51px;
+    padding: 7px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111 !important;
+    background: #ffffff !important;
+    border: 0 !important;
+    border-right: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    transition: none !important;
+  }
+
+  .header__link:hover {
+    background: #f2f2f2 !important;
+  }
+
+  .header__link--active {
+    color: #111 !important;
+    background: var(--xls-header) !important;
+    box-shadow: inset 0 -3px 0 #70ad47 !important;
+  }
+
+  .header__right {
+    gap: 0;
+    background: #f2f2f2;
+    border-left: 1px solid var(--xls-grid);
+  }
+
+  .header__display-mode-toggle,
+  .header__new-intervention,
+  .header__right button,
+  .header__right .MuiButton-root {
+    min-width: 42px !important;
+    height: 28px !important;
+    margin: 11px 3px !important;
+    padding: 2px 7px !important;
+
+    color: #111 !important;
+    background: #f2f2f2 !important;
+    border: 1px solid #9e9e9e !important;
+    border-radius: 2px !important;
+    box-shadow: none !important;
+
+    font-size: 10px !important;
+    font-weight: 400 !important;
+    text-transform: none !important;
+    transform: none !important;
+  }
+
+  .header__display-mode-toggle:hover,
+  .header__new-intervention:hover,
+  .header__right button:hover,
+  .header__right .MuiButton-root:hover {
+    background: #e2f0d9 !important;
+  }
+
+  .header__display-mode-toggle svg,
+  .header__new-intervention svg,
+  .header__right svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+
+  .header__on-hold-notification {
+    width: 18px !important;
+    height: 18px !important;
+    flex-basis: 18px !important;
+    border: 1px solid #999 !important;
+    border-radius: 2px !important;
+    color: #111 !important;
+    background: #fff2cc !important;
+    box-shadow: none !important;
+  }
+
+  /* Every page becomes one flat worksheet */
+  :is(
+    .current-intervention-page,
+    .today-list-page,
+    .history-page,
+    .on-hold-page,
+    .search-results-page,
+    .statistics-page,
+    .templates-page
+  ) {
+    padding: 12px !important;
+    background: transparent !important;
+  }
+
+  :is(
+    .current-intervention-page,
+    .today-list-content,
+    .history-content,
+    .on-hold-list,
+    .search-results-page,
+    .statistics-page,
+    .templates-page
+  ) {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  .today-page-title,
+  .history-page-header h1,
+  .on-hold-page__heading h1,
+  .card-header h1 {
+    color: #111 !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+  }
+
+  :is(.today-page-eyebrow, .history-page-eyebrow, .on-hold-page__eyebrow, .card-header__eyebrow) {
+    display: none !important;
+  }
+
+  /* Flat sections and rows */
+  :is(
+    article,
+    section,
+    .today-intervention-row,
+    .history-intervention-row,
+    .on-hold-card,
+    .revision-card,
+    .current-intervention-page > div,
+    .current-intervention-page form > div
+  ) {
+    box-shadow: none !important;
+  }
+
+  :is(
+    .today-intervention-row,
+    .history-intervention-row,
+    .on-hold-card,
+    .history-date-section,
+    .on-hold-group,
+    .revision-card
+  ) {
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+    background: rgba(255, 255, 255, 0.97) !important;
+  }
+
+  :is(.today-intervention-row, .history-intervention-row, .on-hold-card):hover {
+    transform: none !important;
+    background: #fffde9 !important;
+    box-shadow: none !important;
+  }
+
+  .today-interventions-list,
+  .history-interventions-list,
+  .on-hold-grid {
+    gap: 0 !important;
+  }
+
+  /* Headers resemble merged Excel cells */
+  :is(
+    .today-page-header,
+    .history-page-header,
+    .on-hold-page__header,
+    .history-date-header,
+    .on-hold-group__title
+  ) {
+    margin: 0 !important;
+    padding: 7px 9px !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+    background: var(--xls-header) !important;
+    box-shadow: none !important;
+  }
+
+  /* Status counters become simple colored cells */
+  :is(.today-page-counters, .history-date-stats) {
+    gap: 3px !important;
+  }
+
+  :is(.today-total-counter, .history-date-stat, .animated-today-counter) {
+    min-height: 24px !important;
+    padding: 3px 7px !important;
+    border: 1px solid #b7b7b7 !important;
+    border-radius: 0 !important;
+    background: #f2f2f2 !important;
+    box-shadow: none !important;
+    color: #111 !important;
+    font-size: 10px !important;
+  }
+
+  .animated-today-counter__circle,
+  .animated-today-counter__svg {
+    display: none !important;
+  }
+
+  /* Tabs look like worksheet tabs */
+  .on-hold-tabs {
+    gap: 2px !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .on-hold-tab {
+    min-height: 31px !important;
+    padding: 4px 9px !important;
+    border: 1px solid #a6a6a6 !important;
+    border-radius: 0 0 3px 3px !important;
+    color: #111 !important;
+    background: #eeeeee !important;
+    box-shadow: none !important;
+    transform: none !important;
+    font-size: 10px !important;
+  }
+
+  .on-hold-tab--active {
+    background: #e2f0d9 !important;
+    border-top-color: #70ad47 !important;
+    box-shadow: inset 0 2px 0 #70ad47 !important;
+  }
+
+  .on-hold-tab__icon {
+    width: 16px !important;
+    height: 16px !important;
+  }
+
+  /* MUI form controls become crude cells */
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiPopover-paper,
+  .MuiMenu-paper {
+    border: 1px solid #888 !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.16) !important;
+  }
+
+  .MuiInputBase-root,
+  .MuiOutlinedInput-root,
+  .MuiTextField-root,
+  .MuiFormControl-root,
+  input,
+  textarea,
+  select {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-size: 11px !important;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #a6a6a6 !important;
+    border-width: 1px !important;
+    border-radius: 0 !important;
+  }
+
+  .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline,
+  .MuiInputBase-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #70ad47 !important;
+    border-width: 2px !important;
+  }
+
+  .MuiInputBase-input,
+  .MuiSelect-select,
+  textarea {
+    min-height: 22px !important;
+    padding: 4px 6px !important;
+    color: #111 !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+  }
+
+  .MuiInputLabel-root {
+    color: #333 !important;
+    font-size: 10px !important;
+    font-weight: 400 !important;
+  }
+
+  /* Buttons look like basic form-control buttons */
+  :is(button, .MuiButton-root, .MuiIconButton-root) {
+    border-radius: 1px !important;
+    box-shadow: none !important;
+    text-transform: none !important;
+    transition: none !important;
+  }
+
+  :is(.MuiButton-root, button):not(.header__link) {
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  .MuiButton-contained,
+  .MuiButton-outlined {
+    color: #111 !important;
+    background: #eeeeee !important;
+    border: 1px solid #8d8d8d !important;
+  }
+
+  .MuiButton-contained:hover,
+  .MuiButton-outlined:hover {
+    background: var(--xls-selected) !important;
+  }
+
+  /* Action/status areas become little checkbox-like cells */
+  :is(
+    .current-intervention-actions,
+    .current-intervention-waiting-states,
+    .boolean-input,
+    .today-flags-section,
+    .today-category-section
+  ) {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+  }
+
+  :is(
+    .boolean-input button,
+    .today-action-button,
+    .today-edit-button,
+    .today-delete-button,
+    .comment-copy-actions button,
+    .additional-information-copy-action
+  ) {
+    background: #f2f2f2 !important;
+    border: 1px solid #a6a6a6 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Deliberately crude icon treatment */
+  :is(
+    .icon-container,
+    .letter-badge,
+    .snow-status-icon,
+    .today-boolean-icon,
+    .on-hold-card__technology,
+    .on-hold-card__status
+  ) {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .icon-container {
+    background: #f2f2f2 !important;
+    border: 1px solid #b7b7b7 !important;
+  }
+
+  .letter-badge {
+    color: #111 !important;
+    background: #e7e6e6 !important;
+    border: 1px solid #a6a6a6 !important;
+  }
+
+  /* Dialogs become plain data-entry windows */
+  :is(
+    .smart-import-dialog,
+    .additional-information-dialog,
+    .new-intervention-dialog
+  ) {
+    border-radius: 0 !important;
+    box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.2) !important;
+  }
+
+  :is(
+    .smart-import-dialog__title,
+    .additional-information-dialog .MuiDialogTitle-root,
+    .new-intervention-dialog__title
+  ) {
+    min-height: 26px !important;
+    padding: 5px 8px !important;
+    color: #111 !important;
+    background: var(--xls-header) !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+  }
+
+  .additional-information-workspace {
+    gap: 0 !important;
+  }
+
+  .additional-information-sidebar {
+    border-right: 1px solid var(--xls-grid) !important;
+    background: #f2f2f2 !important;
+  }
+
+  .additional-information-template-button {
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+    background: #ffffff !important;
+    box-shadow: none !important;
+  }
+
+  .additional-information-template-button:hover,
+  .additional-information-template-button--active {
+    background: var(--xls-selected) !important;
+  }
+
+  /* Remove decorative movement and shadows everywhere */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0s !important;
+    transition-duration: 0s !important;
+  }
+
+  [class*="shadow"],
+  [class*="gradient"] {
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+
+  /* Narrow screens keep spreadsheet density rather than card stacking */
+  @media (max-width: 900px) {
+    .header {
+      min-width: 900px;
+    }
+
+    .main {
+      min-width: 900px;
+      overflow: auto !important;
+    }
+  }
+}
+
+/* ========================================================================== */
+/* Ultra-plain worksheet skin: no illustrations, no rounded cards, no colour. */
+/* ========================================================================== */
+body.spreadsheet-mode {
+  --xls-grid: #b9b9b9;
+  --xls-grid-soft: #d7d7d7;
+  --xls-header: #e7e7e7;
+  --xls-header-2: #f1f1f1;
+  --xls-selected: #dddddd;
+  --xls-yellow: #eeeeee;
+  --xls-text: #111111;
+
+  background: #fff !important;
+
+  *,
+  *::before,
+  *::after {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* No decorative colour or hover behaviour anywhere in the masked view. */
+  *:hover,
+  *:active,
+  *:focus-visible {
+    transform: none !important;
+    filter: none !important;
+    box-shadow: none !important;
+  }
+
+  a:hover,
+  button:hover,
+  .MuiButton-root:hover,
+  .MuiIconButton-root:hover,
+  .on-hold-tab:hover,
+  .today-intervention-row:hover,
+  .history-intervention-row:hover,
+  .on-hold-card:hover,
+  .additional-information-template-button:hover {
+    color: #111 !important;
+    background: inherit !important;
+    border-color: inherit !important;
+  }
+
+  /* Remove almost all drawn artwork. Text and native form indicators remain. */
+  :is(
+    .icon-container,
+    .today-field-icon-box,
+    .history-field-icon-box,
+    .today-boolean-icon,
+    .history-boolean-icon,
+    .on-hold-tab__icon,
+    .on-hold-card__status-icon,
+    .snow-inputs-group__icon,
+    .boolean-input-icon,
+    [class*="action-icon"],
+    [class*="status-icon"]
+  ) {
+    display: none !important;
+  }
+
+  :is(
+    .header__right,
+    .current-intervention-page,
+    .today-list-page,
+    .history-page,
+    .on-hold-page,
+    .statistics-page,
+    .templates-page,
+    .search-results-page
+  ) img,
+  :is(
+    .header__right,
+    .current-intervention-page,
+    .today-list-page,
+    .history-page,
+    .on-hold-page,
+    .statistics-page,
+    .templates-page,
+    .search-results-page
+  ) svg {
+    display: none !important;
+  }
+
+  /* Icon-only controls become crude text controls. */
+  .MuiIconButton-root[aria-label] {
+    width: auto !important;
+    min-width: 34px !important;
+    height: 22px !important;
+    padding: 2px 5px !important;
+    border: 1px solid #b9b9b9 !important;
+    background: #f3f3f3 !important;
+    color: #111 !important;
+    font-size: 9px !important;
+    line-height: 1 !important;
+  }
+
+  .MuiIconButton-root[aria-label]::after {
+    content: attr(aria-label);
+    display: inline !important;
+    white-space: nowrap;
+  }
+
+  .simple-input__copy-button,
+  .copy-field-button,
+  .address-client-field__copy {
+    width: auto !important;
+    min-width: 36px !important;
+    height: 22px !important;
+    padding: 2px 5px !important;
+    border: 0 !important;
+    border-left: 1px solid #c6c6c6 !important;
+    background: transparent !important;
+    color: #222 !important;
+  }
+
+  .simple-input__copy-button::after,
+  .copy-field-button::after,
+  .address-client-field__copy::after {
+    content: "Copier";
+    display: inline;
+    font-size: 9px;
+    white-space: nowrap;
+  }
+
+  /* Action drawings become plain labelled checkbox rows. */
+  .boolean-input {
+    width: 100% !important;
+    min-height: 25px !important;
+    height: 25px !important;
+    padding: 2px 5px !important;
+    justify-content: flex-start !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid-soft) !important;
+    background: transparent !important;
+    color: #111 !important;
+    font-size: 10px !important;
+    text-align: left !important;
+  }
+
+  .boolean-input::before {
+    content: "☐";
+    width: 16px;
+    margin-right: 5px;
+    text-align: center;
+  }
+
+  .boolean-input[aria-pressed="true"]::before {
+    content: "☒";
+  }
+
+  .boolean-input::after {
+    content: attr(aria-label);
+    white-space: nowrap;
+  }
+
+  /* Inputs no longer reserve empty icon columns. */
+  .simple-input {
+    gap: 0 !important;
+  }
+
+  .simple-input__control {
+    width: 100% !important;
+  }
+
+  .today-icon-field,
+  .history-icon-field {
+    display: block !important;
+    min-height: 20px !important;
+    padding: 2px 5px !important;
+    border-bottom: 1px solid var(--xls-grid-soft) !important;
+  }
+
+  .today-field-value,
+  .history-field-value {
+    display: block !important;
+    color: #111 !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    line-height: 16px !important;
+  }
+
+  /* One continuous worksheet grid rather than independent cards. */
+  :is(
+    .current-intervention-page,
+    .today-list-content,
+    .history-content,
+    .on-hold-list,
+    .statistics-page,
+    .templates-page,
+    .search-results-page
+  ) {
+    padding: 0 !important;
+    gap: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  :is(
+    .current-intervention-page > *,
+    .current-intervention-page form > *,
+    .today-page-header,
+    .history-page-header,
+    .on-hold-page__header,
+    .today-intervention-row,
+    .history-intervention-row,
+    .history-date-section,
+    .on-hold-card,
+    .on-hold-group,
+    .revision-card
+  ) {
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  :is(
+    .today-page-header,
+    .history-page-header,
+    .on-hold-page__header,
+    .history-date-header,
+    .on-hold-group__title,
+    .current-intervention-page h2,
+    .current-intervention-page h3,
+    .additional-information-dialog .MuiDialogTitle-root,
+    .smart-import-dialog__title,
+    .new-intervention-dialog__title
+  ) {
+    color: #111 !important;
+    background: var(--xls-header) !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+  }
+
+  .today-interventions-list,
+  .history-interventions-list,
+  .on-hold-grid,
+  .on-hold-list,
+  .on-hold-group,
+  .history-date-section {
+    gap: 0 !important;
+  }
+
+  .today-intervention-row,
+  .history-intervention-row,
+  .on-hold-card {
+    border-bottom: 1px solid var(--xls-grid) !important;
+  }
+
+  /* Cells use almost no local borders; the worksheet grid carries structure. */
+  :is(
+    .today-stacked-value,
+    .history-stacked-value,
+    .on-hold-card__details > span,
+    .current-intervention-actions,
+    .current-intervention-waiting-states,
+    .clients-on-address,
+    .address-client,
+    .additional-information-workspace,
+    .additional-information-sidebar,
+    .additional-information-copyable
+  ) {
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .today-stacked-field,
+  .history-stacked-field {
+    gap: 0 !important;
+    border-right: 1px solid var(--xls-grid-soft) !important;
+  }
+
+  .today-stacked-label,
+  .history-stacked-label {
+    margin: 0 !important;
+    padding: 3px 5px !important;
+    color: #111 !important;
+    background: var(--xls-header-2) !important;
+    border-bottom: 1px solid var(--xls-grid-soft) !important;
+    font-size: 10px !important;
+    font-weight: 400 !important;
+  }
+
+  .today-stacked-value,
+  .history-stacked-value {
+    padding: 4px 5px !important;
+    color: #111 !important;
+    font-size: 11px !important;
+    line-height: 1.25 !important;
+  }
+
+  /* Monochrome status cells. */
+  :is(
+    .today-status,
+    .history-badge,
+    .on-hold-card__technology,
+    .on-hold-card__status,
+    .today-total-counter,
+    .history-date-stat,
+    .animated-today-counter,
+    [class*="status-"]
+  ) {
+    color: #111 !important;
+    background: #ededed !important;
+    border-color: #b9b9b9 !important;
+  }
+
+  .letter-badge {
+    color: #111 !important;
+    background: transparent !important;
+    border: 0 !important;
+    font-weight: 400 !important;
+  }
+
+  /* Worksheet tabs and header controls: square, grey, static. */
+  .header,
+  .header::before,
+  .header__navigation,
+  .header__right,
+  .header__datetime {
+    color: #111 !important;
+    background: #ededed !important;
+  }
+
+  .header__link,
+  .header__display-mode-toggle,
+  .header__new-intervention,
+  .header__right button,
+  .header__right .MuiButton-root,
+  .on-hold-tab {
+    color: #111 !important;
+    background: #ededed !important;
+    border: 0 !important;
+    border-right: 1px solid var(--xls-grid) !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+  }
+
+  .header__link--active,
+  .on-hold-tab--active {
+    color: #111 !important;
+    background: #d9d9d9 !important;
+    box-shadow: none !important;
+  }
+
+  .on-hold-tab strong {
+    color: inherit !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+  /* Native-looking square form cells. */
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiPopover-paper,
+  .MuiMenu-paper,
+  .MuiInputBase-root,
+  .MuiOutlinedInput-root,
+  .MuiTextField-root,
+  .MuiFormControl-root,
+  input,
+  textarea,
+  select,
+  button,
+  .MuiButton-root,
+  .MuiIconButton-root {
+    border-radius: 0 !important;
+  }
+
+  .MuiPaper-root,
+  .MuiDialog-paper,
+  .MuiPopover-paper,
+  .MuiMenu-paper {
+    border: 1px solid #8f8f8f !important;
+    background: #fff !important;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #b9b9b9 !important;
+    border-width: 1px !important;
+  }
+
+  .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline,
+  .MuiInputBase-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #777 !important;
+    border-width: 1px !important;
+  }
+
+  .MuiInputBase-input,
+  .MuiSelect-select,
+  textarea {
+    color: #111 !important;
+    background: #fff !important;
+  }
+
+  .MuiButton-contained,
+  .MuiButton-outlined,
+  button {
+    color: #111 !important;
+    background: #ededed !important;
+    border: 1px solid #a6a6a6 !important;
+  }
+
+  /* Dialog/template list behaves like adjacent spreadsheet columns. */
+  .additional-information-workspace {
+    gap: 0 !important;
+    border-top: 1px solid var(--xls-grid) !important;
+  }
+
+  .additional-information-sidebar {
+    border-right: 1px solid var(--xls-grid) !important;
+  }
+
+  .additional-information-template-button {
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid-soft) !important;
+    background: #fff !important;
+  }
+
+  .additional-information-template-button--active {
+    background: #ddd !important;
+  }
+  .snow-assign-button {
+    width: 42px !important;
+    height: 24px !important;
+    padding: 0 !important;
+    color: #111 !important;
+    background: #ededed !important;
+    border: 1px solid #a6a6a6 !important;
+    border-radius: 0 !important;
+    transform: none !important;
+  }
+
+  .snow-assign-button__bars {
+    display: none !important;
+  }
+
+  .snow-assign-button__arrow {
+    width: auto !important;
+    height: auto !important;
+    margin: 0 !important;
+    background: transparent !important;
+  }
+
+  .snow-assign-button__arrow::before {
+    content: "→";
+    font: 15px Arial, sans-serif;
+  }
+
+  .snow-assign-button__arrow::after {
+    display: none !important;
+  }
+
+  .address-client__details::after {
+    content: "Détails";
+    font: 10px Arial, sans-serif;
+  }
+
+  .address-client__details svg {
+    display: none !important;
+  }
+
+  .address-client-dialog .MuiDialog-paper {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .address-client-dialog__section + .address-client-dialog__section {
+    border-top: 1px solid var(--xls-grid) !important;
+  }
+
+  .address-client-dialog__grid {
+    gap: 0 !important;
+  }
+
+  .address-client-dialog__grid > .MuiFormControl-root {
+    padding: 4px !important;
+    border-right: 1px solid var(--xls-grid-soft) !important;
+    border-bottom: 1px solid var(--xls-grid-soft) !important;
+  }
+
+}
+
+body.spreadsheet-mode {
+  .address-client-dialog__import-row {
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #b7b7b7;
+  }
+
+  .address-client-import-trigger,
+  .address-client-import-dialog .MuiButton-root {
+    min-height: 28px !important;
+    padding: 3px 8px !important;
+    color: #111 !important;
+    background: #f2f2f2 !important;
+    border: 1px solid #9c9c9c !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font: 400 12px Arial, sans-serif !important;
+  }
+
+  .address-client-import-dialog .MuiPaper-root,
+  .address-client-import-dropzone {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .address-client-import-dialog__title {
+    color: #111;
+    background: #e7e7e7;
+    border-color: #9c9c9c;
+  }
+
+  .address-client-import-dialog__content {
+    background: #fff;
+  }
+
+  .address-client-import-dropzone {
+    min-height: 260px;
+    border: 1px solid #9c9c9c;
+  }
+}
+
+/* v56: keep the draft control compact in spreadsheet mode */
+.spreadsheet-mode .floating-draft-reminder {
+  top: 45px;
+  right: 8px;
+  padding: 3px 5px 3px 7px;
+  gap: 4px;
+  color: #222;
+  background: #f2f2f2;
+  border: 1px solid #9a9a9a;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: Arial, sans-serif;
+}
+
+.spreadsheet-mode .floating-draft-reminder .floating-draft-reminder__resume {
+  color: #111 !important;
+  background: #ddd !important;
+  border-radius: 0;
+}
+
+.spreadsheet-mode .floating-draft-reminder .floating-draft-reminder__cancel {
+  color: #111 !important;
+  background: transparent !important;
+  border-radius: 0;
+}
+
+
+/* v78: strict monochrome spreadsheet skin */
+body.spreadsheet-mode {
+  --xls-grid: #bcbcbc;
+  --xls-grid-soft: #d5d5d5;
+  --xls-header: #e9e9e9;
+  --xls-header-2: #f3f3f3;
+  --xls-selected: #e1e1e1;
+  --xls-yellow: #ececec;
+
+  * {
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    transition: none !important;
+    animation: none !important;
+  }
+
+  /* No coloured accents. */
+  :is(
+    .header *,
+    .current-intervention-page *,
+    .today-list-page *,
+    .history-page *,
+    .on-hold-page *,
+    .search-results-page *,
+    .statistics-page *,
+    .templates-page *
+  ) {
+    color: #111 !important;
+    border-color: var(--xls-grid) !important;
+  }
+
+  :is(
+    .header__link--active,
+    .on-hold-tab--active,
+    .MuiButton-contained,
+    .MuiButton-outlined,
+    button,
+    .MuiIconButton-root,
+    [class*="active"],
+    [class*="filled"],
+    [class*="confirmed"],
+    [class*="pending"]
+  ) {
+    background-color: #ececec !important;
+    background-image: none !important;
+  }
+
+  /* Disable every hover/focus decoration. */
+  *:hover,
+  *:focus,
+  *:focus-visible,
+  *:active {
+    transform: none !important;
+    box-shadow: none !important;
+    filter: none !important;
+    outline-color: #777 !important;
+  }
+
+  /* No pictograms in XLS mode, including Smart Import artwork. */
+  :is(
+    svg,
+    img,
+    .icon-container,
+    .address-client-import-trigger__icon,
+    .smart-import-trigger__icon,
+    .smart-import-dialog__icon,
+    [class*="icon-stack"],
+    [class*="icon__"],
+    [class$="__icon"]
+  ) {
+    display: none !important;
+  }
+
+  /* Adjacent controls: one continuous cage. */
+  :is(
+    .intervention-core-fields,
+    .inputs-all,
+    .inputs-row,
+    .snow-inputs-group__fields,
+    .current-intervention-layout,
+    .right-card,
+    .left-card,
+    .today-intervention-row,
+    .history-intervention-row,
+    .header,
+    .header__navigation,
+    .header__right
+  ) {
+    gap: 0 !important;
+  }
+
+  .current-intervention-layout {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .intervention-card {
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  .intervention-core-fields > *,
+  .inputs-row > *,
+  .client-name-field,
+  .clients-address-field,
+  .comment-field,
+  .additional-information-dialog-trigger,
+  .status-wrapper {
+    margin: 0 !important;
+  }
+
+  .MuiFormControl-root,
+  .MuiTextField-root,
+  .simple-input,
+  .address-mini-input,
+  .snow-pending-input__field {
+    margin: 0 !important;
+  }
+
+  .MuiOutlinedInput-root,
+  .MuiInput-root,
+  .MuiInputBase-root {
+    border: 1px solid var(--xls-grid) !important;
+  }
+
+  .MuiInput-underline::before,
+  .MuiInput-underline::after {
+    border-bottom: 0 !important;
+  }
+
+  /* Multiline fields show spreadsheet rows. */
+  textarea,
+  .MuiInputBase-inputMultiline {
+    line-height: 22px !important;
+    background-image:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0,
+        transparent 21px,
+        var(--xls-grid-soft) 21px,
+        var(--xls-grid-soft) 22px
+      ) !important;
+    background-size: 100% 22px !important;
+  }
+
+  /* Copy buttons are only tiny empty cells attached to the field corner. */
+  .simple-input__copy-button,
+  .copy-field-button,
+  .address-client-field__copy,
+  .comment-copy-actions button {
+    width: 18px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    min-height: 18px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+  }
+
+  .simple-input__copy-button::before,
+  .simple-input__copy-button::after,
+  .copy-field-button::before,
+  .copy-field-button::after,
+  .address-client-field__copy::before,
+  .address-client-field__copy::after,
+  .comment-copy-actions button::before,
+  .comment-copy-actions button::after {
+    content: "" !important;
+    display: none !important;
+  }
+
+  .copy-field {
+    position: relative !important;
+  }
+
+  .copy-field .copy-field-button-wrapper,
+  .copy-field .comment-copy-actions {
+    margin: 0 !important;
+  }
+
+  /* Remove all tooltip/animation chrome in spreadsheet mode. */
+  .MuiTooltip-popper,
+  .action-toggle-notice,
+  .copy-feedback,
+  [role="tooltip"] {
+    display: none !important;
+  }
+
+  /* Header cells share boundaries. */
+  .header {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .header__datetime,
+  .header__link,
+  .header__right > *,
+  .header__right .MuiInputBase-root,
+  .header__right .MuiFormControl-root {
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-left: 0 !important;
+  }
+
+  /* Circular badges become square cells. */
+  :is(
+    .address-client__number,
+    .animated-today-counter,
+    .today-total-counter,
+    .history-date-stat,
+    .letter-badge,
+    [class*="badge"],
+    [class*="counter"]
+  ) {
+    border-radius: 0 !important;
+  }
+}
+
+body.spreadsheet-mode {
+  :is(
+    .header *,
+    .current-intervention-page *,
+    .today-list-page *,
+    .history-page *,
+    .on-hold-page *,
+    .search-results-page *,
+    .statistics-page *,
+    .templates-page *
+  ) {
+    background-image: none !important;
+  }
+
+  :is(
+    .current-intervention-page *,
+    .today-list-page *,
+    .history-page *,
+    .on-hold-page *,
+    .search-results-page *,
+    .statistics-page *,
+    .templates-page *
+  ):not(input):not(textarea):not(.MuiInputBase-input) {
+    --mui-palette-primary-main: #555;
+  }
+}
+
+/* v79 — true contiguous Excel cage */
+body.spreadsheet-mode {
+  :is(.intervention-card,.left-card,.right-card,.intervention-core-fields,.inputs-all,.inputs-row,
+      .snow-inputs-group,.snow-inputs-group__fields,.clients-on-address,.address-client,
+      .today-intervention-row,.history-intervention-row,.search-result-card,
+      .comment-field,.additional-information-field,.client-name-field) {
+    gap:0 !important;
+    row-gap:0 !important;
+    column-gap:0 !important;
+  }
+
+  :is(.intervention-card,.left-card,.right-card,.intervention-core-fields,.inputs-all,.inputs-row,
+      .snow-inputs-group,.snow-inputs-group__fields,.clients-on-address,.address-client,
+      .today-intervention-row,.history-intervention-row,.search-result-card) > * {
+    margin:0 !important;
+  }
+
+  /* Neighbouring bordered cells overlap one border instead of drawing two separated rules. */
+  :is(.MuiFormControl-root,.MuiTextField-root,.simple-input,.address-mini-input,
+      .snow-pending-input__field,.client-name-field,.comment-field,.additional-information-field,
+      .status-wrapper,.address-client__field) {
+    margin:0 !important;
+  }
+
+  .MuiOutlinedInput-root,
+  .MuiInput-root,
+  .MuiInputBase-root,
+  textarea,
+  .comment-field,
+  .additional-information-field {
+    background-color:#fff !important;
+  }
+
+  /* Large text areas are ruled row-by-row like spreadsheet cells. */
+  textarea,
+  .MuiInputBase-inputMultiline,
+  .comment-field textarea,
+  .additional-information-field textarea,
+  [class*="comment"] textarea,
+  [class*="additional"] textarea {
+    line-height:22px !important;
+    padding-top:0 !important;
+    padding-bottom:0 !important;
+    background-image:repeating-linear-gradient(to bottom,transparent 0,transparent 21px,var(--xls-grid) 21px,var(--xls-grid) 22px) !important;
+    background-size:100% 22px !important;
+  }
+
+  /* Adjacent MUI cells share a single boundary. */
+  .inputs-row > * + *,
+  .intervention-core-fields > * + *,
+  .snow-inputs-group__fields > * + *,
+  .address-client > * + *,
+  .header__navigation > * + *,
+  .header__right > * + * {
+    margin-left:-1px !important;
+  }
+
+  .inputs-all > * + *,
+  .intervention-card > * + *,
+  .clients-on-address > * + * {
+    margin-top:-1px !important;
+  }
+}
+
+/* v80 — stacked labels/cells form one continuous Excel cage. */
+body.spreadsheet-mode {
+  :is(.today-category-section,.history-category-section,.on-hold-card__status-column) {
+    display: grid !important;
+    grid-auto-flow: row !important;
+    grid-auto-rows: auto !important;
+    gap: 0 !important;
+    width: max-content !important;
+    min-width: 0 !important;
+    align-items: stretch !important;
+  }
+
+  :is(.today-category-section,.history-category-section) > * {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  :is(.today-category-section,.history-category-section) > * + * {
+    margin-top: -1px !important;
+  }
+
+  /* The same rule applies to compact vertical badge/status groups elsewhere. */
+  .on-hold-card__status-column > :is(.on-hold-card__technology,.on-hold-card__status) {
+    box-sizing: border-box !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+  .on-hold-card__status-column > * + * {
+    margin-top: -1px !important;
+  }
+}
+
+/* v82 — global XLS cage pass: one boundary, never two neighbouring frames. */
+body.spreadsheet-mode {
+  /* Kill layout spacing at the worksheet level, including the examples reported in header/counters/cards. */
+  :is(
+    .current-intervention-page,
+    .current-intervention-layout,
+    .intervention-card,
+    .left-card,
+    .right-card,
+    .intervention-core-fields,
+    .inputs-all,
+    .inputs-row,
+    .snow-inputs-group,
+    .snow-inputs-group__fields,
+    .today-list-content,
+    .today-page-header,
+    .today-page-counters,
+    .today-interventions-list,
+    .today-intervention-row,
+    .history-content,
+    .history-page-header,
+    .history-date-section,
+    .history-date-header,
+    .history-date-stats,
+    .history-interventions-list,
+    .history-intervention-row,
+    .on-hold-list,
+    .on-hold-grid,
+    .on-hold-card,
+    .search-results-page,
+    .search-results-page__header,
+    .search-results-page__list,
+    .search-result-item,
+    .search-result-card,
+    .clients-on-address,
+    .address-client,
+    .comment-field,
+    .additional-information-trigger,
+    .header,
+    .header__navigation,
+    .header__right,
+    .intervention-search,
+    .intervention-search__form
+  ) {
+    gap: 0 !important;
+    row-gap: 0 !important;
+    column-gap: 0 !important;
+  }
+
+  /* Counters are four adjacent Excel cells. */
+  .today-page-counters,
+  .history-date-stats {
+    display: flex !important;
+    align-items: stretch !important;
+  }
+  .today-page-counters > *,
+  .history-date-stats > * {
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+  }
+  .today-page-counters > * + *,
+  .history-date-stats > * + * {
+    margin-left: -1px !important;
+  }
+
+  /* Header search is a cell group, not floating professional controls. */
+  .intervention-search__form > * {
+    margin: 0 !important;
+  }
+  .intervention-search__input .MuiInputBase-root,
+  .intervention-search__button {
+    height: 28px !important;
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+    background: #fff !important;
+  }
+  .intervention-search__button {
+    margin-left: -1px !important;
+  }
+
+  /* Current-page right-hand fields are cells of one table. */
+  .right-card {
+    display: grid !important;
+    gap: 0 !important;
+  }
+  .right-card > * {
+    margin: 0 !important;
+  }
+  .right-card > * + * {
+    margin-top: -1px !important;
+  }
+  .comment-field > .MuiFormControl-root,
+  .additional-information-trigger {
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+  }
+
+  /* The large comment/info areas are ruled cells, not inset boxes inside an outer box. */
+  .comment-field .MuiOutlinedInput-root,
+  .additional-information-copyable .MuiOutlinedInput-root,
+  .additional-information-readonly .MuiOutlinedInput-root {
+    border: 0 !important;
+  }
+  .comment-field .MuiOutlinedInput-notchedOutline,
+  .additional-information-copyable .MuiOutlinedInput-notchedOutline,
+  .additional-information-readonly .MuiOutlinedInput-notchedOutline {
+    border: 0 !important;
+  }
+  .comment-field textarea,
+  .additional-information-copyable textarea,
+  .additional-information-readonly textarea {
+    line-height: 22px !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 21px,
+      var(--xls-grid) 21px,
+      var(--xls-grid) 22px
+    ) !important;
+  }
+
+  /* Vertical technology/network/status stacks: one rectangle split into rows. */
+  :is(.today-category-section,.history-category-section,.on-hold-card__status-column) {
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 0 !important;
+  }
+  :is(.today-category-section,.history-category-section,.on-hold-card__status-column) > * {
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    border-radius: 0 !important;
+  }
+  :is(.today-category-section,.history-category-section,.on-hold-card__status-column) > * + * {
+    margin-top: -1px !important;
+  }
+
+  /* Generic direct siblings which already represent table cells share one rule. */
+  :is(
+    .inputs-row,
+    .intervention-core-fields,
+    .snow-inputs-group__fields,
+    .address-client,
+    .header__navigation,
+    .header__right
+  ) > * + * {
+    margin-left: -1px !important;
+  }
+  :is(
+    .inputs-all,
+    .clients-on-address,
+    .today-interventions-list,
+    .history-interventions-list,
+    .on-hold-grid,
+    .search-results-page__list
+  ) > * + * {
+    margin-top: -1px !important;
+  }
+}
+
+/* v83 — XLS single-border ownership: wrappers draw the cage, controls do not. */
+body.spreadsheet-mode {
+  /* The worksheet background grid was drawing extra rules behind real cells. */
+  .main {
+    background-image: none !important;
+    background-color: #fff !important;
+  }
+
+  /* MUI's own outline must never be a second frame inside an XLS cell. */
+  :is(
+    .current-intervention-page,
+    .today-list-page,
+    .history-page,
+    .on-hold-page,
+    .search-results-page,
+    .statistics-page,
+    .templates-page
+  ) :is(.MuiOutlinedInput-root, .MuiInput-root, .MuiInputBase-root) {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+  }
+
+  :is(
+    .current-intervention-page,
+    .today-list-page,
+    .history-page,
+    .on-hold-page,
+    .search-results-page,
+    .statistics-page,
+    .templates-page
+  ) .MuiOutlinedInput-notchedOutline {
+    border: 0 !important;
+  }
+
+  /* CURRENT PAGE ---------------------------------------------------------- */
+  /* Each direct form wrapper is the cell. Its inner input has no frame. */
+  .inputs-all {
+    gap: 0 !important;
+    border-top: 1px solid var(--xls-grid) !important;
+    border-left: 1px solid var(--xls-grid) !important;
+  }
+
+  .inputs-all > .inputs-row {
+    margin: 0 !important;
+    gap: 0 !important;
+    border: 0 !important;
+  }
+
+  .inputs-all > .inputs-row > :is(
+    .simple-input,
+    .main-address-input,
+    .address-mini-input,
+    .snow-inputs-group,
+    .snow-pending-input,
+    .snow-assign-button__wrapper
+  ) {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid var(--xls-grid) !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  /* No fake overlap is needed when a single owner draws each boundary. */
+  .inputs-row > * + *,
+  .snow-inputs-group__fields > * + * {
+    margin-left: 0 !important;
+  }
+
+  .simple-input,
+  .simple-input__control,
+  .simple-input__control > .MuiFormControl-root,
+  .main-address-input,
+  .main-address-input__control,
+  .address-mini-input,
+  .snow-pending-input,
+  .snow-pending-input__field {
+    padding: 0 !important;
+    margin: 0 !important;
+    gap: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+  }
+
+  .simple-input__control > .MuiFormControl-root,
+  .main-address-input__control > .MuiFormControl-root,
+  .address-mini-input > .MuiFormControl-root,
+  .snow-pending-input__field > .MuiFormControl-root {
+    width: 100% !important;
+  }
+
+  /* Snow is itself one row of cells; do not put an extra frame around it. */
+  .inputs-all > .inputs-row--snow > .snow-inputs-group {
+    border-right: 1px solid var(--xls-grid) !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+  }
+
+  .snow-inputs-group__fields {
+    gap: 0 !important;
+  }
+
+  .snow-inputs-group__fields > :is(.simple-input, .snow-pending-input__field, .snow-assign-button__wrapper) {
+    margin: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  .snow-inputs-group__fields > :last-child {
+    border-right: 0 !important;
+  }
+
+  /* The two Current Page cards meet on one line, never two. */
+  .current-intervention-layout {
+    gap: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+  }
+
+  .current-intervention-layout > .intervention-card {
+    margin: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+
+  .current-intervention-layout > .intervention-card + .intervention-card {
+    border-left: 1px solid var(--xls-grid) !important;
+  }
+
+  /* TODAY / HISTORY ------------------------------------------------------- */
+  /* A card is one table row; columns own the vertical separators. */
+  :is(.today-intervention-row, .history-intervention-row) {
+    gap: 0 !important;
+    padding: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  :is(.today-intervention-row, .history-intervention-row) > :is(.today-card-column, .history-column) {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 6px !important;
+    gap: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  :is(.today-intervention-row, .history-intervention-row) > :is(.today-card-column, .history-column):last-of-type {
+    border-right: 0 !important;
+  }
+
+  /* Text columns must not contain another inset framed rectangle. */
+  :is(.today-text-column, .history-text-column) {
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  :is(.today-stacked-field, .history-stacked-field) {
+    margin: 0 !important;
+    gap: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+
+  :is(.today-stacked-field, .history-stacked-field) + :is(.today-stacked-field, .history-stacked-field) {
+    border-top: 1px solid var(--xls-grid) !important;
+  }
+
+  :is(.today-stacked-label, .history-stacked-label) {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 4px 8px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  :is(.today-stacked-value, .history-stacked-value) {
+    box-sizing: border-box !important;
+    margin: 0 !important;
+    padding: 6px 8px !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background-color: #fff !important;
+  }
+
+  /* Additional-information button is another cell of the same column. */
+  :is(.today-text-column, .history-text-column) > .additional-information-trigger {
+    box-sizing: border-box !important;
+    align-self: stretch !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    margin: 0 !important;
+    padding: 4px 8px !important;
+    justify-content: flex-start !important;
+    border: 0 !important;
+    border-top: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+
+  /* Consecutive cards/sections share one horizontal rule. */
+  .today-interventions-list > .today-intervention-row + .today-intervention-row,
+  .history-interventions-list > .history-intervention-row + .history-intervention-row,
+  .history-date-section + .history-date-section,
+  .on-hold-grid > .on-hold-card + .on-hold-card,
+  .search-results-page__list > * + * {
+    margin-top: -1px !important;
+  }
+
+  /* Header/counter/status cells are real cage cells, no inset button frames. */
+  :is(.today-page-counters, .history-date-stats) > * {
+    margin: 0 !important;
+    border: 0 !important;
+    border-right: 1px solid var(--xls-grid) !important;
+    border-top: 1px solid var(--xls-grid) !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+  }
+  :is(.today-page-counters, .history-date-stats) > :first-child {
+    border-left: 1px solid var(--xls-grid) !important;
+  }
+  :is(.today-page-counters, .history-date-stats) > * + * {
+    margin-left: 0 !important;
+  }
+
+  /* Vertical badge stacks: parent is the rectangle, children are rows. */
+  :is(.today-category-section, .history-category-section, .on-hold-card__status-column) {
+    gap: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+  :is(.today-category-section, .history-category-section, .on-hold-card__status-column) > * {
+    margin: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--xls-grid) !important;
+    background: #fff !important;
+  }
+  :is(.today-category-section, .history-category-section, .on-hold-card__status-column) > :last-child {
+    border-bottom: 0 !important;
+  }
+  :is(.today-category-section, .history-category-section, .on-hold-card__status-column) > * + * {
+    margin-top: 0 !important;
+  }
+
+  /* Search in the header: one two-cell rectangle. */
+  .intervention-search__form {
+    gap: 0 !important;
+    border: 1px solid var(--xls-grid) !important;
+  }
+  .intervention-search__input .MuiInputBase-root,
+  .intervention-search__button {
+    margin: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+  }
+  .intervention-search__button {
+    border-left: 1px solid var(--xls-grid) !important;
+  }
+
+  /* Remove residual padding/gaps responsible for the visible double rules. */
+  :is(
+    .today-card-column,
+    .history-column,
+    .today-text-column,
+    .history-text-column,
+    .today-client-address-column,
+    .history-client-address-column
+  ) {
+    row-gap: 0 !important;
+    column-gap: 0 !important;
+  }
+}

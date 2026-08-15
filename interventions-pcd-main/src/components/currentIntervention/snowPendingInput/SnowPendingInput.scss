@@ -1,0 +1,74 @@
+.snow-pending-input {
+  display: contents;
+}
+
+.snow-pending-input__field {
+  min-width: 0;
+  width: 100%;
+
+  > * {
+    width: 100%;
+  }
+}
+
+.snow-pending-input__clock {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+
+  width: 40px;
+  height: 40px;
+  padding: 0;
+
+  color: #cbd5e1;
+  background: transparent;
+  border: 0;
+  border-radius: 50%;
+  outline: none;
+
+  cursor: pointer;
+
+  transition:
+    color 140ms ease,
+    background-color 140ms ease,
+    transform 140ms ease,
+    filter 140ms ease;
+
+  svg {
+    width: 31px;
+    height: 31px;
+  }
+
+  &:hover {
+    color: #d4dbe5;
+    background: rgba(226, 232, 240, 0.34);
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: scale(0.94);
+  }
+
+  &:focus-visible {
+    box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.24);
+  }
+}
+
+.snow-pending-input__clock--active,
+.snow-pending-input__clock--active:hover {
+  color: #facc15;
+  background: transparent;
+  filter: drop-shadow(0 2px 4px rgba(202, 138, 4, 0.28));
+}
+
+
+.snow-pending-input--emphasized {
+  .MuiOutlinedInput-root {
+    background: #eef1f5;
+  }
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #aeb8c5;
+  }
+}
