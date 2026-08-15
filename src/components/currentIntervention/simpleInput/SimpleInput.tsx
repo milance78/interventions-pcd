@@ -2,6 +2,7 @@ import * as React from "react";
 
 import { ReactComponent as CopyIcon } from "../../../assets/svg/Copy.svg.tsx";
 import CheckRounded from "@mui/icons-material/CheckRounded";
+import OpenInNewRounded from "@mui/icons-material/OpenInNewRounded";
 import FormControl from "@mui/material/FormControl";
 import IconButton from "@mui/material/IconButton";
 import TextField from "@mui/material/TextField";
@@ -43,8 +44,23 @@ const SimpleInput = ({
   const [copied, setCopied] = React.useState(false);
 
   const Icon = icon;
+  const isWctLink = field === "wctLink";
   const stringValue =
     typeof value === "string" ? value : "";
+
+  const openLink = () => {
+    const raw = stringValue.trim();
+    if (!raw) return;
+
+    try {
+      const candidate = /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+      const parsed = new URL(candidate);
+      if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return;
+      window.open(parsed.toString(), "_blank", "noopener,noreferrer");
+    } catch {
+      // Invalid/unsupported value: deliberately do nothing.
+    }
+  };
 
   const copyValue = async () => {
     if (!stringValue.trim()) {
@@ -168,11 +184,13 @@ const SimpleInput = ({
 
         <Tooltip
           title={
-            copied
-              ? "Copié"
-              : stringValue.trim()
-                ? "Copier"
-                : "Champ vide"
+            isWctLink
+              ? (stringValue.trim() ? "Ouvrir le lien" : "Champ vide")
+              : copied
+                ? "Copié"
+                : stringValue.trim()
+                  ? "Copier"
+                  : "Champ vide"
           }
           placement="left"
           arrow
@@ -181,16 +199,18 @@ const SimpleInput = ({
             <IconButton
               type="button"
               className={`simple-input__copy-button ${
-                copied
+                copied && !isWctLink
                   ? "simple-input__copy-button--copied"
                   : ""
               }`}
-              aria-label={`Copier ${label}`}
-              onClick={copyValue}
+              aria-label={isWctLink ? `Ouvrir ${label}` : `Copier ${label}`}
+              onClick={isWctLink ? openLink : copyValue}
               disabled={!stringValue.trim()}
               size="small"
             >
-              {copied ? (
+              {isWctLink ? (
+                <OpenInNewRounded fontSize="small" />
+              ) : copied ? (
                 <CheckRounded fontSize="small" />
               ) : (
                 <CopyIcon />

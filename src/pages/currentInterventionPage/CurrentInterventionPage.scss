@@ -3138,3 +3138,87 @@
     overflow: visible;
   }
 }
+
+
+/* v97 — standard-like idle underline, no section separators */
+.current-intervention-page .left-card {
+  .MuiOutlinedInput-root:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: rgba(0, 0, 0, 0.42) !important;
+    border-bottom-width: 1px !important;
+  }
+
+  .MuiOutlinedInput-root:not(.Mui-focused):hover .MuiOutlinedInput-notchedOutline,
+  .MuiOutlinedInput-root:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: rgba(0, 0, 0, 0.62) !important;
+  }
+}
+
+.current-intervention-page {
+  .intervention-core-fields::after,
+  .intervention-options::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  .intervention-core-fields {
+    padding-bottom: 8px !important;
+  }
+
+  .intervention-options {
+    padding-top: 8px !important;
+  }
+}
+
+
+/* v98 — soft blue input surfaces; full outline retained only for Technologie/Réseau */
+.current-intervention-page .left-card {
+  .MuiOutlinedInput-root {
+    background-color: #f4f8fd !important;
+  }
+
+  /* Selects stay fully framed even while idle. */
+  #infrastructure-select,
+  #network-select {
+    background-color: #f4f8fd !important;
+  }
+
+  #infrastructure-select:not(.Mui-focused) .MuiOutlinedInput-notchedOutline,
+  #network-select:not(.Mui-focused) .MuiOutlinedInput-notchedOutline,
+  #infrastructure-select .MuiOutlinedInput-notchedOutline,
+  #network-select .MuiOutlinedInput-notchedOutline {
+    border-top-color: #bdbdbd !important;
+    border-left-color: #bdbdbd !important;
+    border-right-color: #bdbdbd !important;
+    border-bottom-color: #bdbdbd !important;
+    border-width: 1px !important;
+  }
+
+  #infrastructure-select:hover .MuiOutlinedInput-notchedOutline,
+  #network-select:hover .MuiOutlinedInput-notchedOutline {
+    border-color: #9e9e9e !important;
+  }
+
+  #infrastructure-select.Mui-focused .MuiOutlinedInput-notchedOutline,
+  #network-select.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #777777 !important;
+    border-width: 2px !important;
+  }
+}
+
+
+/* Ensure the two core selects keep a complete frame despite the quiet-input rule. */
+.current-intervention-page .left-card .intervention-core-fields > .MuiFormControl-root:nth-child(1) .MuiOutlinedInput-root:not(.Mui-focused) .MuiOutlinedInput-notchedOutline,
+.current-intervention-page .left-card .intervention-core-fields > .MuiFormControl-root:nth-child(2) .MuiOutlinedInput-root:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+  border-color: #bdbdbd !important;
+  border-width: 1px !important;
+}
+.current-intervention-page .left-card .intervention-core-fields > .MuiFormControl-root:nth-child(1) .MuiOutlinedInput-root:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline,
+.current-intervention-page .left-card .intervention-core-fields > .MuiFormControl-root:nth-child(2) .MuiOutlinedInput-root:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+  border-color: #9e9e9e !important;
+}
