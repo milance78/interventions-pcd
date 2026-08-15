@@ -3091,3 +3091,50 @@
     background: #dbe4f0 !important;
   }
 }
+
+
+/* v95 — quiet inputs + identity badges */
+.current-intervention-page .left-card {
+  /* Quiet inputs: only the lower rule remains visible until focus. */
+  .MuiOutlinedInput-root:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: #cbd5e1 !important;
+    border-bottom-width: 1px !important;
+  }
+
+  .MuiOutlinedInput-root:not(.Mui-focused):hover .MuiOutlinedInput-notchedOutline,
+  .MuiOutlinedInput-root:hover:not(.Mui-focused) .MuiOutlinedInput-notchedOutline {
+    border-top-color: transparent !important;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: #aebdce !important;
+  }
+
+  .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+    border-color: #94a3b8 !important;
+    border-width: 1.5px !important;
+  }
+
+  /* Core ID/OAG fields use their own badge without the generic grey circle. */
+  .intervention-core-fields .simple-input--with-icon {
+    gap: 10px !important;
+  }
+
+  .intervention-core-fields .simple-input--core-field .icon-container {
+    width: 40px;
+    height: 40px;
+    background: transparent !important;
+    border-radius: 0 !important;
+    overflow: visible;
+  }
+
+  .intervention-core-fields .simple-input--core-field .icon-container svg {
+    width: 40px !important;
+    height: 40px !important;
+    max-width: 40px !important;
+    max-height: 40px !important;
+    overflow: visible;
+  }
+}

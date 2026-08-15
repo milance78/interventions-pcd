@@ -23,6 +23,8 @@ import Alert from "@mui/material/Alert";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
+import { ReactComponent as IDIcon } from "../../assets/svg/ID.svg.tsx";
+import { ReactComponent as OAGIcon } from "../../assets/svg/OAG.svg.tsx";
 import "./CurrentInterventionPage.scss";
 
 import AdditionalInformationDialog from "../../components/additionalInformationDialog/AdditionalInformationDialog";
@@ -937,14 +939,16 @@ const CurrentInterventionPage = () => {
               field="interventionId"
               label="ID de l'intervention"
               inputType="type2"
-              className="simple-input--core-field"
+              icon={IDIcon}
+              className="simple-input--core-field simple-input--core-id"
             />
 
             <SimpleInput
               field="oagID"
               label="OAG ID"
               inputType="type2"
-              className="simple-input--core-field"
+              icon={OAGIcon}
+              className="simple-input--core-field simple-input--core-oag"
             />
           </section>
 
