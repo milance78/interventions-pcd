@@ -44,7 +44,7 @@ const automaticAddressLine =
 const removeAddressClientsBlock = (value: string) =>
   value
     .replace(
-      /(?:^|\n\n?)(?:Un TF à l'adresse:|Un TF à l'adresse,|Un client TF à l'adresse:|Client à l'adresse:|L'UTAC à l'adresse occupé par:)[^\n]*/gi,
+      /(?:^|\n\n?)(?:Un TF à l'adresse(?::|,)?|Un client TF à l'adresse:|Client à l'adresse:|L'UTAC à l'adresse occupé par:?)[^\n]*/gi,
       "",
     )
     .replace(

@@ -78,6 +78,7 @@ import { normalizePersonName } from "../../utils/addressClients";
 import { cureOrder, localDateKey } from "../../utils/cureRecords";
 import VoiceMessageCall1 from "../../assets/icons/VoiceMessageCall1.png";
 import VoiceMessageCall2 from "../../assets/icons/VoiceMessageCall2.png";
+import VoiceMessageCall3 from "../../assets/icons/VoiceMessageCall3.png";
 import CableCutOn from "../../assets/icons/CableCutOn.png";
 import CableCutOff from "../../assets/icons/CableCutOff.png";
 import QuestionActionOn from "../../assets/icons/QuestionActionOn.png";
@@ -1113,6 +1114,14 @@ const CurrentInterventionPage = () => {
                           className={`cure-summary-card__icon ${
                             isUnifiedCureActive ? "" : "cure-summary-card__icon--off"
                           }`}
+                          draggable={false}
+                        />
+                      ) : cureRecords.thirdCure ? (
+                        <img
+                          src={VoiceMessageCall3}
+                          alt=""
+                          aria-hidden="true"
+                          className="cure-summary-card__icon cure-summary-card__icon--off"
                           draggable={false}
                         />
                       ) : (

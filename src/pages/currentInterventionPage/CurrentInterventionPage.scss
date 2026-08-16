@@ -3873,3 +3873,102 @@
     -webkit-filter: none !important;
   }
 }
+
+
+/* v125 — stable CURE visual after the third recorded CURE.
+   Do not allow the generic MUI fallback to expand into the option row. */
+.current-intervention-page {
+  .cure-summary-card__third {
+    position: relative;
+    display: block;
+    width: 78px;
+    height: 78px;
+    flex: 0 0 78px;
+  }
+
+  .cure-summary-card__third .cure-summary-card__icon--third {
+    display: block;
+    width: 78px !important;
+    height: 78px !important;
+    object-fit: contain !important;
+  }
+
+  .cure-summary-card__third-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    z-index: 3;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    box-sizing: border-box;
+    border-radius: 999px;
+    background: #c8c8c8;
+    border: 1px solid rgba(120, 120, 120, .55);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 14px;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .cure-summary-card:not(.pending-state-button--active) .cure-summary-card__third {
+    opacity: .68;
+    filter: grayscale(1) brightness(.78) contrast(.88);
+  }
+}
+
+
+/* v126 — align the 3rd-CURE visual with the rest of the seven-icon row.
+   Keep the badge attached to the phone artwork, not floating outside it. */
+.current-intervention-page {
+  .intervention-option-group__items--six .option-button--cure-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .intervention-option-group__items--six .cure-summary-card {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .cure-summary-card__third {
+    position: relative;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 68px !important;
+    height: 68px !important;
+    flex: 0 0 68px !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .cure-summary-card__third .cure-summary-card__icon--third {
+    display: block !important;
+    width: 68px !important;
+    height: 68px !important;
+    object-fit: contain !important;
+    margin: 0 !important;
+    transform: none !important;
+  }
+
+  .cure-summary-card__third-badge {
+    position: absolute !important;
+    top: 7px !important;
+    right: 7px !important;
+    min-width: 15px !important;
+    height: 15px !important;
+    padding: 0 3px !important;
+    border-radius: 999px !important;
+    line-height: 13px !important;
+    font-size: 9px !important;
+    font-weight: 700 !important;
+    box-sizing: border-box !important;
+    z-index: 4 !important;
+    transform: none !important;
+  }
+}
