@@ -70,6 +70,8 @@ import { ReactComponent as SnowOnIcon } from "../../assets/svg/Snow on.svg.tsx";
 import { ReactComponent as SnowOffIcon } from "../../assets/svg/Snow off.svg.tsx";
 import snowBoardLeft from "../../assets/snow/snow-board-left.png";
 import snowBoardRight from "../../assets/snow/snow-board-right.png";
+import snowBoardLeftOff from "../../assets/snow/snow-board-left-off.png";
+import snowBoardRightOff from "../../assets/snow/snow-board-right-off.png";
 import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
 import { normalizeInterventionStrings, removeBlankLines, trimLeadingHorizontalWhitespace } from "../../utils/textUtils";
 import { normalizePersonName } from "../../utils/addressClients";
@@ -299,7 +301,7 @@ const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => (
       <SnowOffIcon className="snow-trail-icon__flake-svg" />
     )}
     <img
-      src={direction === "left" ? snowBoardLeft : snowBoardRight}
+      src={active ? (direction === "left" ? snowBoardLeft : snowBoardRight) : (direction === "left" ? snowBoardLeftOff : snowBoardRightOff)}
       alt=""
       className="snow-trail-icon__wood-board"
       draggable={false}

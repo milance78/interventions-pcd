@@ -3856,3 +3856,20 @@
     filter: grayscale(1) brightness(1.32) contrast(.68) !important;
   }
 }
+
+
+/* OFF Snow boards are dedicated raster assets derived from the active boards.
+   Preserve full opacity and their baked-in white lettering. Active boards unchanged. */
+.current-intervention-page {
+  .snow-trail-icon--off .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+  }
+
+  .snow-trail-icon--active .snow-trail-icon__wood-board {
+    opacity: 1 !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+  }
+}
