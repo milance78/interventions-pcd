@@ -3,7 +3,8 @@ import type { AddressClient, CureRecord, CureRecords } from "../redux/features/n
 export type AdditionalInformationTemplateId =
   | "bciThreeCures"
   | "bciWrongNumber"
-  | "wioIncorrectAddress";
+  | "wioIncorrectAddress"
+  | "bciReintroductionImport";
 
 export interface AdditionalInformationTemplateSource {
   phone: string;
@@ -19,6 +20,11 @@ export interface AdditionalInformationTemplateSource {
   blockNumber: string;
   cureRecords: CureRecords;
   infrastructure: string;
+  network: string;
+  clientID: string;
+  na: string;
+  cid: string;
+  oagID: string;
   addressClients: AddressClient[];
 }
 
@@ -146,6 +152,12 @@ export const additionalInformationTemplates: AdditionalInformationTemplateDefini
     ],
   },
   {
+    id: "bciReintroductionImport",
+    buttonLabel: "BCI réintroduction de l'import",
+    headerInputLabel: "Numéro BCI",
+    dynamicValues: () => [],
+  },
+  {
     id: "wioIncorrectAddress",
     buttonLabel: 'WIO "Adresse incorrecte en W6"',
     headerInputLabel: "Numéro WIO",
@@ -180,6 +192,13 @@ export const buildAdditionalInformationTemplate = (
 
   if (templateId === "bciWrongNumber") {
     return `Bonjour,\n\nL’ordre a été annulé en raison d’un numéro de contact erroné. Il s’agissait de vérifier l’adresse avec le client, sans possibilité de le contacter.\n\nNuméro de contact du client (numéro portable GSM): ${valueOrDash(source.phone)}\nAdresse de l’ordre : ${valueOrDash(source.mainAddress)}\n\nBonne journée`;
+  }
+
+  if (templateId === "bciReintroductionImport") {
+    const sameClient = source.addressClients.find((client) => client.isSameClient);
+    const currentOperator = source.network.trim();
+    const addressOperator = sameClient?.operator?.trim() || "___";
+    return `Bonjour,\n\nLe client est actuellement actif chez ${addressOperator} et confirme de vouloir passer chez ${currentOperator || "___"}.\n\nMerci de réintroduire l'import\n\nBien à vous,`;
   }
 
   const address = getStructuredAddress(source);

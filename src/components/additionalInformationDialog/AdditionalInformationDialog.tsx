@@ -48,6 +48,8 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const [referenceNumber, setReferenceNumber] = React.useState("");
   const [headerNow, setHeaderNow] = React.useState(() => new Date());
   const [copied, setCopied] = React.useState<"normal" | "nps" | null>(null);
+  const [templateError, setTemplateError] = React.useState("");
+  const [copiedBciField, setCopiedBciField] = React.useState<string | null>(null);
 
   const templateSource = React.useMemo(() => ({
     phone: intervention.phone,
@@ -63,6 +65,11 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     blockNumber: intervention.blockNumber,
     cureRecords: intervention.cureRecords,
     infrastructure: intervention.infrastructure,
+    network: intervention.network,
+    clientID: intervention.clientID,
+    na: intervention.na,
+    cid: intervention.cid,
+    oagID: intervention.oagID,
     addressClients: intervention.addressClients,
   }), [intervention]);
 
@@ -91,13 +98,17 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   };
 
   const selectTemplate = (templateId: AdditionalInformationTemplateId) => {
+    if (templateId === "bciReintroductionImport" && !/^(?:proximus|scarlet)$/i.test(intervention.network.trim())) {
+      setTemplateError("BCI possible uniquement pour Proximus ou Scarlet");
+      return;
+    }
+    setTemplateError("");
     setSelectedTemplate(templateId);
     setReferenceNumber("");
     setCopied(null);
+    setCopiedBciField(null);
     setHeaderNow(new Date());
-    setDraft(
-      buildAdditionalInformationTemplate(templateId, templateSource),
-    );
+    setDraft(buildAdditionalInformationTemplate(templateId, templateSource));
   };
 
   const copyDraft = async (mode: "normal" | "nps") => {
@@ -107,6 +118,20 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setCopied(mode);
     window.setTimeout(() => setCopied(null), 1400);
   };
+
+  const copyBciValue = async (key: string, fieldValue: string) => {
+    if (!fieldValue) return;
+    await writeTextToClipboard(fieldValue);
+    setCopiedBciField(key);
+    window.setTimeout(() => setCopiedBciField((current) => current === key ? null : current), 1200);
+  };
+
+  const bciSameClientOperator = intervention.addressClients.find((client) => client.isSameClient)?.operator?.trim() || "";
+  const bciNa = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim()) ? intervention.cid.trim() : intervention.na.trim();
+  const bciOrderRef = intervention.oagID.trim().replace(/9$/, "");
+  const bciInterventionLabel = /^scarlet$/i.test(intervention.network.trim())
+    ? "SCA - Réintroduction d'un ordre import"
+    : "PXS - Réintroduction d'un ordre import";
 
   const isFiber = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim());
   const visibleTemplates = React.useMemo(
@@ -159,6 +184,92 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
               </aside>
 
               <section className="additional-information-editor">
+                {templateError && <div className="additional-information-template-error" role="alert">{templateError}</div>}
+                {selectedTemplate === "bciReintroductionImport" ? (
+                  <div className="bci-reintroduction-form">
+                    <div className="bci-reintroduction-form__choice-row">
+                      <fieldset>
+                        <legend>Langue</legend>
+                        <label><input type="radio" checked={false} readOnly /> NL</label>
+                        <label><input type="radio" checked readOnly /> FR</label>
+                      </fieldset>
+                      <fieldset>
+                        <legend>* De</legend>
+                        <label><input type="radio" checked={false} readOnly /> HRT</label>
+                        <label><input type="radio" checked={false} readOnly /> FOT</label>
+                        <label><input type="radio" checked readOnly /> IT</label>
+                      </fieldset>
+                      <fieldset>
+                        <legend>Vers</legend>
+                        <label><input type="radio" checked readOnly /> ASA/CIS/BSC</label>
+                        <label><input type="radio" checked={false} readOnly /> MyPXS</label>
+                      </fieldset>
+                    </div>
+
+                    <div className="bci-reintroduction-form__line bci-reintroduction-form__line--email">
+                      <strong>* De</strong>
+                      <input value="milan.pavlovic@proximus.com" readOnly />
+                    </div>
+
+                    <div className="bci-reintroduction-form__line">
+                      <strong>* Cust. ID</strong>
+                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("cust", intervention.clientID.trim())}>
+                        <input value={intervention.clientID} readOnly />
+                        {copiedBciField === "cust" && <em>Copié</em>}
+                      </div>
+                    </div>
+
+                    <div className="bci-reintroduction-form__line">
+                      <strong>* NA</strong>
+                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("na", bciNa)}>
+                        <input value={bciNa} readOnly />
+                        {copiedBciField === "na" && <em>Copié</em>}
+                      </div>
+                    </div>
+
+                    <div className="bci-reintroduction-form__line">
+                      <strong>Order Ref.</strong>
+                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("order", bciOrderRef)}>
+                        <input value={bciOrderRef} readOnly />
+                        {copiedBciField === "order" && <em>Copié</em>}
+                      </div>
+                    </div>
+
+                    <div className="bci-reintroduction-form__line bci-reintroduction-form__line--spaced">
+                      <strong>OAG ID</strong>
+                      <input value="" readOnly />
+                    </div>
+
+                    <div className="bci-reintroduction-form__line bci-reintroduction-form__line--product">
+                      <strong>MM/PM-product</strong>
+                      <select value="Mass Market product" disabled>
+                        <option>Mass Market product</option>
+                      </select>
+                    </div>
+
+                    <div className="bci-reintroduction-form__line bci-reintroduction-form__line--wide">
+                      <strong>Intervention</strong>
+                      <select value={bciInterventionLabel} disabled>
+                        <option>{bciInterventionLabel}</option>
+                      </select>
+                    </div>
+
+                    <div className="bci-reintroduction-form__line bci-reintroduction-form__line--description">
+                      <strong>* Description</strong>
+                      <div className="bci-reintroduction-form__copyable bci-reintroduction-form__description-box" onClick={() => copyBciValue("description", draft)}>
+                        <textarea value={draft} readOnly rows={11} />
+                        {copiedBciField === "description" && <em>Copié</em>}
+                      </div>
+                    </div>
+
+                    {!bciSameClientOperator && (
+                      <div className="bci-reintroduction-form__hint">
+                        Aucun client « même » avec opérateur n'est renseigné.
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
                 <header className="additional-information-template-header">
                   <div className="additional-information-template-datetime">
                     <span>{formatHeaderDate(headerNow)}</span>
@@ -218,6 +329,8 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                     </span>
                   </Tooltip>
                 </div>
+                  </>
+                )}
               </section>
             </div>
           ) : (

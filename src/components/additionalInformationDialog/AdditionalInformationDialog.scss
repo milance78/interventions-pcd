@@ -204,3 +204,189 @@
 .additional-information-copy-action--nps { top: 52px; }
 .additional-information-copy-action--nps { white-space: nowrap; }
 .additional-information-copy-action--nps strong { display:block; color:#6b46a7; font-size:8px; line-height:1; font-weight:800; letter-spacing:0; white-space:nowrap; }
+
+.additional-information-template-error{padding:10px 13px;border:1px solid #ef9a9a;border-radius:9px;background:#fff4f4;color:#b42318;font-size:.88rem;font-weight:650}
+.bci-reintroduction-form{display:flex;flex-direction:column;gap:12px;padding:16px;border:1px solid #b8c1cc;background:#f7f8fa;font-family:Arial,Helvetica,sans-serif}
+.bci-reintroduction-form__top-row,.bci-reintroduction-form__row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.bci-reintroduction-form__top-row{grid-template-columns:130px 1fr 1fr}.bci-reintroduction-form__row--three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.bci-reintroduction-form label{position:relative;display:flex;flex-direction:column;gap:4px;min-width:0;color:#313b46;font-size:12px;font-weight:600}
+.bci-reintroduction-form input,.bci-reintroduction-form textarea{width:100%;box-sizing:border-box;border:1px solid #9fa9b5;border-radius:2px;background:#fff;color:#17202a;font:13px/1.4 Arial,Helvetica,sans-serif}
+.bci-reintroduction-form input{height:31px;padding:5px 8px}.bci-reintroduction-form textarea{min-height:190px;padding:9px 10px;resize:none;white-space:pre-wrap}
+.bci-reintroduction-form__copyable{cursor:pointer}.bci-reintroduction-form__copyable:hover input,.bci-reintroduction-form__copyable:hover textarea{border-color:#1976d2;background:#f8fbff}
+.bci-reintroduction-form__copyable em{position:absolute;right:7px;top:3px;color:#1976d2;font-size:10px;font-style:normal;font-weight:700}.bci-reintroduction-form__hint{color:#b45309;font-size:12px}
+@media(max-width:760px){.bci-reintroduction-form__top-row,.bci-reintroduction-form__row,.bci-reintroduction-form__row--three{grid-template-columns:1fr}}
+
+
+/* BCI réintroduction de l'import — legacy form appearance */
+.bci-reintroduction-form {
+  display: block !important;
+  padding: 18px 20px 22px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #e8f3f6 !important;
+  color: #000 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+
+.bci-reintroduction-form__choice-row {
+  display: grid;
+  grid-template-columns: 188px 302px 364px;
+  gap: 66px;
+  align-items: start;
+  margin-bottom: 40px;
+}
+
+.bci-reintroduction-form fieldset {
+  height: 66px;
+  box-sizing: border-box;
+  border: 1px solid #161616;
+  padding: 10px 16px 8px;
+  background: transparent;
+}
+
+.bci-reintroduction-form legend {
+  padding: 0 4px;
+  font-size: 20px;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.bci-reintroduction-form fieldset label {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  margin-right: 20px;
+  font: 25px/1.15 "Times New Roman", Times, serif;
+  color: #000;
+}
+
+.bci-reintroduction-form fieldset input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: #087cf0;
+  pointer-events: none;
+}
+
+.bci-reintroduction-form__line {
+  display: grid;
+  grid-template-columns: 215px 280px;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.bci-reintroduction-form__line--email,
+.bci-reintroduction-form__line--wide {
+  grid-template-columns: 215px minmax(0, 1fr);
+}
+
+.bci-reintroduction-form__line--spaced {
+  margin-top: 46px;
+}
+
+.bci-reintroduction-form__line--product {
+  grid-template-columns: 215px 240px;
+  margin-top: 15px;
+}
+
+.bci-reintroduction-form__line--description {
+  grid-template-columns: 215px minmax(0, 1fr);
+  align-items: start;
+  margin-top: 16px;
+}
+
+.bci-reintroduction-form__line > strong {
+  justify-self: end;
+  font-size: 27px;
+  line-height: 1;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.bci-reintroduction-form input,
+.bci-reintroduction-form select,
+.bci-reintroduction-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  border: 1px solid #7c7c7c !important;
+  border-radius: 3px !important;
+  background: #fff !important;
+  color: #000 !important;
+  opacity: 1 !important;
+  font-family: Arial, Helvetica, sans-serif !important;
+  box-shadow: none !important;
+}
+
+.bci-reintroduction-form input,
+.bci-reintroduction-form select {
+  height: 36px !important;
+  padding: 3px 7px !important;
+  font-size: 20px !important;
+}
+
+.bci-reintroduction-form select:disabled {
+  -webkit-text-fill-color: #000;
+  cursor: default;
+}
+
+.bci-reintroduction-form__description-box {
+  position: relative;
+  width: 100%;
+}
+
+.bci-reintroduction-form textarea {
+  display: block;
+  min-height: 248px !important;
+  padding: 10px !important;
+  resize: none !important;
+  font-size: 17px !important;
+  line-height: 1.45 !important;
+  white-space: pre-wrap;
+}
+
+.bci-reintroduction-form__copyable {
+  position: relative;
+  cursor: pointer;
+}
+
+.bci-reintroduction-form__copyable:hover input,
+.bci-reintroduction-form__copyable:hover textarea {
+  border-color: #4d78a8 !important;
+  background: #fff !important;
+}
+
+.bci-reintroduction-form__copyable em {
+  position: absolute;
+  top: 4px;
+  right: 7px;
+  z-index: 2;
+  padding: 2px 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,.92);
+  color: #1769aa;
+  font-size: 10px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.bci-reintroduction-form__hint {
+  margin: 8px 0 0 225px;
+  color: #a05a00;
+  font-size: 12px;
+}
+
+@media (max-width: 1050px) {
+  .bci-reintroduction-form__choice-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+
+/* v130 — pointer cursor for BCI fields copied by click */
+.bci-reintroduction-form .bci-reintroduction-form__copyable,
+.bci-reintroduction-form .bci-reintroduction-form__copyable input,
+.bci-reintroduction-form .bci-reintroduction-form__copyable textarea {
+  cursor: pointer !important;
+}
