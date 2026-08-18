@@ -490,12 +490,7 @@ const CurrentInterventionPage = () => {
     (key) => cureRecords[key]?.date === todayKeyForCure,
   ) ?? null;
   const nextCureKey = cureOrder.find((key) => !cureRecords[key]) ?? null;
-  const pendingCureKey =
-    todaysCureKey === "firstCure" || todaysCureKey === "secondCure"
-      ? todaysCureKey
-      : nextCureKey === "firstCure" || nextCureKey === "secondCure"
-        ? nextCureKey
-        : null;
+  const pendingCureKey = todaysCureKey ?? nextCureKey ?? null;
   const todaysCureRecord = todaysCureKey ? cureRecords[todaysCureKey] : null;
   const cureCycleState: "off" | "sms" | "noSms" = !todaysCureKey
     ? "off"
@@ -1090,14 +1085,18 @@ const CurrentInterventionPage = () => {
                       }`}
                       onClick={handleUnifiedCureToggle}
                       aria-label={
-                        pendingCureKey === "secondCure"
-                          ? "CURE 2 en attente"
-                          : "CURE 1 en attente"
+                        pendingCureKey === "thirdCure"
+                          ? "CURE 3"
+                          : pendingCureKey === "secondCure"
+                            ? "CURE 2 en attente"
+                            : "CURE 1 en attente"
                       }
                       title={
-                        pendingCureKey === "secondCure"
-                          ? "CURE 2 en attente"
-                          : "CURE 1 en attente"
+                        pendingCureKey === "thirdCure"
+                          ? "CURE 3"
+                          : pendingCureKey === "secondCure"
+                            ? "CURE 2 en attente"
+                            : "CURE 1 en attente"
                       }
                       aria-pressed={isUnifiedCureActive}
                       disabled={isHistoryView}
@@ -1107,7 +1106,9 @@ const CurrentInterventionPage = () => {
                           src={
                             pendingCureKey === "firstCure"
                               ? VoiceMessageCall1
-                              : VoiceMessageCall2
+                              : pendingCureKey === "secondCure"
+                                ? VoiceMessageCall2
+                                : VoiceMessageCall3
                           }
                           alt=""
                           aria-hidden="true"

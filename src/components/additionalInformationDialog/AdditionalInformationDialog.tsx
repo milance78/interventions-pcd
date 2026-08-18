@@ -50,6 +50,8 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const [copied, setCopied] = React.useState<"normal" | "nps" | null>(null);
   const [templateError, setTemplateError] = React.useState("");
   const [copiedBciField, setCopiedBciField] = React.useState<string | null>(null);
+  const [bciResClientId, setBciResClientId] = React.useState<string | null>(null);
+  const [bciResPickerOpen, setBciResPickerOpen] = React.useState(false);
 
   const templateSource = React.useMemo(() => ({
     phone: intervention.phone,
@@ -89,6 +91,8 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setSelectedTemplate(null);
     setReferenceNumber("");
     setCopied(null);
+    setBciResPickerOpen(false);
+    setBciResClientId(null);
     setOpen(false);
   };
 
@@ -102,6 +106,21 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
       setTemplateError("BCI possible uniquement pour Proximus ou Scarlet");
       return;
     }
+
+    if (templateId === "bciResiliation") {
+      if (bciResEligibleClients.length === 0) {
+        setTemplateError("BCI possible uniquement pour un client à l'adresse Proximus ou Scarlet");
+        return;
+      }
+      if (bciResEligibleClients.length === 1) {
+        applyBciResClient(bciResEligibleClients[0]);
+        return;
+      }
+      setTemplateError("");
+      setBciResPickerOpen(true);
+      return;
+    }
+
     setTemplateError("");
     setSelectedTemplate(templateId);
     setReferenceNumber("");
@@ -126,12 +145,54 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     window.setTimeout(() => setCopiedBciField((current) => current === key ? null : current), 1200);
   };
 
+  const formatNetworkLabel = (value: string) => {
+    const trimmed = value.trim();
+    if (!trimmed) return "";
+    if (/^proximus$/i.test(trimmed)) return "Proximus";
+    if (/^scarlet$/i.test(trimmed)) return "Scarlet";
+    return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
+  };
+
+  const bciResEligibleClients = intervention.addressClients.filter((client) =>
+    /^(?:proximus|scarlet)$/i.test(client.operator.trim()),
+  );
+  const selectedBciResClient =
+    intervention.addressClients.find((client) => client.id === bciResClientId) ?? null;
+
+  const buildBciResDescription = (client: (typeof intervention.addressClients)[number]) =>
+    `Bonjour,\n\nUn nouveau client nous a confirmé qu’il reprend l'adresse ${intervention.mainAddress.trim() || "___"} en remplacement du client actuellement actif.\n\nConformément à la procédure, je crée ce BCI sur le dossier du client actif afin qu’il soit contacté. L’objectif est de vérifier avec lui s’il convient d’encoder un déménagement ou une résiliation à une date compatible avec les besoins des deux clients.\n\nLe client ${client.fullName.trim() || "___"} (ID client ${client.clientId.trim() || "___"}), actuellement actif à cette adresse, est censé quitter les lieux. Sa ligne devra dès lors être résiliée afin de permettre le raccordement du nouveau client ${intervention.clientName.trim() || "___"} (ID client ${intervention.clientID.trim() || "___"}).\n\nMerci de contacter le client actif afin d’entamer les démarches nécessaires et de m’en tenir informé.\n\nBonne journée`;
+
+  const applyBciResClient = (client: (typeof intervention.addressClients)[number]) => {
+    setBciResClientId(client.id);
+    setBciResPickerOpen(false);
+    setTemplateError("");
+    setSelectedTemplate("bciResiliation");
+    setReferenceNumber("");
+    setCopied(null);
+    setCopiedBciField(null);
+    setHeaderNow(new Date());
+    setDraft(buildBciResDescription(client));
+  };
+
   const bciSameClientOperator = intervention.addressClients.find((client) => client.isSameClient)?.operator?.trim() || "";
   const bciNa = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim()) ? intervention.cid.trim() : intervention.na.trim();
   const bciOrderRef = intervention.oagID.trim().replace(/9$/, "");
   const bciInterventionLabel = /^scarlet$/i.test(intervention.network.trim())
     ? "SCA - Réintroduction d'un ordre import"
     : "PXS - Réintroduction d'un ordre import";
+  const isBciResiliation = selectedTemplate === "bciResiliation";
+  const bciFormClientId = isBciResiliation ? (selectedBciResClient?.clientId.trim() || "") : intervention.clientID.trim();
+  const bciFormNa = isBciResiliation
+    ? (/^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim())
+        ? (selectedBciResClient?.cid.trim() || "")
+        : (selectedBciResClient?.na.trim() || ""))
+    : bciNa;
+  const bciFormOrderRef = isBciResiliation ? "" : bciOrderRef;
+  const bciFormInterventionLabel = isBciResiliation
+    ? (/^scarlet$/i.test(intervention.network.trim())
+        ? "SCA - Réintroduction demandée par PCD"
+        : "PXS - Réintroduction demandée par PCD")
+    : bciInterventionLabel;
 
   const isFiber = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim());
   const visibleTemplates = React.useMemo(
@@ -185,7 +246,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
 
               <section className="additional-information-editor">
                 {templateError && <div className="additional-information-template-error" role="alert">{templateError}</div>}
-                {selectedTemplate === "bciReintroductionImport" ? (
+                {(selectedTemplate === "bciReintroductionImport" || selectedTemplate === "bciResiliation") ? (
                   <div className="bci-reintroduction-form">
                     <div className="bci-reintroduction-form__choice-row">
                       <fieldset>
@@ -213,25 +274,28 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
 
                     <div className="bci-reintroduction-form__line">
                       <strong>* Cust. ID</strong>
-                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("cust", intervention.clientID.trim())}>
-                        <input value={intervention.clientID} readOnly />
+                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("cust", bciFormClientId)}>
+                        <input value={bciFormClientId} readOnly />
                         {copiedBciField === "cust" && <em>Copié</em>}
                       </div>
                     </div>
 
                     <div className="bci-reintroduction-form__line">
                       <strong>* NA</strong>
-                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("na", bciNa)}>
-                        <input value={bciNa} readOnly />
+                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("na", bciFormNa)}>
+                        <input value={bciFormNa} readOnly />
                         {copiedBciField === "na" && <em>Copié</em>}
                       </div>
                     </div>
 
                     <div className="bci-reintroduction-form__line">
                       <strong>Order Ref.</strong>
-                      <div className="bci-reintroduction-form__copyable" onClick={() => copyBciValue("order", bciOrderRef)}>
-                        <input value={bciOrderRef} readOnly />
-                        {copiedBciField === "order" && <em>Copié</em>}
+                      <div
+                        className={isBciResiliation ? "" : "bci-reintroduction-form__copyable"}
+                        onClick={isBciResiliation ? undefined : () => copyBciValue("order", bciFormOrderRef)}
+                      >
+                        <input value={bciFormOrderRef} readOnly />
+                        {!isBciResiliation && copiedBciField === "order" && <em>Copié</em>}
                       </div>
                     </div>
 
@@ -249,8 +313,8 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
 
                     <div className="bci-reintroduction-form__line bci-reintroduction-form__line--wide">
                       <strong>Intervention</strong>
-                      <select value={bciInterventionLabel} disabled>
-                        <option>{bciInterventionLabel}</option>
+                      <select value={bciFormInterventionLabel} disabled>
+                        <option>{bciFormInterventionLabel}</option>
                       </select>
                     </div>
 
@@ -262,7 +326,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                       </div>
                     </div>
 
-                    {!bciSameClientOperator && (
+                    {selectedTemplate === "bciReintroductionImport" && !bciSameClientOperator && (
                       <div className="bci-reintroduction-form__hint">
                         Aucun client « même » avec opérateur n'est renseigné.
                       </div>
@@ -342,6 +406,33 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
         <DialogActions>
           <Button onClick={close}>{editable ? "Annuler" : "Fermer"}</Button>
           {editable && <Button variant="contained" onClick={save}>Enregistrer</Button>}
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={bciResPickerOpen} onClose={() => setBciResPickerOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>Choisir le client actif</DialogTitle>
+        <DialogContent>
+          <div className="bci-res-client-picker">
+            {bciResEligibleClients.map((client) => (
+              <button
+                key={client.id}
+                type="button"
+                className="bci-res-client-picker__item"
+                onClick={() => applyBciResClient(client)}
+              >
+                <strong>{client.fullName.trim() || "Client sans nom"}</strong>
+                <span>
+                  {/^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim())
+                    ? `UTAC ${client.utac.trim() || "—"}`
+                    : `NA ${client.na.trim() || "—"}`}
+                </span>
+                <small>{formatNetworkLabel(client.operator)}</small>
+              </button>
+            ))}
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setBciResPickerOpen(false)}>Annuler</Button>
         </DialogActions>
       </Dialog>
     </>

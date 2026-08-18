@@ -3972,3 +3972,10 @@
     transform: none !important;
   }
 }
+
+/* v131 — CURE fallback is constrained to the normal icon footprint. */
+.current-intervention-page .intervention-option-group__items--six .cure-summary-card__fallback {
+  width: 68px !important; height: 68px !important;
+  max-width: 68px !important; max-height: 68px !important;
+  font-size: 68px !important; flex: 0 0 68px !important;
+}

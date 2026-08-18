@@ -4,7 +4,8 @@ export type AdditionalInformationTemplateId =
   | "bciThreeCures"
   | "bciWrongNumber"
   | "wioIncorrectAddress"
-  | "bciReintroductionImport";
+  | "bciReintroductionImport"
+  | "bciResiliation";
 
 export interface AdditionalInformationTemplateSource {
   phone: string;
@@ -158,6 +159,12 @@ export const additionalInformationTemplates: AdditionalInformationTemplateDefini
     dynamicValues: () => [],
   },
   {
+    id: "bciResiliation",
+    buttonLabel: "BCI résilation",
+    headerInputLabel: "Numéro BCI",
+    dynamicValues: () => [],
+  },
+  {
     id: "wioIncorrectAddress",
     buttonLabel: 'WIO "Adresse incorrecte en W6"',
     headerInputLabel: "Numéro WIO",
@@ -178,6 +185,14 @@ export const additionalInformationTemplates: AdditionalInformationTemplateDefini
   },
 ];
 
+const formatNetworkLabel = (value: string): string => {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (/^proximus$/i.test(trimmed)) return "Proximus";
+  if (/^scarlet$/i.test(trimmed)) return "Scarlet";
+  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)}`;
+};
+
 export const buildAdditionalInformationTemplate = (
   templateId: AdditionalInformationTemplateId,
   source: AdditionalInformationTemplateSource,
@@ -196,9 +211,13 @@ export const buildAdditionalInformationTemplate = (
 
   if (templateId === "bciReintroductionImport") {
     const sameClient = source.addressClients.find((client) => client.isSameClient);
-    const currentOperator = source.network.trim();
-    const addressOperator = sameClient?.operator?.trim() || "___";
-    return `Bonjour,\n\nLe client est actuellement actif chez ${addressOperator} et confirme de vouloir passer chez ${currentOperator || "___"}.\n\nMerci de réintroduire l'import\n\nBien à vous,`;
+    const currentOperator = formatNetworkLabel(source.network) || "___";
+    const addressOperator = formatNetworkLabel(sameClient?.operator ?? "") || "___";
+    return `Bonjour,\n\nLe client est actuellement actif chez ${addressOperator} et confirme de vouloir passer chez ${currentOperator}.\n\nMerci de réintroduire l'import\n\nBien à vous,`;
+  }
+
+  if (templateId === "bciResiliation") {
+    return "";
   }
 
   const address = getStructuredAddress(source);

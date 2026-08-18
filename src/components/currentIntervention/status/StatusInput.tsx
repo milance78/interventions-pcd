@@ -73,6 +73,14 @@ const StatusInput = () => {
   return (
     <>
       <div className="status-input-shell">
+        {status === "postponed" && postponedDate && (
+          <div className="postponed-date-line">
+            <span>Postposé au {formatDate(postponedDate)}</span>
+            <IconButton size="small" aria-label="Modifier la date de report" onClick={() => setCalendarOpen(true)}>
+              <EditCalendarRounded fontSize="small" />
+            </IconButton>
+          </div>
+        )}
         <FormControl variant="outlined" className="status-input" size="small" fullWidth>
           <Select
             className="status-select"
@@ -123,14 +131,6 @@ const StatusInput = () => {
             <MenuItem value="postponed">Postposer</MenuItem>
           </Select>
         </FormControl>
-        {status === "postponed" && postponedDate && (
-          <div className="postponed-date-line">
-            <span>Postposé au {formatDate(postponedDate)}</span>
-            <IconButton size="small" aria-label="Modifier la date de report" onClick={() => setCalendarOpen(true)}>
-              <EditCalendarRounded fontSize="small" />
-            </IconButton>
-          </div>
-        )}
       </div>
 
       <Dialog open={calendarOpen} onClose={() => setCalendarOpen(false)} className="postpone-calendar-dialog">
