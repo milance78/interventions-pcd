@@ -40,6 +40,62 @@ const formatHeaderTime = (date: Date) =>
     hour12: false,
   }).format(date);
 
+
+const copyValue = async (value: string) => {
+  if (!value.trim()) return;
+  await writeTextToClipboard(value.trim());
+};
+
+const SnowIssueInput = ({
+  label, value, copyable = false, dropdown = false,
+}: { label: string; value: string; copyable?: boolean; dropdown?: boolean }) => {
+  const [copied, setCopied] = React.useState(false);
+  const handleCopy = async () => {
+    if (!copyable || !value.trim()) return;
+    await copyValue(value);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 900);
+  };
+  return (
+    <div className={`snow-issue-field ${copyable ? "snow-issue-field--copyable" : ""}`}>
+      <label>{label}</label>
+      <div className="snow-issue-field__control" onClick={handleCopy} title={copyable ? (copied ? "Copié" : "Cliquer pour copier") : undefined}>
+        <input readOnly value={value} />
+        {dropdown && <span className="snow-issue-field__arrow">▾</span>}
+      </div>
+    </div>
+  );
+};
+
+const SnowIssueForm = ({
+  cdbId, orderRef, interventionCode, interventionDescription, issueStep, utacUni, description,
+}: {
+  cdbId: string; orderRef: string; interventionCode: string; interventionDescription: string; issueStep: string; utacUni: string; description: string;
+}) => (
+  <div className="snow-issue-card">
+    <div className="snow-issue-title">Issue with handling PCD Intervention</div>
+    <div className="snow-issue-body">
+      <SnowIssueInput label="* CDB ID" value={cdbId} copyable dropdown />
+      <SnowIssueInput label="Customer Contact" value="" dropdown />
+      <label className="snow-issue-checkbox"><input type="checkbox" /> <span>Create Contact</span></label>
+      <SnowIssueInput label="* Order ref" value={orderRef} copyable />
+      <SnowIssueInput label="* Intervention code" value={interventionCode} copyable />
+      <SnowIssueInput label="* Intervention description" value={interventionDescription} copyable />
+      <SnowIssueInput label="Issue occured at a step" value={issueStep} copyable />
+      <SnowIssueInput label="UTAC UNI" value={utacUni} copyable />
+      <div className="snow-issue-field snow-issue-field--description snow-issue-field--copyable">
+        <label>* Description</label>
+        <div className="snow-richtext" title="Cliquer pour copier" onClick={async () => { await copyValue(description); }}>
+          <div className="snow-richtext__toolbar">
+            <span>↶</span><span>↷</span><span>Paragraph⌄</span><b>B</b><i>I</i><span>☰</span><span>≡</span><span>≣</span><span>▤</span><span>☷</span><span>☷</span><span>⇤</span><span>⇥</span><span>🔗</span><span>⛓</span><span>▧</span><span>{`{}`}</span><span>‹›</span>
+          </div>
+          <textarea readOnly value={description} />
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 const AdditionalInformationDialog = ({ value, editable = false, onChange, buttonClassName = "" }: Props) => {
   const intervention = useAppSelector((state) => state.newIntervention);
   const [open, setOpen] = React.useState(false);
@@ -52,6 +108,9 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const [copiedBciField, setCopiedBciField] = React.useState<string | null>(null);
   const [bciResClientId, setBciResClientId] = React.useState<string | null>(null);
   const [bciResPickerOpen, setBciResPickerOpen] = React.useState(false);
+  const [snowUtac, setSnowUtac] = React.useState("");
+  const [snowInterventionNumber, setSnowInterventionNumber] = React.useState("");
+  const [snowFree, setSnowFree] = React.useState({ NPS: false, SALY: true, OCK: false });
 
   const templateSource = React.useMemo(() => ({
     phone: intervention.phone,
@@ -93,6 +152,9 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setCopied(null);
     setBciResPickerOpen(false);
     setBciResClientId(null);
+    setSnowUtac("");
+    setSnowInterventionNumber("");
+    setSnowFree({ NPS: false, SALY: true, OCK: false });
     setOpen(false);
   };
 
@@ -127,6 +189,9 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setCopied(null);
     setCopiedBciField(null);
     setHeaderNow(new Date());
+    setSnowUtac("");
+    setSnowInterventionNumber("");
+    setSnowFree({ NPS: false, SALY: true, OCK: false });
     setDraft(buildAdditionalInformationTemplate(templateId, templateSource));
   };
 
@@ -194,6 +259,26 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
         : "PXS - Réintroduction demandée par PCD")
     : bciInterventionLabel;
 
+  const snowCloseDescription = React.useMemo(() => {
+    const utacLine = snowUtac.trim() ? `L'UTAC ${snowUtac.trim()} est assigné.\n\n` : "";
+    return `Bonjour,\n\n${utacLine}Impossible de clôturer la demande ${intervention.oagID.trim()}. Elle retombe répétitivement en ${intervention.interventionDescription.trim()}. Merci de clôturer la demande.\n\nBonne journée.\n\nPCDINTERVENTIONTEAM`;
+  }, [snowUtac, intervention.oagID, intervention.interventionDescription]);
+
+  const selectedFree = (Object.entries(snowFree) as [keyof typeof snowFree, boolean][])
+    .filter(([, on]) => on)
+    .map(([key]) => key);
+  const freeText = selectedFree.length === 0
+    ? "___"
+    : selectedFree.length === 1
+      ? selectedFree[0]
+      : selectedFree.length === 2
+        ? `${selectedFree[0]} et ${selectedFree[1]}`
+        : `${selectedFree[0]}, ${selectedFree[1]} et ${selectedFree[2]}`;
+  const snowUnassignableDescription = `Bonjour,\n\nL'UTAC ${snowUtac.trim() || "___"} apparaît comme libre dans ${freeText}, mais ne peut pas être attribué dans NPS.\n\nLe message d'erreur affiché dans la fenêtre pop-up, « Point d'installation déjà HA » ne semble pas correct.\n\nMerci de procéder à l'attribution de cet UTAC.\n\nBonne journée\n\nPCDINTERVENTIONTEAM`;
+
+  const isSnowForm = selectedTemplate === "snowCloseImpossible" || selectedTemplate === "snowUtacNonAssignable";
+  const bciTemplateIds: AdditionalInformationTemplateId[] = ["bciThreeCures", "bciWrongNumber", "bciReintroductionImport", "bciResiliation"];
+
   const isFiber = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim());
   const visibleTemplates = React.useMemo(
     () => additionalInformationTemplates.filter(
@@ -201,6 +286,16 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     ),
     [isFiber],
   );
+
+  React.useEffect(() => {
+    if (selectedTemplate === "snowCloseImpossible") setDraft(snowCloseDescription);
+  }, [selectedTemplate, snowCloseDescription]);
+
+  React.useEffect(() => {
+    if (selectedTemplate === "snowUtacNonAssignable") setDraft(snowUnassignableDescription);
+  }, [selectedTemplate, snowUnassignableDescription]);
+
+  const otherTemplates = visibleTemplates.filter((template) => !bciTemplateIds.includes(template.id) && template.id !== "snowCloseImpossible" && template.id !== "snowUtacNonAssignable");
 
   const selectedDefinition = visibleTemplates.find(
     (template) => template.id === selectedTemplate,
@@ -231,17 +326,37 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
             <div className="additional-information-workspace">
               <aside className="additional-information-sidebar" aria-label="Modèles d'informations supplémentaires">
                 <div className="additional-information-sidebar__title">Modèles</div>
-                {visibleTemplates.map((template) => (
-                  <Button
-                    key={template.id}
-                    type="button"
-                    variant={selectedTemplate === template.id ? "contained" : "outlined"}
-                    className="additional-information-template-button"
-                    onClick={() => selectTemplate(template.id)}
-                  >
-                    {template.buttonLabel}
-                  </Button>
-                ))}
+
+                <div className="additional-information-group">
+                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                    <span>BCI</span><span aria-hidden="true">⌄</span>
+                  </button>
+                  <div className="additional-information-group__items">
+                    {bciTemplateIds.map((id) => {
+                      const template = visibleTemplates.find((item) => item.id === id);
+                      return template ? <Button key={id} type="button" variant={selectedTemplate === id ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate(id)}>{template.buttonLabel}</Button> : null;
+                    })}
+                  </div>
+                </div>
+
+                <div className="additional-information-group">
+                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                    <span>Snow création</span><span aria-hidden="true">⌄</span>
+                  </button>
+                  <div className="additional-information-group__items">
+                    <Button type="button" variant={selectedTemplate === "snowCloseImpossible" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowCloseImpossible")}>Snow - clôture intervention pas possible</Button>
+                    <Button type="button" variant={selectedTemplate === "snowUtacNonAssignable" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowUtacNonAssignable")}>Snow - UTAC non assignable</Button>
+                  </div>
+                </div>
+
+                {otherTemplates.length > 0 && <div className="additional-information-group is-open">
+                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                    <span>Autres</span><span aria-hidden="true">⌄</span>
+                  </button>
+                  <div className="additional-information-group__items">
+                    {otherTemplates.map((template) => <Button key={template.id} type="button" variant={selectedTemplate === template.id ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate(template.id)}>{template.buttonLabel}</Button>)}
+                  </div>
+                </div>}
               </aside>
 
               <section className="additional-information-editor">
@@ -330,6 +445,47 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                       <div className="bci-reintroduction-form__hint">
                         Aucun client « même » avec opérateur n'est renseigné.
                       </div>
+                    )}
+                  </div>
+                ) : isSnowForm ? (
+                  <div className="custom-snow-form">
+                    <div className="snow-instruction">Snow création ⇒ PCD ⇒ Issue with handling PCD Intervention</div>
+                    {selectedTemplate === "snowCloseImpossible" ? (
+                      <>
+                        <div className="snow-header-inputs">
+                          <TextField label="UTAC-UNI assigné" size="small" value={snowUtac} onChange={(e) => setSnowUtac(e.target.value)} />
+                          <TextField label="Numéro d'intervention" size="small" value={snowInterventionNumber} onChange={(e) => setSnowInterventionNumber(e.target.value)} />
+                        </div>
+                        <SnowIssueForm
+                          cdbId={intervention.clientID}
+                          orderRef={intervention.oagID}
+                          interventionCode={snowInterventionNumber}
+                          interventionDescription={intervention.interventionDescription}
+                          issueStep="Clôture de l'intervention"
+                          utacUni={snowUtac}
+                          description={snowCloseDescription}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div className="snow-header-inputs snow-header-inputs--free">
+                          <TextField required error={!snowUtac.trim()} label="UTAC-UNI" size="small" value={snowUtac} onChange={(e) => setSnowUtac(e.target.value)} />
+                          <span>libre dans</span>
+                          {(Object.keys(snowFree) as (keyof typeof snowFree)[]).map((key) => (
+                            <button key={key} type="button" className={`snow-toggle ${snowFree[key] ? "is-on" : ""}`} onClick={() => setSnowFree((prev) => ({ ...prev, [key]: !prev[key] }))}>{key}</button>
+                          ))}
+                        </div>
+                        {!snowUtac.trim() && <div className="snow-validation-error">UTAC-UNI est obligatoire.</div>}
+                        <SnowIssueForm
+                          cdbId={intervention.clientID}
+                          orderRef={intervention.oagID}
+                          interventionCode={intervention.interventionId}
+                          interventionDescription={intervention.interventionDescription}
+                          issueStep="Attribution de l'UTAC"
+                          utacUni={snowUtac}
+                          description={snowUnassignableDescription}
+                        />
+                      </>
                     )}
                   </div>
                 ) : (

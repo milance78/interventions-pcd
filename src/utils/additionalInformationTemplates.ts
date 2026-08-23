@@ -5,7 +5,9 @@ export type AdditionalInformationTemplateId =
   | "bciWrongNumber"
   | "wioIncorrectAddress"
   | "bciReintroductionImport"
-  | "bciResiliation";
+  | "bciResiliation"
+  | "snowCloseImpossible"
+  | "snowUtacNonAssignable";
 
 export interface AdditionalInformationTemplateSource {
   phone: string;
@@ -162,6 +164,18 @@ export const additionalInformationTemplates: AdditionalInformationTemplateDefini
     id: "bciResiliation",
     buttonLabel: "BCI résilation",
     headerInputLabel: "Numéro BCI",
+    dynamicValues: () => [],
+  },
+  {
+    id: "snowCloseImpossible",
+    buttonLabel: "Snow - clôture intervention pas possible",
+    headerInputLabel: "Numéro d'intervention",
+    dynamicValues: () => [],
+  },
+  {
+    id: "snowUtacNonAssignable",
+    buttonLabel: "Snow - UTAC non assignable",
+    headerInputLabel: "UTAC-UNI",
     dynamicValues: () => [],
   },
   {

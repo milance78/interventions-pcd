@@ -446,3 +446,205 @@
   font-weight: 700;
   text-align: center;
 }
+
+
+/* v137 — Snow-only visual layer. BCI styles remain untouched. */
+/* v136 — Snow creation must reproduce the Snow form from the supplied reference,
+   and deliberately not inherit the BCI layout. */
+.custom-snow-form {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  color: #45515d;
+}
+.custom-snow-form .snow-instruction {
+  border: 0;
+  padding: 0 0 10px;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  color: #425466;
+}
+.custom-snow-form .snow-header-inputs {
+  padding: 0 0 10px;
+  border: 0;
+  background: transparent;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+.custom-snow-form .snow-header-inputs .MuiInputBase-root {
+  background: #fff;
+}
+.custom-snow-form .snow-header-inputs--free {
+  grid-template-columns: minmax(220px, 1fr) auto repeat(3, auto);
+}
+
+.snow-issue-card {
+  width: 100%;
+  border: 1px solid #c8cfd6;
+  background: #dce5e9;
+}
+.snow-issue-title {
+  padding: 10px 16px 12px;
+  border-bottom: 1px solid #c8cfd6;
+  font-size: 22px;
+  line-height: 1.15;
+  font-weight: 400;
+  color: #596b7a;
+  background: #e8eef1;
+}
+.snow-issue-body {
+  padding: 8px 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.snow-issue-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.snow-issue-field > label {
+  color: #55616d;
+  font-size: 12px;
+  line-height: 1;
+}
+.snow-issue-field > label:first-letter { color: #d01818; }
+.snow-issue-field__control {
+  position: relative;
+  width: 100%;
+}
+.snow-issue-field input,
+.snow-issue-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #aeb7bf;
+  border-radius: 4px;
+  background: #fff;
+  color: #111;
+  padding: 6px 9px;
+  font: 14px Arial, Helvetica, sans-serif;
+  outline: none;
+}
+.snow-issue-field input { height: 28px; }
+.snow-issue-field__arrow {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 24px;
+  height: calc(100% - 2px);
+  display: grid;
+  place-items: center;
+  border-left: 1px solid #aeb7bf;
+  color: #697682;
+  background: #f5f7f8;
+  font-size: 11px;
+  pointer-events: none;
+  border-radius: 0 3px 3px 0;
+}
+.snow-issue-field--copyable .snow-issue-field__control,
+.snow-issue-field--copyable input,
+.snow-issue-field--copyable textarea,
+.snow-issue-field--copyable .snow-richtext { cursor: pointer; }
+.snow-issue-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #59636c;
+  font-size: 12px;
+  min-height: 20px;
+}
+.snow-issue-checkbox input { width: 13px; height: 13px; margin: 0; }
+.snow-issue-field--description { margin-top: 2px; }
+.snow-richtext {
+  border: 1px solid #aeb7bf;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+.snow-richtext__toolbar {
+  height: 31px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-bottom: 1px solid #c7cdd3;
+  background: #f4f6f7;
+  color: #43515d;
+  font: 13px Arial, Helvetica, sans-serif;
+}
+.snow-richtext__toolbar span,
+.snow-richtext__toolbar b,
+.snow-richtext__toolbar i {
+  min-width: 28px;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 7px;
+  border-right: 1px solid #d8dde1;
+  font-style: normal;
+}
+.snow-richtext__toolbar span:nth-child(3) { min-width: 86px; justify-content: flex-start; }
+.snow-richtext textarea {
+  display: block;
+  min-height: 180px;
+  resize: vertical;
+  border: 0;
+  border-radius: 0;
+  line-height: 1.45;
+}
+.snow-validation-error {
+  margin: 0 0 8px;
+}
+@media (max-width: 760px) {
+  .custom-snow-form .snow-header-inputs,
+  .custom-snow-form .snow-header-inputs--free { grid-template-columns: 1fr; }
+  .snow-issue-title { font-size: 18px; }
+  .snow-richtext__toolbar { overflow-x: auto; }
+}
+
+/* The radio and sender rows belong to the Snow card itself, exactly like the reference. */
+.snow-issue-body .snow-form-radio-row {
+  padding: 8px 0 2px;
+  gap: 16px;
+}
+.snow-issue-body .snow-form-radio-row fieldset {
+  background: #dce5e9;
+  border-color: #263746;
+}
+.snow-issue-body .snow-issue-email { margin: 0 0 2px; }
+.snow-issue-body .snow-issue-email .MuiInputBase-root { background: #fff; }
+
+
+/* v137 — collapsible template groups */
+.additional-information-group {
+  border: 1px solid rgba(100,116,139,.18);
+  border-radius: 9px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.additional-information-group__header {
+  width: 100%;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+  border: 0;
+  background: #f8fafc;
+  color: #1e293b;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: left;
+}
+
+.additional-information-group__header svg { transition: transform .16s ease; }
+.additional-information-group.is-open .additional-information-group__header svg { transform: rotate(180deg); }
+.additional-information-group__items { display: none; padding: 7px; gap: 7px; flex-direction: column; }
+.additional-information-group.is-open .additional-information-group__items { display: flex; }
+
+.additional-information-copyable-input,
+.additional-information-copyable-input .MuiInputBase-root { cursor: pointer; }
+.additional-information-copyable-input .MuiFormHelperText-root { color: #188038; }
+
