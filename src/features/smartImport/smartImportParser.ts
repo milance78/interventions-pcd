@@ -225,6 +225,15 @@ const extractPreferredContactPhone = (block: string) => {
 };
 
 const extractFiberServiceId = (text: string) => {
+  // The fiber CID/NA is always a 12-digit number starting with "1" and
+  // labelled "Service ID =". This format rule is authoritative and must be
+  // preferred over the surrounding "Access TYPE = Fiber" heuristic, which
+  // can otherwise pick up an unrelated Service ID appearing earlier in the
+  // Order Items table (e.g. a TV or Pickx line instead of the Internet one).
+  const strictMatches = [...text.matchAll(/Service\s+ID\s*=\s*(1\d{11})\b/gi)];
+  const strictValue = meaningful(strictMatches[0]?.[1]);
+  if (strictValue) return strictValue;
+
   const matches = [...text.matchAll(/Access\s+TYPE\s*=\s*Fiber[\s\S]{0,260}?Service\s+ID\s*=\s*(\d{9,15})/gi)];
   return meaningful(matches[0]?.[1]);
 };
@@ -494,7 +503,10 @@ const parseSafe = (text: string): ParsedSource => {
 };
 
 const parseWorkItem = (text: string): ParsedSource => {
-  const snowMentioned = extractLabelValue(text, ["SNOW_ID"]);
+  const snowMentioned = first(
+    extractLabelValue(text, ["SNOW_ID"]),
+    extractLabelValue(text, ["TICKET_NUM"]),
+  );
   const infrastructureRaw = extractLabelValue(text, ["TECHNOLOGY"]);
   const infrastructure = /fiber|fibre/i.test(infrastructureRaw)
     ? "fiber"
@@ -618,6 +630,7 @@ const merge = (safe: ParsedSource, work: ParsedSource, text: string): Partial<In
     comment: safe.comment ?? "",
     additionalInformation: "",
     isSnow: false,
+    snowStatus: "pending",
     displayAllFields: true,
   };
 };

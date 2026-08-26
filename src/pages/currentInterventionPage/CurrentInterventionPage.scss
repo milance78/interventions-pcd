@@ -3979,3 +3979,1939 @@
   max-width: 68px !important; max-height: 68px !important;
   font-size: 68px !important; flex: 0 0 68px !important;
 }
+
+/* Snow status companion select — appears next to the base Status select
+   once "Snow à mon nom" has a value. Same visual language, laid out side
+   by side, sharing the available footer width evenly.
+
+   The parent grid track (.right-card-actions) is what actually reserves
+   the horizontal space — widening .status-wrapper alone does nothing if
+   its grid column stays narrow, which is what caused the two selects to
+   overlap and clip their labels. Both need to grow together. */
+.status-wrapper {
+  display: flex;
+  gap: 8px;
+
+  > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+.status-wrapper .snow-status-select .MuiSelect-select,
+.status-wrapper .status-select .MuiSelect-select {
+  overflow: visible;
+  white-space: nowrap;
+}
+
+.status-wrapper.status-wrapper--dual .MuiSelect-select {
+  font-size: 13px !important;
+  padding-left: 10px !important;
+  padding-right: 26px !important;
+}
+
+.right-card-actions.right-card-actions--dual-status {
+  grid-template-columns: minmax(230px, 380px) minmax(0, 1fr) !important;
+}
+
+.status-wrapper.status-wrapper--dual {
+  max-width: 380px;
+}
+
+@media (max-width: 900px) {
+  .right-card-actions.right-card-actions--dual-status {
+    grid-template-columns: minmax(210px, 320px) minmax(0, 1fr) !important;
+  }
+
+  .status-wrapper.status-wrapper--dual {
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 760px) {
+  .right-card-actions.right-card-actions--dual-status {
+    grid-template-columns: 1fr !important;
+  }
+
+  .status-wrapper.status-wrapper--dual {
+    max-width: 100%;
+  }
+}
+
+/* Second footer row: "Ajouter à la liste du jour" gets its own line so the
+   first row (status selects + Historique/Effacer/Enregistrer) never has to
+   wrap or pile up. The grid auto-creates this second row since it's a third
+   child of .right-card-actions; it just needs to span both columns. */
+.right-card-actions {
+  row-gap: 12px;
+}
+
+.add-to-today-row {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.add-to-today-row .add-to-today-button--history {
+  width: 220px;
+  min-width: 220px;
+}
+
+@media (max-width: 760px) {
+  .add-to-today-row {
+    justify-content: stretch;
+  }
+
+  .add-to-today-row .add-to-today-button--history {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+/* Fixed, deterministic footer layout — exactly 2 rows, always.
+   Row 1: status select(s) on the left, Historique / Effacer / Enregistrer
+   on the right, all on one line, in that fixed order, never reflowing.
+   Row 2: Ajouter à la liste du jour, alone, right-aligned.
+   This overrides the older 2-column grid rules further up the file
+   (which used to break "Historique / Effacer / Enregistrer" into two
+   lines of their own) with higher specificity, so it always wins. */
+.current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+}
+
+.current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row .revision-history-button {
+  grid-column: unset !important;
+  justify-self: unset !important;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row .clear-form-button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row .submit-intervention-button {
+  flex: 0 0 auto;
+  min-width: 150px;
+  white-space: nowrap;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row {
+    flex-wrap: wrap !important;
+    justify-content: flex-end !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row {
+    width: 100%;
+    justify-content: stretch !important;
+  }
+
+  .current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row .revision-history-button,
+  .current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row .clear-form-button,
+  .current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row .submit-intervention-button {
+    flex: 1 1 auto;
+  }
+}
+
+/* ============================================================
+   DECISIVE, FINAL footer layout override.
+   This file has several older, conflicting `.right-card-actions`
+   grid definitions scattered across different sections (different
+   column widths, some fixed at 230px, some flexible), which is
+   what caused the status buttons and the action buttons to
+   collide/overlap. Rather than keep patching individual grid
+   tracks, this block turns the footer into a plain, unambiguous
+   flex layout with exactly two rows, and wins outright via
+   !important — it does not depend on cascade order versus the
+   older rules above.
+
+   Row 1 (.right-card-actions__top-row): status button(s) on the
+   left, Historique / Effacer / Enregistrer on the right.
+   Row 2 (.add-to-today-row): Ajouter à la liste du jour, alone.
+   ============================================================ */
+.right-card-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 12px !important;
+}
+
+.right-card-actions__top-row {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px !important;
+  width: 100%;
+}
+
+.right-card-actions__top-row .status-wrapper {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  display: flex !important;
+  gap: 8px;
+}
+
+.right-card-actions__top-row .status-wrapper > * {
+  flex: 0 0 auto;
+}
+
+.right-card-actions__top-row .status-wrapper .MuiFormControl-root {
+  width: 150px !important;
+}
+
+.right-card-actions__top-row .status-wrapper.status-wrapper--dual .MuiFormControl-root {
+  width: 165px !important;
+}
+
+.right-card-actions__top-row .current-intervention-submit-buttons {
+  flex: 0 1 auto !important;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0;
+}
+
+.add-to-today-row {
+  display: flex !important;
+  justify-content: flex-end !important;
+  width: 100%;
+}
+
+@media (max-width: 900px) {
+  .right-card-actions__top-row {
+    flex-wrap: wrap !important;
+    justify-content: flex-start !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .right-card-actions__top-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+  }
+
+  .right-card-actions__top-row .status-wrapper .MuiFormControl-root,
+  .right-card-actions__top-row .status-wrapper.status-wrapper--dual .MuiFormControl-root {
+    width: 100% !important;
+  }
+
+  .right-card-actions__top-row .current-intervention-submit-buttons.current-intervention-submit-buttons--actions-row {
+    width: 100% !important;
+    justify-content: stretch !important;
+  }
+}
+
+/* v136 — deterministic bottom-right action layout.
+   Status controls stay in a dedicated left slot; action buttons occupy fixed
+   worksheet-like slots on the right. No wrapping, overlap or auto placement. */
+.current-intervention-page .right-card-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__top-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 603px !important;
+  align-items: center !important;
+  gap: 16px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper {
+  min-width: 0 !important;
+  width: 100% !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper:not(.status-wrapper--dual) {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper .MuiFormControl-root,
+.current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual .MuiFormControl-root {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+  display: grid !important;
+  grid-template-columns: 220px 190px 175px !important;
+  grid-auto-flow: column !important;
+  justify-content: end !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 603px !important;
+  min-width: 603px !important;
+  max-width: 603px !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Fixed slots: history=1, clear=2, save/review=3 when present. */
+.current-intervention-page .current-intervention-submit-buttons > .revision-history-button { grid-column: 1 !important; }
+.current-intervention-page .current-intervention-submit-buttons > .clear-form-button { grid-column: 2 !important; }
+.current-intervention-page .current-intervention-submit-buttons > .submit-intervention-button { grid-column: 3 !important; }
+
+/* In NEW mode there is no history button: clear and save occupy the final two
+   fixed slots rather than moving around based on content width. */
+.current-intervention-page .current-intervention-submit-buttons > .add-to-today-button--history {
+  grid-column: 2 !important;
+}
+
+.current-intervention-page .add-to-today-row {
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 46px !important;
+}
+
+.current-intervention-page .add-to-today-row .add-to-today-button--history {
+  box-sizing: border-box !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+}
+
+@media (max-width: 1180px) {
+  .current-intervention-page .right-card-actions__top-row {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 52%) !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, .9fr) !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__top-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .status-wrapper {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .current-intervention-page .right-card-actions__top-row .status-wrapper,
+  .current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual {
+    grid-template-columns: 1fr !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: 1fr !important;
+    grid-auto-flow: row !important;
+  }
+
+  .current-intervention-page .current-intervention-submit-buttons > .revision-history-button,
+  .current-intervention-page .current-intervention-submit-buttons > .clear-form-button,
+  .current-intervention-page .current-intervention-submit-buttons > .submit-intervention-button,
+  .current-intervention-page .current-intervention-submit-buttons > .add-to-today-button--history {
+    grid-column: 1 !important;
+  }
+}
+
+/* v137 — stable, non-overlapping footer layout.  The previous v136 used a
+   603px action rail plus several later responsive overrides, which could make
+   the status controls collide with the action buttons.  This is the final
+   desktop layout: a fixed status slot on the left and three fixed action
+   slots on the right. */
+.current-intervention-page .right-card-actions {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+.current-intervention-page .right-card-actions__top-row {
+  width: 100% !important;
+  min-width: 0 !important;
+  display: grid !important;
+  grid-template-columns: 230px minmax(0, 1fr) !important;
+  column-gap: 16px !important;
+  align-items: center !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper {
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+  display: grid !important;
+  grid-template-columns: 108px 108px !important;
+  gap: 8px !important;
+  align-items: center !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper:not(.status-wrapper--dual) {
+  grid-template-columns: 150px !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper > *,
+.current-intervention-page .right-card-actions__top-row .status-wrapper .MuiFormControl-root {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  display: grid !important;
+  grid-template-columns: 230px 210px 195px !important;
+  grid-auto-flow: row !important;
+  justify-content: end !important;
+  align-items: center !important;
+  column-gap: 8px !important;
+  row-gap: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .revision-history-button {
+  grid-column: 1 !important;
+}
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .clear-form-button {
+  grid-column: 2 !important;
+}
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .submit-intervention-button {
+  grid-column: 3 !important;
+}
+
+/* When the history button is absent, keep the two actions in the rightmost
+   two fixed slots instead of letting them jump around. */
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .add-to-today-button--history {
+  grid-column: 2 !important;
+}
+
+.current-intervention-page .add-to-today-row {
+  width: 100% !important;
+  min-height: 52px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.current-intervention-page .add-to-today-row .add-to-today-button--history {
+  box-sizing: border-box !important;
+  flex: 0 0 220px !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  white-space: normal !important;
+  line-height: 1.15 !important;
+}
+
+@media (max-width: 980px) {
+  .current-intervention-page .right-card-actions__top-row {
+    grid-template-columns: 210px minmax(0, 1fr) !important;
+    column-gap: 12px !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .status-wrapper {
+    width: 210px !important;
+    min-width: 210px !important;
+    max-width: 210px !important;
+    grid-template-columns: 101px 101px !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .status-wrapper:not(.status-wrapper--dual) {
+    grid-template-columns: 145px !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: 205px 185px 175px !important;
+  }
+}
+
+@media (max-width: 820px) {
+  .current-intervention-page .right-card-actions__top-row {
+    grid-template-columns: 1fr !important;
+    row-gap: 10px !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .status-wrapper,
+  .current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .status-wrapper:not(.status-wrapper--dual) {
+    grid-template-columns: minmax(0, 150px) !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: 1fr !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > button,
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .revision-history-button,
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .clear-form-button,
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .submit-intervention-button,
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .add-to-today-button--history {
+    grid-column: 1 !important;
+    width: 100% !important;
+  }
+  .current-intervention-page .add-to-today-row .add-to-today-button--history {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+/* v138 — FINAL footer geometry. */
+.current-intervention-page .right-card-actions {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: 250px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: center !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper {
+  width: 250px !important;
+  min-width: 250px !important;
+  max-width: 250px !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: 150px !important;
+  gap: 8px !important;
+  align-items: center !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual {
+  grid-template-columns: 121px 121px !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper .MuiFormControl-root {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 180px 170px !important;
+  grid-auto-flow: row !important;
+  gap: 8px !important;
+  align-items: center !important;
+  justify-content: stretch !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > button {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  padding: 0 12px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  flex: none !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .revision-history-button {
+  grid-column: 1 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .clear-form-button {
+  grid-column: 2 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .submit-intervention-button {
+  grid-column: 3 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > .add-to-today-button--history {
+  grid-column: 2 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .add-to-today-row {
+  width: 100% !important;
+  min-height: 52px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .add-to-today-row .add-to-today-button--history {
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__top-row {
+    grid-template-columns: 220px minmax(0, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .status-wrapper {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual {
+    grid-template-columns: 106px 106px !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: minmax(0, 1fr) 160px 155px !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .current-intervention-page .right-card-actions__top-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .status-wrapper,
+  .current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .status-wrapper:not(.status-wrapper--dual) {
+    grid-template-columns: minmax(0, 150px) !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+
+  .current-intervention-page .add-to-today-row .add-to-today-button--history {
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons {
+    grid-template-columns: 1fr !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .current-intervention-submit-buttons > button,
+  .current-intervention-page .add-to-today-row .add-to-today-button--history {
+    grid-column: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+}
+
+/* v139 — final two-row action layout.
+   Row 1: status controls | spacer | clear | save/review.
+   Row 2: history (left) | spacer | add-to-today (right).
+   The submit wrapper becomes transparent so its buttons occupy fixed grid slots. */
+.current-intervention-page .right-card-actions {
+  width: 100% !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: 220px minmax(0, 1fr) 190px 190px !important;
+  grid-template-rows: 52px 52px !important;
+  column-gap: 10px !important;
+  row-gap: 10px !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row {
+  display: contents !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 220px !important;
+  min-width: 220px !important;
+  max-width: 220px !important;
+  height: 52px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 6px !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual {
+  grid-template-columns: 1fr 1fr !important;
+  gap: 6px !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper > *,
+.current-intervention-page .right-card-actions__top-row .status-wrapper .MuiFormControl-root {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons {
+  display: contents !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons > button {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons > .revision-history-button {
+  grid-column: 1 / span 2 !important;
+  grid-row: 2 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons > .clear-form-button {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons > .submit-intervention-button {
+  grid-column: 4 !important;
+  grid-row: 1 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons > .add-to-today-button--history {
+  grid-column: 4 !important;
+  grid-row: 2 !important;
+  justify-self: stretch !important;
+}
+
+.current-intervention-page .add-to-today-row {
+  display: contents !important;
+}
+
+.current-intervention-page .add-to-today-row .add-to-today-button--history {
+  grid-column: 4 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* History view has only the history action: keep it in a sane fixed slot. */
+.current-intervention-page.current-intervention-page--history .current-intervention-submit-buttons > .revision-history-button {
+  grid-column: 1 / span 2 !important;
+  grid-row: 1 !important;
+}
+
+@media (max-width: 820px) {
+  .current-intervention-page .right-card-actions {
+    grid-template-columns: minmax(180px, 1fr) 160px 160px !important;
+    grid-template-rows: 52px 52px !important;
+    column-gap: 8px !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .status-wrapper {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+}
+
+@media (max-width: 620px) {
+  .current-intervention-page .right-card-actions {
+    grid-template-columns: 1fr 1fr !important;
+    grid-template-rows: 52px 52px 52px !important;
+  }
+  .current-intervention-page .right-card-actions__top-row .status-wrapper {
+    grid-column: 1 / span 2 !important;
+    grid-row: 1 !important;
+  }
+  .current-intervention-page .current-intervention-submit-buttons > .clear-form-button {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+  .current-intervention-page .current-intervention-submit-buttons > .submit-intervention-button {
+    grid-column: 2 !important;
+    grid-row: 2 !important;
+  }
+  .current-intervention-page .current-intervention-submit-buttons > .revision-history-button {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+  .current-intervention-page .add-to-today-row .add-to-today-button--history,
+  .current-intervention-page .current-intervention-submit-buttons > .add-to-today-button--history {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+  }
+}
+
+
+/* v140 — deterministic two-row desktop footer.
+   Existing v139 rules are overridden here rather than deleted, so the JSX and
+   behavior stay untouched while every action gets a single fixed grid cell. */
+.current-intervention-page .right-card-actions {
+  display: grid !important;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr) minmax(180px, 210px) minmax(180px, 210px) !important;
+  grid-template-rows: 52px 52px !important;
+  column-gap: 10px !important;
+  row-gap: 10px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row {
+  display: contents !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 6px !important;
+  width: auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 52px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 6px !important;
+}
+
+.current-intervention-page .right-card-actions__top-row .status-wrapper > *,
+.current-intervention-page .right-card-actions__top-row .status-wrapper .MuiFormControl-root {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons {
+  display: contents !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons > button {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  align-self: stretch !important;
+  justify-self: stretch !important;
+}
+
+/* Row 1: clear + save/review. */
+.current-intervention-page .current-intervention-submit-buttons > .clear-form-button {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+}
+
+.current-intervention-page .current-intervention-submit-buttons > .submit-intervention-button {
+  grid-column: 4 !important;
+  grid-row: 1 !important;
+}
+
+/* Row 2: history at left. */
+.current-intervention-page .current-intervention-submit-buttons > .revision-history-button {
+  grid-column: 1 !important;
+  grid-row: 2 !important;
+}
+
+/* Retrieved edit: add-to-today goes into the far-right slot on row 2. */
+.current-intervention-page .add-to-today-row {
+  display: contents !important;
+}
+
+.current-intervention-page .add-to-today-row .add-to-today-button--history {
+  grid-column: 4 !important;
+  grid-row: 2 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 52px !important;
+  min-height: 52px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  justify-self: stretch !important;
+}
+
+/* In a NEW/DRAFT view there is no separate history row button, so the
+   "Ajouter à la liste du jour" action stays in the same far-right cell. */
+.current-intervention-page .current-intervention-submit-buttons > .add-to-today-button--history {
+  grid-column: 4 !important;
+  grid-row: 1 !important;
+}
+
+/* Middle column is intentionally empty: it acts as the visual breathing space
+   that prevents the three action buttons from touching/overlapping. */
+
+/* Keep the same two-row concept on narrower desktop/tablet widths. */
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions {
+    grid-template-columns: minmax(190px, 220px) minmax(0, 1fr) 165px 165px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .current-intervention-page .right-card-actions {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    grid-template-rows: auto auto auto !important;
+    gap: 8px !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-row .status-wrapper {
+    grid-column: 1 / span 2 !important;
+    grid-row: 1 !important;
+    height: auto !important;
+    min-height: 52px !important;
+  }
+
+  .current-intervention-page .current-intervention-submit-buttons > .clear-form-button {
+    grid-column: 1 !important;
+    grid-row: 2 !important;
+  }
+
+  .current-intervention-page .current-intervention-submit-buttons > .submit-intervention-button,
+  .current-intervention-page .current-intervention-submit-buttons > .add-to-today-button--history,
+  .current-intervention-page .add-to-today-row .add-to-today-button--history {
+    grid-column: 2 !important;
+  }
+
+  .current-intervention-page .current-intervention-submit-buttons > .submit-intervention-button {
+    grid-row: 2 !important;
+  }
+
+  .current-intervention-page .current-intervention-submit-buttons > .revision-history-button {
+    grid-column: 1 !important;
+    grid-row: 3 !important;
+  }
+
+  .current-intervention-page .add-to-today-row .add-to-today-button--history,
+  .current-intervention-page .current-intervention-submit-buttons > .add-to-today-button--history {
+    grid-row: 3 !important;
+  }
+}
+
+
+/* v142 — explicit two-row footer. JSX now owns the structure; these rules
+   only provide fixed slots and cannot cross-cascade through nested grids. */
+.current-intervention-page .right-card-actions {
+  width: 100% !important;
+  height: 116px !important;
+  min-height: 116px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  overflow: visible !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__row {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  display: grid !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__row--top {
+  grid-template-columns: 270px minmax(0,1fr) 205px 205px !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom {
+  grid-template-columns: minmax(300px, 1fr) minmax(0,1fr) 230px !important;
+}
+
+.current-intervention-page .right-card-actions__spacer {
+  min-width: 0 !important;
+}
+
+.current-intervention-page .status-wrapper {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 270px !important;
+  min-width: 270px !important;
+  max-width: 270px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 6px !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+}
+
+.current-intervention-page .status-wrapper > *,
+.current-intervention-page .status-wrapper .MuiFormControl-root {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .clear-form-button {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  width: 205px !important;
+  min-width: 205px !important;
+  max-width: 205px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+  grid-column: 4 !important;
+  grid-row: 1 !important;
+  width: 205px !important;
+  min-width: 205px !important;
+  max-width: 205px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-left {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: stretch !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-left .revision-history-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 390px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__row--top {
+    grid-template-columns: 220px minmax(0,1fr) 165px 165px !important;
+  }
+  .current-intervention-page .status-wrapper {
+    width: 220px !important;
+    min-width: 220px !important;
+    max-width: 220px !important;
+  }
+  .current-intervention-page .right-card-actions__row--top > .clear-form-button,
+  .current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+    width: 165px !important;
+    min-width: 165px !important;
+    max-width: 165px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .current-intervention-page .right-card-actions {
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .current-intervention-page .right-card-actions__row--top,
+  .current-intervention-page .right-card-actions__row--bottom {
+    grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+    height: auto !important;
+    min-height: 53px !important;
+  }
+  .current-intervention-page .status-wrapper {
+    grid-column: 1 / span 2 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+  }
+  .current-intervention-page .right-card-actions__row--top {
+    padding-top: 63px !important;
+  }
+  .current-intervention-page .right-card-actions__row--top > .clear-form-button {
+    grid-column: 1 !important;
+  }
+  .current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+    grid-column: 2 !important;
+  }
+  .current-intervention-page .right-card-actions__row--bottom {
+    margin-top: 63px !important;
+  }
+  .current-intervention-page .right-card-actions__bottom-left {
+    grid-column: 1 / span 2 !important;
+  }
+  .current-intervention-page .right-card-actions__bottom-right {
+    display: none !important;
+  }
+}
+
+
+/* v143 — final visual corrections requested:
+   1) wider status area so "Snow en attente" never collides with its arrow;
+   2) Enregistrer keeps the calm light-blue treatment;
+   3) Ajouter à la liste du jour remains green. */
+.current-intervention-page .right-card-actions__row--top {
+  grid-template-columns: 360px minmax(0,1fr) 205px 205px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper {
+  width: 360px !important;
+  min-width: 360px !important;
+  max-width: 360px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+  gap: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper :is(
+  .MuiSelect-select,
+  .MuiInputBase-root
+) {
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+  padding-left: 11px !important;
+  padding-right: 34px !important;
+  font-size: 13px !important;
+}
+
+/* Enregistrer / Revu — subtle blue, matching the calm secondary blue family. */
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+  color: #2f638c !important;
+  -webkit-text-fill-color: #2f638c !important;
+  border: 1px solid #a9c9e3 !important;
+  background: #eef6fc !important;
+  background-image: none !important;
+  box-shadow: 0 2px 6px rgba(70, 115, 150, .10) !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button:hover {
+  color: #285877 !important;
+  -webkit-text-fill-color: #285877 !important;
+  border-color: #8fb6d5 !important;
+  background: #e7f2fa !important;
+  background-image: none !important;
+}
+
+/* Ajouter à la liste du jour — restore the established green treatment. */
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  color: #2f6b45 !important;
+  -webkit-text-fill-color: #2f6b45 !important;
+  border: 1px solid #9bcdaa !important;
+  background: #eef9f1 !important;
+  background-image: none !important;
+  box-shadow: 0 2px 6px rgba(47, 107, 69, .10) !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history:hover {
+  color: #285d3b !important;
+  -webkit-text-fill-color: #285d3b !important;
+  border-color: #82bd95 !important;
+  background: #e5f5e9 !important;
+  background-image: none !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__row--top {
+    grid-template-columns: 300px minmax(0,1fr) 165px 165px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+  }
+}
+
+
+/* v144 — compact the status/action widths and restore the pleasant gradients. */
+.current-intervention-page .right-card-actions__row--top {
+  grid-template-columns: 300px minmax(0,1fr) 180px 180px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper {
+  width: 300px !important;
+  min-width: 300px !important;
+  max-width: 300px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+  padding-left: 10px !important;
+  padding-right: 30px !important;
+  font-size: 12.5px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .clear-form-button,
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+}
+
+/* Enregistrer / Revu — soft, pleasant blue gradient, not saturated. */
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+  color: #315f84 !important;
+  -webkit-text-fill-color: #315f84 !important;
+  border: 1px solid #9bbbd6 !important;
+  background: linear-gradient(145deg, #f3f8fc 0%, #dceaf5 100%) !important;
+  background-image: linear-gradient(145deg, #f3f8fc 0%, #dceaf5 100%) !important;
+  box-shadow: 0 6px 15px rgba(49,95,132,.11) !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button:hover {
+  color: #274f70 !important;
+  -webkit-text-fill-color: #274f70 !important;
+  border-color: #7fa8c9 !important;
+  background: linear-gradient(145deg, #f8fbfe 0%, #d4e6f3 100%) !important;
+  background-image: linear-gradient(145deg, #f8fbfe 0%, #d4e6f3 100%) !important;
+  box-shadow: 0 7px 17px rgba(49,95,132,.14) !important;
+}
+
+/* Ajouter à la liste du jour — restore the original pleasant green gradient. */
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  color: #2f6b45 !important;
+  -webkit-text-fill-color: #2f6b45 !important;
+  border: 1px solid #8bc99d !important;
+  background: linear-gradient(145deg, #eef9f1 0%, #d9f0e0 100%) !important;
+  background-image: linear-gradient(145deg, #eef9f1 0%, #d9f0e0 100%) !important;
+  box-shadow: 0 6px 15px rgba(22,101,52,.12) !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history:hover {
+  color: #285d3b !important;
+  -webkit-text-fill-color: #285d3b !important;
+  border-color: #68b47f !important;
+  background: linear-gradient(145deg, #f5fcf7 0%, #d1ebd9 100%) !important;
+  background-image: linear-gradient(145deg, #f5fcf7 0%, #d1ebd9 100%) !important;
+  box-shadow: 0 7px 17px rgba(22,101,52,.15) !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__row--top {
+    grid-template-columns: 280px minmax(0,1fr) 160px 160px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top > .clear-form-button,
+  .current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+  }
+}
+
+
+/* v145 — small final polish:
+   Enregistrer typography matches Ajouter à la liste du jour,
+   and the old horizontal separator touching the action row is removed. */
+.current-intervention-page .right-card-actions {
+  border-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  text-transform: none !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button .MuiButton-startIcon {
+  margin-right: 7px !important;
+}
+
+
+/* v146 — make the two status buttons visually match the action buttons. */
+.current-intervention-page .right-card-actions__row--top .status-wrapper {
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
+  gap: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper :is(
+  .MuiFormControl-root,
+  .MuiInputBase-root,
+  .MuiOutlinedInput-root,
+  .MuiSelect-select
+) {
+  min-height: 53px !important;
+  height: 53px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+  display: flex !important;
+  align-items: center !important;
+  padding: 0 34px 0 10px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Keep the two action buttons at exactly the same height/typography. */
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button,
+.current-intervention-page .right-card-actions__row--top > .clear-form-button,
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  height: 53px !important;
+  min-height: 53px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+}
+
+/* Give the slightly wider status block back exactly what the 320px slot needs. */
+.current-intervention-page .right-card-actions__row--top {
+  grid-template-columns: 320px minmax(0,1fr) 180px 180px !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__row--top {
+    grid-template-columns: 290px minmax(0,1fr) 160px 160px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+    width: 290px !important;
+    min-width: 290px !important;
+    max-width: 290px !important;
+  }
+}
+
+
+/* v147 — soften the two status labels and match their physical height to actions. */
+.current-intervention-page .right-card-actions__row--top .status-wrapper {
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top {
+  grid-template-columns: 320px minmax(0,1fr) 180px 180px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper :is(
+  .MuiFormControl-root,
+  .MuiInputBase-root,
+  .MuiOutlinedInput-root,
+  .MuiSelect-select
+) {
+  height: 53px !important;
+  min-height: 53px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+  display: flex !important;
+  align-items: center !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__row--top {
+    grid-template-columns: 290px minmax(0,1fr) 160px 160px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+    width: 290px !important;
+    min-width: 290px !important;
+    max-width: 290px !important;
+  }
+}
+
+
+/* v148 — use the former "Informations supplémentaires" zone for the
+   postponed date; move the Info trigger to the far right without moving
+   the status control itself. */
+.current-intervention-page .right-card-actions {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__additional-trigger {
+  position: absolute !important;
+  top: -52px !important;
+  right: 0 !important;
+  z-index: 8 !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__additional-trigger .additional-information-trigger {
+  margin: 0 !important;
+  padding: 7px 10px !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__row--top {
+  position: relative !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .postponed-date-line {
+  position: absolute !important;
+  left: 0 !important;
+  top: -52px !important;
+  z-index: 7 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  width: auto !important;
+  min-width: 150px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #6b21a8 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .postponed-date-line .MuiIconButton-root {
+  width: 28px !important;
+  height: 28px !important;
+  padding: 4px !important;
+  color: #7e22ce !important;
+}
+
+@media (max-width: 720px) {
+  .current-intervention-page .right-card-actions__additional-trigger {
+    top: -48px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top .postponed-date-line {
+    top: -48px !important;
+  }
+}
+
+
+/* v149 — the Postposé/Informations supplémentaires meta row is a real row
+   above the footer and outside Commentaire. The status control itself remains
+   exactly where it was. */
+.current-intervention-page .right-card-actions__meta-row {
+  width: 100% !important;
+  min-height: 34px !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__postponed-slot {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  height: 34px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.current-intervention-page .right-card-actions__meta-row .postponed-date-line {
+  position: static !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #6b21a8 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__meta-row .right-card-actions__additional-trigger {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__meta-row .additional-information-trigger {
+  margin: 0 !important;
+  padding: 7px 10px !important;
+  white-space: nowrap !important;
+}
+
+/* Neutralize the v148 absolute placement so these controls cannot land inside
+   the Commentaire area. */
+.current-intervention-page .right-card-actions > .right-card-actions__additional-trigger {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+}
+
+
+/* v152 — only one Postposé line: keep the new page-level meta-row copy and
+   suppress the legacy copy that StatusInput renders inside the status control.
+   The status button itself does not move. */
+.current-intervention-page .right-card-actions__row--top .status-wrapper .postponed-date-line {
+  display: none !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button {
+  padding: 6px 12px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__label {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  line-height: 1.08 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+
+/* v153 — trash icon sits inline with "Effacer" and above "le formulaire". */
+.current-intervention-page .right-card-actions__row--top .clear-form-button__content {
+  display: grid !important;
+  grid-template-columns: auto auto !important;
+  grid-template-rows: auto auto !important;
+  column-gap: 7px !important;
+  align-items: start !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  margin-top: 1px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__label {
+  grid-column: 2 !important;
+  grid-row: 1 / span 2 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0 !important;
+  line-height: 1.08 !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+
+/* v154 — exact requested geometry:
+   row 1 = trash + "Effacer" inline;
+   row 2 = "le formulaire" starts exactly under the trash icon. */
+.current-intervention-page .right-card-actions__row--top .clear-form-button__content {
+  display: grid !important;
+  grid-template-columns: auto auto !important;
+  grid-template-rows: auto auto !important;
+  column-gap: 7px !important;
+  row-gap: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.08 !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 18px !important;
+  height: 18px !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__icon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__label {
+  display: contents !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__label > span:first-child {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  align-self: center !important;
+  justify-self: start !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__label > span:last-child {
+  grid-column: 1 / span 2 !important;
+  grid-row: 2 !important;
+  justify-self: start !important;
+  align-self: start !important;
+  white-space: nowrap !important;
+  text-align: left !important;
+}
+
+
+/* v155 — icon-to-label spacing should read like an ordinary word space. */
+.current-intervention-page .right-card-actions__row--top .clear-form-button__content {
+  column-gap: 3px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__icon {
+  width: 18px !important;
+  margin-right: 0 !important;
+}
+
+
+/* v156 — make the trash behave like a normal inline glyph before "Effacer".
+   Keep the second line anchored directly under the icon. */
+.current-intervention-page .right-card-actions__row--top .clear-form-button__content {
+  grid-template-columns: 14px auto !important;
+  column-gap: 2px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__icon {
+  width: 14px !important;
+  height: 18px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .clear-form-button__icon svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+
+/* v157 — Effacer joins the bottom-row action cluster, immediately before
+   Ajouter à la liste du jour. The top-row status position stays untouched. */
+.current-intervention-page .right-card-actions__bottom-right {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+  padding: 6px 12px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__content {
+  display: grid !important;
+  grid-template-columns: 14px auto !important;
+  grid-template-rows: auto auto !important;
+  column-gap: 2px !important;
+  row-gap: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.08 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 14px !important;
+  height: 18px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__icon svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__label {
+  display: contents !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__label > span:first-child {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: start !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__label > span:last-child {
+  grid-column: 1 / span 2 !important;
+  grid-row: 2 !important;
+  justify-self: start !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  flex: 0 0 230px !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+    flex-basis: 200px !important;
+    width: 200px !important;
+    min-width: 200px !important;
+    max-width: 200px !important;
+  }
+}
+
+
+/* v158 — one invariant footer geometry across Nouvelle intervention,
+   current/retrieved intervention and history. Presence/absence of a button
+   never changes another button's cell. */
+.current-intervention-page .right-card-actions__row--top {
+  grid-template-columns: 320px minmax(0,1fr) 180px 180px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top .status-wrapper {
+  grid-column: 1 !important;
+}
+
+.current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+  grid-column: 4 !important;
+  grid-row: 1 !important;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+  flex: 0 0 180px !important;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  flex: 0 0 230px !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__row--top {
+    grid-template-columns: 290px minmax(0,1fr) 160px 160px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top > .submit-intervention-button {
+    width: 160px !important;
+    min-width: 160px !important;
+    max-width: 160px !important;
+  }
+
+  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+    width: 290px !important;
+    min-width: 290px !important;
+    max-width: 290px !important;
+  }
+}

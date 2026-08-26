@@ -83,6 +83,9 @@ export interface InterventionData {
   snowMentioned: string;
   isSnowReceivedPending: boolean;
   isSnowSentPending: boolean;
+  /** Snow ticket resolution state, shown next to the base status once
+   * "Snow à mon nom" has a value. */
+  snowStatus: "pending" | "resolved";
   isResPending: boolean;
   /** Local calendar date (YYYY-MM-DD) of the latest Résiliation consultation. */
   resConsultedDate: string | null;
@@ -194,6 +197,7 @@ export const emptyInterventionData: InterventionData = {
   snowMentioned: "",
   isSnowReceivedPending: false,
   isSnowSentPending: false,
+  snowStatus: "pending",
   isResPending: false,
   resConsultedDate: null,
   snowReceivedConsultedDate: null,
@@ -287,6 +291,7 @@ const extractData = (state: Intervention): InterventionData => ({
   snowMentioned: state.snowMentioned,
   isSnowReceivedPending: state.isSnowReceivedPending,
   isSnowSentPending: state.isSnowSentPending,
+  snowStatus: state.snowStatus,
   isResPending: state.isResPending,
   resConsultedDate: state.resConsultedDate,
   snowReceivedConsultedDate: state.snowReceivedConsultedDate,

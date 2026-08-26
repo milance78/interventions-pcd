@@ -32,6 +32,7 @@ import InfrastructureInput from "../../components/currentIntervention/infrastruc
 import InputsAll from "../../components/currentIntervention/inputsAll/InputsAll";
 import NetworkInput from "../../components/currentIntervention/networkInput/NetworkInput";
 import StatusInput from "../../components/currentIntervention/status/StatusInput";
+import SnowStatusInput from "../../components/currentIntervention/snowStatusInput/SnowStatusInput";
 import SmartImportDialog from "../../components/smartImportDialog/SmartImportDialog";
 
 import {
@@ -342,6 +343,9 @@ const CurrentInterventionPage = () => {
     isHistoryView,
     hasDraft,
     mode,
+    snowReceived,
+    snowStatus,
+    postponedDate,
   } = newIntervention;
 
   const isDisplayedDraft = Boolean(
@@ -649,9 +653,6 @@ const CurrentInterventionPage = () => {
     if (nextAddressConfirmation === "confirmed") {
       dispatch(updateField({ field: "cure", value: "noCure" }));
       dispatch(updateField({ field: "smsEnabled", value: false }));
-      dispatch(updateField({ field: "isSnowReceivedPending", value: false }));
-      dispatch(updateField({ field: "isSnowSentPending", value: false }));
-      dispatch(updateField({ field: "isSnow", value: false }));
     }
 
     dispatch(updateField({ field: "comment", value: nextComment }));
@@ -696,15 +697,19 @@ const CurrentInterventionPage = () => {
     }
 
     if (context.tab === "snowReceived") {
-      return onHold
-        ? { ...payload, isSnowReceivedPending: true, isSnow: true, snowReceivedReviewedDate: today }
-        : payload;
+      if (!onHold) return payload;
+      const next = { ...payload, isSnowReceivedPending: true, isSnow: true, snowReceivedReviewedDate: today };
+      // The intervention can sit on both Snow lists at once; reviewing it from
+      // either tab must stamp "Revu aujourd'hui" on both.
+      if (payload.isSnowSentPending) next.snowSentReviewedDate = today;
+      return next;
     }
 
     if (context.tab === "snowSent") {
-      return onHold
-        ? { ...payload, isSnowSentPending: true, isSnow: true, snowSentReviewedDate: today }
-        : payload;
+      if (!onHold) return payload;
+      const next = { ...payload, isSnowSentPending: true, isSnow: true, snowSentReviewedDate: today };
+      if (payload.isSnowReceivedPending) next.snowReceivedReviewedDate = today;
+      return next;
     }
 
     if (context.tab === "cure") {
@@ -1277,61 +1282,113 @@ const CurrentInterventionPage = () => {
             />
           </div>
 
-          <AdditionalInformationDialog
-            value={additionalInformation}
-            editable={!isHistoryView}
-            onChange={(value) =>
-              dispatch(
-                updateField({
-                  field: "additionalInformation",
-                  value,
-                }),
-              )
-            }
-          />
-
-          <footer className="right-card-actions">
-            <div className="status-wrapper">
-              <StatusInput />
+          <div className="right-card-actions__meta-row">
+            <div className="right-card-actions__postponed-slot">
+              {newIntervention.status === "postponed" && postponedDate && (
+                <span className="postponed-date-line">Postposé au {postponedDate}</span>
+              )}
             </div>
 
-            <div className="current-intervention-submit-buttons">
-              {isRetrievedEdit ? (
-                <>
-                  {newIntervention.documentId && (
-                    <Button
-                      variant="text"
-                      size="large"
-                      onClick={openRevisionHistory}
-                      startIcon={<HistoryRounded />}
-                      className="revision-history-button"
-                    >
-                      Historique des modifications
-                    </Button>
-                  )}
+            <div className="right-card-actions__additional-trigger">
+              <AdditionalInformationDialog
+                value={additionalInformation}
+                editable={!isHistoryView}
+                onChange={(value) =>
+                  dispatch(
+                    updateField({
+                      field: "additionalInformation",
+                      value,
+                    }),
+                  )
+                }
+              />
+            </div>
+          </div>
 
+          <footer className="right-card-actions">
+            <div className="right-card-actions__row right-card-actions__row--top">
+              <div className={`status-wrapper ${snowReceived.trim() ? "status-wrapper--dual" : ""}`.trim()}>
+                <StatusInput />
+                {snowReceived.trim() && <SnowStatusInput />}
+              </div>
+
+              <div className="right-card-actions__spacer" />
+
+              {/* Fixed TOP-RIGHT cell: Enregistrer / Revu only.
+                  Nouvelle intervention intentionally leaves this cell empty. */}
+              {!isHistoryView && !isNewOrDraft && (
+                <Button
+                  variant="contained"
+                  size="large"
+                  onClick={submitActions}
+                  startIcon={isOpenedFromReviewableOnHold ? <CheckRounded /> : <Send />}
+                  className={`submit-intervention-button ${
+                    isOpenedFromReviewableOnHold ? "submit-intervention-button--review" : ""
+                  }`}
+                >
+                  {isOpenedFromReviewableOnHold ? "Revu" : "Enregistrer"}
+                </Button>
+              )}
+            </div>
+
+            <div className="right-card-actions__row right-card-actions__row--bottom">
+              <div className="right-card-actions__bottom-left">
+                {(isRetrievedEdit || isHistoryView) && newIntervention.documentId && (
+                  <Button
+                    variant="text"
+                    size="large"
+                    onClick={openRevisionHistory}
+                    startIcon={<HistoryRounded />}
+                    className="revision-history-button"
+                  >
+                    Historique des modifications
+                  </Button>
+                )}
+              </div>
+
+              <div className="right-card-actions__spacer" />
+
+              {/* Fixed BOTTOM-RIGHT cell:
+                  Clear is always first; the "Ajouter..." action, when present,
+                  always occupies the same cell beside it. */}
+              <div className="right-card-actions__bottom-right">
+                {!isHistoryView && (
                   <Button
                     variant="text"
                     size="large"
                     onClick={() => setClearDialogOpen(true)}
-                    startIcon={<DeleteSweepRounded />}
                     className="clear-form-button"
                   >
-                    Effacer le formulaire
+                    <span className="clear-form-button__content">
+                      <span className="clear-form-button__icon">
+                        <DeleteSweepRounded fontSize="small" />
+                      </span>
+                      <span className="clear-form-button__label">
+                        <span>Effacer</span>
+                        <span>le formulaire</span>
+                      </span>
+                    </span>
                   </Button>
+                )}
 
+                {/* New intervention uses this exact same bottom-right slot instead
+                    of moving "Ajouter..." into the top row. */}
+                {!isHistoryView && isNewOrDraft && (
                   <Button
-                    variant="contained"
+                    variant="outlined"
                     size="large"
                     onClick={submitActions}
-                    startIcon={isOpenedFromReviewableOnHold ? <CheckRounded /> : <Send />}
-                    className={`submit-intervention-button ${
-                      isOpenedFromReviewableOnHold ? "submit-intervention-button--review" : ""
-                    }`}
+                    startIcon={<AddTaskRounded />}
+                    className="add-to-today-button add-to-today-button--history"
                   >
-                    {isOpenedFromReviewableOnHold ? "Revu" : "Enregistrer"}
+                    <span className="add-to-today-button__label">
+                      <span>Ajouter à la</span>
+                      <span>liste du jour</span>
+                    </span>
                   </Button>
+                )}
 
+                {isRetrievedEdit && (
                   <Button
                     variant="outlined"
                     size="large"
@@ -1344,57 +1401,8 @@ const CurrentInterventionPage = () => {
                       <span>liste du jour</span>
                     </span>
                   </Button>
-                </>
-              ) : isHistoryView ? (
-                <>
-                  {newIntervention.documentId && (
-                    <Button
-                      variant="text"
-                      size="large"
-                      onClick={openRevisionHistory}
-                      startIcon={<HistoryRounded />}
-                      className="revision-history-button"
-                    >
-                      Historique des modifications
-                    </Button>
-                  )}
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="text"
-                    size="large"
-                    onClick={() => setClearDialogOpen(true)}
-                    startIcon={<DeleteSweepRounded />}
-                    className="clear-form-button"
-                  >
-                    Effacer le formulaire
-                  </Button>
-
-                  <Button
-                    variant={isNewOrDraft ? "outlined" : "contained"}
-                    size="large"
-                    onClick={submitActions}
-                    startIcon={
-                      isNewOrDraft ? <AddTaskRounded /> : <Send />
-                    }
-                    className={
-                      isNewOrDraft
-                        ? "add-to-today-button add-to-today-button--history"
-                        : "submit-intervention-button"
-                    }
-                  >
-                    {isNewOrDraft ? (
-                      <span className="add-to-today-button__label">
-                        <span>Ajouter à la</span>
-                        <span>liste du jour</span>
-                      </span>
-                    ) : (
-                      "Enregistrer"
-                    )}
-                  </Button>
-                </>
-              )}
+                )}
+              </div>
             </div>
           </footer>
         </section>

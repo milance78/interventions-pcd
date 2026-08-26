@@ -7,7 +7,8 @@ export type AdditionalInformationTemplateId =
   | "bciReintroductionImport"
   | "bciResiliation"
   | "snowCloseImpossible"
-  | "snowUtacNonAssignable";
+  | "snowUtacNonAssignable"
+  | "snowIfhUtacNotFound";
 
 export interface AdditionalInformationTemplateSource {
   phone: string;
@@ -179,6 +180,12 @@ export const additionalInformationTemplates: AdditionalInformationTemplateDefini
     dynamicValues: () => [],
   },
   {
+    id: "snowIfhUtacNotFound",
+    buttonLabel: "Snow IFH - UTAC N'existe pas dans la data base",
+    headerInputLabel: "UTAC-UNI assigné",
+    dynamicValues: () => [],
+  },
+  {
     id: "wioIncorrectAddress",
     buttonLabel: 'WIO "Adresse incorrecte en W6"',
     headerInputLabel: "Numéro WIO",
@@ -231,6 +238,10 @@ export const buildAdditionalInformationTemplate = (
   }
 
   if (templateId === "bciResiliation") {
+    return "";
+  }
+
+  if (templateId === "snowIfhUtacNotFound") {
     return "";
   }
 

@@ -18,6 +18,7 @@ import {
   type AdditionalInformationTemplateId,
 } from "../../utils/additionalInformationTemplates";
 import "./AdditionalInformationDialog.scss";
+import snowIfhUtacNotFoundReference from "../../assets/forms/snow-ifh-utac-not-found-reference.jpg";
 
 type Props = {
   value: string;
@@ -96,6 +97,119 @@ const SnowIssueForm = ({
   </div>
 );
 
+
+const IfhUtacNotFoundForm = ({
+  utac,
+  description,
+  onCopy,
+}: {
+  utac: string;
+  description: string;
+  onCopy: (key: string, value: string) => Promise<void> | void;
+}) => {
+  const [copied, setCopied] = React.useState<string | null>(null);
+  const displayDescription = React.useMemo(
+    () => description.replace(/\\n/g, "\n").replace(/\r\n/g, "\n"),
+    [description],
+  );
+
+  const handleCopy = async (key: string, value: string) => {
+    if (!value.trim()) return;
+    await onCopy(key, value);
+    setCopied(key);
+    window.setTimeout(() => setCopied((current) => (current === key ? null : current)), 1000);
+  };
+
+  const StaticField = ({
+    className = "",
+    value,
+  }: {
+    className?: string;
+    value: string;
+  }) => (
+    <div className={`ifh-overlay-field ${className}`}>
+      <input readOnly value={value} />
+    </div>
+  );
+
+  const CopyField = ({
+    className = "",
+    value,
+    copyKey,
+  }: {
+    className?: string;
+    value: string;
+    copyKey: string;
+  }) => (
+    <div
+      className={`ifh-overlay-field is-copyable ${className}`}
+      onClick={() => handleCopy(copyKey, value)}
+      title={value.trim() ? (copied === copyKey ? "Copié" : "Cliquer pour copier") : undefined}
+    >
+      <input readOnly value={value} />
+      {copied === copyKey && <span className="ifh-overlay-field__copied">Copié</span>}
+    </div>
+  );
+
+  return (
+    <div className="ifh-reference-form">
+      <div className="ifh-reference-form__canvas">
+        <img
+          src={snowIfhUtacNotFoundReference}
+          alt="IFH - ISIs/SALY : UTAC/PON Issue"
+          className="ifh-reference-form__image"
+          draggable={false}
+        />
+
+        <div className="ifh-reference-form__overlay">
+          <StaticField
+            className="ifh-overlay-field--requested-for"
+            value="Milan Pavlovic"
+          />
+
+          <StaticField
+            className="ifh-overlay-field--requested-by"
+            value="Milan Pavlovic"
+          />
+
+          <StaticField
+            className="ifh-overlay-field--request-type"
+            value="IFH - ISIs/SALY : UTAC/PON Issue"
+          />
+
+          <StaticField
+            className="ifh-overlay-field--issue-type"
+            value="UTAC not found"
+          />
+
+          <CopyField
+            className="ifh-overlay-field--utac"
+            value={utac}
+            copyKey="UTAC"
+          />
+
+          <div
+            className="ifh-overlay-field ifh-overlay-field--description is-copyable"
+            onClick={() => handleCopy("Description", displayDescription)}
+            title="Cliquer pour copier"
+            aria-label="Description of the issue"
+          >
+            <textarea
+              readOnly
+              value={displayDescription}
+              wrap="soft"
+              rows={10}
+            />
+            {copied === "Description" && (
+              <span className="ifh-overlay-field__copied">Copié</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const AdditionalInformationDialog = ({ value, editable = false, onChange, buttonClassName = "" }: Props) => {
   const intervention = useAppSelector((state) => state.newIntervention);
   const [open, setOpen] = React.useState(false);
@@ -111,6 +225,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const [snowUtac, setSnowUtac] = React.useState("");
   const [snowInterventionNumber, setSnowInterventionNumber] = React.useState("");
   const [snowFree, setSnowFree] = React.useState({ NPS: false, SALY: true, OCK: false });
+  const [ifhUtac, setIfhUtac] = React.useState("");
 
   const templateSource = React.useMemo(() => ({
     phone: intervention.phone,
@@ -155,6 +270,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setSnowUtac("");
     setSnowInterventionNumber("");
     setSnowFree({ NPS: false, SALY: true, OCK: false });
+    setIfhUtac("");
     setOpen(false);
   };
 
@@ -192,6 +308,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setSnowUtac("");
     setSnowInterventionNumber("");
     setSnowFree({ NPS: false, SALY: true, OCK: false });
+    setIfhUtac("");
     setDraft(buildAdditionalInformationTemplate(templateId, templateSource));
   };
 
@@ -246,6 +363,13 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     ? "SCA - Réintroduction d'un ordre import"
     : "PXS - Réintroduction d'un ordre import";
   const isBciResiliation = selectedTemplate === "bciResiliation";
+  const isBciGenericInfoForm = selectedTemplate === "bciThreeCures" || selectedTemplate === "bciWrongNumber";
+  const bciGenericInterventionLabel = React.useMemo(() => {
+    const baseLabel = additionalInformationTemplates.find((template) => template.id === selectedTemplate)?.buttonLabel ?? "";
+    const stripped = baseLabel.replace(/^BCI\s*/i, "").trim();
+    const capitalized = stripped ? `${stripped.charAt(0).toUpperCase()}${stripped.slice(1)}` : "";
+    return /^scarlet$/i.test(intervention.network.trim()) ? `SCA - ${capitalized}` : `PXS - ${capitalized}`;
+  }, [selectedTemplate, intervention.network]);
   const bciFormClientId = isBciResiliation ? (selectedBciResClient?.clientId.trim() || "") : intervention.clientID.trim();
   const bciFormNa = isBciResiliation
     ? (/^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim())
@@ -257,7 +381,10 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     ? (/^scarlet$/i.test(intervention.network.trim())
         ? "SCA - Réintroduction demandée par PCD"
         : "PXS - Réintroduction demandée par PCD")
-    : bciInterventionLabel;
+    : isBciGenericInfoForm
+      ? bciGenericInterventionLabel
+      : bciInterventionLabel;
+
 
   const snowCloseDescription = React.useMemo(() => {
     const utacLine = snowUtac.trim() ? `L'UTAC ${snowUtac.trim()} est assigné.\n\n` : "";
@@ -276,7 +403,18 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
         : `${selectedFree[0]}, ${selectedFree[1]} et ${selectedFree[2]}`;
   const snowUnassignableDescription = `Bonjour,\n\nL'UTAC ${snowUtac.trim() || "___"} apparaît comme libre dans ${freeText}, mais ne peut pas être attribué dans NPS.\n\nLe message d'erreur affiché dans la fenêtre pop-up, « Point d'installation déjà HA » ne semble pas correct.\n\nMerci de procéder à l'attribution de cet UTAC.\n\nBonne journée\n\nPCDINTERVENTIONTEAM`;
 
+  const ifhAddress = [
+    intervention.mainAddress.trim(),
+    intervention.mailbox.trim() ? `Boite : ${intervention.mailbox.trim()}` : "",
+    intervention.floor.trim() ? `Etage : ${intervention.floor.trim()}` : "",
+    intervention.apartment.trim() ? `Appartement : ${intervention.apartment.trim()}` : "",
+    intervention.blockNumber.trim() ? `Bloc : ${intervention.blockNumber.trim()}` : "",
+  ].filter(Boolean).join(" ");
+
+  const ifhDescription = `Adresse: ${ifhAddress || "___"}\nUTAC: ${ifhUtac.trim() || "___"}\nCID: ${intervention.cid.trim() || "___"}\nOAG: ${intervention.oagID.trim() || "___"}\n\nBonjour,\n\nMerci de résoudre le problème avec l'erreur "IFH - UTAC n'existe pas dans la data base" et faire progresser l'intervention. Si nécessaire, n'hésitez pas de transmettre la question à l'autre déparement spécialisé\n\nBonne journée`;
+
   const isSnowForm = selectedTemplate === "snowCloseImpossible" || selectedTemplate === "snowUtacNonAssignable";
+  const isIfhUtacForm = selectedTemplate === "snowIfhUtacNotFound";
   const bciTemplateIds: AdditionalInformationTemplateId[] = ["bciThreeCures", "bciWrongNumber", "bciReintroductionImport", "bciResiliation"];
 
   const isFiber = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim());
@@ -295,7 +433,17 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     if (selectedTemplate === "snowUtacNonAssignable") setDraft(snowUnassignableDescription);
   }, [selectedTemplate, snowUnassignableDescription]);
 
-  const otherTemplates = visibleTemplates.filter((template) => !bciTemplateIds.includes(template.id) && template.id !== "snowCloseImpossible" && template.id !== "snowUtacNonAssignable");
+  React.useEffect(() => {
+    if (selectedTemplate === "snowIfhUtacNotFound") setDraft(ifhDescription);
+  }, [selectedTemplate, ifhDescription]);
+
+  const otherTemplates = visibleTemplates.filter(
+    (template) =>
+      !bciTemplateIds.includes(template.id) &&
+      template.id !== "snowCloseImpossible" &&
+      template.id !== "snowUtacNonAssignable" &&
+      template.id !== "snowIfhUtacNotFound",
+  );
 
   const selectedDefinition = visibleTemplates.find(
     (template) => template.id === selectedTemplate,
@@ -346,6 +494,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                   <div className="additional-information-group__items">
                     <Button type="button" variant={selectedTemplate === "snowCloseImpossible" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowCloseImpossible")}>Snow - clôture intervention pas possible</Button>
                     <Button type="button" variant={selectedTemplate === "snowUtacNonAssignable" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowUtacNonAssignable")}>Snow - UTAC non assignable</Button>
+                    <Button type="button" variant={selectedTemplate === "snowIfhUtacNotFound" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowIfhUtacNotFound")}>Snow IFH - UTAC N'existe pas dans la data base</Button>
                   </div>
                 </div>
 
@@ -361,7 +510,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
 
               <section className="additional-information-editor">
                 {templateError && <div className="additional-information-template-error" role="alert">{templateError}</div>}
-                {(selectedTemplate === "bciReintroductionImport" || selectedTemplate === "bciResiliation") ? (
+                {(selectedTemplate === "bciReintroductionImport" || selectedTemplate === "bciResiliation" || isBciGenericInfoForm) ? (
                   <div className="bci-reintroduction-form">
                     <div className="bci-reintroduction-form__choice-row">
                       <fieldset>
@@ -447,6 +596,23 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                       </div>
                     )}
                   </div>
+                ) : isIfhUtacForm ? (
+                  <div className="custom-snow-form custom-snow-form--ifh-utac">
+                    <div className="snow-instruction">Snow création ⇒ IFH ⇒ IFH - ISIs/SALY : UTAC/PON Issue ⇒ UTAC not found</div>
+                    <div className="snow-header-inputs">
+                      <TextField
+                        label="UTAC-UNI assigné"
+                        size="small"
+                        value={ifhUtac}
+                        onChange={(e) => setIfhUtac(e.target.value)}
+                      />
+                    </div>
+                    <IfhUtacNotFoundForm
+                      utac={ifhUtac}
+                      description={ifhDescription}
+                      onCopy={(key, fieldValue) => copyBciValue(key, fieldValue)}
+                    />
+                  </div>
                 ) : isSnowForm ? (
                   <div className="custom-snow-form">
                     <div className="snow-instruction">Snow création ⇒ PCD ⇒ Issue with handling PCD Intervention</div>
@@ -475,7 +641,6 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                             <button key={key} type="button" className={`snow-toggle ${snowFree[key] ? "is-on" : ""}`} onClick={() => setSnowFree((prev) => ({ ...prev, [key]: !prev[key] }))}>{key}</button>
                           ))}
                         </div>
-                        {!snowUtac.trim() && <div className="snow-validation-error">UTAC-UNI est obligatoire.</div>}
                         <SnowIssueForm
                           cdbId={intervention.clientID}
                           orderRef={intervention.oagID}

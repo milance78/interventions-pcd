@@ -80,6 +80,8 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
   const isSnowSentPending = Boolean(
     data.isSnowSentPending ?? false,
   );
+  const snowStatus: "pending" | "resolved" =
+    data.snowStatus === "resolved" ? "resolved" : "pending";
 
   const normalizedCure =
     data.cure === "CURE1"
@@ -125,6 +127,7 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     snowMentioned,
     isSnowReceivedPending,
     isSnowSentPending,
+    snowStatus,
     isResPending: Boolean(
       data.isResPending ??
         data.resPending ??

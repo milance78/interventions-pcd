@@ -223,6 +223,13 @@ const TodayListPage = () => {
           currentCounters.completed += 1;
         }
 
+        // A Snow ticket resolved on the intervention counts as its own
+        // "Terminé" point, independent of the main status — so an
+        // intervention with both green (Terminé + Snow résolu) adds 2.
+        if (intervention.snowStatus === "resolved") {
+          currentCounters.completed += 1;
+        }
+
         if (
           intervention.status === "on hold"
         ) {

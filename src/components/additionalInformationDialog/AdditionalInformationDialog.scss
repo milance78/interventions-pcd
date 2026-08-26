@@ -466,7 +466,10 @@
   color: #425466;
 }
 .custom-snow-form .snow-header-inputs {
-  padding: 0 0 10px;
+  display: grid;
+  align-items: center;
+  gap: 14px;
+  padding: 0 0 14px;
   border: 0;
   background: transparent;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -481,7 +484,7 @@
 .snow-issue-card {
   width: 100%;
   border: 1px solid #c8cfd6;
-  background: #dce5e9;
+  background: #fff;
 }
 .snow-issue-title {
   padding: 10px 16px 12px;
@@ -490,7 +493,7 @@
   line-height: 1.15;
   font-weight: 400;
   color: #596b7a;
-  background: #e8eef1;
+  background: #fff;
 }
 .snow-issue-body {
   padding: 8px 16px 12px;
@@ -508,7 +511,6 @@
   font-size: 12px;
   line-height: 1;
 }
-.snow-issue-field > label:first-letter { color: #d01818; }
 .snow-issue-field__control {
   position: relative;
   width: 100%;
@@ -592,9 +594,6 @@
   border-radius: 0;
   line-height: 1.45;
 }
-.snow-validation-error {
-  margin: 0 0 8px;
-}
 @media (max-width: 760px) {
   .custom-snow-form .snow-header-inputs,
   .custom-snow-form .snow-header-inputs--free { grid-template-columns: 1fr; }
@@ -608,8 +607,48 @@
   gap: 16px;
 }
 .snow-issue-body .snow-form-radio-row fieldset {
-  background: #dce5e9;
+  background: #fff;
   border-color: #263746;
+}
+
+/* NPS / SALY / OCK toggle buttons — same pressed / on-off feel as the
+   boolean inputs on the "Intervention en cours" page. */
+.snow-toggle {
+  padding: 6px 16px;
+  min-height: 34px;
+  border: 1px solid #aeb7bf;
+  border-radius: 8px;
+  background: #fff;
+  color: #45515d;
+  font: 700 13px Arial, Helvetica, sans-serif;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    box-shadow 160ms ease,
+    transform 160ms ease;
+}
+.snow-toggle:hover {
+  border-color: #78a8e8;
+  background: #f5f9ff;
+}
+.snow-toggle:active {
+  transform: scale(0.95);
+}
+.snow-toggle:focus-visible {
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+.snow-toggle.is-on {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: #fff;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+.snow-toggle.is-on:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
 }
 .snow-issue-body .snow-issue-email { margin: 0 0 2px; }
 .snow-issue-body .snow-issue-email .MuiInputBase-root { background: #fff; }
@@ -648,3 +687,599 @@
 .additional-information-copyable-input .MuiInputBase-root { cursor: pointer; }
 .additional-information-copyable-input .MuiFormHelperText-root { color: #188038; }
 
+
+
+/* v159 — Snow IFH / UTAC not found form. Separate styling from BCI and
+   from the two PCD Snow forms; geometry follows the supplied reference. */
+.ifh-utac-form {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  border: 1px solid #d2d8de;
+  background: #fff;
+  color: #45515d;
+  font-family: Arial, Helvetica, sans-serif;
+  box-sizing: border-box;
+}
+
+.ifh-utac-form__title {
+  padding: 10px 18px 6px;
+  font-size: 24px;
+  line-height: 1.15;
+  font-weight: 400;
+  color: #596b7a;
+}
+
+.ifh-utac-form__subtitle {
+  padding: 0 18px 10px;
+  border-bottom: 1px solid #d2d8de;
+  color: #9aa5af;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.ifh-utac-form__banner {
+  min-height: 405px;
+  padding: 20px 32px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  box-sizing: border-box;
+  background: #fff;
+}
+
+.ifh-utac-form__icon {
+  margin: auto 0 50px;
+  color: #663399;
+  font-size: 104px;
+  line-height: .72;
+  font-weight: 300;
+}
+
+.ifh-utac-form__legend {
+  align-self: flex-start;
+  color: #526171;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+.ifh-utac-form__section {
+  padding: 14px 20px 18px;
+  border-top: 1px solid #d9dee3;
+}
+
+.ifh-utac-form__section-title {
+  margin-bottom: 8px;
+  color: #596b7a;
+  font-size: 17px;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+.ifh-utac-form__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+}
+
+.ifh-issue-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+  min-width: 0;
+}
+
+.ifh-issue-field > label,
+.ifh-utac-form__description > label {
+  color: #5d6873;
+  font-size: 12px;
+  line-height: 1.15;
+}
+
+.ifh-issue-field__control {
+  position: relative;
+  width: 100%;
+}
+
+.ifh-issue-field input,
+.ifh-utac-form__description textarea,
+.ifh-utac-form__copyable-box textarea {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #aeb7bf;
+  border-radius: 3px;
+  background: #fff;
+  color: #1d2731;
+  font: 13px/1.35 Arial, Helvetica, sans-serif;
+  outline: none;
+}
+
+.ifh-issue-field input {
+  height: 33px;
+  padding: 6px 9px;
+}
+
+.ifh-issue-field__arrow {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  width: 28px;
+  height: calc(100% - 2px);
+  display: grid;
+  place-items: center;
+  border-left: 1px solid #b8c0c7;
+  background: #f3f5f6;
+  color: #68747e;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.ifh-issue-field--copyable .ifh-issue-field__control,
+.ifh-issue-field--copyable input,
+.ifh-utac-form__copyable-box,
+.ifh-utac-form__copyable-box textarea {
+  cursor: pointer;
+}
+
+.ifh-issue-field--copyable:hover input,
+.ifh-utac-form__copyable-box:hover textarea {
+  border-color: #6d9ac7;
+  background: #fbfdff;
+}
+
+.ifh-utac-form__description {
+  margin-top: 3px;
+}
+
+.ifh-utac-form__copyable-box {
+  margin-top: 4px;
+}
+
+.ifh-utac-form__copyable-box textarea {
+  display: block;
+  min-height: 190px;
+  padding: 9px 10px;
+  resize: vertical;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
+@media (max-width: 760px) {
+  .ifh-utac-form__row {
+    grid-template-columns: 1fr;
+  }
+  .ifh-utac-form__banner {
+    min-height: 300px;
+  }
+}
+
+
+/* v160 — exact supplied IFH reference image with live overlays.
+   The screenshot supplies the authentic labels, grey field surfaces,
+   spacing, borders and banner; only the dynamic fields are live elements. */
+.ifh-reference-form {
+  position: relative;
+  width: min(843px, 100%);
+  margin: 0 auto;
+  box-sizing: border-box;
+  background: #fff;
+  overflow: hidden;
+}
+
+.ifh-reference-form__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  pointer-events: none;
+}
+
+.ifh-reference-form__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.ifh-overlay-field {
+  position: absolute;
+  box-sizing: border-box;
+}
+
+.ifh-overlay-field input,
+.ifh-overlay-field textarea {
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border: 1px solid #9fa7ae;
+  border-radius: 3px;
+  padding: 0 10px;
+  margin: 0;
+  color: #17212b;
+  background: rgba(255,255,255,.97);
+  font: 13px/1.2 Arial, Helvetica, sans-serif;
+  outline: none;
+}
+
+/* Coordinates correspond to the supplied 843×945 reference image. */
+.ifh-overlay-field--requested-for {
+  left: 3.8%;
+  top: 60.8%;
+  width: 44.4%;
+  height: 3.55%;
+}
+
+.ifh-overlay-field--requested-by {
+  left: 55.7%;
+  top: 60.8%;
+  width: 44.2%;
+  height: 3.55%;
+}
+
+.ifh-overlay-field--request-type {
+  left: 8.0%;
+  top: 70.8%;
+  width: 91.2%;
+  height: 3.55%;
+}
+
+.ifh-overlay-field--issue-type {
+  left: 3.8%;
+  top: 78.3%;
+  width: 96.2%;
+  height: 3.55%;
+}
+
+.ifh-overlay-field--utac {
+  left: 3.8%;
+  top: 85.9%;
+  width: 96.2%;
+  height: 3.55%;
+}
+
+.ifh-overlay-field--description {
+  left: 3.8%;
+  top: 93.4%;
+  width: 96.2%;
+  height: 6.2%;
+}
+
+.ifh-overlay-field--requested-by input,
+.ifh-overlay-field--request-type input {
+  background: rgba(222,225,227,.98);
+}
+
+.ifh-overlay-field--description textarea {
+  resize: vertical;
+  padding: 8px 10px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.ifh-overlay-field.is-copyable,
+.ifh-overlay-field.is-copyable input,
+.ifh-overlay-field.is-copyable textarea {
+  cursor: pointer;
+}
+
+.ifh-overlay-field.is-copyable:hover input,
+.ifh-overlay-field.is-copyable:hover textarea {
+  border-color: #6d9ac7;
+  box-shadow: 0 0 0 1px rgba(109,154,199,.12);
+}
+
+.ifh-overlay-field--utac input {
+  background: rgba(255,255,255,.98);
+}
+
+/* On smaller popups, keep the reference image visually faithful and allow
+   horizontal scrolling instead of reflowing the pixel-matched overlay. */
+.additional-information-editor .ifh-reference-form {
+  overflow-x: auto;
+}
+
+
+/* v161 — IFH reference form: keep the supplied grey controls flush with the
+   source image and let the editor scroll vertically so the Description field
+   and its full contents are reachable. */
+.custom-snow-form--ifh-utac {
+  min-height: 0 !important;
+}
+
+.custom-snow-form--ifh-utac .additional-information-editor {
+  min-height: 0 !important;
+}
+
+.additional-information-dialog .MuiDialogContent-root:has(.custom-snow-form--ifh-utac) {
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.additional-information-workspace:has(.custom-snow-form--ifh-utac) {
+  min-height: 0 !important;
+  height: calc(100vh - 220px) !important;
+}
+
+.additional-information-editor:has(.custom-snow-form--ifh-utac) {
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding-right: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form {
+  overflow: visible !important;
+  width: min(843px, 100%) !important;
+  flex: 0 0 auto !important;
+  margin-bottom: 12px !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form__image {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+}
+
+/* The two grey reference fields should sit exactly inside the grey zones,
+   never protruding beyond their source borders. */
+.custom-snow-form--ifh-utac .ifh-overlay-field--requested-by input,
+.custom-snow-form--ifh-utac .ifh-overlay-field--request-type input {
+  background: #dee1e3 !important;
+  border-color: #9fa7ae !important;
+  box-shadow: none !important;
+}
+
+/* The Description field is the last element in the supplied 945px reference,
+   so leave it fully inside the scrollable image instead of clipping it. */
+.custom-snow-form--ifh-utac .ifh-overlay-field--description {
+  overflow: visible !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--description textarea {
+  min-height: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+}
+
+
+/* v162 — IFH form fit/scroll correction.
+   Keep the reference image as the coordinate canvas, but extend the white
+   page below it so the live Description field can be taller without being
+   clipped. All fields stop before the form's right vertical edge. */
+.custom-snow-form--ifh-utac .ifh-reference-form {
+  width: min(843px, 100%) !important;
+  margin: 0 auto !important;
+  padding-bottom: 210px !important;
+  overflow: visible !important;
+  background: #fff !important;
+  box-sizing: border-box !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form__canvas {
+  position: relative !important;
+  width: 100% !important;
+  aspect-ratio: 843 / 945 !important;
+  overflow: visible !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form__image {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: fill !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form__overlay {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Match the actual usable width of the source form and leave a clean right
+   safety margin instead of crossing the vertical separator. */
+.custom-snow-form--ifh-utac .ifh-overlay-field--requested-for {
+  left: 3.8% !important;
+  width: 44.4% !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--requested-by {
+  left: 55.7% !important;
+  width: 40.1% !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--request-type {
+  left: 8.0% !important;
+  width: 87.9% !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--issue-type,
+.custom-snow-form--ifh-utac .ifh-overlay-field--utac {
+  left: 3.8% !important;
+  width: 92.1% !important;
+}
+
+/* Description deliberately departs from the source height: show the complete
+   generated message at once; the editor itself remains the only scroller. */
+.custom-snow-form--ifh-utac .ifh-overlay-field--description {
+  left: 3.8% !important;
+  width: 92.1% !important;
+  top: 93.4% !important;
+  height: 190px !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--description textarea {
+  height: 190px !important;
+  min-height: 190px !important;
+  max-height: none !important;
+  overflow: hidden !important;
+  resize: none !important;
+  white-space: pre-wrap !important;
+  line-height: 1.45 !important;
+  padding: 9px 10px !important;
+  box-sizing: border-box !important;
+}
+
+/* Do not let the individual fields create horizontal overflow. */
+.custom-snow-form--ifh-utac .ifh-overlay-field,
+.custom-snow-form--ifh-utac .ifh-overlay-field input,
+.custom-snow-form--ifh-utac .ifh-overlay-field textarea {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.additional-information-editor:has(.custom-snow-form--ifh-utac) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+
+/* v163 — give the IFH Description enough real height for the complete
+   generated message, including "Bonne journée". The reference image's
+   bottom separator must never cut through the enlarged live textarea. */
+.custom-snow-form--ifh-utac .ifh-reference-form {
+  padding-bottom: 255px !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form__canvas {
+  overflow: visible !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form__canvas::after {
+  content: "" !important;
+  position: absolute !important;
+  z-index: 2 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: -1px !important;
+  height: 7px !important;
+  background: #fff !important;
+  pointer-events: none !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--description {
+  top: 93.4% !important;
+  left: 3.8% !important;
+  width: 92.1% !important;
+  height: 245px !important;
+  z-index: 4 !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--description textarea {
+  width: 100% !important;
+  height: 245px !important;
+  min-height: 245px !important;
+  max-height: 245px !important;
+  overflow: hidden !important;
+  resize: none !important;
+  padding: 9px 10px !important;
+  line-height: 1.45 !important;
+  white-space: pre-wrap !important;
+  background: #fff !important;
+}
+
+/* The reference image ends at the original form's bottom rule. Mask only
+   that rule; the live Description textarea sits above the mask. */
+.custom-snow-form--ifh-utac .ifh-reference-form__image {
+  z-index: 1 !important;
+}
+
+
+/* v164 — IFH copy feedback + hard replacement of the reference "None" value. */
+.custom-snow-form--ifh-utac .ifh-reference-form__overlay {
+  z-index: 20 !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--issue-type {
+  z-index: 30 !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field--issue-type input {
+  background: #fff !important;
+  color: #17212b !important;
+  opacity: 1 !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field__copied {
+  position: absolute !important;
+  top: 50% !important;
+  right: 10px !important;
+  transform: translateY(-50%) !important;
+  padding: 2px 5px !important;
+  border-radius: 3px !important;
+  background: #edf7ef !important;
+  color: #347548 !important;
+  font-size: 10px !important;
+  font-weight: 600 !important;
+  line-height: 1 !important;
+  pointer-events: none !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field.is-copyable {
+  cursor: pointer !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-overlay-field.is-copyable input {
+  cursor: pointer !important;
+}
+
+
+/* v165 — IFH description must behave as a normal multiline textarea. */
+.custom-snow-form--ifh-utac .ifh-overlay-field--description textarea {
+  display: block !important;
+  white-space: pre-wrap !important;
+  overflow-wrap: break-word !important;
+  word-break: normal !important;
+  text-align: left !important;
+  vertical-align: top !important;
+  direction: ltr !important;
+  writing-mode: horizontal-tb !important;
+  padding: 10px 12px !important;
+  line-height: 1.45 !important;
+  height: 245px !important;
+  min-height: 245px !important;
+  max-height: 245px !important;
+  overflow-y: hidden !important;
+  overflow-x: hidden !important;
+}
+
+/* Keep enough room below the reference image for the complete Description
+   field and prevent the image's last horizontal separator from crossing it. */
+.custom-snow-form--ifh-utac .ifh-reference-form {
+  padding-bottom: 275px !important;
+}
+
+.custom-snow-form--ifh-utac .ifh-reference-form__canvas::after {
+  bottom: -2px !important;
+  height: 9px !important;
+}
+
+
+/* v166 — force real multiline display in the IFH Description field.
+   Also use the enlarged field height consistently. */
+.custom-snow-form--ifh-utac .ifh-overlay-field--description textarea {
+  display: block !important;
+  width: 100% !important;
+  height: 245px !important;
+  min-height: 245px !important;
+  max-height: 245px !important;
+  padding: 10px 12px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  resize: none !important;
+
+  white-space: pre-wrap !important;
+  overflow-wrap: anywhere !important;
+  word-break: normal !important;
+  text-align: left !important;
+  vertical-align: top !important;
+
+  overflow-x: hidden !important;
+  overflow-y: hidden !important;
+  line-height: 1.45 !important;
+  font: 13px/1.45 Arial, Helvetica, sans-serif !important;
+}
