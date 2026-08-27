@@ -693,21 +693,22 @@ const CurrentInterventionPage = () => {
     }
 
     if (context.tab === "res") {
-      return onHold ? { ...payload, isResPending: true, resReviewedDate: today } : payload;
+      return onHold
+        ? { ...payload, resReviewedDate: today }
+        : payload;
     }
 
     if (context.tab === "snowReceived") {
       if (!onHold) return payload;
-      const next = { ...payload, isSnowReceivedPending: true, isSnow: true, snowReceivedReviewedDate: today };
-      // The intervention can sit on both Snow lists at once; reviewing it from
-      // either tab must stamp "Revu aujourd'hui" on both.
+      const next = { ...payload, snowReceivedReviewedDate: today };
+      // Preserve the second Snow membership exactly as edited by the operator.
       if (payload.isSnowSentPending) next.snowSentReviewedDate = today;
       return next;
     }
 
     if (context.tab === "snowSent") {
       if (!onHold) return payload;
-      const next = { ...payload, isSnowSentPending: true, isSnow: true, snowSentReviewedDate: today };
+      const next = { ...payload, snowSentReviewedDate: today };
       if (payload.isSnowReceivedPending) next.snowReceivedReviewedDate = today;
       return next;
     }
@@ -717,7 +718,9 @@ const CurrentInterventionPage = () => {
     }
 
     if (context.tab === "questions") {
-      return onHold ? { ...payload, isUnclear: true, questionReviewedDate: today } : payload;
+      return onHold
+        ? { ...payload, questionReviewedDate: today }
+        : payload;
     }
 
     return { ...payload, otherReviewedDate: today };
@@ -726,6 +729,7 @@ const CurrentInterventionPage = () => {
   const submitActions = async () => {
     const normalized = normalizeInterventionStrings(newIntervention);
     const formIsCompletelyEmpty = !hasMeaningfulDraft(normalized);
+
     let safePayload =
       isEditing && formIsCompletelyEmpty && newIntervention.editSnapshot
         ? {
@@ -760,79 +764,15 @@ const CurrentInterventionPage = () => {
       return;
     }
 
-    if (isOpenedFromOnHold && onHoldEditContext) {
-      window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
-      window.sessionStorage.setItem(PENDING_TAB_KEY, onHoldEditContext.tab);
-      window.sessionStorage.setItem("scroll:on-hold", String(onHoldEditContext.scrollTop));
-      navigate("/en-attente");
-      return;
-    }
-
-    const isRetrievedIntervention =
-      mode === "SEARCH_EDIT" || mode === "HISTORY_EDIT";
-
-    if (isRetrievedIntervention) {
-      if (mode === "SEARCH_EDIT") {
-        const isAlreadyInToday = todayInterventions.some((item) =>
-          isSameLogicalIntervention(item, newIntervention),
-        );
-
-        if (isAlreadyInToday) {
-          navigate("/liste-du-jour");
-          return;
-        }
-
-        const normalizedInterventionId =
-          newIntervention.interventionId.trim().toLowerCase();
-        const normalizedOagId =
-          newIntervention.oagID.trim().toLowerCase();
-
-        const latestDate = historyInterventions
-          .filter((item) => {
-            if (
-              normalizedInterventionId &&
-              item.interventionId.trim().toLowerCase() ===
-                normalizedInterventionId
-            ) {
-              return true;
-            }
-
-            return Boolean(
-              normalizedOagId &&
-                item.oagID.trim().toLowerCase() === normalizedOagId,
-            );
-          })
-          .map((item) => item.dateKey ?? "")
-          .filter(Boolean)
-          .sort((a, b) => b.localeCompare(a))[0];
-
-        if (latestDate) {
-          window.sessionStorage.setItem(
-            "history:pending-date",
-            latestDate,
-          );
-        }
-      }
-
-      navigate("/historique");
-      return;
-    }
-
-    if (isEditing && hasDraft && !isDisplayedDraft) {
-      dispatch(resumeDraft());
-    } else {
-      dispatch(clearTask());
-    }
-
-    navigate("/liste-du-jour");
+    // Enregistrer / Revu always finish the current editing task. The page stays
+    // on Intervention en cours but is reset to a completely blank, ready form.
+    window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
+    dispatch(clearTask());
   };
 
   const addToTodayList = async () => {
     if (mode !== "SEARCH_EDIT" && mode !== "HISTORY_EDIT") return;
 
-    // When an intervention comes from En attente, adding it to today's list is
-    // also an explicit review: it stays in the same pending section (if status
-    // remains En attente) and receives the Revu aujourd'hui marker.
     const payload =
       isOpenedFromOnHold && onHoldEditContext
         ? applyOnHoldConsultationState(newIntervention, onHoldEditContext)
@@ -852,16 +792,11 @@ const CurrentInterventionPage = () => {
       return;
     }
 
-    dispatch(markSearchInterventionSaved(result.payload));
-
-    if (isOpenedFromOnHold && onHoldEditContext) {
-      window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
-      // Ajouter à la liste du jour always closes the review flow on Liste du jour.
-      navigate("/liste-du-jour");
-      return;
-    }
-
-    navigate("/liste-du-jour");
+    // This button is also a save: every field currently present in the form
+    // has already been persisted by the thunk. Clear the editor afterwards so
+    // Intervention en cours is immediately ready for the next case.
+    window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
+    dispatch(clearTask());
   };
 
   const openRevisionHistory = async () => {

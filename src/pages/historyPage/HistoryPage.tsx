@@ -12,6 +12,7 @@ import Numbers from "@mui/icons-material/Numbers";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import Tooltip from "@mui/material/Tooltip";
 import {
+  CalendarDays,
   Contact,
   House,
   KeyRound,
@@ -47,7 +48,6 @@ import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { deleteInterventionThunk } from "../../redux/thunks/deleteInterventionThunk";
 import type { Intervention } from "../../redux/features/newInterventionSlice";
 import { buildHistoryViewModel } from "../../utils/historyViewModel";
-import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 import { writeTextToClipboard } from "../../utils/clipboard";
 
 const hasValue = (value?: string | null): value is string =>
@@ -177,9 +177,28 @@ const convertToDate = (value: unknown): Date | null => {
     return Number.isNaN(value.getTime()) ? null : value;
   }
 
-  if (typeof value === "string" || typeof value === "number") {
-    const parsedDate = new Date(value);
+  if (typeof value === "string") {
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
 
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      const parsedLocalDate = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+      );
+
+      return Number.isNaN(parsedLocalDate.getTime())
+        ? null
+        : parsedLocalDate;
+    }
+
+    const parsedDate = new Date(value);
+    return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+  }
+
+  if (typeof value === "number") {
+    const parsedDate = new Date(value);
     return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
   }
 
@@ -314,101 +333,205 @@ const HistoryNavigation = memo(({
   onSelectDate,
 }: HistoryNavigationProps) => {
   const [openMonthKey, setOpenMonthKey] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"dates" | "calendar">("dates");
+  const [calendarValue, setCalendarValue] = useState("");
   const navigationRef = useRef<HTMLElement | null>(null);
 
+  // The sidebar is intentionally newest-first: newest month at the top and
+  // newest date first inside each month.
+  const newestFirstMonths = useMemo(
+    () =>
+      [...months]
+        .map((month) => ({
+          ...month,
+          dates: [...month.dates].sort((a, b) => {
+            const aTime = a.date?.getTime() ?? -Infinity;
+            const bTime = b.date?.getTime() ?? -Infinity;
+            return bTime - aTime;
+          }),
+        }))
+        .sort((a, b) => {
+          const aTime = a.dates[0]?.date?.getTime() ?? -Infinity;
+          const bTime = b.dates[0]?.date?.getTime() ?? -Infinity;
+          return bTime - aTime;
+        }),
+    [months],
+  );
+
   useEffect(() => {
-    if (months.length === 0) {
+    if (newestFirstMonths.length === 0) {
       setOpenMonthKey(null);
       return;
     }
 
     const now = new Date();
     const currentMonthKey = `${now.getFullYear()}-${now.getMonth()}`;
-    const preferredMonth = months.some(
+    const preferredMonth = newestFirstMonths.some(
       (month) => month.key === currentMonthKey,
     )
       ? currentMonthKey
-      : months[months.length - 1].key;
+      : newestFirstMonths[0].key;
 
     setOpenMonthKey((current) =>
-      current && months.some((month) => month.key === current)
+      current && newestFirstMonths.some((month) => month.key === current)
         ? current
         : preferredMonth,
     );
-  }, [months]);
+  }, [newestFirstMonths]);
 
-  useLayoutEffect(() => {
-    const navigation = navigationRef.current;
-    if (
-      !navigation ||
-      months.length === 0 ||
-      openMonthKey !== months[months.length - 1].key
-    ) return;
+  const availableDateKeys = useMemo(
+    () => new Set(
+      newestFirstMonths.flatMap((month) => month.dates.map((group) => group.key)),
+    ),
+    [newestFirstMonths],
+  );
 
-    // Oldest entries are above, newest are below. Start at the bottom so the
-    // most recent date is always immediately visible.
-    const frame = window.requestAnimationFrame(() => {
-      navigation.scrollTop = navigation.scrollHeight;
-    });
+  useEffect(() => {
+    if (!calendarValue && newestFirstMonths[0]?.dates[0]?.key) {
+      setCalendarValue(newestFirstMonths[0].dates[0].key);
+    }
+  }, [calendarValue, newestFirstMonths]);
 
-    return () => window.cancelAnimationFrame(frame);
-  }, [months, openMonthKey]);
+  const handleCalendarChange = (value: string) => {
+    if (!value) {
+      setCalendarValue("");
+      return;
+    }
+
+    if (availableDateKeys.has(value)) {
+      setCalendarValue(value);
+      onSelectDate(value);
+      return;
+    }
+
+    // Never leave the calendar showing a date that is not actually open
+    // in the history content. Revert immediately to the last valid date.
+    setCalendarValue((current) => current);
+  };
 
   return (
     <aside className="history-sidebar">
       <div className="history-sidebar-inner">
         <div className="history-sidebar-heading">
-          <span>Navigation</span>
-          <h2>Dates</h2>
+          <div className="history-sidebar-heading__text">
+            <span>Navigation</span>
+            <h2>Dates</h2>
+          </div>
+
+          <button
+            type="button"
+            className="history-sidebar-view-toggle"
+            onClick={() => setViewMode((current) => current === "dates" ? "calendar" : "dates")}
+            aria-label={viewMode === "dates" ? "Choisir une date au calendrier" : "Afficher la liste des dates"}
+            title={viewMode === "dates" ? "Choisir une date au calendrier" : "Afficher la liste des dates"}
+          >
+            {viewMode === "dates" ? <CalendarDays size={18} /> : <NotebookTabs size={18} />}
+          </button>
         </div>
 
-        <nav ref={navigationRef} className="history-date-navigation">
-          {months.map((month) => {
-            const isOpen = openMonthKey === month.key;
+        {viewMode === "calendar" ? (
+          <div className="history-sidebar-calendar">
+            <label htmlFor="history-sidebar-calendar-display">Choisir une date</label>
 
-            return (
-              <div
-                key={month.key}
-                className={`history-sidebar-month ${isOpen ? "is-open" : ""}`}
-              >
-                <button
-                  type="button"
-                  className="history-sidebar-month-toggle"
-                  aria-expanded={isOpen}
-                  onClick={() =>
-                    setOpenMonthKey((current) =>
-                      current === month.key ? null : month.key,
-                    )
+            <div className="history-sidebar-calendar-picker">
+              <input
+                id="history-sidebar-calendar-display"
+                type="text"
+                inputMode="numeric"
+                placeholder="dd/mm/yyyy"
+                value={calendarValue ? calendarValue.split("-").reverse().join("/") : ""}
+                onChange={(event) => {
+                  const digits = event.target.value.replace(/\D/g, "").slice(0, 8);
+                  let formatted = digits;
+                  if (digits.length > 4) {
+                    formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+                  } else if (digits.length > 2) {
+                    formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
                   }
-                >
-                  <span>{month.title}</span>
-                  <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
-                </button>
+                  if (formatted.length === 10) {
+                    const [day, month, year] = formatted.split("/");
+                    const iso = `${year}-${month}-${day}`;
+                    setCalendarValue(iso);
+                    if (availableDateKeys.has(iso)) onSelectDate(iso);
+                  } else {
+                    setCalendarValue("");
+                  }
+                }}
+              />
 
+              <button
+                type="button"
+                className="history-sidebar-calendar-button"
+                aria-label="Ouvrir le calendrier"
+                title="Ouvrir le calendrier"
+              >
+                <CalendarDays size={18} />
+                <input
+                  type="date"
+                  aria-label="Calendrier"
+                  value={calendarValue}
+                  onChange={(event) => handleCalendarChange(event.target.value)}
+                />
+              </button>
+            </div>
+
+            <p>
+              Format : dd/mm/yyyy. La sélection ouvre directement la date correspondante
+              dans l&apos;historique.
+            </p>
+          </div>
+        ) : (
+          <nav ref={navigationRef} className="history-date-navigation" aria-label="Navigation par date">
+            {newestFirstMonths.map((month) => {
+              const isOpen = openMonthKey === month.key;
+
+              return (
                 <div
-                  className="history-sidebar-dates-shell"
-                  aria-hidden={!isOpen}
+                  key={month.key}
+                  className={`history-sidebar-month ${isOpen ? "is-open" : ""}`}
                 >
-                  <div className="history-sidebar-dates">
-                    {month.dates.map((group) => (
-                      <button
-                        key={group.key}
-                        type="button"
-                        tabIndex={isOpen ? 0 : -1}
-                        onClick={() => onSelectDate(group.key)}
-                      >
-                        <span>
-                          {capitalizeFirstLetter(formatSidebarDate(group.date))}
-                        </span>
-                        <strong>{group.interventions.length}</strong>
-                      </button>
-                    ))}
+                  <button
+                    type="button"
+                    className="history-sidebar-month-toggle"
+                    aria-expanded={isOpen}
+                    onClick={() =>
+                      setOpenMonthKey((current) =>
+                        current === month.key ? null : month.key,
+                      )
+                    }
+                  >
+                    <span>{month.title}</span>
+                    <span aria-hidden="true">{isOpen ? "−" : "+"}</span>
+                  </button>
+
+                  <div
+                    className="history-sidebar-dates-shell"
+                    aria-hidden={!isOpen}
+                  >
+                    <div className="history-sidebar-dates">
+                      {month.dates.map((group) => (
+                        <button
+                          key={group.key}
+                          type="button"
+                          tabIndex={isOpen ? 0 : -1}
+                          onClick={() => {
+                            setCalendarValue(group.key);
+                            onSelectDate(group.key);
+                          }}
+                        >
+                          <span>
+                            {capitalizeFirstLetter(formatSidebarDate(group.date))}
+                          </span>
+                          <strong>{group.interventions.length}</strong>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })}
-        </nav>
+              );
+            })}
+          </nav>
+        )}
       </div>
     </aside>
   );
@@ -423,6 +546,7 @@ const HistoryPage = () => {
     documentId: string;
     dateKey: string;
   } | null>(null);
+  const [freeDayNotice, setFreeDayNotice] = useState(false);
   const [renderedGroupCount, setRenderedGroupCount] = useState(
     getInitialRenderedHistoryGroupCount,
   );
@@ -448,17 +572,25 @@ const HistoryPage = () => {
   >({});
   const pendingScrollDateRef = useRef<string | null>(null);
 
-  usePersistentElementScroll(
-    "history",
-    scrollContainerRef,
-    isInitialized,
-    true,
-  );
-
   const { groupedInterventions, navigationGroups } = buildHistoryViewModel(
     interventions,
     dateKeys,
   );
+
+  useLayoutEffect(() => {
+    if (!isInitialized || groupedInterventions.length === 0) return;
+
+    const pendingDate = window.sessionStorage.getItem("history:pending-date");
+    if (pendingDate) return;
+
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return;
+
+    // Every normal entry into Historique starts at the beginning so the newest
+    // date header/bar is fully visible. Explicit date navigation is handled
+    // separately below.
+    scrollContainer.scrollTop = 0;
+  }, [isInitialized, groupedInterventions]);
 
   const sidebarMonths = useMemo(() => {
     const months = new Map<
@@ -494,53 +626,82 @@ const HistoryPage = () => {
     }));
   }, [navigationGroups]);
 
-  // Render only the first day before the initial paint. Creating every card in
-  // a large archive synchronously blocks route navigation even when CSS uses
-  // content-visibility. Remaining days are appended after the first paint.
+  // Progressive mount is retained to keep entry into Historique fast.
+  // The mounted window stays well ahead of the scroll position so normal
+  // scrolling never reaches an unmounted gap.
   useEffect(() => {
     if (groupedInterventions.length === 0) {
       setRenderedGroupCount(0);
-      window.sessionStorage.setItem("history:rendered-group-count", "0");
       return;
     }
 
-    // Keep the amount that was already rendered on the previous visit.
-    // Resetting this to 1 after mount caused the small visible jump when
-    // returning to Historique. slice() safely clamps values above the length.
     setRenderedGroupCount((current) =>
-      Math.max(1, Math.min(current, groupedInterventions.length)),
+      Math.max(
+        Math.min(8, groupedInterventions.length),
+        Math.min(current, groupedInterventions.length),
+      ),
     );
+
     let cancelled = false;
-    let timeoutId: ReturnType<typeof setTimeout> | null = null;
+    let timerId: number | null = null;
 
     const appendBatch = () => {
-      if (cancelled) return;
-
-      if (isDateNavigationActiveRef.current) {
-        timeoutId = globalThis.setTimeout(appendBatch, 55);
-        return;
-      }
+      if (cancelled || isDateNavigationActiveRef.current) return;
 
       setRenderedGroupCount((current) => {
-        const next = Math.min(current + 1, groupedInterventions.length);
+        if (current >= groupedInterventions.length) return current;
+
+        const next = Math.min(current + 5, groupedInterventions.length);
 
         if (next < groupedInterventions.length) {
-          timeoutId = globalThis.setTimeout(appendBatch, 55);
+          timerId = window.setTimeout(appendBatch, 25);
         }
 
         return next;
       });
     };
 
-    // The zero-delay task runs only after React has painted the page shell,
-    // the first date and the complete Navigation list.
-    timeoutId = globalThis.setTimeout(appendBatch, 0);
+    timerId = window.setTimeout(appendBatch, 0);
 
     return () => {
       cancelled = true;
-      if (timeoutId !== null) globalThis.clearTimeout(timeoutId);
+      if (timerId !== null) window.clearTimeout(timerId);
     };
   }, [groupedInterventions]);
+
+  // While the user scrolls, pre-mount another chunk before the end of the
+  // currently mounted content is reached.
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer || groupedInterventions.length === 0) return;
+
+    let framePending = false;
+
+    const handleScroll = () => {
+      if (framePending || isDateNavigationActiveRef.current) return;
+      framePending = true;
+
+      window.requestAnimationFrame(() => {
+        framePending = false;
+
+        const remaining =
+          scrollContainer.scrollHeight -
+          (scrollContainer.scrollTop + scrollContainer.clientHeight);
+
+        if (remaining < 3500) {
+          setRenderedGroupCount((current) =>
+            Math.min(current + 10, groupedInterventions.length),
+          );
+        }
+      });
+    };
+
+    scrollContainer.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => {
+      scrollContainer.removeEventListener("scroll", handleScroll);
+    };
+  }, [groupedInterventions.length]);
 
 
   const performScrollToDate = (dateKey: string) => {
@@ -549,59 +710,40 @@ const HistoryPage = () => {
 
     if (!scrollContainer || !targetSection) return false;
 
-    const containerRect = scrollContainer.getBoundingClientRect();
-    const targetRect = targetSection.getBoundingClientRect();
-    const start = scrollContainer.scrollTop;
-    const target = Math.max(
-      0,
-      start + targetRect.top - containerRect.top - 4,
-    );
-    const distance = target - start;
+    const targetTop = Math.max(0, targetSection.offsetTop - 4);
 
-    if (Math.abs(distance) < 2) {
-      scrollContainer.scrollTop = target;
-      return true;
-    }
+    scrollContainer.scrollTo({
+      top: targetTop,
+      behavior: "smooth",
+    });
 
-    // Native smooth scrolling can fight with sticky headers/layout updates and
-    // appear to stutter or briefly reverse. Keep a fixed start/end point and
-    // animate scrollTop monotonically ourselves instead.
-    const duration = Math.min(620, Math.max(280, Math.abs(distance) * 0.18));
-    const startedAt = performance.now();
-
-    scrollContainer.classList.add("history-content--programmatic-scroll");
-
-    const easeInOutCubic = (progress: number) =>
-      progress < 0.5
-        ? 4 * progress * progress * progress
-        : 1 - Math.pow(-2 * progress + 2, 3) / 2;
-
-    const animate = (now: number) => {
-      const progress = Math.min(1, (now - startedAt) / duration);
-      const eased = easeInOutCubic(progress);
-      scrollContainer.scrollTop = start + distance * eased;
-
-      if (progress < 1) {
-        window.requestAnimationFrame(animate);
-      } else {
-        scrollContainer.scrollTop = target;
-        scrollContainer.classList.remove("history-content--programmatic-scroll");
-      }
-    };
-
-    window.requestAnimationFrame(animate);
     return true;
   };
 
   const scrollToDate = (dateKey: string) => {
+    const navigationGroup = navigationGroups.find(
+      (group) => group.key === dateKey,
+    );
+
+    if (!navigationGroup) return;
+
+    if (navigationGroup.interventions.length === 0) {
+      setFreeDayNotice(true);
+      window.setTimeout(() => setFreeDayNotice(false), 1800);
+      return;
+    }
+
     const groupIndex = groupedInterventions.findIndex(
       (group) => group.key === dateKey,
     );
+
     if (groupIndex < 0) return;
 
     pendingScrollDateRef.current = dateKey;
     setIsDateNavigationActive(true);
-    setRenderedGroupCount((current) => Math.max(current, groupIndex + 1));
+    setRenderedGroupCount((current) =>
+      Math.max(current, groupIndex + 1),
+    );
   };
 
   useLayoutEffect(() => {
@@ -611,31 +753,22 @@ const HistoryPage = () => {
     const groupIndex = groupedInterventions.findIndex(
       (group) => group.key === pendingDate,
     );
+
     if (groupIndex < 0 || groupIndex >= renderedGroupCount) return;
 
-    // At this point the target and every section above it are really mounted.
-    // Wait two frames for their final layout, then make one smooth jump.
-    // There is deliberately no second corrective scroll: that was the source
-    // of the visible "correct date -> wrong date" jump.
-    let secondFrame = 0;
-    let finishTimer: number | null = null;
+    const targetSection = dateSectionRefs.current[pendingDate];
+    if (!targetSection) return;
 
-    const firstFrame = window.requestAnimationFrame(() => {
-      secondFrame = window.requestAnimationFrame(() => {
-        if (!performScrollToDate(pendingDate)) return;
-
-        finishTimer = window.setTimeout(() => {
-          pendingScrollDateRef.current = null;
-          setIsDateNavigationActive(false);
-        }, 700);
-      });
+    // One frame is enough after mounting the target. No timers and no
+    // second corrective pass: the browser owns the smooth animation.
+    const frame = window.requestAnimationFrame(() => {
+      if (performScrollToDate(pendingDate)) {
+        pendingScrollDateRef.current = null;
+        setIsDateNavigationActive(false);
+      }
     });
 
-    return () => {
-      window.cancelAnimationFrame(firstFrame);
-      if (secondFrame) window.cancelAnimationFrame(secondFrame);
-      if (finishTimer !== null) window.clearTimeout(finishTimer);
-    };
+    return () => window.cancelAnimationFrame(frame);
   }, [renderedGroupCount, groupedInterventions, isDateNavigationActive]);
 
   useEffect(() => {
@@ -675,6 +808,12 @@ const HistoryPage = () => {
               {interventions.length === 1 ? "" : "s"}
             </span>
           </header>
+
+          {freeDayNotice && (
+            <div className="history-free-day-notice" role="status">
+              jour libre
+            </div>
+          )}
 
           {isLoading && (
             <div className="history-empty">Chargement de l'historique…</div>

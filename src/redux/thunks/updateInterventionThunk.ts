@@ -1,10 +1,17 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { auth } from "../../firebase/firebaseConfig";
-import { updateIntervention } from "../../firebase/interventionsService";
+import {
+  updateIntervention,
+  updateSearchInterventionAndMoveToToday,
+} from "../../firebase/interventionsService";
 import { updateLocalIntervention } from "../features/interventionsListSlice";
-import { updateHistoryIntervention } from "../features/historySlice";
+import {
+  addHistoryIntervention,
+  updateHistoryIntervention,
+} from "../features/historySlice";
 import type { Intervention } from "../features/newInterventionSlice";
 import { normalizeInterventionStrings } from "../../utils/textUtils";
+import { addIntervention } from "../features/interventionsListSlice";
 
 const updateInterventionThunk = createAsyncThunk<
   Intervention,
@@ -28,23 +35,47 @@ const updateInterventionThunk = createAsyncThunk<
         return rejectWithValue("Missing Firestore document ID");
       }
 
-      await updateIntervention(
-        user.uid,
-        interventionDate,
-        normalizedIntervention.documentId,
-        normalizedIntervention,
-      );
+      const movedToToday = interventionDate !== today;
+
+      const savedIntervention = movedToToday
+        ? await updateSearchInterventionAndMoveToToday(
+            user.uid,
+            interventionDate,
+            today,
+            normalizedIntervention,
+          )
+        : (
+            await updateIntervention(
+              user.uid,
+              interventionDate,
+              normalizedIntervention.documentId,
+              normalizedIntervention,
+            ),
+            {
+              ...normalizedIntervention,
+              dateKey: interventionDate,
+            }
+          );
 
       const updatedIntervention: Intervention = {
-        ...normalizedIntervention,
+        ...savedIntervention,
         isEditing: false,
         isHistoryView: false,
         mode: "TODAY_EDIT",
+        dateKey: savedIntervention.dateKey || interventionDate,
         updatedAt: new Date().toISOString(),
       };
 
-      dispatch(updateLocalIntervention(updatedIntervention));
-      dispatch(updateHistoryIntervention(updatedIntervention));
+      if (movedToToday) {
+        // The old day's historical occurrence remains untouched. Add the
+        // newly saved today's occurrence separately.
+        dispatch(addHistoryIntervention(updatedIntervention));
+        dispatch(addIntervention(updatedIntervention));
+      } else {
+        dispatch(updateLocalIntervention(updatedIntervention));
+        dispatch(updateHistoryIntervention(updatedIntervention));
+      }
+
       return updatedIntervention;
     } catch (error) {
       return rejectWithValue(

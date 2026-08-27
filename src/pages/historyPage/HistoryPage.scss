@@ -1107,3 +1107,302 @@
 .history-date-section {
   content-visibility: visible;
 }
+
+
+/* v176 — History sidebar: newest-first navigation, real vertical scrolling,
+   and an exclusive list/calendar switch. */
+.history-sidebar {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+.history-sidebar-inner {
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+}
+
+.history-sidebar-heading {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+}
+
+.history-sidebar-heading__text {
+  min-width: 0;
+}
+
+.history-sidebar-view-toggle {
+  width: 36px !important;
+  height: 36px !important;
+  flex: 0 0 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  color: #355887 !important;
+  background: #eef4fb !important;
+  border: 1px solid #c5d4e7 !important;
+  border-radius: 9px !important;
+  cursor: pointer !important;
+  transition:
+    background-color 140ms ease,
+    border-color 140ms ease,
+    color 140ms ease,
+    transform 120ms ease !important;
+}
+
+.history-sidebar-view-toggle:hover {
+  color: #1d4ed8 !important;
+  background: #e4eefb !important;
+  border-color: #aac3e2 !important;
+}
+
+.history-sidebar-view-toggle:active {
+  transform: translateY(1px) !important;
+}
+
+.history-date-navigation {
+  min-height: 0 !important;
+  flex: 1 1 auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 12px 5px 8px 3px !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(91, 111, 143, 0.58) transparent !important;
+}
+
+.history-date-navigation::-webkit-scrollbar {
+  width: 5px !important;
+}
+
+.history-date-navigation::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+.history-date-navigation::-webkit-scrollbar-thumb {
+  background: rgba(91, 111, 143, 0.52) !important;
+  border-radius: 999px !important;
+}
+
+.history-sidebar-calendar {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding: 18px 8px 12px !important;
+  overflow-y: auto !important;
+}
+
+.history-sidebar-calendar label {
+  color: #41516a !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+}
+
+.history-sidebar-calendar input[type="date"] {
+  width: 100% !important;
+  min-height: 42px !important;
+  padding: 8px 10px !important;
+  box-sizing: border-box !important;
+  color: #27364d !important;
+  background: #f8fbff !important;
+  border: 1px solid #b9cbe0 !important;
+  border-radius: 9px !important;
+  font: inherit !important;
+  font-size: 14px !important;
+  outline: none !important;
+}
+
+.history-sidebar-calendar input[type="date"]:focus {
+  border-color: #7fa3d0 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08) !important;
+}
+
+.history-sidebar-calendar p {
+  margin: 0 !important;
+  color: #718096 !important;
+  font-size: 11px !important;
+  line-height: 1.45 !important;
+}
+
+
+/* v177 — reliable history navigation + explicit dd/mm/yyyy calendar field. */
+.history-sidebar-calendar-picker {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 44px !important;
+  gap: 7px !important;
+  align-items: stretch !important;
+}
+
+.history-sidebar-calendar-picker > input[type="text"] {
+  width: 100% !important;
+  min-width: 0 !important;
+  min-height: 42px !important;
+  padding: 8px 10px !important;
+  box-sizing: border-box !important;
+  color: #27364d !important;
+  background: #f8fbff !important;
+  border: 1px solid #b9cbe0 !important;
+  border-radius: 9px !important;
+  font: inherit !important;
+  font-size: 14px !important;
+  outline: none !important;
+}
+
+.history-sidebar-calendar-picker > input[type="text"]::placeholder {
+  color: #8391a3 !important;
+  opacity: 1 !important;
+}
+
+.history-sidebar-calendar-picker > input[type="text"]:focus {
+  border-color: #7fa3d0 !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.08) !important;
+}
+
+.history-sidebar-calendar-button {
+  position: relative !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  min-height: 42px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  color: #355887 !important;
+  background: #eef4fb !important;
+  border: 1px solid #c5d4e7 !important;
+  border-radius: 9px !important;
+  cursor: pointer !important;
+}
+
+.history-sidebar-calendar-button:hover {
+  color: #1d4ed8 !important;
+  background: #e4eefb !important;
+}
+
+.history-sidebar-calendar-button input[type="date"] {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+}
+
+.history-sidebar-calendar-button svg {
+  pointer-events: none !important;
+}
+
+
+/* v178 — faster date navigation without removing the visual scroll animation. */
+.history-content--programmatic-scroll {
+  scroll-behavior: auto !important;
+  overflow-anchor: none !important;
+}
+
+/* Date sections keep their real layout height. Their exact physical position
+   is used by the sidebar navigator, so approximated intrinsic heights are
+   deliberately not used here. */
+.history-date-section {
+  content-visibility: visible !important;
+  contain: none !important;
+}
+
+
+/* v179 — native smooth scroll only; no artificial delay or custom duration. */
+.history-content {
+  scroll-behavior: smooth !important;
+}
+
+.history-content--programmatic-scroll {
+  scroll-behavior: smooth !important;
+  overflow-anchor: none !important;
+}
+
+.history-date-section {
+  scroll-margin-top: 4px !important;
+}
+
+
+/* v181 — date controls are unmistakably clickable, without hover movement. */
+.history-sidebar-dates button,
+.history-sidebar-month-toggle,
+.history-sidebar-calendar-button {
+  cursor: pointer !important;
+}
+
+.history-sidebar-dates button:hover {
+  transform: none !important;
+}
+
+
+/* v182 — never blank the history while scrolling. Every historical day stays
+   mounted; the browser only scrolls the existing DOM. */
+.history-date-section {
+  content-visibility: visible !important;
+  contain: none !important;
+}
+
+.history-sidebar-dates button,
+.history-sidebar-dates button *,
+.history-sidebar-month-toggle,
+.history-sidebar-view-toggle,
+.history-sidebar-calendar-button,
+.history-sidebar-calendar-button *,
+.history-sidebar-calendar-picker > input[type="text"] {
+  cursor: pointer !important;
+}
+
+.history-sidebar-calendar-button input[type="date"] {
+  cursor: pointer !important;
+}
+
+.history-sidebar-dates button:hover {
+  transform: none !important;
+}
+
+/* A deliberately quiet feedback message for dates that exist in the calendar
+   but contain no interventions. */
+.history-free-day-notice {
+  position: fixed;
+  z-index: 1000;
+  top: 82px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 7px 12px;
+  color: #596778;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid #d5dce5;
+  border-radius: 8px;
+  box-shadow: 0 5px 14px rgba(30, 41, 59, 0.09);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  pointer-events: none;
+  animation: history-free-day-fade 1800ms ease forwards;
+}
+
+@keyframes history-free-day-fade {
+  0% { opacity: 0; transform: translate(-50%, -4px); }
+  12% { opacity: 1; transform: translate(-50%, 0); }
+  82% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -2px); }
+}
+
+
+/* v183 — progressive mount retained; avoid any CSS virtualization gaps. */
+.history-date-section {
+  content-visibility: visible !important;
+  contain: none !important;
+}
+.history-sidebar-dates button,
+.history-sidebar-dates button *,
+.history-sidebar-month-toggle,
+.history-sidebar-view-toggle,
+.history-sidebar-calendar-button,
+.history-sidebar-calendar-button * {
+  cursor: pointer !important;
+}

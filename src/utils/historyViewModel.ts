@@ -23,7 +23,27 @@ const convertToDate = (value: unknown): Date | null => {
   if (!value) return null;
   if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
 
-  if (typeof value === "string" || typeof value === "number") {
+  if (typeof value === "string") {
+    const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+
+    if (dateOnlyMatch) {
+      const [, year, month, day] = dateOnlyMatch;
+      const parsedLocalDate = new Date(
+        Number(year),
+        Number(month) - 1,
+        Number(day),
+      );
+
+      return Number.isNaN(parsedLocalDate.getTime())
+        ? null
+        : parsedLocalDate;
+    }
+
+    const parsedDate = new Date(value);
+    return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+  }
+
+  if (typeof value === "number") {
     const parsedDate = new Date(value);
     return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
   }

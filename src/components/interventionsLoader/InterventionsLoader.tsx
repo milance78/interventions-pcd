@@ -83,15 +83,17 @@ const InterventionsLoader = () => {
 
           if (cancelled) return;
 
-          const hydratedHistory = hydrateOccurrencesWithLatestState(
-            historyDays.flatMap((day) => day.interventions),
-            latestInterventions,
+          // History is immutable by day: keep each day's stored snapshot exactly
+          // as it was recorded. The "latest active state" is used for Today/Search,
+          // never to rewrite a previous day's historical occurrence or its score.
+          const historicalOccurrences = historyDays.flatMap(
+            (day) => day.interventions,
           );
 
           firebaseHistoryApplied = true;
-          buildHistoryViewModel(hydratedHistory, dateKeys);
-          dispatch(setHistory(hydratedHistory));
-          void saveHistoryCache(user.uid, hydratedHistory, dateKeys);
+          buildHistoryViewModel(historicalOccurrences, dateKeys);
+          dispatch(setHistory(historicalOccurrences));
+          void saveHistoryCache(user.uid, historicalOccurrences, dateKeys);
         } catch (error) {
           console.error("Unable to load history:", error);
           if (!cancelled) {

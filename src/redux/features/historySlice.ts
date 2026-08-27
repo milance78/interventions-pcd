@@ -63,14 +63,23 @@ const historySlice = createSlice({
       action: PayloadAction<Intervention>,
     ) => {
       state.interventions = state.interventions.map((item) => {
-        if (!isSameLogicalIntervention(item, action.payload)) {
+        const sameOccurrence =
+          item.documentId === action.payload.documentId &&
+          item.dateKey === action.payload.dateKey;
+
+        if (!sameOccurrence && !isSameLogicalIntervention(item, action.payload)) {
+          return item;
+        }
+
+        // A case can have multiple immutable daily occurrences. Never let a
+        // new today's occurrence rewrite yesterday's historical occurrence.
+        if (item.dateKey !== action.payload.dateKey) {
           return item;
         }
 
         return {
           ...item,
           ...action.payload,
-          // Preserve the day on which this occurrence belongs.
           documentId: item.documentId,
           dateKey: item.dateKey,
           createdAt: item.createdAt ?? action.payload.createdAt,
