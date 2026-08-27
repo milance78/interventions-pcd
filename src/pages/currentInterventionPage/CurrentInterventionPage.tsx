@@ -1283,12 +1283,19 @@ const CurrentInterventionPage = () => {
           </div>
 
           <div className="right-card-actions__meta-row">
-            <div className="right-card-actions__postponed-slot">
-              {newIntervention.status === "postponed" && postponedDate && (
-                <span className="postponed-date-line">Postposé au {postponedDate}</span>
+            <div className="right-card-actions__meta-history">
+              {(isRetrievedEdit || isHistoryView) && newIntervention.documentId && (
+                <Button
+                  variant="text"
+                  size="large"
+                  onClick={openRevisionHistory}
+                  startIcon={<HistoryRounded />}
+                  className="revision-history-button"
+                >
+                  Historique des modifications
+                </Button>
               )}
             </div>
-
             <div className="right-card-actions__additional-trigger">
               <AdditionalInformationDialog
                 value={additionalInformation}
@@ -1307,50 +1314,42 @@ const CurrentInterventionPage = () => {
 
           <footer className="right-card-actions">
             <div className="right-card-actions__row right-card-actions__row--top">
-              <div className={`status-wrapper ${snowReceived.trim() ? "status-wrapper--dual" : ""}`.trim()}>
-                <StatusInput />
-                {snowReceived.trim() && <SnowStatusInput />}
-              </div>
-
+              <div className="right-card-actions__history-slot" />
               <div className="right-card-actions__spacer" />
 
-              {/* Fixed TOP-RIGHT cell: Enregistrer / Revu only.
-                  Nouvelle intervention intentionally leaves this cell empty. */}
-              {!isHistoryView && !isNewOrDraft && (
-                <Button
-                  variant="contained"
-                  size="large"
-                  onClick={submitActions}
-                  startIcon={isOpenedFromReviewableOnHold ? <CheckRounded /> : <Send />}
-                  className={`submit-intervention-button ${
-                    isOpenedFromReviewableOnHold ? "submit-intervention-button--review" : ""
-                  }`}
-                >
-                  {isOpenedFromReviewableOnHold ? "Revu" : "Enregistrer"}
-                </Button>
-              )}
-            </div>
-
-            <div className="right-card-actions__row right-card-actions__row--bottom">
-              <div className="right-card-actions__bottom-left">
-                {(isRetrievedEdit || isHistoryView) && newIntervention.documentId && (
+              <div className="right-card-actions__top-right">
+                {!isHistoryView && !isNewOrDraft && (
                   <Button
-                    variant="text"
+                    variant="contained"
                     size="large"
-                    onClick={openRevisionHistory}
-                    startIcon={<HistoryRounded />}
-                    className="revision-history-button"
+                    onClick={submitActions}
+                    startIcon={isOpenedFromReviewableOnHold ? <CheckRounded /> : <Send />}
+                    className={`submit-intervention-button ${
+                      isOpenedFromReviewableOnHold ? "submit-intervention-button--review" : ""
+                    }`}
                   >
-                    Historique des modifications
+                    {isOpenedFromReviewableOnHold ? "Revu" : "Enregistrer"}
                   </Button>
                 )}
               </div>
+            </div>
+
+            <div className="right-card-actions__row right-card-actions__row--bottom">
+              <div className="right-card-actions__status-slot">
+                {newIntervention.status === "postponed" && postponedDate && (
+                  <div className="postponed-date-line">
+                    Postposé au {postponedDate}
+                  </div>
+                )}
+
+                <div className={`status-wrapper ${snowReceived.trim() ? "status-wrapper--dual" : ""}`.trim()}>
+                  <StatusInput />
+                  {snowReceived.trim() && <SnowStatusInput />}
+                </div>
+              </div>
 
               <div className="right-card-actions__spacer" />
 
-              {/* Fixed BOTTOM-RIGHT cell:
-                  Clear is always first; the "Ajouter..." action, when present,
-                  always occupies the same cell beside it. */}
               <div className="right-card-actions__bottom-right">
                 {!isHistoryView && (
                   <Button
@@ -1371,8 +1370,6 @@ const CurrentInterventionPage = () => {
                   </Button>
                 )}
 
-                {/* New intervention uses this exact same bottom-right slot instead
-                    of moving "Ajouter..." into the top row. */}
                 {!isHistoryView && isNewOrDraft && (
                   <Button
                     variant="outlined"

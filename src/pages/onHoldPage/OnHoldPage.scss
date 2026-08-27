@@ -669,7 +669,7 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   font-size: 14px;
 }
 
-@media (max-width: 1540px) {
+@media (max-width: 900px) {
   .on-hold-page__header {
     align-items: flex-start;
     flex-direction: column;
@@ -856,4 +856,12 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
 .on-hold-card__review-stamp span:last-child {
   font-size: 8.5px;
   letter-spacing: 0.01em;
+}
+
+/* v175 — keep On Hold header horizontal during browser zoom. */
+@media (min-width: 901px) {
+  .on-hold-page__header { flex-direction: row !important; align-items: center !important; }
+  .on-hold-page__heading { min-width: 190px !important; flex: 0 1 280px !important; }
+  .on-hold-tabs { flex: 1 1 auto !important; min-width: 0 !important; max-width: none !important; grid-template-columns: repeat(6, minmax(0,1fr)) !important; }
+  .on-hold-tab { min-width: 0 !important; padding: 8px 10px !important; gap: 7px !important; font-size: 14px !important; }
 }

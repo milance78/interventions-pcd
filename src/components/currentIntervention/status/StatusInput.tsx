@@ -7,17 +7,10 @@ import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
-import IconButton from "@mui/material/IconButton";
-import EditCalendarRounded from "@mui/icons-material/EditCalendarRounded";
 import CalendarMonthRounded from "@mui/icons-material/CalendarMonthRounded";
 import { updateField } from "../../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 
-const formatDate = (value: string | null) => {
-  if (!value) return "";
-  const [year, month, day] = value.split("-");
-  return year && month && day ? `${day}/${month}/${year}` : value;
-};
 
 const StatusInput = () => {
   const dispatch = useAppDispatch();
@@ -73,14 +66,6 @@ const StatusInput = () => {
   return (
     <>
       <div className="status-input-shell">
-        {status === "postponed" && postponedDate && (
-          <div className="postponed-date-line">
-            <span>Postposé au {formatDate(postponedDate)}</span>
-            <IconButton size="small" aria-label="Modifier la date de report" onClick={() => setCalendarOpen(true)}>
-              <EditCalendarRounded fontSize="small" />
-            </IconButton>
-          </div>
-        )}
         <FormControl variant="outlined" className="status-input" size="small" fullWidth>
           <Select
             className="status-select"

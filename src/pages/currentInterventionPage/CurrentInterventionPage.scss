@@ -5915,3 +5915,583 @@
     max-width: 290px !important;
   }
 }
+
+
+/* v168 — final invariant footer geometry requested by user.
+   Row 1: Historique / spacer / Enregistrer.
+   Row 2: Postposé + Statuses / spacer / Effacer + Ajouter.
+   The same cells are used in every Intervention en cours mode. */
+.current-intervention-page .right-card-actions {
+  width: 100% !important;
+  height: 116px !important;
+  min-height: 116px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__row {
+  width: 100% !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  display: grid !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__row--top,
+.current-intervention-page .right-card-actions__row--bottom {
+  grid-template-columns: minmax(320px, 1fr) minmax(0, 1fr) 410px !important;
+}
+
+.current-intervention-page .right-card-actions__history-slot,
+.current-intervention-page .right-card-actions__status-slot {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__history-slot {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.current-intervention-page .right-card-actions__history-slot .revision-history-button {
+  width: auto !important;
+  max-width: 100% !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+  justify-content: flex-start !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot {
+  height: 53px !important;
+  min-height: 53px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 3px !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line {
+  position: static !important;
+  height: 16px !important;
+  min-height: 16px !important;
+  margin: 0 !important;
+  padding: 0 0 0 2px !important;
+  color: #6b21a8 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 16px !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 8px !important;
+  align-items: stretch !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper > *,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiFormControl-root,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiInputBase-root,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiOutlinedInput-root {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  height: 34px !important;
+  min-height: 34px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiSelect-select {
+  height: 34px !important;
+  min-height: 34px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.current-intervention-page .right-card-actions__top-right {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  width: 410px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+}
+
+.current-intervention-page .right-card-actions__top-right .submit-intervention-button {
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right {
+  grid-column: 3 !important;
+  grid-row: 1 !important;
+  min-width: 0 !important;
+  width: 410px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+  flex: 0 0 180px !important;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  flex: 0 0 230px !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__row--top,
+  .current-intervention-page .right-card-actions__row--bottom {
+    grid-template-columns: minmax(290px, 1fr) minmax(0, 1fr) 335px !important;
+  }
+
+  .current-intervention-page .right-card-actions__status-slot .status-wrapper {
+    width: 290px !important;
+    min-width: 290px !important;
+    max-width: 290px !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-right,
+  .current-intervention-page .right-card-actions__bottom-right {
+    width: 335px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+    flex-basis: 150px !important;
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+    flex-basis: 175px !important;
+    width: 175px !important;
+    min-width: 175px !important;
+    max-width: 175px !important;
+  }
+}
+
+
+/* v169 — one Postposé label and stable bottom-right action cluster. */
+.current-intervention-page .right-card-actions__status-slot .status-input-shell > .postponed-date-line,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .postponed-date-line {
+  display: none !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right {
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__content {
+  display: grid !important;
+  grid-template-columns: 14px auto !important;
+  grid-template-rows: auto auto !important;
+  column-gap: 2px !important;
+  row-gap: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1.08 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__icon {
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  width: 14px !important;
+  height: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  margin: 0 !important;
+  line-height: 1 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__icon svg {
+  width: 15px !important;
+  height: 15px !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__label {
+  display: contents !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__label > span:first-child {
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  justify-self: start !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button__label > span:last-child {
+  grid-column: 1 / span 2 !important;
+  grid-row: 2 !important;
+  justify-self: start !important;
+  text-align: left !important;
+  white-space: nowrap !important;
+}
+
+
+/* v171 — lock the right action area to the actual right edge of the card.
+   Left side is reserved for status/history; right side is a fixed 420px cell.
+   No version-specific presence/absence can move the buttons horizontally. */
+.current-intervention-page .right-card-actions {
+  position: relative !important;
+  width: 100% !important;
+  height: 116px !important;
+  min-height: 116px !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  overflow: visible !important;
+}
+
+.current-intervention-page .right-card-actions__row {
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__row--top {
+  top: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom {
+  top: 63px !important;
+}
+
+/* Ignore the old three-column grid participation. */
+.current-intervention-page .right-card-actions__row > .right-card-actions__spacer,
+.current-intervention-page .right-card-actions__row > .right-card-actions__history-slot {
+  display: none !important;
+}
+
+/* TOP ROW: fixed left history placeholder + fixed right action cell. */
+.current-intervention-page .right-card-actions__history-slot {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: calc(100% - 420px) !important;
+  height: 53px !important;
+}
+
+.current-intervention-page .right-card-actions__top-right {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 420px !important;
+  height: 53px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__top-right .submit-intervention-button {
+  flex: 0 0 200px !important;
+  width: 200px !important;
+  min-width: 200px !important;
+  max-width: 200px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+
+  /* Restore the established soft blue gradient. */
+  color: #315f84 !important;
+  -webkit-text-fill-color: #315f84 !important;
+  border: 1px solid #9bbbd6 !important;
+  background: linear-gradient(145deg, #f3f8fc 0%, #dceaf5 100%) !important;
+  background-image: linear-gradient(145deg, #f3f8fc 0%, #dceaf5 100%) !important;
+  box-shadow: 0 6px 15px rgba(49,95,132,.11) !important;
+}
+
+.current-intervention-page .right-card-actions__top-right .submit-intervention-button:hover {
+  color: #274f70 !important;
+  -webkit-text-fill-color: #274f70 !important;
+  border-color: #7fa8c9 !important;
+  background: linear-gradient(145deg, #f8fbfe 0%, #d4e6f3 100%) !important;
+  background-image: linear-gradient(145deg, #f8fbfe 0%, #d4e6f3 100%) !important;
+}
+
+/* BOTTOM ROW: status has a fixed left home; the two action buttons share
+   one fixed right cluster and are always flush to the card's right edge. */
+.current-intervention-page .right-card-actions__status-slot {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: calc(100% - 420px) !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right {
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 420px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+  gap: 10px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+  flex: 0 0 180px !important;
+  width: 180px !important;
+  min-width: 180px !important;
+  max-width: 180px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  flex: 0 0 230px !important;
+  width: 230px !important;
+  min-width: 230px !important;
+  max-width: 230px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  margin: 0 !important;
+}
+
+/* The status remains on the left and the Postposé text stays immediately above
+   the status control, never above/inside Commentaire. */
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  width: 320px !important;
+  min-width: 320px !important;
+  max-width: 320px !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__top-right,
+  .current-intervention-page .right-card-actions__bottom-right {
+    width: 345px !important;
+  }
+
+  .current-intervention-page .right-card-actions__history-slot,
+  .current-intervention-page .right-card-actions__status-slot {
+    width: calc(100% - 345px) !important;
+  }
+
+  .current-intervention-page .right-card-actions__top-right .submit-intervention-button {
+    flex-basis: 165px !important;
+    width: 165px !important;
+    min-width: 165px !important;
+    max-width: 165px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+    flex-basis: 150px !important;
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+    flex-basis: 185px !important;
+    width: 185px !important;
+    min-width: 185px !important;
+    max-width: 185px !important;
+  }
+}
+
+
+/* v172 — status controls and primary action typography/height are identical
+   to "Ajouter à la liste du jour". Keep Postposé just above them and align
+   its left edge exactly with the first status control. */
+.current-intervention-page .right-card-actions__status-slot {
+  padding: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line {
+  position: absolute !important;
+  left: 0 !important;
+  bottom: 57px !important;
+  height: 16px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  color: #6b21a8 !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 16px !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  position: absolute !important;
+  left: 0 !important;
+  bottom: 0 !important;
+  width: 360px !important;
+  min-width: 360px !important;
+  max-width: 360px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  display: grid !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper > *,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiFormControl-root,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiInputBase-root,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiOutlinedInput-root,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiSelect-select {
+  height: 53px !important;
+  min-height: 53px !important;
+  box-sizing: border-box !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiSelect-select {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  color: #64748b !important;
+}
+
+/* Match button typography exactly. */
+.current-intervention-page .right-card-actions__top-right .submit-intervention-button,
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+}
+
+/* The right-hand action pair sits tighter together; Add remains flush right. */
+.current-intervention-page .right-card-actions__bottom-right {
+  gap: 6px !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+  flex-basis: 176px !important;
+  width: 176px !important;
+  min-width: 176px !important;
+  max-width: 176px !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  flex-basis: 228px !important;
+  width: 228px !important;
+  min-width: 228px !important;
+  max-width: 228px !important;
+}
+
+/* Keep the whole footer's horizontal geometry unchanged. */
+.current-intervention-page .right-card-actions__top-right,
+.current-intervention-page .right-card-actions__bottom-right {
+  right: 0 !important;
+}
+
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__status-slot .status-wrapper {
+    width: 300px !important;
+    min-width: 300px !important;
+    max-width: 300px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right {
+    gap: 5px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+    flex-basis: 145px !important;
+    width: 145px !important;
+    min-width: 145px !important;
+    max-width: 145px !important;
+  }
+
+  .current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+    flex-basis: 175px !important;
+    width: 175px !important;
+    min-width: 175px !important;
+    max-width: 175px !important;
+  }
+}
+
+
+/* v173 — final small footer polish requested. */
+.current-intervention-page .right-card-actions__bottom-right {
+  justify-content: flex-end !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .clear-form-button {
+  margin-right: -18px !important;
+}
+
+.current-intervention-page .right-card-actions__meta-row .revision-history-button,
+.current-intervention-page .right-card-actions__meta-history .revision-history-button {
+  font-weight: 400 !important;
+}
