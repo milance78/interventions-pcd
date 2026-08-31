@@ -256,7 +256,13 @@ const IfhUtacNotFoundForm = ({
 
 const formatWioOrderReference = (value: string) => value.trim().replace(/9$/, "");
 
-const AdditionalInformationDialog = ({ value, editable = false, onChange, buttonClassName = "" }: Props) => {
+const AdditionalInformationDialog = ({
+  value,
+  editable = false,
+  onChange,
+  onTemplateDataChange,
+  buttonClassName = "",
+}: Props) => {
   const intervention = useAppSelector((state) => state.newIntervention);
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState(value);
