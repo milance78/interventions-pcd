@@ -1315,27 +1315,124 @@
 .custom-wio-form { font-family: Arial, Helvetica, sans-serif; }
 .custom-wio-form__canvas {
   position: relative;
-  width: min(400px, 100%);
+  width: 100%;
   margin: 0 auto;
-  overflow: hidden;
-  border: 1px solid #c4cbd3;
-  background: #2b1685;
+  overflow: visible;
+  background: #5a2c92;
+  line-height: 1;
 }
-.custom-wio-form__canvas img { display:block; width:100%; height:auto; }
+.custom-wio-form__canvas img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+}
 .custom-wio-form__overlay-order,
-.custom-wio-form__overlay-info {
-  position:absolute;
-  box-sizing:border-box;
-  color:#101827;
-  background:#fff;
-  border:1px solid #656e79;
-  font:12px/1.25 Arial,Helvetica,sans-serif;
+.custom-wio-form__overlay-info,
+.custom-wio-form__overlay-grid-field,
+.custom-wio-form__overlay-grid-info {
+  position: absolute;
+  box-sizing: border-box;
+  color: #111827;
+  background: #fff;
+  border: 2px solid #111827;
+  font: 16px/1.35 Arial, Helvetica, sans-serif;
+  z-index: 2;
 }
 .custom-wio-form__overlay-order {
-  left:3%; top:23%; width:51%; height:11%; padding:5px 7px;
+  left: 2.8%;
+  top: 23.5%;
+  width: 50.8%;
+  height: 10.8%;
+  padding: 10px 12px;
 }
 .custom-wio-form__overlay-info {
-  left:3%; top:45%; width:83%; height:49%; padding:8px; white-space:pre-wrap; overflow:auto;
+  left: 2.8%;
+  top: 45.8%;
+  width: 83.2%;
+  height: 48.8%;
+  padding: 12px;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+.custom-wio-form__overlay-order-ref {
+  left: 2.85%;
+  top: 23.4%;
+  width: 44.6%;
+  height: 11.4%;
+  padding: 10px 12px;
+}
+.custom-wio-form__overlay-circuit-id {
+  left: 52.7%;
+  top: 23.4%;
+  width: 44.6%;
+  height: 11.4%;
+  padding: 10px 12px;
+}
+.custom-wio-form__overlay-operator {
+  left: 2.85%;
+  top: 45.8%;
+  width: 44.6%;
+  height: 11.4%;
+  padding: 10px 12px;
+}
+.custom-wio-form__overlay-voice {
+  left: 52.7%;
+  top: 45.8%;
+  width: 44.6%;
+  height: 11.4%;
+}
+.custom-wio-form__overlay-client {
+  left: 2.85%;
+  top: 68.3%;
+  width: 44.6%;
+  height: 11.4%;
+  padding: 10px 12px;
+}
+.custom-wio-form__overlay-services {
+  left: 52.7%;
+  top: 68.3%;
+  width: 44.6%;
+  height: 11.4%;
+}
+.custom-wio-form__overlay-grid-info {
+  left: 2.85%;
+  top: 86.5%;
+  width: 94.35%;
+  min-height: 12.5%;
+  height: auto;
+  padding: 10px 12px;
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+.custom-wio-form__copyable {
+  cursor: pointer;
+}
+.custom-wio-form__copyable:hover {
+  border-color: #6d9ac7;
+}
+.custom-wio-form__copyable em {
+  position: absolute;
+  right: 8px;
+  top: 6px;
+  padding: 3px 6px;
+  background: rgba(255,255,255,.96);
+  color: #1769aa;
+  font: 700 11px Arial, sans-serif;
+  font-style: normal;
+  border-radius: 3px;
+}
+.custom-wio-form--operator-change .template-form-header {
+  margin-bottom: 10px;
+}
+@media (max-width: 760px) {
+  .custom-wio-form__overlay-grid-field,
+  .custom-wio-form__overlay-order,
+  .custom-wio-form__overlay-info,
+  .custom-wio-form__overlay-grid-info {
+    font-size: 12px;
+    border-width: 1px;
+  }
 }
 
 .custom-task-form { display:flex; flex-direction:column; gap:10px; }
@@ -1414,4 +1511,415 @@
 
 .custom-task-form .template-form-header {
   flex-wrap: nowrap;
+}
+
+
+/* v191 — one unified header style. The header inputs are native controls to
+   prevent duplicated MUI underline/floating-label artifacts. */
+.template-form-header,
+.template-form-header--snow {
+  min-height: 62px !important;
+  width: 100% !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 18px !important;
+  padding: 10px 14px !important;
+  margin: 0 0 10px !important;
+  box-sizing: border-box !important;
+  background: #eef1f4 !important;
+  border: 1px solid #cbd3dc !important;
+  border-radius: 8px !important;
+  color: #334155 !important;
+  overflow: visible !important;
+}
+
+.template-form-header__title {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  color: #475569 !important;
+  font-size: 14px !important;
+  font-weight: 650 !important;
+  line-height: 1.35 !important;
+}
+
+.template-form-header__controls {
+  display: flex !important;
+  align-items: flex-end !important;
+  justify-content: flex-end !important;
+  gap: 12px !important;
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+}
+
+.template-form-header__field {
+  width: 250px !important;
+  min-width: 190px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  box-sizing: border-box !important;
+}
+
+.template-form-header__field > span {
+  display: block !important;
+  color: #4b5563 !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  line-height: 1.15 !important;
+  white-space: nowrap !important;
+}
+
+.template-form-header__field > input {
+  display: block !important;
+  width: 100% !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  box-sizing: border-box !important;
+  padding: 7px 10px !important;
+  margin: 0 !important;
+  border: 1px solid #aeb8c4 !important;
+  border-radius: 4px !important;
+  background: #fff !important;
+  color: #1f2937 !important;
+  outline: none !important;
+  font: 14px/1.2 Arial, Helvetica, sans-serif !important;
+}
+
+.template-form-header__field > input:focus {
+  border-color: #7b9abd !important;
+  box-shadow: 0 0 0 2px rgba(123,154,189,.12) !important;
+}
+
+.template-form-header__free-controls {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding-bottom: 1px !important;
+  white-space: nowrap !important;
+  color: #566273 !important;
+  font-size: 12px !important;
+  font-weight: 650 !important;
+}
+
+/* The WIO reference artwork already contains the field rectangles.
+   Only the live text layer is needed on top. */
+.custom-wio-form__overlay-order,
+.custom-wio-form__overlay-info,
+.custom-wio-form__overlay-grid-field,
+.custom-wio-form__overlay-grid-info {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #111827 !important;
+  cursor: pointer !important;
+}
+
+.custom-wio-form__overlay-info,
+.custom-wio-form__overlay-grid-info {
+  white-space: pre-wrap !important;
+  overflow: visible !important;
+}
+
+.custom-wio-form__overlay-order:hover,
+.custom-wio-form__overlay-info:hover,
+.custom-wio-form__overlay-grid-field:hover,
+.custom-wio-form__overlay-grid-info:hover {
+  border: 0 !important;
+  background: transparent !important;
+}
+
+@media (max-width: 900px) {
+  .template-form-header {
+    align-items: stretch !important;
+    flex-direction: column !important;
+  }
+  .template-form-header__controls {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+  }
+}
+
+
+/* v192 — WIO populated text layers must remain absolute overlays.
+   v187 accidentally gave .custom-wio-form__copyable position: relative,
+   which pushed Info into normal document flow below the reference image.
+   Restore the image-relative geometry explicitly. */
+.custom-wio-form__canvas {
+  position: relative !important;
+}
+
+.custom-wio-form__overlay-order,
+.custom-wio-form__overlay-info,
+.custom-wio-form__overlay-grid-field,
+.custom-wio-form__overlay-grid-info {
+  position: absolute !important;
+  z-index: 3 !important;
+  box-sizing: border-box !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.custom-wio-form__overlay-order {
+  left: 2.8% !important;
+  top: 23.5% !important;
+  width: 50.8% !important;
+  height: 10.8% !important;
+  padding: 10px 12px !important;
+}
+
+.custom-wio-form__overlay-info {
+  left: 2.8% !important;
+  top: 45.8% !important;
+  width: 83.2% !important;
+  height: 48.8% !important;
+  padding: 12px !important;
+}
+
+.custom-wio-form__overlay-order-ref {
+  left: 2.85% !important;
+  top: 23.4% !important;
+  width: 44.6% !important;
+  height: 11.4% !important;
+  padding: 10px 12px !important;
+}
+
+.custom-wio-form__overlay-circuit-id {
+  left: 52.7% !important;
+  top: 23.4% !important;
+  width: 44.6% !important;
+  height: 11.4% !important;
+  padding: 10px 12px !important;
+}
+
+.custom-wio-form__overlay-operator {
+  left: 2.85% !important;
+  top: 45.8% !important;
+  width: 44.6% !important;
+  height: 11.4% !important;
+  padding: 10px 12px !important;
+}
+
+.custom-wio-form__overlay-voice {
+  left: 52.7% !important;
+  top: 45.8% !important;
+  width: 44.6% !important;
+  height: 11.4% !important;
+  padding: 10px 12px !important;
+}
+
+.custom-wio-form__overlay-client {
+  left: 2.85% !important;
+  top: 68.3% !important;
+  width: 44.6% !important;
+  height: 11.4% !important;
+  padding: 10px 12px !important;
+}
+
+.custom-wio-form__overlay-services {
+  left: 52.7% !important;
+  top: 68.3% !important;
+  width: 44.6% !important;
+  height: 11.4% !important;
+  padding: 10px 12px !important;
+}
+
+.custom-wio-form__overlay-grid-info {
+  left: 2.85% !important;
+  top: 86.5% !important;
+  width: 94.35% !important;
+  min-height: 0 !important;
+  height: 11% !important;
+  padding: 8px 12px !important;
+  white-space: pre-wrap !important;
+  overflow: hidden !important;
+  line-height: 1.35 !important;
+}
+
+
+/* v193 — WIO "Info" must be one real, readable field, not a clipped imitation
+   of the source image. Its height is intentionally larger than the artwork's
+   original field so the complete generated message is visible without an
+   inner scrollbar. */
+.custom-wio-form__canvas--operator-change {
+  overflow: visible !important;
+  padding-bottom: 230px !important;
+  box-sizing: border-box !important;
+}
+
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+  left: 2.85% !important;
+  top: 86.5% !important;
+  width: 94.35% !important;
+  min-height: 0 !important;
+  height: 215px !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+  background: #fff !important;
+  border: 2px solid #111827 !important;
+  color: #111827 !important;
+  font: 16px/1.45 Arial, Helvetica, sans-serif !important;
+  white-space: pre-wrap !important;
+  overflow: visible !important;
+  z-index: 4 !important;
+}
+
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info:hover {
+  background: #fff !important;
+  border: 2px solid #6d9ac7 !important;
+}
+
+@media (max-width: 760px) {
+  .custom-wio-form__canvas--operator-change {
+    padding-bottom: 190px !important;
+  }
+
+  .custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+    height: 175px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+}
+
+
+/* v194 — WIO Info: enlarge the original Info field in place.
+   The earlier height extension changed the percentage positioning context,
+   pushing the live field below the reference artwork and leaving two Info
+   boxes plus the artwork divider visible. */
+.custom-wio-form__canvas--operator-change {
+  position: relative !important;
+  overflow: visible !important;
+  padding-bottom: 230px !important;
+}
+
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+  position: absolute !important;
+  left: 2.85% !important;
+  top: calc(86.5% - 230px) !important;
+  width: 94.35% !important;
+  height: 215px !important;
+  min-height: 215px !important;
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+  background: #fff !important;
+  border: 2px solid #111827 !important;
+  color: #111827 !important;
+  font: 16px/1.45 Arial, Helvetica, sans-serif !important;
+  white-space: pre-wrap !important;
+  overflow: visible !important;
+  z-index: 10 !important;
+}
+
+/* The enlarged white field masks the reference image's original Info box
+   and its lower separator, so there is exactly one visible Info field. */
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info:hover {
+  background: #fff !important;
+  border: 2px solid #6d9ac7 !important;
+}
+
+@media (max-width: 760px) {
+  .custom-wio-form__canvas--operator-change {
+    padding-bottom: 190px !important;
+  }
+
+  .custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+    top: calc(86.5% - 190px) !important;
+    height: 175px !important;
+    min-height: 175px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
+}
+
+
+/* v195 — restore the original visual gap above WIO Info.
+   The enlarged Info field remains one field, but starts at the same visual
+   height as the artwork's Info field, not immediately against Services actifs. */
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+  top: 82.45% !important;
+  left: 2.85% !important;
+  width: 94.35% !important;
+  height: 215px !important;
+  min-height: 215px !important;
+  padding: 12px 14px !important;
+  background: #fff !important;
+  border: 2px solid #111827 !important;
+  box-sizing: border-box !important;
+  z-index: 10 !important;
+  overflow: visible !important;
+  white-space: pre-wrap !important;
+  font: 16px/1.45 Arial, Helvetica, sans-serif !important;
+}
+
+.custom-wio-form__canvas--operator-change {
+  padding-bottom: 245px !important;
+}
+
+@media (max-width: 760px) {
+  .custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+    top: 82.45% !important;
+    height: 175px !important;
+    min-height: 175px !important;
+    font-size: 13px !important;
+  }
+
+  .custom-wio-form__canvas--operator-change {
+    padding-bottom: 205px !important;
+  }
+}
+
+
+/* v196 — final WIO Info geometry.
+   IMPORTANT: use margin-bottom, not padding-bottom, because percentage
+   positioning must stay relative to the ORIGINAL 1404×792 artwork height.
+   The previous padding changed that containing height and pushed Info down. */
+.custom-wio-form__canvas--operator-change {
+  position: relative !important;
+  padding-bottom: 0 !important;
+  margin-bottom: 245px !important;
+  overflow: visible !important;
+}
+
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+  position: absolute !important;
+  left: 2.85% !important;
+  top: 82.45% !important;
+  width: 94.35% !important;
+  height: 215px !important;
+  min-height: 215px !important;
+  margin: 0 !important;
+  padding: 12px 14px !important;
+  box-sizing: border-box !important;
+  background: #fff !important;
+  border: 2px solid #111827 !important;
+  color: #111827 !important;
+  font: 16px/1.45 Arial, Helvetica, sans-serif !important;
+  white-space: pre-wrap !important;
+  overflow: visible !important;
+  z-index: 20 !important;
+}
+
+/* Cover the artwork's original Info rectangle and separator with the single
+   enlarged live Info field. */
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info:hover {
+  background: #fff !important;
+  border: 2px solid #6d9ac7 !important;
+}
+
+@media (max-width: 760px) {
+  .custom-wio-form__canvas--operator-change {
+    padding-bottom: 0 !important;
+    margin-bottom: 205px !important;
+  }
+
+  .custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+    top: 82.45% !important;
+    height: 175px !important;
+    min-height: 175px !important;
+    font-size: 13px !important;
+    line-height: 1.4 !important;
+  }
 }

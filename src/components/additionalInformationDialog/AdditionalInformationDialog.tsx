@@ -19,7 +19,8 @@ import {
 } from "../../utils/additionalInformationTemplates";
 import "./AdditionalInformationDialog.scss";
 import snowIfhUtacNotFoundReference from "../../assets/forms/snow-ifh-utac-not-found-reference.jpg";
-import wioIncorrectAddressReference from "../../assets/forms/wio-incorrect-address-reference.png";
+import wioIncorrectAddressReference from "../../assets/forms/wio-incorrect-address-reference-hd.png";
+import wioOperatorChangeReference from "../../assets/forms/wio-operator-change-reference-hd.png";
 import DraggableDialogPaper from "../draggableDialogPaper/DraggableDialogPaper";
 
 type Props = {
@@ -37,6 +38,38 @@ type Props = {
   }) => void;
   buttonClassName?: string;
 };
+
+type TemplateHeaderField = {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+};
+
+const TemplateHeader = ({
+  title,
+  fields = [],
+  children,
+}: {
+  title: React.ReactNode;
+  fields?: TemplateHeaderField[];
+  children?: React.ReactNode;
+}) => (
+  <div className="template-form-header">
+    <div className="template-form-header__title">{title}</div>
+    <div className="template-form-header__controls">
+      {fields.map((field) => (
+        <label key={field.label} className="template-form-header__field">
+          <span>{field.label}</span>
+          <input
+            value={field.value}
+            onChange={(event) => field.onChange(event.target.value)}
+          />
+        </label>
+      ))}
+      {children}
+    </div>
+  </div>
+);
 
 const formatHeaderDate = (date: Date) =>
   new Intl.DateTimeFormat("fr-BE", {
@@ -324,6 +357,16 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
       return;
     }
 
+    if (
+      templateId === "wioOperatorChange" &&
+      !intervention.addressClients.some((client) => client.isSameClient)
+    ) {
+      setTemplateError(
+        "WIO changement d'opérateur nécessite un client « même » à l'adresse",
+      );
+      return;
+    }
+
     if (templateId === "bciResiliation") {
       if (bciResEligibleClients.length === 0) {
         setTemplateError("BCI possible uniquement pour un client à l'adresse Proximus ou Scarlet");
@@ -428,6 +471,20 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     : bciNa;
   const bciFormOrderRef = isBciResiliation ? "" : bciOrderRef;
   const bciResNetwork = selectedBciResClient?.operator?.trim() || "";
+  const wioSameAddressClient =
+    intervention.addressClients.find((client) => client.isSameClient) ?? null;
+  const wioOperatorNetwork = formatNetworkLabel(
+    wioSameAddressClient?.operator ?? "",
+  );
+  const wioOperatorChangeInfo = React.useMemo(() => {
+    const network = wioOperatorNetwork || "___";
+    return `Bonjour,
+
+Le même client est actuellement actif à l'adresse chez ${network}. Vu qu'il souhaite passer chez Mobile Vikings merci de procéder au changement d'opérateur
+
+Bonne journée`;
+  }, [wioOperatorNetwork]);
+
   const bciFormInterventionLabel = isBciResiliation
     ? (/^scarlet$/i.test(bciResNetwork)
         ? "SCA - Réintroduction demandée par PCD"
@@ -600,10 +657,10 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                 {templateError && <div className="additional-information-template-error" role="alert">{templateError}</div>}
                 {(selectedTemplate === "bciReintroductionImport" || selectedTemplate === "bciResiliation" || isBciGenericInfoForm) ? (
                   <div className="bci-reintroduction-form">
-                    <div className="template-form-header">
-                      <strong>{selectedDefinition?.buttonLabel ?? "BCI"}</strong>
-                      <TextField label="Numéro BCI" size="small" value={referenceNumber} onChange={(event) => { const next = event.target.value; setReferenceNumber(next); }} />
-                    </div>
+                    <TemplateHeader
+                      title={selectedDefinition?.buttonLabel ?? "BCI"}
+                      fields={[{ label: "Numéro BCI", value: referenceNumber, onChange: setReferenceNumber }]}
+                    />
                     <div className="bci-reintroduction-form__choice-row">
                       <fieldset>
                         <legend>Langue</legend>
@@ -690,37 +747,185 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                   </div>
                 ) : isWioForm ? (
                   <div className="custom-wio-form">
-                    <div className="template-form-header">
-                      <strong>WIO Adresse incorrecte en W6</strong>
-                      <TextField label="Numéro WIO" size="small" value={wioNumber} onChange={(event) => { const next = event.target.value; setWioNumber(next); }} />
-                    </div>
-                    <div className="custom-wio-form__canvas">
-                      <img src={wioIncorrectAddressReference} alt="WIO Mobile Vikings : Adresse incorrecte en W6" />
+                    <TemplateHeader
+                      title="WIO Adresse incorrecte en W6"
+                      fields={[{ label: "Numéro WIO", value: wioNumber, onChange: setWioNumber }]}
+                    />
+
+                    <div className="custom-wio-form__canvas custom-wio-form__canvas--incorrect-address">
+                      <img
+                        src={wioIncorrectAddressReference}
+                        alt="WIO Mobile Vikings : Adresse incorrecte en W6"
+                      />
+
                       <div
                         className="custom-wio-form__overlay-order custom-wio-form__copyable"
-                        onClick={() => copyBciValue("wio-order", formatWioOrderReference(intervention.oagID))}
-                        title="Cliquer pour copier"
+                        onClick={() =>
+                          copyBciValue(
+                            "wio-order",
+                            formatWioOrderReference(intervention.oagID),
+                          )
+                        }
+                        title={
+                          copiedWioField === "wio-order"
+                            ? "Copié"
+                            : "Cliquer pour copier"
+                        }
                       >
                         {formatWioOrderReference(intervention.oagID)}
                         {copiedWioField === "wio-order" && <em>Copié</em>}
                       </div>
+
                       <div
                         className="custom-wio-form__overlay-info custom-wio-form__copyable"
-                        onClick={() => copyBciValue("wio-info", buildAdditionalInformationTemplate("wioIncorrectAddress", templateSource))}
-                        title="Cliquer pour copier"
+                        onClick={() =>
+                          copyBciValue(
+                            "wio-info",
+                            buildAdditionalInformationTemplate(
+                              "wioIncorrectAddress",
+                              templateSource,
+                            ),
+                          )
+                        }
+                        title={
+                          copiedWioField === "wio-info"
+                            ? "Copié"
+                            : "Cliquer pour copier"
+                        }
                       >
-                        {buildAdditionalInformationTemplate("wioIncorrectAddress", templateSource)}
+                        {buildAdditionalInformationTemplate(
+                          "wioIncorrectAddress",
+                          templateSource,
+                        )}
                         {copiedWioField === "wio-info" && <em>Copié</em>}
+                      </div>
+                    </div>
+                  </div>
+                ) : selectedTemplate === "wioOperatorChange" ? (
+                  <div className="custom-wio-form custom-wio-form--operator-change">
+                    <TemplateHeader
+                      title="WIO changement d'opérateur"
+                      fields={[{ label: "Numéro WIO", value: wioNumber, onChange: setWioNumber }]}
+                    />
+
+                    <div className="custom-wio-form__canvas custom-wio-form__canvas--operator-change">
+                      <img
+                        src={wioOperatorChangeReference}
+                        alt="WIO Mobile Vikings : Changement d'opérateur"
+                      />
+
+                      <div
+                        className="custom-wio-form__overlay-grid-field custom-wio-form__overlay-order-ref custom-wio-form__copyable"
+                        onClick={() =>
+                          copyBciValue(
+                            "wio-order-change",
+                            formatWioOrderReference(intervention.oagID),
+                          )
+                        }
+                        title={
+                          copiedWioField === "wio-order-change"
+                            ? "Copié"
+                            : "Cliquer pour copier"
+                        }
+                      >
+                        {formatWioOrderReference(intervention.oagID)}
+                        {copiedWioField === "wio-order-change" && <em>Copié</em>}
+                      </div>
+
+                      <div
+                        className="custom-wio-form__overlay-grid-field custom-wio-form__overlay-circuit-id custom-wio-form__copyable"
+                        onClick={() =>
+                          copyBciValue(
+                            "wio-circuit",
+                            wioSameAddressClient?.cid?.trim() || "",
+                          )
+                        }
+                        title={
+                          copiedWioField === "wio-circuit"
+                            ? "Copié"
+                            : "Cliquer pour copier"
+                        }
+                      >
+                        {wioSameAddressClient?.cid?.trim() || ""}
+                        {copiedWioField === "wio-circuit" && <em>Copié</em>}
+                      </div>
+
+                      <div
+                        className="custom-wio-form__overlay-grid-field custom-wio-form__overlay-operator custom-wio-form__copyable"
+                        onClick={() =>
+                          copyBciValue("wio-operator", wioOperatorNetwork)
+                        }
+                        title={
+                          copiedWioField === "wio-operator"
+                            ? "Copié"
+                            : "Cliquer pour copier"
+                        }
+                      >
+                        {wioOperatorNetwork}
+                        {copiedWioField === "wio-operator" && <em>Copié</em>}
+                      </div>
+
+                      <div
+                        className="custom-wio-form__overlay-grid-field custom-wio-form__overlay-voice custom-wio-form__copyable"
+                        onClick={() => copyBciValue("wio-voice", "")}
+                        title="Cliquer pour copier"
+                      />
+
+                      <div
+                        className="custom-wio-form__overlay-grid-field custom-wio-form__overlay-client custom-wio-form__copyable"
+                        onClick={() =>
+                          copyBciValue("wio-client", intervention.clientName.trim())
+                        }
+                        title={
+                          copiedWioField === "wio-client"
+                            ? "Copié"
+                            : "Cliquer pour copier"
+                        }
+                      >
+                        {intervention.clientName.trim()}
+                        {copiedWioField === "wio-client" && <em>Copié</em>}
+                      </div>
+
+                      <div
+                        className="custom-wio-form__overlay-grid-field custom-wio-form__overlay-services custom-wio-form__copyable"
+                        onClick={() => copyBciValue("wio-services", "")}
+                        title="Cliquer pour copier"
+                      />
+
+                      <div
+                        className="custom-wio-form__overlay-grid-info custom-wio-form__copyable"
+                        onClick={() =>
+                          copyBciValue("wio-info-change", wioOperatorChangeInfo)
+                        }
+                        title={
+                          copiedWioField === "wio-info-change"
+                            ? "Copié"
+                            : "Cliquer pour copier"
+                        }
+                      >
+                        {wioOperatorChangeInfo}
+                        {copiedWioField === "wio-info-change" && <em>Copié</em>}
                       </div>
                     </div>
                   </div>
                 ) : isTaskForm ? (
                   <div className="custom-task-form">
-                    <div className="template-form-header">
-                      <strong>{selectedTemplate === "tache173" ? "Tâche 173" : selectedTemplate === "tache79" ? "Tâche 79" : "Tâche 96"}</strong>
-                      {selectedTemplate === "tache79" && <TextField label="Job ID" size="small" value={task79JobId} onChange={(event) => { const next = event.target.value; setTask79JobId(next); }} />}
-                      {selectedTemplate === "tache96" && <TextField label="Snow ID" size="small" value={task96SnowId} onChange={(event) => { const next = event.target.value; setTask96SnowId(next); }} />}
-                    </div>
+                    <TemplateHeader
+                      title={
+                        selectedTemplate === "tache173"
+                          ? "Tâche 173"
+                          : selectedTemplate === "tache79"
+                            ? "Tâche 79"
+                            : "Tâche 96"
+                      }
+                      fields={
+                        selectedTemplate === "tache79"
+                          ? [{ label: "Job ID", value: task79JobId, onChange: setTask79JobId }]
+                          : selectedTemplate === "tache96"
+                            ? [{ label: "Snow ID", value: task96SnowId, onChange: setTask96SnowId }]
+                            : []
+                      }
+                    />
                     <textarea
                       value={selectedTemplate === "tache173" ? task173 : selectedTemplate === "tache79" ? task79 : task96}
                       onChange={(event) => { const next = event.target.value; if (selectedTemplate === "tache173") setTask173(next); else if (selectedTemplate === "tache79") setTask79(next); else setTask96(next); }}
@@ -729,15 +934,10 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                   </div>
                 ) : isIfhUtacForm ? (
                   <div className="custom-snow-form custom-snow-form--ifh-utac">
-                    <div className="template-form-header template-form-header--snow">
-                      <strong>Snow création ⇒ IFH ⇒ IFH - ISIs/SALY : UTAC/PON Issue ⇒ UTAC not found</strong>
-                      <TextField
-                        label="UTAC-UNI assigné"
-                        size="small"
-                        value={ifhUtac}
-                        onChange={(e) => setIfhUtac(e.target.value)}
-                      />
-                    </div>
+                    <TemplateHeader
+                      title="Snow création ⇒ IFH ⇒ IFH - ISIs/SALY : UTAC/PON Issue ⇒ UTAC not found"
+                      fields={[{ label: "UTAC-UNI assigné", value: ifhUtac, onChange: setIfhUtac }]}
+                    />
                     <IfhUtacNotFoundForm
                       utac={ifhUtac}
                       description={ifhDescription}
@@ -746,15 +946,15 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                   </div>
                 ) : isSnowForm ? (
                   <div className="custom-snow-form">
-                    <div className="template-form-header template-form-header--snow">
-                      <strong>Snow création ⇒ PCD ⇒ Issue with handling PCD Intervention</strong>
-                    </div>
                     {selectedTemplate === "snowCloseImpossible" ? (
                       <>
-                        <div className="snow-header-inputs">
-                          <TextField label="UTAC-UNI assigné" size="small" value={snowUtac} onChange={(e) => setSnowUtac(e.target.value)} />
-                          <TextField label="Numéro d'intervention" size="small" value={snowInterventionNumber} onChange={(e) => setSnowInterventionNumber(e.target.value)} />
-                        </div>
+                        <TemplateHeader
+                          title="Snow création ⇒ PCD ⇒ Issue with handling PCD Intervention"
+                          fields={[
+                            { label: "UTAC-UNI assigné", value: snowUtac, onChange: setSnowUtac },
+                            { label: "Numéro d'intervention", value: snowInterventionNumber, onChange: setSnowInterventionNumber },
+                          ]}
+                        />
                         <SnowIssueForm
                           cdbId={intervention.clientID}
                           orderRef={intervention.oagID}
@@ -767,13 +967,25 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                       </>
                     ) : (
                       <>
-                        <div className="snow-header-inputs snow-header-inputs--free">
-                          <TextField required error={!snowUtac.trim()} label="UTAC-UNI" size="small" value={snowUtac} onChange={(e) => setSnowUtac(e.target.value)} />
-                          <span>libre dans</span>
-                          {(Object.keys(snowFree) as (keyof typeof snowFree)[]).map((key) => (
-                            <button key={key} type="button" className={`snow-toggle ${snowFree[key] ? "is-on" : ""}`} onClick={() => setSnowFree((prev) => ({ ...prev, [key]: !prev[key] }))}>{key}</button>
-                          ))}
-                        </div>
+                        <TemplateHeader title="Snow création ⇒ PCD ⇒ Issue with handling PCD Intervention">
+                          <label className="template-form-header__field">
+                            <span>UTAC-UNI</span>
+                            <input value={snowUtac} onChange={(e) => setSnowUtac(e.target.value)} />
+                          </label>
+                          <div className="template-form-header__free-controls">
+                            <span>libre dans</span>
+                            {(Object.keys(snowFree) as (keyof typeof snowFree)[]).map((key) => (
+                              <button
+                                key={key}
+                                type="button"
+                                className={`snow-toggle ${snowFree[key] ? "is-on" : ""}`}
+                                onClick={() => setSnowFree((prev) => ({ ...prev, [key]: !prev[key] }))}
+                              >
+                                {key}
+                              </button>
+                            ))}
+                          </div>
+                        </TemplateHeader>
                         <SnowIssueForm
                           cdbId={intervention.clientID}
                           orderRef={intervention.oagID}
