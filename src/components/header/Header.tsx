@@ -5,6 +5,7 @@ import GridOnRounded from "@mui/icons-material/GridOnRounded";
 import DashboardCustomizeRounded from "@mui/icons-material/DashboardCustomizeRounded";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
+import DraggableDialogPaper from "../draggableDialogPaper/DraggableDialogPaper";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -225,6 +226,7 @@ const Header = () => {
       </div>
 
       <Dialog
+        PaperComponent={DraggableDialogPaper}
         open={newDialogOpen}
         onClose={closeNewInterventionDialog}
         TransitionComponent={DialogTransition}

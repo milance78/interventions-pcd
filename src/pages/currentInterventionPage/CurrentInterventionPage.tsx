@@ -11,6 +11,7 @@ import MailOutlineRounded from "@mui/icons-material/MailOutlineRounded";
 import Send from "@mui/icons-material/Send";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
+import DraggableDialogPaper from "../../components/draggableDialogPaper/DraggableDialogPaper";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -311,6 +312,15 @@ const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => (
   </span>
 );
 
+const replaceActionCommentLine = (comment: string, prefixes: string[], nextLine: string) => {
+  const lines = comment.replace(/\r\n/g, "\n").split("\n");
+  const filtered = lines.filter((line) =>
+    !prefixes.some((prefix) => line.trim().toLowerCase().startsWith(prefix.toLowerCase())),
+  );
+  const cleaned = filtered.join("\n").replace(/\n{3,}/g, "\n\n").trim();
+  return nextLine.trim() ? (cleaned ? `${cleaned}\n\n${nextLine.trim()}` : nextLine.trim()) : cleaned;
+};
+
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -455,6 +465,7 @@ const CurrentInterventionPage = () => {
     const resLine = client ? buildResPendingLine(client) : "RES en attente";
     const nextComment = cleaned ? `${cleaned}\n\n${resLine}` : resLine;
     dispatch(updateField({ field: "comment", value: nextComment }));
+    dispatch(updateField({ field: "commentActionResiliation", value: resLine }));
     dispatch(updateField({ field: "isResPending", value: true }));
     showActionNotice("res", "Résiliation en attente");
   };
@@ -468,6 +479,7 @@ const CurrentInterventionPage = () => {
       if (cleaned !== comment) {
         dispatch(updateField({ field: "comment", value: cleaned }));
       }
+      dispatch(updateField({ field: "commentActionResiliation", value: "" }));
       return;
     }
 
@@ -577,26 +589,62 @@ const CurrentInterventionPage = () => {
     field: "isSnowReceivedPending" | "isSnowSentPending",
   ) => {
     if (isHistoryView) return;
+
     const current = field === "isSnowReceivedPending"
       ? isSnowReceivedPending
       : isSnowSentPending;
     const next = !current;
+    const actionField =
+      field === "isSnowReceivedPending"
+        ? "commentActionSnowReceived"
+        : "commentActionSnowSent";
+    const prefix =
+      field === "isSnowReceivedPending"
+        ? "Snow à mon nom:"
+        : "Snow en attente:";
+
     dispatch(updateField({ field, value: next }));
+
     if (next) {
+      const snowActionLine =
+        field === "isSnowReceivedPending"
+          ? `Snow à mon nom: ${snowReceived.trim()}`
+          : `Snow en attente: ${newIntervention.snowSent.trim()}`;
+
+      dispatch(updateField({ field: actionField, value: snowActionLine }));
+      dispatch(
+        updateField({
+          field: "comment",
+          value: replaceActionCommentLine(
+            newIntervention.comment,
+            [prefix],
+            snowActionLine,
+          ),
+        }),
+      );
       showActionNotice(
         field === "isSnowReceivedPending" ? "snowReceived" : "snowSent",
         field === "isSnowReceivedPending"
           ? "Snow à mon nom en attente"
           : "Snow créé en attente",
       );
+      return;
     }
+
+    dispatch(updateField({ field: actionField, value: "" }));
+    dispatch(
+      updateField({
+        field: "comment",
+        value: replaceActionCommentLine(newIntervention.comment, [prefix], ""),
+      }),
+    );
   };
 
 
-  const confirmedAddressText = "Adresse confirmée.";
-  const notConfirmedAddressText = "Adresse pas encore confirmée.";
+  const confirmedAddressText = "Adresse confirmée";
+  const notConfirmedAddressText = "Adresse pas confirmée";
   const automaticAddressLine =
-    /^(?:Adresse confirmée\.?|Adresse pas encore confirmée\.?)$/;
+    /^(?:Adresse confirmée\.?|Adresse pas confirmée\.?|Adresse pas encore confirmée\.?)$/;
 
   const removeAutomaticAddressLines = (value: string) => {
     const lines = value.replace(/\r\n/g, "\n").split("\n");
@@ -643,9 +691,13 @@ const CurrentInterventionPage = () => {
     }
 
     dispatch(updateField({ field: "addressConfirmation", value: nextAddressConfirmation }));
+    dispatch(updateField({
+      field: "commentSegmentAddressConfirmation",
+      value: nextAddressConfirmation === "confirmed" ? "Adresse confirmée" : nextAddressConfirmation === "notConfirmed" ? "Adresse pas confirmée" : "",
+    }));
 
     if (nextAddressConfirmation === "notConfirmed") {
-      showActionNotice("address", "Adresse pas encore confirmée");
+      showActionNotice("address", "Adresse pas confirmée");
     } else if (nextAddressConfirmation === "confirmed") {
       showActionNotice("address", "Adresse confirmée");
     }
@@ -1243,6 +1295,53 @@ const CurrentInterventionPage = () => {
                     }),
                   )
                 }
+                onTemplateDataChange={(data) => {
+                  let nextComment = newIntervention.comment;
+
+                  if (data.bciNumber !== undefined) {
+                    const line = data.bciNumber.trim() ? `BCI: ${data.bciNumber.trim()}` : "";
+                    nextComment = replaceActionCommentLine(nextComment, ["BCI:"], line);
+                    dispatch(updateField({ field: "bciNumber", value: data.bciNumber }));
+                    dispatch(updateField({ field: "commentActionBci", value: line }));
+                  }
+
+                  if (data.tache173Content !== undefined) {
+                    const line = data.tache173Content.trim() ? `T173: "${data.tache173Content.trim()}"` : "";
+                    nextComment = replaceActionCommentLine(nextComment, ["T173:"], line);
+                    dispatch(updateField({ field: "tache173Content", value: data.tache173Content }));
+                    dispatch(updateField({ field: "commentActionTache173", value: line }));
+                  }
+
+                  if (data.tache79JobId !== undefined) {
+                    dispatch(updateField({ field: "tache79JobId", value: data.tache79JobId }));
+                  }
+
+                  if (data.tache79Content !== undefined) {
+                    const jobId = data.tache79JobId ?? newIntervention.tache79JobId;
+                    const line = data.tache79Content.trim() ? `T79 créé, JMS No ${jobId.trim()}` : "";
+                    nextComment = replaceActionCommentLine(nextComment, ["T79 créé,"], line);
+                    dispatch(updateField({ field: "tache79Content", value: data.tache79Content }));
+                    dispatch(updateField({ field: "commentActionTache79", value: line }));
+                  }
+
+                  if (data.tache96SnowId !== undefined) {
+                    dispatch(updateField({ field: "tache96SnowId", value: data.tache96SnowId }));
+                  }
+
+                  if (data.tache96Content !== undefined) {
+                    const snowId = data.tache96SnowId ?? newIntervention.tache96SnowId;
+                    const line = data.tache96Content.trim() ? `T96 créé: ${snowId.trim()}` : "";
+                    nextComment = replaceActionCommentLine(nextComment, ["T96 créé:"], line);
+                    dispatch(updateField({ field: "tache96Content", value: data.tache96Content }));
+                    dispatch(updateField({ field: "commentActionTache96", value: line }));
+                  }
+
+                  if (data.wioNumber !== undefined) {
+                    dispatch(updateField({ field: "wioNumber", value: data.wioNumber }));
+                  }
+
+                  dispatch(updateField({ field: "comment", value: nextComment }));
+                }}
               />
             </div>
           </div>
@@ -1368,6 +1467,7 @@ const CurrentInterventionPage = () => {
       )}
 
       <Dialog
+        PaperComponent={DraggableDialogPaper}
         open={resClientDialogOpen}
         onClose={() => setResClientDialogOpen(false)}
         fullWidth
@@ -1411,6 +1511,7 @@ const CurrentInterventionPage = () => {
       </Dialog>
 
       <Dialog
+        PaperComponent={DraggableDialogPaper}
         open={historyDialogOpen}
         onClose={() => setHistoryDialogOpen(false)}
         fullWidth
@@ -1458,6 +1559,7 @@ const CurrentInterventionPage = () => {
       </Dialog>
 
       <Dialog
+        PaperComponent={DraggableDialogPaper}
         open={clearDialogOpen}
         onClose={() => setClearDialogOpen(false)}
         aria-labelledby="clear-form-dialog-title"

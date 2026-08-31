@@ -19,11 +19,22 @@ import {
 } from "../../utils/additionalInformationTemplates";
 import "./AdditionalInformationDialog.scss";
 import snowIfhUtacNotFoundReference from "../../assets/forms/snow-ifh-utac-not-found-reference.jpg";
+import wioIncorrectAddressReference from "../../assets/forms/wio-incorrect-address-reference.png";
+import DraggableDialogPaper from "../draggableDialogPaper/DraggableDialogPaper";
 
 type Props = {
   value: string;
   editable?: boolean;
   onChange?: (value: string) => void;
+  onTemplateDataChange?: (data: {
+    bciNumber?: string;
+    wioNumber?: string;
+    tache173Content?: string;
+    tache79Content?: string;
+    tache79JobId?: string;
+    tache96Content?: string;
+    tache96SnowId?: string;
+  }) => void;
   buttonClassName?: string;
 };
 
@@ -210,12 +221,20 @@ const IfhUtacNotFoundForm = ({
   );
 };
 
+const formatWioOrderReference = (value: string) => value.trim().replace(/9$/, "");
+
 const AdditionalInformationDialog = ({ value, editable = false, onChange, buttonClassName = "" }: Props) => {
   const intervention = useAppSelector((state) => state.newIntervention);
   const [open, setOpen] = React.useState(false);
   const [draft, setDraft] = React.useState(value);
   const [selectedTemplate, setSelectedTemplate] = React.useState<AdditionalInformationTemplateId | null>(null);
-  const [referenceNumber, setReferenceNumber] = React.useState("");
+  const [referenceNumber, setReferenceNumber] = React.useState(intervention.bciNumber || "");
+  const [wioNumber, setWioNumber] = React.useState(intervention.wioNumber || "");
+  const [task173, setTask173] = React.useState(intervention.tache173Content || "");
+  const [task79, setTask79] = React.useState(intervention.tache79Content || "");
+  const [task79JobId, setTask79JobId] = React.useState(intervention.tache79JobId || "");
+  const [task96, setTask96] = React.useState(intervention.tache96Content || "");
+  const [task96SnowId, setTask96SnowId] = React.useState(intervention.tache96SnowId || "");
   const [headerNow, setHeaderNow] = React.useState(() => new Date());
   const [copied, setCopied] = React.useState<"normal" | "nps" | null>(null);
   const [templateError, setTemplateError] = React.useState("");
@@ -226,6 +245,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const [snowInterventionNumber, setSnowInterventionNumber] = React.useState("");
   const [snowFree, setSnowFree] = React.useState({ NPS: false, SALY: true, OCK: false });
   const [ifhUtac, setIfhUtac] = React.useState("");
+  const [copiedWioField, setCopiedWioField] = React.useState<string | null>(null);
 
   const templateSource = React.useMemo(() => ({
     phone: intervention.phone,
@@ -250,8 +270,17 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   }), [intervention]);
 
   React.useEffect(() => {
-    if (!open) setDraft(value);
-  }, [value, open]);
+    if (!open) {
+      setDraft(value);
+      setReferenceNumber(intervention.bciNumber || "");
+      setWioNumber(intervention.wioNumber || "");
+      setTask173(intervention.tache173Content || "");
+      setTask79(intervention.tache79Content || "");
+      setTask79JobId(intervention.tache79JobId || "");
+      setTask96(intervention.tache96Content || "");
+      setTask96SnowId(intervention.tache96SnowId || "");
+    }
+  }, [value, open, intervention.bciNumber, intervention.wioNumber, intervention.tache173Content, intervention.tache79Content, intervention.tache79JobId, intervention.tache96Content, intervention.tache96SnowId]);
 
   React.useEffect(() => {
     if (!open) return undefined;
@@ -271,11 +300,21 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
     setSnowInterventionNumber("");
     setSnowFree({ NPS: false, SALY: true, OCK: false });
     setIfhUtac("");
+    setCopiedWioField(null);
     setOpen(false);
   };
 
   const save = () => {
     onChange?.(draft.trim());
+    onTemplateDataChange?.({
+      bciNumber: referenceNumber,
+      wioNumber,
+      tache173Content: task173,
+      tache79Content: task79,
+      tache79JobId: task79JobId,
+      tache96Content: task96,
+      tache96SnowId: task96SnowId,
+    });
     setOpen(false);
   };
 
@@ -301,7 +340,13 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
 
     setTemplateError("");
     setSelectedTemplate(templateId);
-    setReferenceNumber("");
+    setReferenceNumber(intervention.bciNumber || "");
+    setWioNumber(intervention.wioNumber || "");
+    setTask173(intervention.tache173Content || "");
+    setTask79(intervention.tache79Content || "");
+    setTask79JobId(intervention.tache79JobId || "");
+    setTask96(intervention.tache96Content || "");
+    setTask96SnowId(intervention.tache96SnowId || "");
     setCopied(null);
     setCopiedBciField(null);
     setHeaderNow(new Date());
@@ -323,6 +368,11 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
   const copyBciValue = async (key: string, fieldValue: string) => {
     if (!fieldValue) return;
     await writeTextToClipboard(fieldValue);
+    if (key.startsWith("wio-")) {
+      setCopiedWioField(key);
+      window.setTimeout(() => setCopiedWioField((current) => current === key ? null : current), 1200);
+      return;
+    }
     setCopiedBciField(key);
     window.setTimeout(() => setCopiedBciField((current) => current === key ? null : current), 1200);
   };
@@ -377,13 +427,22 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
         : (selectedBciResClient?.na.trim() || ""))
     : bciNa;
   const bciFormOrderRef = isBciResiliation ? "" : bciOrderRef;
+  const bciResNetwork = selectedBciResClient?.operator?.trim() || "";
   const bciFormInterventionLabel = isBciResiliation
-    ? (/^scarlet$/i.test(intervention.network.trim())
+    ? (/^scarlet$/i.test(bciResNetwork)
         ? "SCA - Réintroduction demandée par PCD"
-        : "PXS - Réintroduction demandée par PCD")
-    : isBciGenericInfoForm
-      ? bciGenericInterventionLabel
-      : bciInterventionLabel;
+        : /^proximus$/i.test(bciResNetwork)
+          ? "PXS - Réintroduction demandée par PCD"
+          : "")
+    : selectedTemplate === "bciThreeCures"
+      ? (/^scarlet$/i.test(intervention.network.trim())
+          ? "SCA - Annulation de commande, client injoignable après 3 prises de contact"
+          : "PXS - Annulation de commande, client injoignable après 3 prises de contact")
+      : selectedTemplate === "bciWrongNumber"
+        ? (/^scarlet$/i.test(intervention.network.trim())
+            ? "SCA - Numéro erroné ou pas accessible"
+            : "PXS - Numéro erroné ou pas accessible")
+        : bciInterventionLabel;
 
 
   const snowCloseDescription = React.useMemo(() => {
@@ -415,6 +474,8 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
 
   const isSnowForm = selectedTemplate === "snowCloseImpossible" || selectedTemplate === "snowUtacNonAssignable";
   const isIfhUtacForm = selectedTemplate === "snowIfhUtacNotFound";
+  const isWioForm = selectedTemplate === "wioIncorrectAddress";
+  const isTaskForm = selectedTemplate === "tache173" || selectedTemplate === "tache79" || selectedTemplate === "tache96";
   const bciTemplateIds: AdditionalInformationTemplateId[] = ["bciThreeCures", "bciWrongNumber", "bciReintroductionImport", "bciResiliation"];
 
   const isFiber = /^(?:fiber|fibre)$/i.test(intervention.infrastructure.trim());
@@ -442,7 +503,12 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
       !bciTemplateIds.includes(template.id) &&
       template.id !== "snowCloseImpossible" &&
       template.id !== "snowUtacNonAssignable" &&
-      template.id !== "snowIfhUtacNotFound",
+      template.id !== "snowIfhUtacNotFound" &&
+      template.id !== "wioIncorrectAddress" &&
+      template.id !== "wioOperatorChange" &&
+      template.id !== "tache173" &&
+      template.id !== "tache79" &&
+      template.id !== "tache96",
   );
 
   const selectedDefinition = visibleTemplates.find(
@@ -462,6 +528,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
       </Button>
 
       <Dialog
+        PaperComponent={DraggableDialogPaper}
         open={open}
         onClose={close}
         fullWidth
@@ -489,12 +556,33 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
 
                 <div className="additional-information-group">
                   <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                    <span>WIO</span><span aria-hidden="true">⌄</span>
+                  </button>
+                  <div className="additional-information-group__items">
+                    <Button type="button" variant={selectedTemplate === "wioIncorrectAddress" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("wioIncorrectAddress")}>WIO Adresse incorrecte en W6</Button>
+                    <Button type="button" variant={selectedTemplate === "wioOperatorChange" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("wioOperatorChange")}>Changement d'opérateur</Button>
+                  </div>
+                </div>
+
+                <div className="additional-information-group">
+                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
                     <span>Snow création</span><span aria-hidden="true">⌄</span>
                   </button>
                   <div className="additional-information-group__items">
                     <Button type="button" variant={selectedTemplate === "snowCloseImpossible" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowCloseImpossible")}>Snow - clôture intervention pas possible</Button>
                     <Button type="button" variant={selectedTemplate === "snowUtacNonAssignable" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowUtacNonAssignable")}>Snow - UTAC non assignable</Button>
                     <Button type="button" variant={selectedTemplate === "snowIfhUtacNotFound" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("snowIfhUtacNotFound")}>Snow IFH - UTAC N'existe pas dans la data base</Button>
+                  </div>
+                </div>
+
+                <div className="additional-information-group">
+                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                    <span>Tâches</span><span aria-hidden="true">⌄</span>
+                  </button>
+                  <div className="additional-information-group__items">
+                    <Button type="button" variant={selectedTemplate === "tache173" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("tache173")}>Tâche 173</Button>
+                    <Button type="button" variant={selectedTemplate === "tache79" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("tache79")}>Tâche 79</Button>
+                    <Button type="button" variant={selectedTemplate === "tache96" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("tache96")}>Tâche 96</Button>
                   </div>
                 </div>
 
@@ -512,6 +600,10 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                 {templateError && <div className="additional-information-template-error" role="alert">{templateError}</div>}
                 {(selectedTemplate === "bciReintroductionImport" || selectedTemplate === "bciResiliation" || isBciGenericInfoForm) ? (
                   <div className="bci-reintroduction-form">
+                    <div className="template-form-header">
+                      <strong>{selectedDefinition?.buttonLabel ?? "BCI"}</strong>
+                      <TextField label="Numéro BCI" size="small" value={referenceNumber} onChange={(event) => { const next = event.target.value; setReferenceNumber(next); }} />
+                    </div>
                     <div className="bci-reintroduction-form__choice-row">
                       <fieldset>
                         <legend>Langue</legend>
@@ -596,10 +688,49 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                       </div>
                     )}
                   </div>
+                ) : isWioForm ? (
+                  <div className="custom-wio-form">
+                    <div className="template-form-header">
+                      <strong>WIO Adresse incorrecte en W6</strong>
+                      <TextField label="Numéro WIO" size="small" value={wioNumber} onChange={(event) => { const next = event.target.value; setWioNumber(next); }} />
+                    </div>
+                    <div className="custom-wio-form__canvas">
+                      <img src={wioIncorrectAddressReference} alt="WIO Mobile Vikings : Adresse incorrecte en W6" />
+                      <div
+                        className="custom-wio-form__overlay-order custom-wio-form__copyable"
+                        onClick={() => copyBciValue("wio-order", formatWioOrderReference(intervention.oagID))}
+                        title="Cliquer pour copier"
+                      >
+                        {formatWioOrderReference(intervention.oagID)}
+                        {copiedWioField === "wio-order" && <em>Copié</em>}
+                      </div>
+                      <div
+                        className="custom-wio-form__overlay-info custom-wio-form__copyable"
+                        onClick={() => copyBciValue("wio-info", buildAdditionalInformationTemplate("wioIncorrectAddress", templateSource))}
+                        title="Cliquer pour copier"
+                      >
+                        {buildAdditionalInformationTemplate("wioIncorrectAddress", templateSource)}
+                        {copiedWioField === "wio-info" && <em>Copié</em>}
+                      </div>
+                    </div>
+                  </div>
+                ) : isTaskForm ? (
+                  <div className="custom-task-form">
+                    <div className="template-form-header">
+                      <strong>{selectedTemplate === "tache173" ? "Tâche 173" : selectedTemplate === "tache79" ? "Tâche 79" : "Tâche 96"}</strong>
+                      {selectedTemplate === "tache79" && <TextField label="Job ID" size="small" value={task79JobId} onChange={(event) => { const next = event.target.value; setTask79JobId(next); }} />}
+                      {selectedTemplate === "tache96" && <TextField label="Snow ID" size="small" value={task96SnowId} onChange={(event) => { const next = event.target.value; setTask96SnowId(next); }} />}
+                    </div>
+                    <textarea
+                      value={selectedTemplate === "tache173" ? task173 : selectedTemplate === "tache79" ? task79 : task96}
+                      onChange={(event) => { const next = event.target.value; if (selectedTemplate === "tache173") setTask173(next); else if (selectedTemplate === "tache79") setTask79(next); else setTask96(next); }}
+                      placeholder="Saisissez librement le contenu…"
+                    />
+                  </div>
                 ) : isIfhUtacForm ? (
                   <div className="custom-snow-form custom-snow-form--ifh-utac">
-                    <div className="snow-instruction">Snow création ⇒ IFH ⇒ IFH - ISIs/SALY : UTAC/PON Issue ⇒ UTAC not found</div>
-                    <div className="snow-header-inputs">
+                    <div className="template-form-header template-form-header--snow">
+                      <strong>Snow création ⇒ IFH ⇒ IFH - ISIs/SALY : UTAC/PON Issue ⇒ UTAC not found</strong>
                       <TextField
                         label="UTAC-UNI assigné"
                         size="small"
@@ -615,7 +746,9 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
                   </div>
                 ) : isSnowForm ? (
                   <div className="custom-snow-form">
-                    <div className="snow-instruction">Snow création ⇒ PCD ⇒ Issue with handling PCD Intervention</div>
+                    <div className="template-form-header template-form-header--snow">
+                      <strong>Snow création ⇒ PCD ⇒ Issue with handling PCD Intervention</strong>
+                    </div>
                     {selectedTemplate === "snowCloseImpossible" ? (
                       <>
                         <div className="snow-header-inputs">
@@ -730,7 +863,7 @@ const AdditionalInformationDialog = ({ value, editable = false, onChange, button
         </DialogActions>
       </Dialog>
 
-      <Dialog open={bciResPickerOpen} onClose={() => setBciResPickerOpen(false)} fullWidth maxWidth="sm">
+      <Dialog PaperComponent={DraggableDialogPaper} open={bciResPickerOpen} onClose={() => setBciResPickerOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle>Choisir le client actif</DialogTitle>
         <DialogContent>
           <div className="bci-res-client-picker">

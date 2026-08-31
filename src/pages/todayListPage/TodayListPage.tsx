@@ -26,6 +26,7 @@ import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 
 import AdditionalInformationDialog from "../../components/additionalInformationDialog/AdditionalInformationDialog";
 import AnimatedCircularCounter from "../../components/animatedCircularCounter/AnimatedCircularCounter";
+import { FileSpreadsheet } from "lucide-react";
 import CommentCopyActions from "../../components/commentCopyActions/CommentCopyActions";
 import ConfirmDeleteDialog from "../../components/confirmDeleteDialog/ConfirmDeleteDialog";
 
@@ -49,6 +50,7 @@ import {
 } from "../../redux/store";
 import { deleteInterventionThunk } from "../../redux/thunks/deleteInterventionThunk";
 import { writeTextToClipboard } from "../../utils/clipboard";
+import { exportInterventionsToExcel } from "../../utils/excelExport";
 
 const hasValue = (
   value?: string | null,
@@ -258,10 +260,17 @@ const TodayListPage = () => {
     true,
   );
 
+  const exportTodayList = () => {
+    const now = new Date();
+    const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+    exportInterventionsToExcel(interventions, now.toLocaleDateString("fr-BE"), `Liste_du_jour_${dateKey}.xls`);
+  };
+
   return (
     <main className="today-list-page">
       <div ref={scrollContainerRef} className="today-list-content">
         <header className="today-page-header">
+          <button type="button" className="today-export-button" onClick={exportTodayList} title="Exporter la liste du jour vers Excel"><FileSpreadsheet size={16} /> Export Excel</button>
           <div className="today-page-title">
             <span className="today-page-eyebrow">
               Interventions

@@ -3,6 +3,7 @@ import ContentPasteGoRounded from "@mui/icons-material/ContentPasteGoRounded";
 import CloseRounded from "@mui/icons-material/CloseRounded";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
+import DraggableDialogPaper from "../draggableDialogPaper/DraggableDialogPaper";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
@@ -131,6 +132,7 @@ const SmartImportDialog = ({
       </Button>
 
       <Dialog
+        PaperComponent={DraggableDialogPaper}
         open={open}
         onClose={() => !processing && setOpen(false)}
         fullWidth

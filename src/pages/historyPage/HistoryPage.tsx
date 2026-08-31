@@ -13,6 +13,7 @@ import CheckRounded from "@mui/icons-material/CheckRounded";
 import Tooltip from "@mui/material/Tooltip";
 import {
   CalendarDays,
+  FileSpreadsheet,
   Contact,
   House,
   KeyRound,
@@ -49,6 +50,7 @@ import { deleteInterventionThunk } from "../../redux/thunks/deleteInterventionTh
 import type { Intervention } from "../../redux/features/newInterventionSlice";
 import { buildHistoryViewModel } from "../../utils/historyViewModel";
 import { writeTextToClipboard } from "../../utils/clipboard";
+import { exportInterventionsToExcel } from "../../utils/excelExport";
 
 const hasValue = (value?: string | null): value is string =>
   Boolean(value?.trim());
@@ -663,7 +665,7 @@ const HistoryPage = () => {
 
     timerId = window.setTimeout(appendBatch, 0);
 
-    return () => {
+  return () => {
       cancelled = true;
       if (timerId !== null) window.clearTimeout(timerId);
     };
@@ -784,6 +786,15 @@ const HistoryPage = () => {
     window.requestAnimationFrame(() => scrollToDate(pendingDate));
   }, [groupedInterventions, isInitialized]);
 
+  const exportHistoryDate = (dateKey: string, items: Intervention[]) => {
+    const [year, month, day] = dateKey.split("-");
+    exportInterventionsToExcel(
+      items,
+      `${day}/${month}/${year}`,
+      `Historique_${dateKey}.xls`,
+    );
+  };
+
   return (
     <main className="history-page">
       <div className="history-page-layout">
@@ -843,6 +854,12 @@ const HistoryPage = () => {
                       formatDateTitle(group.date),
                     )}
                   </h2>
+                </div>
+
+                <div className="history-date-header__tools">
+                  <button type="button" className="history-date-export-button" onClick={() => exportHistoryDate(group.key, group.interventions)} title="Exporter cette journée vers Excel">
+                    <FileSpreadsheet size={16} /> Excel
+                  </button>
                 </div>
 
                 <div

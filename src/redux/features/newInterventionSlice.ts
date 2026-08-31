@@ -1,7 +1,24 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { normalizePersonName, parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
+import { formatAddressClientsForComment, normalizePersonName, parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
 import { cureOrder, emptyCureRecords, localDateKey, localTimeKey, removeCureLines, upsertCureLine } from "../../utils/cureRecords";
 import { composeMainAddress, normalizeNaNumber, parseMainAddress } from "../../utils/interventionAddress";
+
+const replaceCommentBlock = (comment: string, previous: string, next: string, insertAfterFirstBlock = false) => {
+  const blocks = comment.replace(/\r\n/g, "\n").split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+  const filtered = previous.trim()
+    ? blocks.filter((block) => block !== previous.trim())
+    : blocks;
+
+  if (!next.trim()) return filtered.join("\n\n");
+
+  const nextBlock = next.trim();
+  if (insertAfterFirstBlock && filtered.length > 0) {
+    filtered.splice(1, 0, nextBlock);
+  } else {
+    filtered.push(nextBlock);
+  }
+  return filtered.join("\n\n");
+};
 
 export type InterventionMode =
   | "NEW"
@@ -106,6 +123,25 @@ export interface InterventionData {
   isGoodExample: boolean;
   isSnow: boolean;
   comment: string;
+  commentSegmentAddressConfirmation: string;
+  commentSegmentTechDetailOnAddress: string;
+  commentSegmentClientsOnAddress: string;
+  commentSegmentGeneralInfo: string;
+  commentActionCure: string;
+  commentActionResiliation: string;
+  commentActionSnowReceived: string;
+  commentActionSnowSent: string;
+  commentActionBci: string;
+  commentActionTache173: string;
+  commentActionTache79: string;
+  commentActionTache96: string;
+  bciNumber: string;
+  wioNumber: string;
+  tache173Content: string;
+  tache79Content: string;
+  tache79JobId: string;
+  tache96Content: string;
+  tache96SnowId: string;
   additionalInformation: string;
   cure: CureValue;
   cureRecords: CureRecords;
@@ -213,6 +249,25 @@ export const emptyInterventionData: InterventionData = {
   isGoodExample: false,
   isSnow: false,
   comment: "",
+  commentSegmentAddressConfirmation: "",
+  commentSegmentTechDetailOnAddress: "",
+  commentSegmentClientsOnAddress: "",
+  commentSegmentGeneralInfo: "",
+  commentActionCure: "",
+  commentActionResiliation: "",
+  commentActionSnowReceived: "",
+  commentActionSnowSent: "",
+  commentActionBci: "",
+  commentActionTache173: "",
+  commentActionTache79: "",
+  commentActionTache96: "",
+  bciNumber: "",
+  wioNumber: "",
+  tache173Content: "",
+  tache79Content: "",
+  tache79JobId: "",
+  tache96Content: "",
+  tache96SnowId: "",
   additionalInformation: "",
   cure: "noCure",
   cureRecords: emptyCureRecords(),
@@ -307,6 +362,25 @@ const extractData = (state: Intervention): InterventionData => ({
   isGoodExample: state.isGoodExample,
   isSnow: state.isSnow,
   comment: state.comment,
+  commentSegmentAddressConfirmation: state.commentSegmentAddressConfirmation,
+  commentSegmentTechDetailOnAddress: state.commentSegmentTechDetailOnAddress,
+  commentSegmentClientsOnAddress: state.commentSegmentClientsOnAddress,
+  commentSegmentGeneralInfo: state.commentSegmentGeneralInfo,
+  commentActionCure: state.commentActionCure,
+  commentActionResiliation: state.commentActionResiliation,
+  commentActionSnowReceived: state.commentActionSnowReceived,
+  commentActionSnowSent: state.commentActionSnowSent,
+  commentActionBci: state.commentActionBci,
+  commentActionTache173: state.commentActionTache173,
+  commentActionTache79: state.commentActionTache79,
+  commentActionTache96: state.commentActionTache96,
+  bciNumber: state.bciNumber,
+  wioNumber: state.wioNumber,
+  tache173Content: state.tache173Content,
+  tache79Content: state.tache79Content,
+  tache79JobId: state.tache79JobId,
+  tache96Content: state.tache96Content,
+  tache96SnowId: state.tache96SnowId,
   additionalInformation: state.additionalInformation,
   cure: state.cure,
   cureRecords: state.cureRecords,
@@ -465,16 +539,35 @@ const NewInterventionSlice = createSlice({
         state.mainAddress = composeMainAddress(parsed);
       }
 
+      if (field === "comment" && typeof value === "string") {
+        state.commentSegmentGeneralInfo = value;
+      }
+
+      if (field === "addressConfirmation") {
+        state.commentSegmentAddressConfirmation =
+          value === "confirmed"
+            ? "Adresse confirmée"
+            : value === "notConfirmed"
+              ? "Adresse pas confirmée"
+              : "";
+      }
+
       if (field === "clientsOnAddress" && typeof value === "string") {
         state.addressClients = parseLegacyAddressClients(value);
+        state.commentSegmentClientsOnAddress = formatAddressClientsForComment(
+          state.addressClients,
+          state.infrastructure,
+        );
       }
 
       if (field === "addressClients" && Array.isArray(value)) {
         state.clientsOnAddress = serializeAddressClients(value, state.infrastructure);
+        state.commentSegmentClientsOnAddress = formatAddressClientsForComment(value, state.infrastructure);
       }
 
       if (field === "infrastructure") {
         state.clientsOnAddress = serializeAddressClients(state.addressClients, String(value));
+        state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, String(value));
       }
 
       if (field === "cure") {
@@ -565,6 +658,15 @@ const NewInterventionSlice = createSlice({
           ? state.cureRecords[cure]?.recordedAt ?? existing?.recordedAt ?? null
           : null;
       state.comment = upsertCureLine(state.comment, cure, state.cureRecords);
+      state.commentActionCure = cureOrder
+        .map((key) => state.cureRecords[key])
+        .filter(Boolean)
+        .map((record, index) => {
+          const cure = cureOrder[index];
+          return record ? upsertCureLine("", cure, { ...emptyCureRecords(), [cure]: record }) : "";
+        })
+        .filter(Boolean)
+        .join("\n");
       refreshDraftMetadata(state);
     },
 
@@ -584,6 +686,15 @@ const NewInterventionSlice = createSlice({
         action.payload.cure,
         state.cureRecords,
       );
+      state.commentActionCure = cureOrder
+        .map((key) => state.cureRecords[key])
+        .filter(Boolean)
+        .map((record, index) => {
+          const cure = cureOrder[index];
+          return record ? upsertCureLine("", cure, { ...emptyCureRecords(), [cure]: record }) : "";
+        })
+        .filter(Boolean)
+        .join("\n");
       refreshDraftMetadata(state);
     },
 
@@ -628,11 +739,21 @@ const NewInterventionSlice = createSlice({
         latestRemainingCure === "firstCure" || latestRemainingCure === "secondCure"
           ? state.cureRecords[latestRemainingCure]?.recordedAt ?? null
           : null;
+      state.commentActionCure = cureOrder
+        .map((key) => state.cureRecords[key])
+        .filter(Boolean)
+        .map((record, index) => {
+          const cure = cureOrder[index];
+          return record ? upsertCureLine("", cure, { ...emptyCureRecords(), [cure]: record }) : "";
+        })
+        .filter(Boolean)
+        .join("\n");
       refreshDraftMetadata(state);
     },
 
     addAddressClient: (state, action: PayloadAction<AddressClient>) => {
       if (state.mode === "VIEW_HISTORY") return;
+      const previousSegment = state.commentSegmentClientsOnAddress;
       state.addressClients.push({
         ...action.payload,
         isFuture: Boolean(action.payload.isFuture),
@@ -640,6 +761,13 @@ const NewInterventionSlice = createSlice({
         na: normalizeNaNumber(action.payload.na ?? ""),
       });
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
+      state.comment = replaceCommentBlock(
+        state.comment,
+        previousSegment,
+        state.commentSegmentClientsOnAddress,
+        state.commentSegmentAddressConfirmation.trim().length > 0,
+      );
       refreshDraftMetadata(state);
     },
 
@@ -647,11 +775,19 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
       const client = state.addressClients.find((item) => item.id === action.payload.id);
       if (!client) return;
+      const previousSegment = state.commentSegmentClientsOnAddress;
       // Keep raw input while the user is typing. Field-specific normalization
       // (for example the leading zero in NA) is applied on blur by the UI.
       (client as unknown as Record<string, unknown>)[action.payload.field] =
         action.payload.value;
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
+      state.comment = replaceCommentBlock(
+        state.comment,
+        previousSegment,
+        state.commentSegmentClientsOnAddress,
+        state.commentSegmentAddressConfirmation.trim().length > 0,
+      );
       refreshDraftMetadata(state);
     },
 
@@ -659,11 +795,13 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
       state.addressClients = state.addressClients.filter((item) => item.id !== action.payload);
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
       refreshDraftMetadata(state);
     },
 
     setAddressClients: (state, action: PayloadAction<AddressClient[]>) => {
       if (state.mode === "VIEW_HISTORY") return;
+      const previousSegment = state.commentSegmentClientsOnAddress;
       state.addressClients = action.payload.map((client) => ({
         ...client,
         isFuture: Boolean(client.isFuture),
@@ -671,6 +809,13 @@ const NewInterventionSlice = createSlice({
         na: normalizeNaNumber(client.na ?? ""),
       }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
+      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
+      state.comment = replaceCommentBlock(
+        state.comment,
+        previousSegment,
+        state.commentSegmentClientsOnAddress,
+        state.commentSegmentAddressConfirmation.trim().length > 0,
+      );
       refreshDraftMetadata(state);
     },
 

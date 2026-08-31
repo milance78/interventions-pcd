@@ -3,6 +3,7 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Dialog from "@mui/material/Dialog";
+import DraggableDialogPaper from "../../draggableDialogPaper/DraggableDialogPaper";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
@@ -118,7 +119,7 @@ const StatusInput = () => {
         </FormControl>
       </div>
 
-      <Dialog open={calendarOpen} onClose={() => setCalendarOpen(false)} className="postpone-calendar-dialog">
+      <Dialog PaperComponent={DraggableDialogPaper} open={calendarOpen} onClose={() => setCalendarOpen(false)} className="postpone-calendar-dialog">
         <DialogTitle><CalendarMonthRounded /> Choisir la date de report</DialogTitle>
         <DialogContent>
           <input

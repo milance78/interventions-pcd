@@ -165,6 +165,25 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
       typeof data.questionReviewedDate === "string" ? data.questionReviewedDate : null,
     isSnow: isSnowReceivedPending || isSnowSentPending,
     comment,
+    commentSegmentAddressConfirmation: String(data.commentSegmentAddressConfirmation ?? ""),
+    commentSegmentTechDetailOnAddress: String(data.commentSegmentTechDetailOnAddress ?? ""),
+    commentSegmentClientsOnAddress: String(data.commentSegmentClientsOnAddress ?? ""),
+    commentSegmentGeneralInfo: String(data.commentSegmentGeneralInfo ?? ""),
+    commentActionCure: String(data.commentActionCure ?? ""),
+    commentActionResiliation: String(data.commentActionResiliation ?? ""),
+    commentActionSnowReceived: String(data.commentActionSnowReceived ?? ""),
+    commentActionSnowSent: String(data.commentActionSnowSent ?? ""),
+    commentActionBci: String(data.commentActionBci ?? ""),
+    commentActionTache173: String(data.commentActionTache173 ?? ""),
+    commentActionTache79: String(data.commentActionTache79 ?? ""),
+    commentActionTache96: String(data.commentActionTache96 ?? ""),
+    bciNumber: String(data.bciNumber ?? ""),
+    wioNumber: String(data.wioNumber ?? ""),
+    tache173Content: String(data.tache173Content ?? ""),
+    tache79Content: String(data.tache79Content ?? ""),
+    tache79JobId: String(data.tache79JobId ?? ""),
+    tache96Content: String(data.tache96Content ?? ""),
+    tache96SnowId: String(data.tache96SnowId ?? ""),
     wctLink: String(data.wctLink ?? ""),
     addressConfirmation,
     additionalInformation:
@@ -236,7 +255,13 @@ const stripUiFields = (intervention: Intervention) => {
   return interventionData;
 };
 
+const getLocalDateKey = (date = new Date()) =>
+  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
 const updateSummaryInBackground = (userId: string, date: string) => {
+  // A daily score is a snapshot. Once the calendar day has passed, later
+  // edits must never recalculate that day's score.
+  if (date !== getLocalDateKey()) return;
   void recalculateDailySummary(userId, date).catch((error) => {
     console.error("Daily summary update failed:", error);
   });

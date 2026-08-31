@@ -3,7 +3,11 @@ import type { CureRecords } from "../../redux/features/newInterventionSlice";
 export type AdditionalInformationTemplateId =
   | "bciThreeCures"
   | "bciWrongNumber"
-  | "wioIncorrectAddress";
+  | "wioIncorrectAddress"
+  | "wioOperatorChange"
+  | "tache173"
+  | "tache79"
+  | "tache96";
 
 export interface AdditionalInformationTemplateSource {
   phone: string;

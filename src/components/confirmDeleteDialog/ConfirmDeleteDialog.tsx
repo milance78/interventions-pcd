@@ -1,5 +1,6 @@
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
+import DraggableDialogPaper from "../draggableDialogPaper/DraggableDialogPaper";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
@@ -12,7 +13,7 @@ type Props = {
 };
 
 const ConfirmDeleteDialog = ({ open, onCancel, onConfirm }: Props) => (
-  <Dialog open={open} onClose={onCancel} maxWidth="xs" fullWidth>
+  <Dialog PaperComponent={DraggableDialogPaper} open={open} onClose={onCancel} maxWidth="xs" fullWidth>
     <DialogTitle>Supprimer cette intervention ?</DialogTitle>
     <DialogContent>
       <DialogContentText>

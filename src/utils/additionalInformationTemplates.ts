@@ -8,7 +8,11 @@ export type AdditionalInformationTemplateId =
   | "bciResiliation"
   | "snowCloseImpossible"
   | "snowUtacNonAssignable"
-  | "snowIfhUtacNotFound";
+  | "snowIfhUtacNotFound"
+  | "wioOperatorChange"
+  | "tache173"
+  | "tache79"
+  | "tache96";
 
 export interface AdditionalInformationTemplateSource {
   phone: string;
@@ -204,6 +208,30 @@ export const additionalInformationTemplates: AdditionalInformationTemplateDefini
       ].filter((item) => item.value);
     },
   },
+  {
+    id: "wioOperatorChange",
+    buttonLabel: "Changement d'opérateur",
+    headerInputLabel: "Numéro WIO",
+    dynamicValues: () => [],
+  },
+  {
+    id: "tache173",
+    buttonLabel: "Tâche 173",
+    headerInputLabel: "",
+    dynamicValues: () => [],
+  },
+  {
+    id: "tache79",
+    buttonLabel: "Tâche 79",
+    headerInputLabel: "Job ID",
+    dynamicValues: () => [],
+  },
+  {
+    id: "tache96",
+    buttonLabel: "Tâche 96",
+    headerInputLabel: "Snow ID",
+    dynamicValues: () => [],
+  },
 ];
 
 const formatNetworkLabel = (value: string): string => {
@@ -242,6 +270,10 @@ export const buildAdditionalInformationTemplate = (
   }
 
   if (templateId === "snowIfhUtacNotFound") {
+    return "";
+  }
+
+  if (templateId === "wioOperatorChange" || templateId === "tache173" || templateId === "tache79" || templateId === "tache96") {
     return "";
   }
 
