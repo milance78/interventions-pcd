@@ -82,7 +82,6 @@ const currentData = (state: Intervention): InterventionData => ({
   isGoodExample: state.isGoodExample,
   isSnow: state.isSnow,
   comment: state.comment,
-  additionalInformation: state.additionalInformation,
   cure: state.cure,
   cureRecords: state.cureRecords,
   curePendingSince: state.curePendingSince,
