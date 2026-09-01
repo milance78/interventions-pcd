@@ -6495,3 +6495,24 @@
 .current-intervention-page .right-card-actions__meta-history .revision-history-button {
   font-weight: 400 !important;
 }
+
+
+/* v199 — requested meta/footer arrangement without moving status controls. */
+.current-intervention-page .right-card-actions__meta-row {
+  justify-content: space-between !important;
+}
+.current-intervention-page .right-card-actions__meta-history {
+  order: 2 !important;
+}
+.current-intervention-page .right-card-actions__additional-trigger {
+  order: 1 !important;
+}
+.current-intervention-page .right-card-actions__bottom-right {
+  gap: 3px !important;
+}
+.current-intervention-page .right-card-actions--single {
+  margin-top: 7px !important;
+}
+.current-intervention-page .right-card-actions--dual {
+  margin-top: 0 !important;
+}

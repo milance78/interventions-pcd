@@ -573,6 +573,7 @@ const HistoryPage = () => {
     Record<string, HTMLElement | null>
   >({});
   const pendingScrollDateRef = useRef<string | null>(null);
+  const pendingScrollAnchorRef = useRef<string | null>(null);
 
   const { groupedInterventions, navigationGroups } = buildHistoryViewModel(
     interventions,
@@ -706,6 +707,25 @@ const HistoryPage = () => {
   }, [groupedInterventions.length]);
 
 
+  const performScrollToAnchor = (anchor: string) => {
+    const scrollContainer = scrollContainerRef.current;
+    if (!scrollContainer) return false;
+
+    const target = Array.from(
+      scrollContainer.querySelectorAll<HTMLElement>("[data-history-anchor]"),
+    ).find(
+      (element) => element.getAttribute("data-history-anchor") === anchor,
+    );
+
+    if (!target) return false;
+
+    scrollContainer.scrollTo({
+      top: Math.max(0, target.offsetTop - 8),
+      behavior: "smooth",
+    });
+    return true;
+  };
+
   const performScrollToDate = (dateKey: string) => {
     const scrollContainer = scrollContainerRef.current;
     const targetSection = dateSectionRefs.current[dateKey];
@@ -750,6 +770,8 @@ const HistoryPage = () => {
 
   useLayoutEffect(() => {
     const pendingDate = pendingScrollDateRef.current;
+    const pendingAnchor = pendingScrollAnchorRef.current;
+
     if (!pendingDate || !isDateNavigationActive) return;
 
     const groupIndex = groupedInterventions.findIndex(
@@ -758,12 +780,17 @@ const HistoryPage = () => {
 
     if (groupIndex < 0 || groupIndex >= renderedGroupCount) return;
 
-    const targetSection = dateSectionRefs.current[pendingDate];
-    if (!targetSection) return;
-
-    // One frame is enough after mounting the target. No timers and no
-    // second corrective pass: the browser owns the smooth animation.
     const frame = window.requestAnimationFrame(() => {
+      if (
+        pendingAnchor &&
+        performScrollToAnchor(pendingAnchor)
+      ) {
+        pendingScrollDateRef.current = null;
+        pendingScrollAnchorRef.current = null;
+        setIsDateNavigationActive(false);
+        return;
+      }
+
       if (performScrollToDate(pendingDate)) {
         pendingScrollDateRef.current = null;
         setIsDateNavigationActive(false);
@@ -776,14 +803,30 @@ const HistoryPage = () => {
   useEffect(() => {
     if (!isInitialized || groupedInterventions.length === 0) return;
 
-    const pendingDate = window.sessionStorage.getItem(
-      "history:pending-date",
-    );
+    const pendingDate = window.sessionStorage.getItem("history:pending-date");
+    const pendingAnchor = window.sessionStorage.getItem("history:pending-anchor");
 
     if (!pendingDate) return;
 
+    const groupIndex = groupedInterventions.findIndex(
+      (group) => group.key === pendingDate,
+    );
+
+    if (groupIndex < 0) {
+      window.sessionStorage.removeItem("history:pending-date");
+      window.sessionStorage.removeItem("history:pending-anchor");
+      return;
+    }
+
     window.sessionStorage.removeItem("history:pending-date");
-    window.requestAnimationFrame(() => scrollToDate(pendingDate));
+    window.sessionStorage.removeItem("history:pending-anchor");
+
+    pendingScrollDateRef.current = pendingDate;
+    pendingScrollAnchorRef.current = pendingAnchor;
+    setIsDateNavigationActive(true);
+    setRenderedGroupCount((current) =>
+      Math.max(current, groupIndex + 1),
+    );
   }, [groupedInterventions, isInitialized]);
 
   const exportHistoryDate = (dateKey: string, items: Intervention[]) => {
@@ -920,7 +963,15 @@ const HistoryPage = () => {
                         intervention.interventionId
                       }
                       className={`history-intervention-row status-${statusClass}`}
+                      data-history-anchor={`${intervention.dateKey ?? ""}::${intervention.documentId}`}
                     >
+                      {intervention.lastRevuAt && (
+                        <small className="history-intervention-last-review">
+                          Dernier revu le {new Date(intervention.lastRevuAt).toLocaleDateString("fr-BE")} à{" "}
+                          {new Date(intervention.lastRevuAt).toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit", hour12: false })}
+                        </small>
+                      )}
+
                       <div className="history-intervention-actions">
                         <button
                           type="button"

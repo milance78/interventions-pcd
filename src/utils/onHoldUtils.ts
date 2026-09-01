@@ -5,6 +5,7 @@ import {
 } from "./interventionIdentity";
 
 export type OnHoldTab =
+  | "overdue"
   | "cure"
   | "snowSent"
   | "snowReceived"
@@ -321,6 +322,82 @@ export const isCureOverdue = (
   now = new Date(),
 ) => getCureStatus(intervention, now).isOverdue;
 
+const parseLocalDateKey = (value: string | null | undefined): BelgianCalendarDate | null => {
+  if (!value) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.trim());
+  if (!match) return null;
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  };
+};
+
+const compareCalendarDates = (
+  first: BelgianCalendarDate,
+  second: BelgianCalendarDate,
+) => calendarDateKey(first).localeCompare(calendarDateKey(second));
+
+const addBusinessDaysToDateKey = (
+  dateKey: string | null | undefined,
+  businessDays: number,
+) => {
+  const source = parseLocalDateKey(dateKey);
+  if (!source) return null;
+
+  let date = source;
+  let counted = 0;
+  while (counted < businessDays) {
+    date = nextCalendarDate(date);
+    if (isBelgianBusinessDay(date)) counted += 1;
+  }
+  return date;
+};
+
+const isSnowOverdueAfterReview = (
+  intervention: Intervention,
+  now = new Date(),
+) => {
+  const today = getBelgiumDateParts(now);
+  const pendingReviews = [
+    intervention.isSnowReceivedPending ? intervention.snowReceivedReviewedDate : null,
+    intervention.isSnowSentPending ? intervention.snowSentReviewedDate : null,
+  ];
+
+  return pendingReviews.some((reviewDate) => {
+    const due = addBusinessDaysToDateKey(reviewDate, 2);
+    return due ? compareCalendarDates(today, due) >= 0 : false;
+  });
+};
+
+const isPostponedOverdue = (
+  intervention: Intervention,
+  now = new Date(),
+) => {
+  const due = parseLocalDateKey(intervention.postponedDate);
+  if (!due) return false;
+  return compareCalendarDates(getBelgiumDateParts(now), due) >= 0;
+};
+
+export const isOverdueIntervention = (
+  intervention: Intervention,
+  now = new Date(),
+) =>
+  isPostponedOverdue(intervention, now) ||
+  isCureOverdue(intervention, now) ||
+  isSnowOverdueAfterReview(intervention, now);
+
+export type OverdueKind = "postponed" | "cure" | "snow";
+
+export const getOverdueKind = (
+  intervention: Intervention,
+  now = new Date(),
+): OverdueKind => {
+  if (isPostponedOverdue(intervention, now)) return "postponed";
+  if (isCureOverdue(intervention, now)) return "cure";
+  return "snow";
+};
+
 export const getLatestInterventions = (
   interventions: Intervention[],
 ) => {
@@ -343,6 +420,10 @@ export const getOnHoldInterventions = (
   tab: OnHoldTab,
 ) => {
   const latest = getLatestInterventions(interventions);
+
+  if (tab === "overdue") {
+    return latest.filter((intervention) => isOverdueIntervention(intervention));
+  }
 
   if (tab === "cure") {
     return latest.filter(

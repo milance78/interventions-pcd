@@ -46,6 +46,7 @@ const currentData = (state: Intervention): InterventionData => ({
   tache96Content: state.tache96Content,
   tache96SnowId: state.tache96SnowId,
   additionalInformation: state.additionalInformation,
+  lastRevuAt: state.lastRevuAt,
   streetNumber: state.streetNumber,
   streetAlpha: state.streetAlpha,
   postalCode: state.postalCode,

@@ -184,6 +184,8 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     tache79JobId: String(data.tache79JobId ?? ""),
     tache96Content: String(data.tache96Content ?? ""),
     tache96SnowId: String(data.tache96SnowId ?? ""),
+    lastRevuAt:
+      typeof data.lastRevuAt === "string" ? data.lastRevuAt : null,
     wctLink: String(data.wctLink ?? ""),
     addressConfirmation,
     additionalInformation:

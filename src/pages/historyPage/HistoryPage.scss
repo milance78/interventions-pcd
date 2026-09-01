@@ -1411,3 +1411,11 @@
 .history-date-header__tools{margin-left:auto;display:flex;align-items:center}
 .history-date-export-button,.today-export-button{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #b8c6d8;border-radius:7px;background:#f7fafc;color:#35506e;font:600 12px Arial,sans-serif;cursor:pointer}
 .history-date-export-button:hover,.today-export-button:hover{background:#edf4fb;border-color:#9fb4ca}
+
+.history-intervention-last-review {
+  display: block;
+  margin-top: 4px;
+  color: #7a8796;
+  font-size: 10px;
+  font-weight: 500;
+}

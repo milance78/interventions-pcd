@@ -865,3 +865,104 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   .on-hold-tabs { flex: 1 1 auto !important; min-width: 0 !important; max-width: none !important; grid-template-columns: repeat(6, minmax(0,1fr)) !important; }
   .on-hold-tab { min-width: 0 !important; padding: 8px 10px !important; gap: 7px !important; font-size: 14px !important; }
 }
+
+
+/* v199 — overdue list and review metadata. */
+.on-hold-tab--overdue {
+  --tab-color: #b45309 !important;
+  --tab-soft: rgba(180, 83, 9, .10) !important;
+  --tab-line: rgba(180, 83, 9, .50) !important;
+}
+.on-hold-tab--overdue .on-hold-tab__icon svg {
+  width: 27px !important;
+  height: 27px !important;
+}
+.on-hold-card--overdue {
+  border-color: rgba(180, 83, 9, .24) !important;
+}
+.on-hold-card--overdue .on-hold-card__status-main {
+  color: #b45309 !important;
+}
+.on-hold-card__last-review {
+  display: block !important;
+  margin-top: 4px !important;
+  color: #7a8796 !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  white-space: nowrap !important;
+}
+
+
+/* v200 — Échéance dépassée is deliberately icon-only to preserve the fixed
+   tab geometry. The warning triangle is the button label; no text is shown. */
+.on-hold-tab--overdue {
+  flex: 0 0 auto !important;
+  width: 62px !important;
+  min-width: 62px !important;
+  max-width: 62px !important;
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+  gap: 7px !important;
+  justify-content: center !important;
+}
+
+.on-hold-tab--overdue .on-hold-tab__icon {
+  width: 27px !important;
+  min-width: 27px !important;
+}
+
+.on-hold-tab--overdue > strong {
+  margin-left: 0 !important;
+}
+
+
+/* v201 — Échéance dépassée is intentionally icon-only. Its grid slot must
+   collapse to the icon + counter so removing the text actually frees space. */
+@media (min-width: 901px) {
+  .on-hold-page .on-hold-tabs {
+    grid-template-columns: 68px repeat(6, minmax(0, 1fr)) !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue {
+    width: 68px !important;
+    min-width: 68px !important;
+    max-width: 68px !important;
+    padding: 8px 4px !important;
+    gap: 4px !important;
+    justify-content: center !important;
+    color: #cf6767 !important;
+    background: transparent !important;
+    border-right: 1px solid #d8e0ea !important;
+    border-radius: 0 !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue .on-hold-tab__icon {
+    color: #cf6767 !important;
+    flex: 0 0 auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue .on-hold-tab__icon svg {
+    width: 26px !important;
+    height: 26px !important;
+    stroke-width: 2.2 !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue > strong {
+    min-width: 22px !important;
+    height: 22px !important;
+    padding: 0 5px !important;
+    color: #a94d4d !important;
+    background: #f8e4e4 !important;
+    border: 1px solid #ecc2c2 !important;
+    font-size: 10px !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active {
+    color: #bd5c5c !important;
+    background: #fff7f7 !important;
+    box-shadow: inset 0 -2px 0 #cf6767 !important;
+  }
+}

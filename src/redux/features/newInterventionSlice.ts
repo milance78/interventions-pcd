@@ -151,6 +151,7 @@ export interface InterventionData {
   postponedDate: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  lastRevuAt: string | null;
   dateKey?: string;
 }
 
@@ -277,6 +278,7 @@ export const emptyInterventionData: InterventionData = {
   postponedDate: null,
   createdAt: null,
   updatedAt: null,
+  lastRevuAt: null,
 };
 
 export const hasMeaningfulDraft = (
@@ -390,6 +392,7 @@ const extractData = (state: Intervention): InterventionData => ({
   postponedDate: state.postponedDate,
   createdAt: state.createdAt,
   updatedAt: state.updatedAt,
+  lastRevuAt: state.lastRevuAt,
   dateKey: state.dateKey,
 });
 

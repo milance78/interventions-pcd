@@ -4,6 +4,7 @@ import { createIntervention } from "../../firebase/interventionsService";
 import type { Intervention } from "../features/newInterventionSlice";
 import { normalizeInterventionStrings } from "../../utils/textUtils";
 import { addHistoryIntervention } from "../features/historySlice";
+import { addIntervention } from "../features/interventionsListSlice";
 
 const getLocalDate = () => {
   const now = new Date();
@@ -46,6 +47,7 @@ const createInterventionThunk = createAsyncThunk<
       };
 
       dispatch(addHistoryIntervention(createdIntervention));
+      dispatch(addIntervention(createdIntervention));
       return createdIntervention;
     } catch (error) {
       return rejectWithValue(

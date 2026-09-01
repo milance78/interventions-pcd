@@ -91,7 +91,7 @@ const PENDING_TAB_KEY = "on-hold:pending-tab";
 const SMART_IMPORT_AUTO_OPEN_KEY = "smart-import:auto-open";
 
 type OnHoldEditContext = {
-  tab: "cure" | "res" | "snowReceived" | "snowSent" | "questions" | "other";
+  tab: "overdue" | "cure" | "res" | "snowReceived" | "snowSent" | "questions" | "other";
   anchor: string;
   documentId: string;
   dateKey: string;
@@ -109,6 +109,7 @@ const readOnHoldEditContext = (): OnHoldEditContext | null => {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as Partial<OnHoldEditContext>;
     const tab =
+      parsed.tab === "overdue" ||
       parsed.tab === "cure" ||
       parsed.tab === "res" ||
       parsed.tab === "snowReceived" ||
@@ -400,7 +401,9 @@ const CurrentInterventionPage = () => {
   const isOpenedFromReviewableOnHold = Boolean(
     isOpenedFromOnHold &&
       onHoldEditContext &&
-      ["res", "snowReceived", "snowSent", "other"].includes(onHoldEditContext.tab),
+      ["overdue", "cure", "res", "snowReceived", "snowSent", "questions", "other"].includes(
+        onHoldEditContext.tab,
+      ),
   );
 
   const showActionNotice = (
@@ -721,6 +724,7 @@ const CurrentInterventionPage = () => {
     const completed = payload.status === "completed" || payload.status === "transferred";
     const onHold = payload.status === "on hold";
     const today = getLocalDateKey();
+    const reviewedAt = new Date().toISOString();
 
     if (completed) {
       // Once an intervention opened from En attente is completed/transferred,
@@ -735,6 +739,7 @@ const CurrentInterventionPage = () => {
         isSnow: false,
         isResPending: false,
         isUnclear: false,
+        lastRevuAt: reviewedAt,
         ...(context.tab === "res" ? { resReviewedDate: today } : {}),
         ...(context.tab === "snowReceived" ? { snowReceivedReviewedDate: today } : {}),
         ...(context.tab === "snowSent" ? { snowSentReviewedDate: today } : {}),
@@ -746,36 +751,49 @@ const CurrentInterventionPage = () => {
 
     if (context.tab === "res") {
       return onHold
-        ? { ...payload, resReviewedDate: today }
-        : payload;
+        ? { ...payload, resReviewedDate: today, lastRevuAt: reviewedAt }
+        : { ...payload, lastRevuAt: reviewedAt };
     }
 
     if (context.tab === "snowReceived") {
-      if (!onHold) return payload;
-      const next = { ...payload, snowReceivedReviewedDate: today };
+      if (!onHold) return { ...payload, lastRevuAt: reviewedAt };
+      const next = { ...payload, snowReceivedReviewedDate: today, lastRevuAt: reviewedAt };
       // Preserve the second Snow membership exactly as edited by the operator.
       if (payload.isSnowSentPending) next.snowSentReviewedDate = today;
       return next;
     }
 
     if (context.tab === "snowSent") {
-      if (!onHold) return payload;
-      const next = { ...payload, snowSentReviewedDate: today };
+      if (!onHold) return { ...payload, lastRevuAt: reviewedAt };
+      const next = { ...payload, snowSentReviewedDate: today, lastRevuAt: reviewedAt };
       if (payload.isSnowReceivedPending) next.snowReceivedReviewedDate = today;
       return next;
     }
 
     if (context.tab === "cure") {
-      return onHold ? { ...payload, cureReviewedDate: today } : payload;
+      return onHold
+        ? { ...payload, cureReviewedDate: today, lastRevuAt: reviewedAt }
+        : { ...payload, lastRevuAt: reviewedAt };
     }
 
     if (context.tab === "questions") {
       return onHold
-        ? { ...payload, questionReviewedDate: today }
-        : payload;
+        ? { ...payload, questionReviewedDate: today, lastRevuAt: reviewedAt }
+        : { ...payload, lastRevuAt: reviewedAt };
     }
 
-    return { ...payload, otherReviewedDate: today };
+    if (context.tab === "overdue") {
+      return {
+        ...payload,
+        lastRevuAt: reviewedAt,
+        ...(payload.postponedDate ? { otherReviewedDate: today } : {}),
+        ...(payload.cure !== "noCure" ? { cureReviewedDate: today } : {}),
+        ...(payload.isSnowReceivedPending ? { snowReceivedReviewedDate: today } : {}),
+        ...(payload.isSnowSentPending ? { snowSentReviewedDate: today } : {}),
+      };
+    }
+
+    return { ...payload, otherReviewedDate: today, lastRevuAt: reviewedAt };
   };
 
   const submitActions = async () => {
@@ -784,17 +802,16 @@ const CurrentInterventionPage = () => {
 
     let safePayload =
       isEditing && formIsCompletelyEmpty && newIntervention.editSnapshot
-        ? {
-            ...newIntervention,
-            ...newIntervention.editSnapshot,
-          }
+        ? { ...newIntervention, ...newIntervention.editSnapshot }
         : normalized;
 
     if (isOpenedFromOnHold && onHoldEditContext) {
-      safePayload = applyOnHoldConsultationState(
-        safePayload,
-        onHoldEditContext,
-      );
+      safePayload = applyOnHoldConsultationState(safePayload, onHoldEditContext);
+    }
+
+    const isRevuAction = isOpenedFromReviewableOnHold;
+    if (isRevuAction && !safePayload.lastRevuAt) {
+      safePayload = { ...safePayload, lastRevuAt: new Date().toISOString() };
     }
 
     const result = isEditing
@@ -809,17 +826,43 @@ const CurrentInterventionPage = () => {
       const message =
         typeof result.payload === "string"
           ? result.payload
-          : result.error.message ||
-            "L'intervention n'a pas pu être enregistrée.";
-
+          : result.error.message || "L'intervention n'a pas pu être enregistrée.";
       window.alert(message);
       return;
     }
 
-    // Enregistrer / Revu always finish the current editing task. The page stays
-    // on Intervention en cours but is reset to a completely blank, ready form.
+    const saved = result.payload as typeof newIntervention;
+    const today = getLocalDateKey();
+    const isOnTodayList =
+      saved.dateKey === today ||
+      todayInterventions.some(
+        (item) =>
+          item.documentId === saved.documentId ||
+          (item.interventionId && item.interventionId === saved.interventionId),
+      );
+
     window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
     dispatch(clearTask());
+
+    if (isRevuAction && onHoldEditContext) {
+      window.sessionStorage.setItem(PENDING_TAB_KEY, onHoldEditContext.tab);
+      navigate("/en-attente");
+      return;
+    }
+
+    if (isOnTodayList) {
+      navigate("/liste-du-jour");
+      return;
+    }
+
+    if (saved.dateKey) {
+      window.sessionStorage.setItem("history:pending-date", saved.dateKey);
+      window.sessionStorage.setItem(
+        "history:pending-anchor",
+        `${saved.dateKey}::${saved.documentId}`,
+      );
+    }
+    navigate("/historique");
   };
 
   const addToTodayList = async () => {
@@ -838,17 +881,14 @@ const CurrentInterventionPage = () => {
       const message =
         typeof result.payload === "string"
           ? result.payload
-          : result.error.message ||
-            "L'intervention n'a pas pu être ajoutée à la liste du jour.";
+          : result.error.message || "L'intervention n'a pas pu être ajoutée à la liste du jour.";
       window.alert(message);
       return;
     }
 
-    // This button is also a save: every field currently present in the form
-    // has already been persisted by the thunk. Clear the editor afterwards so
-    // Intervention en cours is immediately ready for the next case.
     window.sessionStorage.removeItem(ON_HOLD_EDIT_CONTEXT_KEY);
     dispatch(clearTask());
+    navigate("/liste-du-jour");
   };
 
   const openRevisionHistory = async () => {
@@ -1346,7 +1386,13 @@ const CurrentInterventionPage = () => {
             </div>
           </div>
 
-          <footer className="right-card-actions">
+          <footer
+            className={`right-card-actions ${
+              snowReceived.trim()
+                ? "right-card-actions--dual"
+                : "right-card-actions--single"
+            }`}
+          >
             <div className="right-card-actions__row right-card-actions__row--top">
               <div className="right-card-actions__history-slot" />
               <div className="right-card-actions__spacer" />

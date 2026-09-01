@@ -2,6 +2,7 @@ import * as React from "react";
 import { useNavigate } from "react-router-dom";
 import { flushSync } from "react-dom";
 import AccessTimeRounded from "@mui/icons-material/AccessTimeRounded";
+import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
 import EventRepeatRounded from "@mui/icons-material/EventRepeatRounded";
@@ -12,6 +13,7 @@ import { loadInterventionFromSearch } from "../../redux/features/newIntervention
 import {
   getCureDeadline,
   getOnHoldInterventions,
+  getOverdueKind,
   isCureOverdue,
   type OnHoldTab,
 } from "../../utils/onHoldUtils";
@@ -35,6 +37,7 @@ const tabs: Array<{
   label: string;
   icon: React.ReactNode;
 }> = [
+  { value: "overdue", label: "Échéance dépassée", icon: <WarningAmberRounded /> },
   { value: "cure", label: "CURE", icon: <PhoneInTalkRounded /> },
   {
     value: "res",
@@ -169,6 +172,19 @@ const OnHoldPage = () => {
   const sortedInterventions = React.useMemo(() => {
     const sorted = [...interventions];
 
+    if (activeTab === "overdue") {
+      const priority: Record<string, number> = {
+        postponed: 0,
+        cure: 1,
+        snow: 2,
+      };
+      return sorted.sort(
+        (first, second) =>
+          priority[getOverdueKind(first)] - priority[getOverdueKind(second)] ||
+          interventionOldestValue(first).localeCompare(interventionOldestValue(second)),
+      );
+    }
+
     if (activeTab === "cure") {
       const today = localDateKey();
       return sorted.sort((first, second) => {
@@ -293,6 +309,13 @@ const OnHoldPage = () => {
   const getCardLabel = (
     intervention: (typeof sortedInterventions)[number],
   ) => {
+    if (activeTab === "overdue") {
+      const kind = getOverdueKind(intervention);
+      if (kind === "postponed") return "POSTPOSÉ";
+      if (kind === "cure") return "CURE";
+      return "SNOW";
+    }
+
     if (activeTab === "cure") {
       return intervention.cure === "firstCure" ? "CURE 1" : "CURE 2";
     }
@@ -306,6 +329,7 @@ const OnHoldPage = () => {
   };
 
   const getStatusIcon = () => {
+    if (activeTab === "overdue") return <WarningAmberRounded />;
     if (activeTab === "cure") return <PhoneInTalkRounded />;
     if (activeTab === "res") return <CableCutIcon />;
     if (activeTab === "snowReceived") {
@@ -435,6 +459,16 @@ const OnHoldPage = () => {
           </span>
         </span>
 
+        {intervention.lastRevuAt && (
+          <small className="on-hold-card__last-review">
+            Dernier revu le {new Date(intervention.lastRevuAt).toLocaleDateString("fr-BE")} à{" "}
+            {new Date(intervention.lastRevuAt).toLocaleTimeString("fr-BE", {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            })}
+          </small>
+        )}
         <ArrowForwardRounded className="on-hold-card__arrow" />
       </article>
     );
@@ -467,8 +501,13 @@ const OnHoldPage = () => {
                 }`}
                 onClick={() => changeTab(tab.value)}
               >
-                <span className="on-hold-tab__icon">{tab.icon}</span>
-                <span>{tab.label}</span>
+                <span
+                  className="on-hold-tab__icon"
+                  aria-hidden={tab.value !== "overdue"}
+                >
+                  {tab.icon}
+                </span>
+                {tab.value !== "overdue" && <span>{tab.label}</span>}
                 <strong>{count}</strong>
               </button>
             );
