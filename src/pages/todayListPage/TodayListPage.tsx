@@ -542,6 +542,20 @@ const TodayListPage = () => {
                             )}
                           </span>
                         )}
+
+                        {hasValue(intervention.snowReceived) && (
+                          <span
+                            className={`today-badge today-snow-status ${
+                              intervention.snowStatus === "resolved"
+                                ? "today-snow-status--resolved"
+                                : "today-snow-status--pending"
+                            }`}
+                          >
+                            {intervention.snowStatus === "resolved"
+                              ? "Snow résolu"
+                              : "Snow en attente"}
+                          </span>
+                        )}
                       </div>
                     )}
                   </div>
@@ -690,16 +704,6 @@ const TodayListPage = () => {
                     />
                   )}
 
-                  {intervention.lastRevuAt && (
-                    <small className="today-intervention-last-review">
-                      Dernier revu le {new Date(intervention.lastRevuAt).toLocaleDateString("fr-BE")} à{" "}
-                      {new Date(intervention.lastRevuAt).toLocaleTimeString("fr-BE", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        hour12: false,
-                      })}
-                    </small>
-                  )}
                 </div>
               </article>
             );

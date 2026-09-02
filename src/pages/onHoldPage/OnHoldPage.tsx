@@ -446,6 +446,30 @@ const OnHoldPage = () => {
               <span>{intervention.postponedDate.split("-").reverse().join("/")}</span>
             </span>
           )}
+          <span className="on-hold-card__timestamps">
+            <small>
+              Créé le {intervention.createdAt
+                ? new Date(intervention.createdAt).toLocaleDateString("fr-BE")
+                : "—"} à {intervention.createdAt
+                  ? `${new Date(intervention.createdAt).toLocaleTimeString("fr-BE", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })}h`
+                  : "—"}
+            </small>
+            <small>
+              Revu le {intervention.lastRevuAt
+                ? new Date(intervention.lastRevuAt).toLocaleDateString("fr-BE")
+                : "—"} à {intervention.lastRevuAt
+                  ? `${new Date(intervention.lastRevuAt).toLocaleTimeString("fr-BE", {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      hour12: false,
+                    })}h`
+                  : "—"}
+            </small>
+          </span>
         </span>
 
         <span className="on-hold-card__details">
@@ -459,16 +483,6 @@ const OnHoldPage = () => {
           </span>
         </span>
 
-        {intervention.lastRevuAt && (
-          <small className="on-hold-card__last-review">
-            Dernier revu le {new Date(intervention.lastRevuAt).toLocaleDateString("fr-BE")} à{" "}
-            {new Date(intervention.lastRevuAt).toLocaleTimeString("fr-BE", {
-              hour: "2-digit",
-              minute: "2-digit",
-              hour12: false,
-            })}
-          </small>
-        )}
         <ArrowForwardRounded className="on-hold-card__arrow" />
       </article>
     );

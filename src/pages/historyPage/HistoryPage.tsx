@@ -965,13 +965,6 @@ const HistoryPage = () => {
                       className={`history-intervention-row status-${statusClass}`}
                       data-history-anchor={`${intervention.dateKey ?? ""}::${intervention.documentId}`}
                     >
-                      {intervention.lastRevuAt && (
-                        <small className="history-intervention-last-review">
-                          Dernier revu le {new Date(intervention.lastRevuAt).toLocaleDateString("fr-BE")} à{" "}
-                          {new Date(intervention.lastRevuAt).toLocaleTimeString("fr-BE", { hour: "2-digit", minute: "2-digit", hour12: false })}
-                        </small>
-                      )}
-
                       <div className="history-intervention-actions">
                         <button
                           type="button"
@@ -1045,6 +1038,20 @@ const HistoryPage = () => {
                               ? displayStatus(intervention.status)
                               : "\u00A0"}
                           </span>
+
+                          {hasValue(intervention.snowReceived) && (
+                            <span
+                              className={`history-badge history-snow-status ${
+                                intervention.snowStatus === "resolved"
+                                  ? "history-snow-status--resolved"
+                                  : "history-snow-status--pending"
+                              }`}
+                            >
+                              {intervention.snowStatus === "resolved"
+                                ? "Snow résolu"
+                                : "Snow en attente"}
+                            </span>
+                          )}
                         </div>
 
                         <div className="history-flags-section">

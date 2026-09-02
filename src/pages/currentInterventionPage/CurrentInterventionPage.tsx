@@ -796,6 +796,38 @@ const CurrentInterventionPage = () => {
     return { ...payload, otherReviewedDate: today, lastRevuAt: reviewedAt };
   };
 
+  const stampFirstPendingActivation = (payload: typeof newIntervention) => {
+    const original = isEditing ? newIntervention.editSnapshot : null;
+    const now = new Date().toISOString();
+    const today = getLocalDateKey();
+    let next = payload;
+
+    // These three lists receive their initial Revu stamp automatically when
+    // the intervention is actually saved with the pending marker for the
+    // first time. Existing pending markers are left untouched.
+    if (payload.isResPending && !original?.isResPending && !payload.resReviewedDate) {
+      next = { ...next, resReviewedDate: today, lastRevuAt: now };
+    }
+
+    if (
+      payload.isSnowReceivedPending &&
+      !original?.isSnowReceivedPending &&
+      !payload.snowReceivedReviewedDate
+    ) {
+      next = { ...next, snowReceivedReviewedDate: today, lastRevuAt: now };
+    }
+
+    if (
+      payload.isSnowSentPending &&
+      !original?.isSnowSentPending &&
+      !payload.snowSentReviewedDate
+    ) {
+      next = { ...next, snowSentReviewedDate: today, lastRevuAt: now };
+    }
+
+    return next;
+  };
+
   const submitActions = async () => {
     const normalized = normalizeInterventionStrings(newIntervention);
     const formIsCompletelyEmpty = !hasMeaningfulDraft(normalized);
@@ -804,6 +836,8 @@ const CurrentInterventionPage = () => {
       isEditing && formIsCompletelyEmpty && newIntervention.editSnapshot
         ? { ...newIntervention, ...newIntervention.editSnapshot }
         : normalized;
+
+    safePayload = stampFirstPendingActivation(safePayload);
 
     if (isOpenedFromOnHold && onHoldEditContext) {
       safePayload = applyOnHoldConsultationState(safePayload, onHoldEditContext);
@@ -868,10 +902,11 @@ const CurrentInterventionPage = () => {
   const addToTodayList = async () => {
     if (mode !== "SEARCH_EDIT" && mode !== "HISTORY_EDIT") return;
 
-    const payload =
-      isOpenedFromOnHold && onHoldEditContext
-        ? applyOnHoldConsultationState(newIntervention, onHoldEditContext)
-        : newIntervention;
+    let payload = stampFirstPendingActivation(newIntervention);
+
+    if (isOpenedFromOnHold && onHoldEditContext) {
+      payload = applyOnHoldConsultationState(payload, onHoldEditContext);
+    }
 
     const result = await dispatch(
       updateSearchInterventionThunk(payload),
