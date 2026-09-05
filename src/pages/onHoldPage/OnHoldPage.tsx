@@ -22,6 +22,8 @@ import "./OnHoldPage.scss";
 import { usePersistentElementScroll } from "../../hooks/usePersistentScroll";
 import CableCutMono from "../../assets/icons/CableCutMono.png";
 import SnowStatusIcon from "../../components/snowStatusIcon/SnowStatusIcon";
+import { FileSpreadsheet } from "lucide-react";
+import { exportInterventionsToExcel } from "../../utils/excelExport";
 
 const CableCutIcon = () => (
   <img
@@ -306,6 +308,13 @@ const OnHoldPage = () => {
     navigate("/intervention-en-cours");
   };
 
+  const exportOnHoldList = () => {
+    const labels: Record<OnHoldTab, string> = {
+      overdue: "Echeance_depassee", cure: "CURE", res: "Resiliation", snowReceived: "Snow_a_mon_nom", snowSent: "Snow_cree", questions: "Questions_MP", other: "Postpose",
+    };
+    exportInterventionsToExcel(sortedInterventions, "En attente", `En_attente_${labels[activeTab]}.xls`);
+  };
+
   const getCardLabel = (
     intervention: (typeof sortedInterventions)[number],
   ) => {
@@ -530,6 +539,11 @@ const OnHoldPage = () => {
       </section>
 
       <section className="on-hold-list">
+        <div className="on-hold-list__toolbar">
+          <button type="button" className="on-hold-export-button" onClick={exportOnHoldList} title="Exporter cette liste vers Excel">
+            <FileSpreadsheet size={16} /> Excel
+          </button>
+        </div>
         {isRefreshing && history.length === 0 ? (
           <div className="on-hold-empty">Chargement des interventions…</div>
         ) : sortedInterventions.length === 0 ? (

@@ -6516,3 +6516,280 @@
 .current-intervention-page .right-card-actions--dual {
   margin-top: 0 !important;
 }
+
+
+/* v205 — requested final footer arrangement. */
+.current-intervention-page .right-card-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  border-top: 0 !important;
+  padding-top: 8px !important;
+}
+.current-intervention-page .right-card-actions__row--top,
+.current-intervention-page .right-card-actions__row--bottom {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 53px !important;
+  height: 53px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  gap: 10px !important;
+}
+.current-intervention-page .right-card-actions__utility-row {
+  grid-column: 1 / -1 !important;
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: 44px !important;
+}
+.current-intervention-page .right-card-actions__utility-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 7px 10px !important;
+  border: 1px solid currentColor !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #526b83 !important;
+  -webkit-text-fill-color: #526b83 !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  text-transform: none !important;
+}
+.current-intervention-page .right-card-actions__utility-button:hover {
+  background: rgba(82,107,131,.05) !important;
+}
+.current-intervention-page .right-card-actions__status-slot {
+  grid-column: 1 !important;
+  width: 100% !important;
+  height: 53px !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  position: static !important;
+  width: min(100%, 310px) !important;
+  min-width: 0 !important;
+  max-width: 310px !important;
+  height: 53px !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 6px !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiSelect-select {
+  font-size: 13px !important;
+  padding-left: 8px !important;
+  padding-right: 24px !important;
+}
+.current-intervention-page .right-card-actions__submit-slot {
+  grid-column: 2 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  min-width: 150px !important;
+}
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button {
+  width: 165px !important;
+  min-width: 165px !important;
+  max-width: 165px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+}
+.current-intervention-page .right-card-actions__bottom-right {
+  grid-column: 3 !important;
+  width: 100% !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  width: 205px !important;
+  min-width: 205px !important;
+  max-width: 205px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+}
+@media (max-width: 900px) {
+  .current-intervention-page .right-card-actions__utility-row { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 6px !important; }
+  .current-intervention-page .right-card-actions__utility-button { font-size: 12px !important; padding-left: 6px !important; padding-right: 6px !important; }
+  .current-intervention-page .right-card-actions__status-slot .status-wrapper { max-width: 250px !important; }
+  .current-intervention-page .right-card-actions__submit-slot .submit-intervention-button { width: 145px !important; min-width: 145px !important; }
+  .current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history { width: 180px !important; min-width: 180px !important; }
+}
+
+/* v206 — overdue control: keep the single active underline and move its content farther from the divider. */
+@media (min-width: 901px) {
+  .on-hold-page .on-hold-tabs { grid-template-columns: 104px repeat(6, minmax(0, 1fr)) !important; }
+  .on-hold-page .on-hold-tab--overdue {
+    width: 104px !important; min-width: 104px !important; max-width: 104px !important;
+    padding: 8px 10px !important; gap: 8px !important; justify-content: center !important;
+  }
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active::after {
+    left: 10px !important; right: 10px !important; bottom: 2px !important; height: 2px !important;
+  }
+}
+
+.on-hold-list__toolbar {
+  display: flex; justify-content: flex-end; margin: 0 2px 8px;
+}
+.on-hold-export-button {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px;
+  border: 1px solid #b8c6d8; border-radius: 7px; background: #f7fafc; color: #35506e;
+  font: 600 12px Arial, sans-serif; cursor: pointer;
+}
+.on-hold-export-button:hover { background: #edf4fb; border-color: #9fb4ca; }
+
+
+/* v207 — final requested footer geometry and utility-button styling. */
+.current-intervention-page .right-card-actions {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  padding-top: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__row--top {
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 44px !important;
+  height: 44px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__utility-row {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+  height: 44px !important;
+}
+
+.current-intervention-page .right-card-actions__utility-button {
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 6px 10px !important;
+  border: 1px solid #bdbdbd !important;
+  border-radius: 8px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #6f7b8a !important;
+  -webkit-text-fill-color: #6f7b8a !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  text-transform: none !important;
+  white-space: nowrap !important;
+}
+.current-intervention-page .right-card-actions__utility-button .MuiButton-startIcon {
+  margin-left: 0 !important;
+  margin-right: 6px !important;
+}
+.current-intervention-page .right-card-actions__utility-button .MuiButton-startIcon svg {
+  width: 18px !important;
+  height: 18px !important;
+}
+.current-intervention-page .right-card-actions__utility-button:hover {
+  border-color: #9e9e9e !important;
+  background: rgba(189,189,189,.05) !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) 150px 205px !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 53px !important;
+  height: 53px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  gap: 10px !important;
+}
+.current-intervention-page .right-card-actions__status-slot {
+  grid-column: 1 !important;
+  position: static !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 53px !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  width: min(100%, 250px) !important;
+  min-width: 0 !important;
+  max-width: 250px !important;
+  height: 53px !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 6px !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper.status-wrapper--dual {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+  gap: 6px !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiFormControl-root {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .MuiSelect-select {
+  font-size: 13px !important;
+  padding-left: 7px !important;
+  padding-right: 24px !important;
+}
+.current-intervention-page .right-card-actions__submit-slot {
+  grid-column: 2 !important;
+  width: 150px !important;
+  min-width: 150px !important;
+  height: 53px !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: center !important;
+}
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button {
+  width: 150px !important;
+  min-width: 150px !important;
+  max-width: 150px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  font-size: 14px !important;
+}
+.current-intervention-page .right-card-actions__bottom-right {
+  grid-column: 3 !important;
+  position: static !important;
+  width: 205px !important;
+  min-width: 205px !important;
+  max-width: 205px !important;
+  height: 53px !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: flex-end !important;
+  gap: 0 !important;
+}
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  width: 205px !important;
+  min-width: 205px !important;
+  max-width: 205px !important;
+  height: 53px !important;
+  min-height: 53px !important;
+  font-size: 14px !important;
+}
+
+/* No Snow à mon nom value = no secondary Snow status in the export. */

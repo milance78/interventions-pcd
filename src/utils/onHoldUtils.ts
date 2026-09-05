@@ -407,7 +407,17 @@ export const getLatestInterventions = (
     const key = interventionLogicalKey(intervention);
     const current = latest.get(key);
 
-    if (!current || interventionActivityValue(intervention) > interventionActivityValue(current)) {
+    if (!current) {
+      latest.set(key, intervention);
+      return;
+    }
+
+    // Daily occurrences are immutable. A review only updates the occurrence
+    // that was clicked; it must never make an older occurrence become the
+    // "latest" one merely because its updatedAt changed.
+    const currentDate = current.dateKey ?? "";
+    const nextDate = intervention.dateKey ?? "";
+    if (nextDate > currentDate || (nextDate === currentDate && interventionActivityValue(intervention) > interventionActivityValue(current))) {
       latest.set(key, intervention);
     }
   });

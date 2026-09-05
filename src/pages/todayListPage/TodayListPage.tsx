@@ -263,7 +263,7 @@ const TodayListPage = () => {
   const exportTodayList = () => {
     const now = new Date();
     const dateKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
-    exportInterventionsToExcel(interventions, now.toLocaleDateString("fr-BE"), `Liste_du_jour_${dateKey}.xls`);
+    exportInterventionsToExcel(interventions, now.toLocaleDateString("fr-BE"), `Liste_du_jour_${dateKey.split("-").reverse().join("-")}.xls`);
   };
 
   return (

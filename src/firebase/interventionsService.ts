@@ -125,6 +125,12 @@ const normalizeLegacyFields = (data: Record<string, any>): Record<string, any> =
     snowReceived,
     snowSent,
     snowMentioned,
+    snowMentionedCreatedAt:
+      typeof data.snowMentionedCreatedAt === "string" ? data.snowMentionedCreatedAt : null,
+    snowReceivedCreatedAt:
+      typeof data.snowReceivedCreatedAt === "string" ? data.snowReceivedCreatedAt : null,
+    snowSentCreatedAt:
+      typeof data.snowSentCreatedAt === "string" ? data.snowSentCreatedAt : null,
     isSnowReceivedPending,
     isSnowSentPending,
     snowStatus,
@@ -420,6 +426,26 @@ export const updateIntervention = async (
   writeVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
   await batch.commit();
   updateSummaryInBackground(userId, date);
+};
+
+export const markInterventionReviewed = async (
+  userId: string,
+  date: string,
+  documentId: string,
+  intervention: Intervention,
+) => {
+  if (!documentId) throw new Error("Missing Firestore document ID");
+  const snapshotRef = doc(getInterventionsReference(userId, date), documentId);
+  const snapshot = await getDoc(snapshotRef);
+  const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
+  const activeRef = doc(getActiveReference(userId), caseId);
+  const data = stripUiFields(intervention);
+  const batch = writeBatch(db);
+  batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
+  batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
+  writeVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
+  await batch.commit();
+  return { ...intervention, updatedAt: new Date().toISOString(), dateKey: date };
 };
 
 export interface InterventionRevision {

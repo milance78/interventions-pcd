@@ -98,6 +98,9 @@ export interface InterventionData {
   snowReceived: string;
   snowSent: string;
   snowMentioned: string;
+  snowMentionedCreatedAt: string | null;
+  snowReceivedCreatedAt: string | null;
+  snowSentCreatedAt: string | null;
   isSnowReceivedPending: boolean;
   isSnowSentPending: boolean;
   /** Snow ticket resolution state, shown next to the base status once
@@ -232,6 +235,9 @@ export const emptyInterventionData: InterventionData = {
   snowReceived: "",
   snowSent: "",
   snowMentioned: "",
+  snowMentionedCreatedAt: null,
+  snowReceivedCreatedAt: null,
+  snowSentCreatedAt: null,
   isSnowReceivedPending: false,
   isSnowSentPending: false,
   snowStatus: "pending",
@@ -346,6 +352,9 @@ const extractData = (state: Intervention): InterventionData => ({
   snowReceived: state.snowReceived,
   snowSent: state.snowSent,
   snowMentioned: state.snowMentioned,
+  snowMentionedCreatedAt: state.snowMentionedCreatedAt,
+  snowReceivedCreatedAt: state.snowReceivedCreatedAt,
+  snowSentCreatedAt: state.snowSentCreatedAt,
   isSnowReceivedPending: state.isSnowReceivedPending,
   isSnowSentPending: state.isSnowSentPending,
   snowStatus: state.snowStatus,
@@ -505,6 +514,9 @@ const NewInterventionSlice = createSlice({
 
       const { field, value } = action.payload;
       const previousCure = state.cure;
+      const previousSnowMentioned = state.snowMentioned;
+      const previousSnowReceived = state.snowReceived;
+      const previousSnowSent = state.snowSent;
 
       (
         state as unknown as Record<
@@ -512,6 +524,16 @@ const NewInterventionSlice = createSlice({
           InterventionData[InterventionField]
         >
       )[field] = value;
+
+      if (field === "snowMentioned" && typeof value === "string" && !previousSnowMentioned.trim() && value.trim() && !state.snowMentionedCreatedAt) {
+        state.snowMentionedCreatedAt = new Date().toISOString();
+      }
+      if (field === "snowReceived" && typeof value === "string" && !previousSnowReceived.trim() && value.trim() && !state.snowReceivedCreatedAt) {
+        state.snowReceivedCreatedAt = new Date().toISOString();
+      }
+      if (field === "snowSent" && typeof value === "string" && !previousSnowSent.trim() && value.trim() && !state.snowSentCreatedAt) {
+        state.snowSentCreatedAt = new Date().toISOString();
+      }
 
       if (field === "na" && typeof value === "string") {
         state.na = normalizeNaNumber(value);
@@ -825,11 +847,15 @@ const NewInterventionSlice = createSlice({
     applyImportedData: (state, action: PayloadAction<ImportedDataPayload>) => {
       if (state.mode === "VIEW_HISTORY") return;
 
+      const importedAt = new Date().toISOString();
       for (const [key, value] of Object.entries(action.payload)) {
         if (value === undefined || value === null) continue;
         const field = key as InterventionField;
         (state as unknown as Record<string, unknown>)[field] = value;
       }
+      if (action.payload.snowMentioned?.trim() && !state.snowMentionedCreatedAt) state.snowMentionedCreatedAt = importedAt;
+      if (action.payload.snowReceived?.trim() && !state.snowReceivedCreatedAt) state.snowReceivedCreatedAt = importedAt;
+      if (action.payload.snowSent?.trim() && !state.snowSentCreatedAt) state.snowSentCreatedAt = importedAt;
 
       state.clientName = normalizePersonName(String(state.clientName ?? ""));
 
@@ -1054,6 +1080,9 @@ const NewInterventionSlice = createSlice({
         documentId: state.documentId,
         createdAt: state.createdAt,
         updatedAt: state.updatedAt,
+        snowMentionedCreatedAt: state.snowMentionedCreatedAt,
+        snowReceivedCreatedAt: state.snowReceivedCreatedAt,
+        snowSentCreatedAt: state.snowSentCreatedAt,
         dateKey: state.dateKey,
         isEditing: state.isEditing,
         isHistoryView: state.isHistoryView,

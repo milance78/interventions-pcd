@@ -1,6 +1,7 @@
 import * as React from "react";
 import ArticleOutlined from "@mui/icons-material/ArticleOutlined";
 import ContentCopyRounded from "@mui/icons-material/ContentCopyRounded";
+import EditRounded from "@mui/icons-material/EditRounded";
 import CheckRounded from "@mui/icons-material/CheckRounded";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -37,6 +38,7 @@ type Props = {
     tache96SnowId?: string;
   }) => void;
   buttonClassName?: string;
+  buttonLabel?: string;
 };
 
 type TemplateHeaderField = {
@@ -256,15 +258,106 @@ const IfhUtacNotFoundForm = ({
 
 const formatWioOrderReference = (value: string) => value.trim().replace(/9$/, "");
 
+const TemplateCopyEditEnhancer = ({ rootRef }: { rootRef: React.RefObject<HTMLDivElement | null> }) => {
+  React.useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    const fields = Array.from(root.querySelectorAll<HTMLElement>(
+      ".bci-reintroduction-form__copyable, .custom-wio-form__copyable, .ifh-overlay-field.is-copyable, .snow-issue-field--copyable",
+    ));
+
+    const valueOf = (field: HTMLElement) => {
+      const control = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
+      if (control) return control.value.trim();
+      return Array.from(field.childNodes)
+        .filter((node) => !(node.nodeType === Node.ELEMENT_NODE && (node as HTMLElement).classList.contains("template-pencil")))
+        .map((node) => node.textContent ?? "")
+        .join("")
+        .replace(/\s+Copié\s*$/i, "")
+        .trim();
+    };
+
+    const copyAndNotice = async (field: HTMLElement) => {
+      const value = valueOf(field);
+      if (!value) return;
+      await writeTextToClipboard(value);
+      const notice = document.createElement("span");
+      notice.className = "template-copy-notice";
+      notice.textContent = "Copié";
+      field.appendChild(notice);
+      window.setTimeout(() => notice.remove(), 1100);
+    };
+
+    const onRootClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      const field = target.closest<HTMLElement>(
+        ".bci-reintroduction-form__copyable, .custom-wio-form__copyable, .ifh-overlay-field.is-copyable, .snow-issue-field--copyable",
+      );
+      if (!field || !root.contains(field)) return;
+      if (target.closest(".template-pencil")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      void copyAndNotice(field);
+    };
+
+    fields.forEach((field) => {
+      field.classList.add("template-copy-editable");
+      if (field.querySelector(":scope > .template-pencil")) return;
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "template-pencil";
+      button.setAttribute("aria-label", "Modifier");
+      button.title = "Modifier";
+      button.innerHTML = "✎";
+      button.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        const editable = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
+        if (editable) {
+          editable.readOnly = false;
+          editable.focus();
+          editable.setSelectionRange?.(editable.value.length, editable.value.length);
+          editable.addEventListener("blur", () => { editable.readOnly = true; }, { once: true });
+          return;
+        }
+        field.contentEditable = "true";
+        field.focus();
+        const selection = window.getSelection();
+        const range = document.createRange();
+        range.selectNodeContents(field);
+        range.collapse(false);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      });
+      field.appendChild(button);
+    });
+
+    root.addEventListener("click", onRootClick, true);
+    return () => {
+      root.removeEventListener("click", onRootClick, true);
+      fields.forEach((field) => {
+        field.querySelector(":scope > .template-pencil")?.remove();
+        field.querySelectorAll(".template-copy-notice").forEach((node) => node.remove());
+        field.contentEditable = "false";
+      });
+    };
+  }, [rootRef]);
+  return null;
+};
+
 const AdditionalInformationDialog = ({
   value,
   editable = false,
   onChange,
   onTemplateDataChange,
   buttonClassName = "",
+  buttonLabel = "Informations supplémentaires",
 }: Props) => {
   const intervention = useAppSelector((state) => state.newIntervention);
   const [open, setOpen] = React.useState(false);
+  const templateRootRef = React.useRef<HTMLDivElement | null>(null);
   const [draft, setDraft] = React.useState(value);
   const [selectedTemplate, setSelectedTemplate] = React.useState<AdditionalInformationTemplateId | null>(null);
   const [referenceNumber, setReferenceNumber] = React.useState(intervention.bciNumber || "");
@@ -587,7 +680,7 @@ Bonne journée`;
         className={`additional-information-trigger ${buttonClassName}`.trim()}
         onClick={() => setOpen(true)}
       >
-        Informations supplémentaires{value.trim() ? " •" : ""}
+        {buttonLabel}{value.trim() ? " •" : ""}
       </Button>
 
       <Dialog
@@ -601,7 +694,8 @@ Bonne journée`;
         <DialogTitle>Informations supplémentaires</DialogTitle>
         <DialogContent>
           {editable ? (
-            <div className="additional-information-workspace">
+            <div className="additional-information-workspace" ref={templateRootRef}>
+              <TemplateCopyEditEnhancer rootRef={templateRootRef} />
               <aside className="additional-information-sidebar" aria-label="Modèles d'informations supplémentaires">
                 <div className="additional-information-sidebar__title">Modèles</div>
 

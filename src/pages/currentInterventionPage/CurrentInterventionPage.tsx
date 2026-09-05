@@ -56,6 +56,7 @@ import { createInterventionThunk } from "../../redux/thunks/createInterventionTh
 import { updateInterventionThunk } from "../../redux/thunks/updateInterventionThunk";
 import { clearTodaysCuresThunk } from "../../redux/thunks/clearTodaysCuresThunk";
 import { updateSearchInterventionThunk } from "../../redux/thunks/updateSearchInterventionThunk";
+import { markInterventionReviewedThunk } from "../../redux/thunks/markInterventionReviewedThunk";
 import { auth } from "../../firebase/firebaseConfig";
 import {
   loadInterventionRevisions,
@@ -848,9 +849,11 @@ const CurrentInterventionPage = () => {
       safePayload = { ...safePayload, lastRevuAt: new Date().toISOString() };
     }
 
-    const result = isEditing
-      ? await dispatch(updateInterventionThunk(safePayload))
-      : await dispatch(createInterventionThunk(safePayload));
+    const result = isRevuAction
+      ? await dispatch(markInterventionReviewedThunk(safePayload))
+      : isEditing
+        ? await dispatch(updateInterventionThunk(safePayload))
+        : await dispatch(createInterventionThunk(safePayload));
 
     const requestFailed =
       createInterventionThunk.rejected.match(result) ||
@@ -1344,83 +1347,6 @@ const CurrentInterventionPage = () => {
             />
           </div>
 
-          <div className="right-card-actions__meta-row">
-            <div className="right-card-actions__meta-history">
-              {(isRetrievedEdit || isHistoryView) && newIntervention.documentId && (
-                <Button
-                  variant="text"
-                  size="large"
-                  onClick={openRevisionHistory}
-                  startIcon={<HistoryRounded />}
-                  className="revision-history-button"
-                >
-                  Historique des modifications
-                </Button>
-              )}
-            </div>
-            <div className="right-card-actions__additional-trigger">
-              <AdditionalInformationDialog
-                value={additionalInformation}
-                editable={!isHistoryView}
-                onChange={(value) =>
-                  dispatch(
-                    updateField({
-                      field: "additionalInformation",
-                      value,
-                    }),
-                  )
-                }
-                onTemplateDataChange={(data) => {
-                  let nextComment = newIntervention.comment;
-
-                  if (data.bciNumber !== undefined) {
-                    const line = data.bciNumber.trim() ? `BCI: ${data.bciNumber.trim()}` : "";
-                    nextComment = replaceActionCommentLine(nextComment, ["BCI:"], line);
-                    dispatch(updateField({ field: "bciNumber", value: data.bciNumber }));
-                    dispatch(updateField({ field: "commentActionBci", value: line }));
-                  }
-
-                  if (data.tache173Content !== undefined) {
-                    const line = data.tache173Content.trim() ? `T173: "${data.tache173Content.trim()}"` : "";
-                    nextComment = replaceActionCommentLine(nextComment, ["T173:"], line);
-                    dispatch(updateField({ field: "tache173Content", value: data.tache173Content }));
-                    dispatch(updateField({ field: "commentActionTache173", value: line }));
-                  }
-
-                  if (data.tache79JobId !== undefined) {
-                    dispatch(updateField({ field: "tache79JobId", value: data.tache79JobId }));
-                  }
-
-                  if (data.tache79Content !== undefined) {
-                    const jobId = data.tache79JobId ?? newIntervention.tache79JobId;
-                    const line = data.tache79Content.trim() ? `T79 créé, JMS No ${jobId.trim()}` : "";
-                    nextComment = replaceActionCommentLine(nextComment, ["T79 créé,"], line);
-                    dispatch(updateField({ field: "tache79Content", value: data.tache79Content }));
-                    dispatch(updateField({ field: "commentActionTache79", value: line }));
-                  }
-
-                  if (data.tache96SnowId !== undefined) {
-                    dispatch(updateField({ field: "tache96SnowId", value: data.tache96SnowId }));
-                  }
-
-                  if (data.tache96Content !== undefined) {
-                    const snowId = data.tache96SnowId ?? newIntervention.tache96SnowId;
-                    const line = data.tache96Content.trim() ? `T96 créé: ${snowId.trim()}` : "";
-                    nextComment = replaceActionCommentLine(nextComment, ["T96 créé:"], line);
-                    dispatch(updateField({ field: "tache96Content", value: data.tache96Content }));
-                    dispatch(updateField({ field: "commentActionTache96", value: line }));
-                  }
-
-                  if (data.wioNumber !== undefined) {
-                    dispatch(updateField({ field: "wioNumber", value: data.wioNumber }));
-                  }
-
-                  dispatch(updateField({ field: "comment", value: nextComment }));
-                }}
-              />
-            </div>
-          </div>
-
           <footer
             className={`right-card-actions ${
               snowReceived.trim()
@@ -1429,89 +1355,97 @@ const CurrentInterventionPage = () => {
             }`}
           >
             <div className="right-card-actions__row right-card-actions__row--top">
-              <div className="right-card-actions__history-slot" />
-              <div className="right-card-actions__spacer" />
-
-              <div className="right-card-actions__top-right">
-                {!isHistoryView && !isNewOrDraft && (
-                  <Button
-                    variant="contained"
-                    size="large"
-                    onClick={submitActions}
-                    startIcon={isOpenedFromReviewableOnHold ? <CheckRounded /> : <Send />}
-                    className={`submit-intervention-button ${
-                      isOpenedFromReviewableOnHold ? "submit-intervention-button--review" : ""
-                    }`}
-                  >
-                    {isOpenedFromReviewableOnHold ? "Revu" : "Enregistrer"}
-                  </Button>
-                )}
+              <div className="right-card-actions__utility-row">
+                <AdditionalInformationDialog
+                  value={additionalInformation}
+                  editable={!isHistoryView}
+                  buttonClassName="right-card-actions__utility-button"
+                  buttonLabel="Notes & modèles"
+                  onChange={(value) => dispatch(updateField({ field: "additionalInformation", value }))}
+                  onTemplateDataChange={(data) => {
+                    let nextComment = newIntervention.comment;
+                    if (data.bciNumber !== undefined) {
+                      const line = data.bciNumber.trim() ? `BCI: ${data.bciNumber.trim()}` : "";
+                      nextComment = replaceActionCommentLine(nextComment, ["BCI:"], line);
+                      dispatch(updateField({ field: "bciNumber", value: data.bciNumber }));
+                      dispatch(updateField({ field: "commentActionBci", value: line }));
+                    }
+                    if (data.tache173Content !== undefined) {
+                      const line = data.tache173Content.trim() ? `T173: "${data.tache173Content.trim()}"` : "";
+                      nextComment = replaceActionCommentLine(nextComment, ["T173:"], line);
+                      dispatch(updateField({ field: "tache173Content", value: data.tache173Content }));
+                      dispatch(updateField({ field: "commentActionTache173", value: line }));
+                    }
+                    if (data.tache79JobId !== undefined) dispatch(updateField({ field: "tache79JobId", value: data.tache79JobId }));
+                    if (data.tache79Content !== undefined) {
+                      const jobId = data.tache79JobId ?? newIntervention.tache79JobId;
+                      const line = data.tache79Content.trim() ? `T79 créé, JMS No ${jobId.trim()}` : "";
+                      nextComment = replaceActionCommentLine(nextComment, ["T79 créé,"], line);
+                      dispatch(updateField({ field: "tache79Content", value: data.tache79Content }));
+                      dispatch(updateField({ field: "commentActionTache79", value: line }));
+                    }
+                    if (data.tache96SnowId !== undefined) dispatch(updateField({ field: "tache96SnowId", value: data.tache96SnowId }));
+                    if (data.tache96Content !== undefined) {
+                      const snowId = data.tache96SnowId ?? newIntervention.tache96SnowId;
+                      const line = data.tache96Content.trim() ? `T96 créé: ${snowId.trim()}` : "";
+                      nextComment = replaceActionCommentLine(nextComment, ["T96 créé:"], line);
+                      dispatch(updateField({ field: "tache96Content", value: data.tache96Content }));
+                      dispatch(updateField({ field: "commentActionTache96", value: line }));
+                    }
+                    if (data.wioNumber !== undefined) dispatch(updateField({ field: "wioNumber", value: data.wioNumber }));
+                    dispatch(updateField({ field: "comment", value: nextComment }));
+                  }}
+                />
+                <Button variant="outlined" size="large" onClick={() => setClearDialogOpen(true)} disabled={isHistoryView} className="right-card-actions__utility-button" startIcon={<DeleteSweepRounded />}>
+                  Effacer
+                </Button>
+                <Button
+                  variant="outlined"
+                  size="large"
+                  onClick={openRevisionHistory}
+                  disabled={!newIntervention.documentId}
+                  className="right-card-actions__utility-button"
+                  startIcon={<HistoryRounded />}
+                >
+                  Modifications
+                </Button>
               </div>
             </div>
 
             <div className="right-card-actions__row right-card-actions__row--bottom">
               <div className="right-card-actions__status-slot">
                 {newIntervention.status === "postponed" && postponedDate && (
-                  <div className="postponed-date-line">
-                    Postposé au {postponedDate}
-                  </div>
+                  <div className="postponed-date-line">Postposé au {postponedDate}</div>
                 )}
-
                 <div className={`status-wrapper ${snowReceived.trim() ? "status-wrapper--dual" : ""}`.trim()}>
                   <StatusInput />
                   {snowReceived.trim() && <SnowStatusInput />}
                 </div>
               </div>
 
-              <div className="right-card-actions__spacer" />
-
-              <div className="right-card-actions__bottom-right">
-                {!isHistoryView && (
+              <div className="right-card-actions__submit-slot">
+                {!isHistoryView && !isNewOrDraft && (
                   <Button
-                    variant="text"
-                    size="large"
-                    onClick={() => setClearDialogOpen(true)}
-                    className="clear-form-button"
-                  >
-                    <span className="clear-form-button__content">
-                      <span className="clear-form-button__icon">
-                        <DeleteSweepRounded fontSize="small" />
-                      </span>
-                      <span className="clear-form-button__label">
-                        <span>Effacer</span>
-                        <span>le formulaire</span>
-                      </span>
-                    </span>
-                  </Button>
-                )}
-
-                {!isHistoryView && isNewOrDraft && (
-                  <Button
-                    variant="outlined"
+                    variant="contained"
                     size="large"
                     onClick={submitActions}
-                    startIcon={<AddTaskRounded />}
-                    className="add-to-today-button add-to-today-button--history"
+                    startIcon={isOpenedFromReviewableOnHold ? <CheckRounded /> : <Send />}
+                    className={`submit-intervention-button ${isOpenedFromReviewableOnHold ? "submit-intervention-button--review" : ""}`}
                   >
-                    <span className="add-to-today-button__label">
-                      <span>Ajouter à la</span>
-                      <span>liste du jour</span>
-                    </span>
+                    {isOpenedFromReviewableOnHold ? "Revu" : "Enregistrer"}
                   </Button>
                 )}
+              </div>
 
+              <div className="right-card-actions__bottom-right">
+                {!isHistoryView && isNewOrDraft && (
+                  <Button variant="outlined" size="large" onClick={submitActions} startIcon={<AddTaskRounded />} className="add-to-today-button add-to-today-button--history">
+                    <span className="add-to-today-button__label"><span>Ajouter à la</span><span>liste du jour</span></span>
+                  </Button>
+                )}
                 {isRetrievedEdit && (
-                  <Button
-                    variant="outlined"
-                    size="large"
-                    onClick={addToTodayList}
-                    startIcon={<AddTaskRounded />}
-                    className="add-to-today-button add-to-today-button--history"
-                  >
-                    <span className="add-to-today-button__label">
-                      <span>Ajouter à la</span>
-                      <span>liste du jour</span>
-                    </span>
+                  <Button variant="outlined" size="large" onClick={addToTodayList} startIcon={<AddTaskRounded />} className="add-to-today-button add-to-today-button--history">
+                    <span className="add-to-today-button__label"><span>Ajouter à la</span><span>liste du jour</span></span>
                   </Button>
                 )}
               </div>
@@ -1646,7 +1580,7 @@ const CurrentInterventionPage = () => {
         aria-labelledby="clear-form-dialog-title"
       >
         <DialogTitle id="clear-form-dialog-title">
-          Effacer tout le formulaire ?
+          Effacer le fomulaire?
         </DialogTitle>
         <DialogContent>
           <DialogContentText>

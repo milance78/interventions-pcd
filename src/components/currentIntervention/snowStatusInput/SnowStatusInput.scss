@@ -5,3 +5,7 @@
     min-height: 54px;
   }
 }
+
+.snow-status-two-line, .snow-status-menu-two-line { display:inline-flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.02; }
+.snow-status-two-line span, .snow-status-menu-two-line span { display:block; }
+.snow-status-menu-two-line { min-width:70px; }

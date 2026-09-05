@@ -1923,3 +1923,20 @@
     line-height: 1.4 !important;
   }
 }
+
+
+/* v205 — every copyable template field has a small explicit edit affordance. */
+.template-copy-editable { position: relative !important; cursor: pointer !important; }
+.template-pencil {
+  position: absolute; top: 6px; right: 6px; z-index: 20; width: 24px; height: 24px;
+  border: 0; border-radius: 6px; background: rgba(255,255,255,.94); color: #526b83;
+  cursor: pointer; box-shadow: 0 1px 4px rgba(15,23,42,.14);
+}
+.template-copy-editable:hover .template-pencil { color: #315f84; }
+.template-copy-editable input, .template-copy-editable textarea { cursor: pointer; }
+
+.template-copy-notice {
+  position: absolute; right: 7px; bottom: 5px; z-index: 21;
+  padding: 3px 6px; border-radius: 5px; background: rgba(49,95,132,.92); color: #fff;
+  font: 700 10px/1 Arial, sans-serif; pointer-events: none;
+}

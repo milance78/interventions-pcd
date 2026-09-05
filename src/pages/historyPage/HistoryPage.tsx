@@ -834,7 +834,7 @@ const HistoryPage = () => {
     exportInterventionsToExcel(
       items,
       `${day}/${month}/${year}`,
-      `Historique_${dateKey}.xls`,
+      `Historique_${dateKey.split("-").reverse().join("-")}.xls`,
     );
   };
 
