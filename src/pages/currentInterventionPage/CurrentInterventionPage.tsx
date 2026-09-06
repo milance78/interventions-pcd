@@ -1243,7 +1243,7 @@ const CurrentInterventionPage = () => {
                     >
                       <span className="address-cycle-button__stack" aria-hidden="true">
                         <img
-                          src={AddressNotConfirmedOffArtwork}
+                          src={AddressConfirmedArtwork}
                           alt=""
                           className={`address-cycle-button__icon address-cycle-button__icon--off ${addressConfirmation === "none" ? "address-cycle-button__icon--current" : ""}`}
                           draggable={false}

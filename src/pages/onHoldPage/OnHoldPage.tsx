@@ -126,7 +126,7 @@ const OnHoldPage = () => {
       const pending = window.sessionStorage.getItem(PENDING_TAB_KEY);
       return tabOrder.includes(pending as OnHoldTab)
         ? (pending as OnHoldTab)
-        : "cure";
+        : "overdue";
     } catch {
       return "cure";
     }

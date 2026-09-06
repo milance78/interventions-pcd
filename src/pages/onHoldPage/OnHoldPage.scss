@@ -1010,6 +1010,7 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   .on-hold-page .on-hold-tab--overdue .on-hold-tab__icon {
     color: #dc2626 !important;
     margin-right: 1px;
+    transform: translateX(-7px);
   }
 
   .on-hold-page .on-hold-tab--overdue.on-hold-tab--active::after {
@@ -1031,13 +1032,16 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   }
 
   .on-hold-page .on-hold-tab--overdue > strong {
-    min-width: 23px !important;
-    height: 23px !important;
-    padding: 0 5px !important;
+    min-width: 30px !important;
+    width: 30px !important;
+    height: 30px !important;
+    padding: 0 8px !important;
     color: #b91c1c !important;
     background: #fee2e2 !important;
     border: 1px solid #fca5a5 !important;
-    font-size: 10px !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    transform: translateX(-7px);
   }
 
   .on-hold-page .on-hold-tab--overdue.on-hold-tab--active {
@@ -1051,5 +1055,72 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
   .on-hold-card__timestamps {
     flex-wrap: wrap;
     gap: 7px 14px;
+  }
+}
+
+/* v218 — align the active underline with the visually shifted icon/counter
+   group. The group moves a little further left; the underline follows the
+   same visual footprint instead of remaining centered in the original slot. */
+@media (min-width: 901px) {
+  .on-hold-page .on-hold-tab--overdue .on-hold-tab__icon {
+    transform: translateX(-22px) !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue .on-hold-tab__icon svg {
+    width: 30px !important;
+    height: 30px !important;
+    stroke-width: 2.25 !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue > strong {
+    transform: translateX(-22px) !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active::after {
+    left: -13px !important;
+    right: 31px !important;
+  }
+}
+
+/* v219 — overdue tab now mirrors the active CURE counter/underline treatment. */
+@media (min-width: 901px) {
+  .on-hold-page .on-hold-tab--overdue > strong {
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px !important;
+    padding: 0 8px !important;
+    font-size: 13px !important;
+    font-weight: 900 !important;
+    line-height: 1 !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active > strong {
+    color: #fff !important;
+    background: #dc2626 !important;
+    border-color: transparent !important;
+    box-shadow: 0 3px 8px rgba(220, 38, 38, 0.22) !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active::after {
+    left: -13px !important;
+    right: 4px !important;
+    bottom: 2px !important;
+    height: 2px !important;
+    border-radius: 999px !important;
+    background: #dc2626 !important;
+  }
+}
+
+/* v220 — keep the overdue underline anchored to the same visual group as
+   the shifted warning icon/counter. The group itself is translated left, so
+   the underline must receive the same translation instead of being positioned
+   in the tab's original center. */
+@media (min-width: 901px) {
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active::after {
+    left: 50% !important;
+    right: auto !important;
+    width: 70px !important;
+    transform: translateX(calc(-50% - 22px)) !important;
+    transform-origin: center center !important;
   }
 }

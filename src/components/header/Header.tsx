@@ -1,6 +1,6 @@
 import * as React from "react";
 import AddRounded from "@mui/icons-material/AddRounded";
-import PhoneRounded from "@mui/icons-material/PhoneRounded";
+import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import GridOnRounded from "@mui/icons-material/GridOnRounded";
 import DashboardCustomizeRounded from "@mui/icons-material/DashboardCustomizeRounded";
 import Button from "@mui/material/Button";
@@ -21,7 +21,7 @@ import {
   startNewIntervention,
 } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
-import { getOverdueCureCount } from "../../utils/onHoldUtils";
+import { getOnHoldInterventions } from "../../utils/onHoldUtils";
 
 import "./Header.scss";
 
@@ -44,8 +44,8 @@ const Header = () => {
   const historyInterventions = useAppSelector(
     (state) => state.history.interventions,
   );
-  const overdueCureCount = React.useMemo(
-    () => getOverdueCureCount(historyInterventions),
+  const overdueCount = React.useMemo(
+    () => getOnHoldInterventions(historyInterventions, "overdue").length,
     [historyInterventions, now],
   );
 
@@ -136,14 +136,14 @@ const Header = () => {
           }
         >
           <span>En attente</span>
-          {overdueCureCount > 0 && (
+          {overdueCount > 0 && (
             <span
               className="header__on-hold-notification"
-              aria-label={`${overdueCureCount} ticket${overdueCureCount > 1 ? "s" : ""} CURE en retard`}
-              title={`${overdueCureCount} ticket${overdueCureCount > 1 ? "s" : ""} CURE en retard`}
+              aria-label={`${overdueCount} ticket${overdueCount > 1 ? "s" : ""} avec échéance dépassée`}
+              title={`${overdueCount} ticket${overdueCount > 1 ? "s" : ""} avec échéance dépassée`}
             >
-              <strong>{overdueCureCount}</strong>
-              <PhoneRounded aria-hidden="true" />
+              <WarningAmberRounded aria-hidden="true" />
+              <strong>{overdueCount}</strong>
             </span>
           )}
         </NavLink>

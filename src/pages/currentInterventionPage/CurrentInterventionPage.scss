@@ -3322,8 +3322,8 @@
     filter: grayscale(1) brightness(1.02) contrast(.82) !important;
   }
   .intervention-option-group__items--six .address-cycle-button:not(.address-cycle-button--active) .address-cycle-button__icon--off {
-    opacity: .80 !important;
-    filter: grayscale(1) brightness(.80) contrast(.88) !important;
+    opacity: .72 !important;
+    filter: grayscale(1) brightness(.90) contrast(1.08) !important;
   }
 
   /* Address no longer remounts a different SVG at every click. The three states are
@@ -3533,7 +3533,8 @@
   .address-cycle-button:not(.address-cycle-button--active)
   .address-cycle-button__icon--off {
     box-shadow: none !important;
-    filter: grayscale(1) brightness(.82) contrast(.9) !important;
+    opacity: .72 !important;
+    filter: grayscale(1) brightness(.90) contrast(1.08) !important;
   }
 }
 
