@@ -21,7 +21,7 @@ const SnowStatusInput = () => {
   return (
     <FormControl variant="outlined" className="snow-status-input" size="small" fullWidth>
       <Select
-        className="snow-status-select"
+        className={`snow-status-select snow-status-select--${snowStatus === "resolved" ? "resolved" : "pending"}`}
         id="snow-status-select"
         value={snowStatus}
         displayEmpty
@@ -41,10 +41,10 @@ const SnowStatusInput = () => {
           "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#9e9e9e" },
           "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#777777", borderWidth: "2px" },
         }}
-        renderValue={(selected) => selected === "resolved" ? <span className="snow-status-two-line"><span>Snow</span><span>résolu</span></span> : <span className="snow-status-two-line"><span>Snow</span><span>en attente</span></span>}
+        renderValue={(selected) => selected === "resolved" ? "Snow résolu" : "Snow en attente"}
       >
-        <MenuItem value="pending"><span className="snow-status-menu-two-line"><span>Snow</span><span>en attente</span></span></MenuItem>
-        <MenuItem value="resolved"><span className="snow-status-menu-two-line"><span>Snow</span><span>résolu</span></span></MenuItem>
+        <MenuItem value="pending">Snow en attente</MenuItem>
+        <MenuItem value="resolved">Snow résolu</MenuItem>
       </Select>
     </FormControl>
   );

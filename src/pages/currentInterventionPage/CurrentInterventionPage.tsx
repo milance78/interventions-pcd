@@ -469,6 +469,11 @@ const CurrentInterventionPage = () => {
     const resLine = client ? buildResPendingLine(client) : "RES en attente";
     const nextComment = cleaned ? `${cleaned}\n\n${resLine}` : resLine;
     dispatch(updateField({ field: "comment", value: nextComment }));
+    // Résiliation en attente replaces the active CURE membership. Historical
+    // CURE records/comment text remain intact; only the current pending CURE
+    // state is cleared so the intervention cannot stay in the CURE list.
+    dispatch(updateField({ field: "cure", value: "noCure" }));
+    dispatch(updateField({ field: "curePendingSince", value: null }));
     dispatch(updateField({ field: "commentActionResiliation", value: resLine }));
     dispatch(updateField({ field: "isResPending", value: true }));
     showActionNotice("res", "Résiliation en attente");

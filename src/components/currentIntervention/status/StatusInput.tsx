@@ -69,7 +69,7 @@ const StatusInput = () => {
       <div className="status-input-shell">
         <FormControl variant="outlined" className="status-input" size="small" fullWidth>
           <Select
-            className="status-select"
+            className={`status-select status-select--${status === "completed" ? "completed" : status === "on hold" ? "on-hold" : status === "transferred" ? "transferred" : status === "postponed" ? "postponed" : "default"}`}
             id="status-select"
             value={status}
             displayEmpty
@@ -77,12 +77,13 @@ const StatusInput = () => {
             onChange={handleChange}
             sx={{
               "& .MuiSelect-select": {
-                backgroundColor:
-                  status === "" ? "#f1f5f9" :
-                  status === "completed" ? "#dcfce7" :
-                  status === "on hold" ? "#fef3c7" :
-                  status === "transferred" ? "#dbeafe" :
-                  status === "postponed" ? "#f3e8ff" : "#f1f5f9",
+                backgroundColor: "transparent",
+                backgroundImage:
+                  status === "completed" ? "linear-gradient(145deg, #f4fff7 0%, #d9f5e2 100%)" :
+                  status === "on hold" ? "linear-gradient(145deg, #fffdf3 0%, #fff6c7 100%)" :
+                  status === "transferred" ? "linear-gradient(145deg, #f5f9ff 0%, #dceafe 100%)" :
+                  status === "postponed" ? "linear-gradient(145deg, #faf7ff 0%, #eee3ff 100%)" :
+                  "linear-gradient(145deg, #f8fafc 0%, #eef2f7 100%)",
                 display: "flex", alignItems: "center", justifyContent: "center", textAlign: "center",
               },
               color:

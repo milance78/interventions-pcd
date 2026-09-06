@@ -1439,3 +1439,49 @@
   background: #dcfce7;
   border-color: #86d49c;
 }
+
+
+/* v208 — visual history calendar: occupied dates are active, empty dates are pale. */
+.history-calendar-grid {
+  border: 1px solid #dbe4ee;
+  border-radius: 11px;
+  padding: 10px;
+  background: #fbfdff;
+}
+.history-calendar-grid__header {
+  display: grid;
+  grid-template-columns: 32px 1fr 32px;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 9px;
+}
+.history-calendar-grid__header strong { text-align: center; color: #40516a; font-size: 13px; }
+.history-calendar-grid__header button {
+  width: 32px; height: 30px; border: 1px solid #d4deea; border-radius: 7px;
+  background: #f3f7fb; color: #526b83; cursor: pointer; font-size: 20px; line-height: 1;
+}
+.history-calendar-weekdays, .history-calendar-days {
+  display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px;
+}
+.history-calendar-weekdays { margin-bottom: 4px; }
+.history-calendar-weekdays span { text-align: center; color: #8995a5; font-size: 10px; font-weight: 700; }
+.history-calendar-day {
+  min-width: 0; aspect-ratio: 1; border: 1px solid transparent; border-radius: 7px;
+  display: inline-flex; align-items: center; justify-content: center;
+  font: 600 12px Arial, sans-serif;
+  transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+.history-calendar-day.has-interventions {
+  color: #355d8a; background: #eef5fc; border-color: #c8dced; cursor: pointer;
+}
+.history-calendar-day.has-interventions:hover { background: #e1eef9; border-color: #9fbfda; }
+.history-calendar-day.is-empty { color: #c4cbd4; background: transparent; cursor: default; }
+.history-calendar-day.is-empty:hover { background: #f6f7f9; }
+.history-calendar-day.is-selected { border-color: #7fa3d0; box-shadow: inset 0 0 0 1px #7fa3d0; }
+.history-calendar-day--outside { visibility: hidden; }
+.history-free-day-notice.is-hidden { display: none; }
+
+
+/* v210 — final calendar cursor precedence. */
+.history-calendar-day.has-interventions { cursor: pointer !important; }
+.history-calendar-day.is-empty { cursor: default !important; }

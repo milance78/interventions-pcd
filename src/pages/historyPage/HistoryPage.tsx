@@ -337,6 +337,7 @@ const HistoryNavigation = memo(({
   const [openMonthKey, setOpenMonthKey] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"dates" | "calendar">("dates");
   const [calendarValue, setCalendarValue] = useState("");
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date());
   const navigationRef = useRef<HTMLElement | null>(null);
 
   // The sidebar is intentionally newest-first: newest month at the top and
@@ -381,9 +382,12 @@ const HistoryNavigation = memo(({
     );
   }, [newestFirstMonths]);
 
-  const availableDateKeys = useMemo(
+  const occupiedDateKeys = useMemo(
     () => new Set(
-      newestFirstMonths.flatMap((month) => month.dates.map((group) => group.key)),
+      newestFirstMonths
+        .flatMap((month) => month.dates)
+        .filter((group) => group.interventions.length > 0)
+        .map((group) => group.key),
     ),
     [newestFirstMonths],
   );
@@ -394,22 +398,7 @@ const HistoryNavigation = memo(({
     }
   }, [calendarValue, newestFirstMonths]);
 
-  const handleCalendarChange = (value: string) => {
-    if (!value) {
-      setCalendarValue("");
-      return;
-    }
 
-    if (availableDateKeys.has(value)) {
-      setCalendarValue(value);
-      onSelectDate(value);
-      return;
-    }
-
-    // Never leave the calendar showing a date that is not actually open
-    // in the history content. Revert immediately to the last valid date.
-    setCalendarValue((current) => current);
-  };
 
   return (
     <aside className="history-sidebar">
@@ -445,42 +434,65 @@ const HistoryNavigation = memo(({
                 onChange={(event) => {
                   const digits = event.target.value.replace(/\D/g, "").slice(0, 8);
                   let formatted = digits;
-                  if (digits.length > 4) {
-                    formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-                  } else if (digits.length > 2) {
-                    formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
-                  }
+                  if (digits.length > 4) formatted = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+                  else if (digits.length > 2) formatted = `${digits.slice(0, 2)}/${digits.slice(2)}`;
                   if (formatted.length === 10) {
                     const [day, month, year] = formatted.split("/");
                     const iso = `${year}-${month}-${day}`;
                     setCalendarValue(iso);
-                    if (availableDateKeys.has(iso)) onSelectDate(iso);
-                  } else {
-                    setCalendarValue("");
-                  }
+                    setCalendarMonth(new Date(Number(year), Number(month) - 1, 1));
+                    onSelectDate(iso);
+                  } else setCalendarValue("");
                 }}
               />
-
-              <button
-                type="button"
-                className="history-sidebar-calendar-button"
-                aria-label="Ouvrir le calendrier"
-                title="Ouvrir le calendrier"
-              >
+              <button type="button" className="history-sidebar-calendar-button" aria-label="Calendrier" title="Calendrier">
                 <CalendarDays size={18} />
-                <input
-                  type="date"
-                  aria-label="Calendrier"
-                  value={calendarValue}
-                  onChange={(event) => handleCalendarChange(event.target.value)}
-                />
               </button>
             </div>
 
-            <p>
-              Format : dd/mm/yyyy. La sélection ouvre directement la date correspondante
-              dans l&apos;historique.
-            </p>
+            <div className="history-calendar-grid" aria-label="Calendrier des interventions">
+              <div className="history-calendar-grid__header">
+                <button type="button" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() - 1, 1))} aria-label="Mois précédent">‹</button>
+                <strong>{capitalizeFirstLetter(new Intl.DateTimeFormat("fr-BE", { month: "long", year: "numeric" }).format(calendarMonth))}</strong>
+                <button type="button" onClick={() => setCalendarMonth(new Date(calendarMonth.getFullYear(), calendarMonth.getMonth() + 1, 1))} aria-label="Mois suivant">›</button>
+              </div>
+              <div className="history-calendar-weekdays">
+                {['Lu','Ma','Me','Je','Ve','Sa','Di'].map((day) => <span key={day}>{day}</span>)}
+              </div>
+              <div className="history-calendar-days">
+                {(() => {
+                  const year = calendarMonth.getFullYear();
+                  const month = calendarMonth.getMonth();
+                  const first = new Date(year, month, 1);
+                  const mondayIndex = (first.getDay() + 6) % 7;
+                  const daysInMonth = new Date(year, month + 1, 0).getDate();
+                  const cells: ReactNode[] = [];
+                  for (let i = 0; i < mondayIndex; i += 1) cells.push(<span key={`empty-${i}`} className="history-calendar-day history-calendar-day--outside" aria-hidden="true" />);
+                  for (let day = 1; day <= daysInMonth; day += 1) {
+                    const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+                    const hasInterventions = occupiedDateKeys.has(iso);
+                    cells.push(
+                      <button
+                        key={iso}
+                        type="button"
+                        className={`history-calendar-day ${hasInterventions ? "has-interventions" : "is-empty"} ${calendarValue === iso ? "is-selected" : ""}`}
+                        disabled={false}
+                        onClick={() => {
+                          setCalendarValue(iso);
+                          onSelectDate(iso);
+                        }}
+                        aria-label={hasInterventions ? `${iso} — interventions enregistrées` : `${iso} — aucune intervention enregistrée`}
+                      >
+                        {day}
+                      </button>,
+                    );
+                  }
+                  return cells;
+                })()}
+              </div>
+            </div>
+
+            <p>Format : dd/mm/yyyy. Les dates pâles sont vides ; les dates avec interventions sont sélectionnables.</p>
           </div>
         ) : (
           <nav ref={navigationRef} className="history-date-navigation" aria-label="Navigation par date">
@@ -865,7 +877,7 @@ const HistoryPage = () => {
 
           {freeDayNotice && (
             <div className="history-free-day-notice" role="status">
-              jour libre
+              Pas d&apos;interventions enregistrées pour cette date
             </div>
           )}
 

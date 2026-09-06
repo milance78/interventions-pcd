@@ -5198,18 +5198,18 @@
   grid-template-columns: 360px minmax(0,1fr) 205px 205px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper {
   width: 360px !important;
   min-width: 360px !important;
   max-width: 360px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper.status-wrapper--dual {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper.status-wrapper--dual {
   grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
   gap: 8px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper :is(
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper :is(
   .MuiSelect-select,
   .MuiInputBase-root
 ) {
@@ -5218,7 +5218,7 @@
   text-overflow: clip !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper .MuiSelect-select {
   padding-left: 11px !important;
   padding-right: 34px !important;
   font-size: 13px !important;
@@ -5265,7 +5265,7 @@
     grid-template-columns: 300px minmax(0,1fr) 165px 165px !important;
   }
 
-  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+  .current-intervention-page .right-card-actions__row--bottom .status-wrapper {
     width: 300px !important;
     min-width: 300px !important;
     max-width: 300px !important;
@@ -5278,13 +5278,13 @@
   grid-template-columns: 300px minmax(0,1fr) 180px 180px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper {
   width: 300px !important;
   min-width: 300px !important;
   max-width: 300px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper .MuiSelect-select {
   padding-left: 10px !important;
   padding-right: 30px !important;
   font-size: 12.5px !important;
@@ -5340,7 +5340,7 @@
     grid-template-columns: 280px minmax(0,1fr) 160px 160px !important;
   }
 
-  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+  .current-intervention-page .right-card-actions__row--bottom .status-wrapper {
     width: 280px !important;
     min-width: 280px !important;
     max-width: 280px !important;
@@ -5377,7 +5377,7 @@
 
 
 /* v146 — make the two status buttons visually match the action buttons. */
-.current-intervention-page .right-card-actions__row--top .status-wrapper {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper {
   width: 320px !important;
   min-width: 320px !important;
   max-width: 320px !important;
@@ -5385,12 +5385,12 @@
   min-height: 53px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper.status-wrapper--dual {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper.status-wrapper--dual {
   grid-template-columns: minmax(0,1fr) minmax(0,1fr) !important;
   gap: 8px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper :is(
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper :is(
   .MuiFormControl-root,
   .MuiInputBase-root,
   .MuiOutlinedInput-root,
@@ -5401,7 +5401,7 @@
   box-sizing: border-box !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper .MuiSelect-select {
   display: flex !important;
   align-items: center !important;
   padding: 0 34px 0 10px !important;
@@ -5436,7 +5436,7 @@
     grid-template-columns: 290px minmax(0,1fr) 160px 160px !important;
   }
 
-  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+  .current-intervention-page .right-card-actions__row--bottom .status-wrapper {
     width: 290px !important;
     min-width: 290px !important;
     max-width: 290px !important;
@@ -5445,7 +5445,7 @@
 
 
 /* v147 — soften the two status labels and match their physical height to actions. */
-.current-intervention-page .right-card-actions__row--top .status-wrapper {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper {
   width: 320px !important;
   min-width: 320px !important;
   max-width: 320px !important;
@@ -5455,7 +5455,7 @@
   grid-template-columns: 320px minmax(0,1fr) 180px 180px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper :is(
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper :is(
   .MuiFormControl-root,
   .MuiInputBase-root,
   .MuiOutlinedInput-root,
@@ -5466,7 +5466,7 @@
   box-sizing: border-box !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper .MuiSelect-select {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper .MuiSelect-select {
   display: flex !important;
   align-items: center !important;
   font-family: inherit !important;
@@ -5482,7 +5482,7 @@
     grid-template-columns: 290px minmax(0,1fr) 160px 160px !important;
   }
 
-  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+  .current-intervention-page .right-card-actions__row--bottom .status-wrapper {
     width: 290px !important;
     min-width: 290px !important;
     max-width: 290px !important;
@@ -5620,7 +5620,7 @@
 /* v152 — only one Postposé line: keep the new page-level meta-row copy and
    suppress the legacy copy that StatusInput renders inside the status control.
    The status button itself does not move. */
-.current-intervention-page .right-card-actions__row--top .status-wrapper .postponed-date-line {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper .postponed-date-line {
   display: none !important;
 }
 
@@ -5855,7 +5855,7 @@
   grid-template-columns: 320px minmax(0,1fr) 180px 180px !important;
 }
 
-.current-intervention-page .right-card-actions__row--top .status-wrapper {
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper {
   grid-column: 1 !important;
 }
 
@@ -5909,7 +5909,7 @@
     max-width: 160px !important;
   }
 
-  .current-intervention-page .right-card-actions__row--top .status-wrapper {
+  .current-intervention-page .right-card-actions__row--bottom .status-wrapper {
     width: 290px !important;
     min-width: 290px !important;
     max-width: 290px !important;
@@ -6733,9 +6733,9 @@
   height: 53px !important;
 }
 .current-intervention-page .right-card-actions__status-slot .status-wrapper {
-  width: min(100%, 250px) !important;
+  width: 100% !important;
   min-width: 0 !important;
-  max-width: 250px !important;
+  max-width: none !important;
   height: 53px !important;
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) !important;
@@ -6793,3 +6793,116 @@
 }
 
 /* No Snow à mon nom value = no secondary Snow status in the export. */
+
+
+/* v209 — final footer visual tuning. */
+.current-intervention-page .right-card-actions__utility-button {
+  border-color: #cbd5e1 !important;
+  color: #64748b !important;
+  -webkit-text-fill-color: #64748b !important;
+}
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button--review {
+  color: #315f84 !important;
+  border: 1px solid #9bbbd6 !important;
+  background: linear-gradient(145deg, #f3f8fc 0%, #dceaf5 100%) !important;
+  box-shadow: 0 6px 15px rgba(49, 95, 132, 0.11) !important;
+}
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button:hover,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button--review:hover {
+  color: #274f70 !important;
+  border-color: #7fa8c9 !important;
+  background: linear-gradient(145deg, #f8fbfe 0%, #d4e6f3 100%) !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  margin-left: 0 !important;
+}
+
+/* v211 — keep the status control flush with the left edge of the right-card content.
+   The older align-self rule was visually centering it inside the first footer column. */
+.current-intervention-page .right-card-actions__status-slot {
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  align-self: stretch !important;
+  justify-self: start !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+}
+
+/* v212 — preserve the established right edge while aligning the status
+   control's left edge with the footer content above. The 3-column footer
+   reserves the submit and add-to-today widths; the status slot fills the
+   remaining space instead of being artificially capped at 250px. */
+.current-intervention-page .right-card-actions__status-slot {
+  min-width: 0 !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+
+
+
+/* v213 — footer status typography and softer gradients.
+   Status/Snow controls use the same readable 14px typography and calm blue
+   text family as the two action buttons. The gradients are intentionally
+   low-contrast so wide controls do not wash out to white on the left. */
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select .MuiSelect-select,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .snow-status-select .MuiSelect-select {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #315f84 !important;
+  -webkit-text-fill-color: #315f84 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select.status-select--completed .MuiSelect-select {
+  background-image: linear-gradient(145deg, #e8f8ed 0%, #d2f0dc 100%) !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select.status-select--on-hold .MuiSelect-select {
+  background-image: linear-gradient(145deg, #fff8dc 0%, #ffedb2 100%) !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select.status-select--transferred .MuiSelect-select {
+  background-image: linear-gradient(145deg, #eaf2fb 0%, #d4e5f4 100%) !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select.status-select--postponed .MuiSelect-select {
+  background-image: linear-gradient(145deg, #f0eafb 0%, #e2d6f4 100%) !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select.status-select--default .MuiSelect-select {
+  background-image: linear-gradient(145deg, #eef3f7 0%, #e1e9f0 100%) !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .snow-status-select.snow-status-select--resolved .MuiSelect-select {
+  background-image: linear-gradient(145deg, #e8f8ed 0%, #d2f0dc 100%) !important;
+  background-color: transparent !important;
+}
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .snow-status-select.snow-status-select--pending .MuiSelect-select {
+  background-image: linear-gradient(145deg, #fff8dc 0%, #ffedb2 100%) !important;
+  background-color: transparent !important;
+}
+
+
+/* v147 — status controls use exactly the same typography as Enregistrer / Ajouter.
+   Snow labels remain on one line because the available width is sufficient. */
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper .MuiSelect-select {
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  color: #315f84 !important;
+  -webkit-text-fill-color: #315f84 !important;
+  white-space: nowrap !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper .MuiSelect-select span {
+  font-family: inherit !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  color: #315f84 !important;
+  -webkit-text-fill-color: #315f84 !important;
+}

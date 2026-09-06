@@ -1,17 +1,13 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { auth } from "../../firebase/firebaseConfig";
-import {
-  updateIntervention,
-  updateSearchInterventionAndMoveToToday,
-} from "../../firebase/interventionsService";
+import { updateIntervention } from "../../firebase/interventionsService";
 import { updateLocalIntervention } from "../features/interventionsListSlice";
 import {
-  addHistoryIntervention,
   updateHistoryIntervention,
 } from "../features/historySlice";
 import type { Intervention } from "../features/newInterventionSlice";
 import { normalizeInterventionStrings } from "../../utils/textUtils";
-import { addIntervention } from "../features/interventionsListSlice";
+
 
 const updateInterventionThunk = createAsyncThunk<
   Intervention,
@@ -35,28 +31,17 @@ const updateInterventionThunk = createAsyncThunk<
         return rejectWithValue("Missing Firestore document ID");
       }
 
-      const movedToToday = interventionDate !== today;
-
-      const savedIntervention = movedToToday
-        ? await updateSearchInterventionAndMoveToToday(
-            user.uid,
-            interventionDate,
-            today,
-            normalizedIntervention,
-          )
-        : (
-            await updateIntervention(
-              user.uid,
-              interventionDate,
-              normalizedIntervention.documentId,
-              normalizedIntervention,
-            ),
-            {
-              ...normalizedIntervention,
-              dateKey: interventionDate,
-            }
-          );
-
+      await updateIntervention(
+        user.uid,
+        interventionDate,
+        normalizedIntervention.documentId,
+        normalizedIntervention,
+      );
+      const savedIntervention: Intervention = {
+        ...normalizedIntervention,
+        dateKey: interventionDate,
+        updatedAt: new Date().toISOString(),
+      };
       const updatedIntervention: Intervention = {
         ...savedIntervention,
         isEditing: false,
@@ -66,15 +51,11 @@ const updateInterventionThunk = createAsyncThunk<
         updatedAt: new Date().toISOString(),
       };
 
-      if (movedToToday) {
-        // The old day's historical occurrence remains untouched. Add the
-        // newly saved today's occurrence separately.
-        dispatch(addHistoryIntervention(updatedIntervention));
-        dispatch(addIntervention(updatedIntervention));
-      } else {
-        dispatch(updateLocalIntervention(updatedIntervention));
-        dispatch(updateHistoryIntervention(updatedIntervention));
-      }
+      // Enregistrer edits the occurrence from which the intervention was opened.
+      // Moving an historical/search result to today is an explicit action handled
+      // only by Ajouter à la liste du jour.
+      dispatch(updateLocalIntervention(updatedIntervention));
+      dispatch(updateHistoryIntervention(updatedIntervention));
 
       return updatedIntervention;
     } catch (error) {
