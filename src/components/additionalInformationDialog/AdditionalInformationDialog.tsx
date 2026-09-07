@@ -30,6 +30,8 @@ type Props = {
   onChange?: (value: string) => void;
   onTemplateDataChange?: (data: {
     bciNumber?: string;
+    bciTemplateId?: AdditionalInformationTemplateId;
+    bciDescription?: string;
     wioNumber?: string;
     tache173Content?: string;
     tache79Content?: string;
@@ -261,11 +263,10 @@ const formatWioOrderReference = (value: string) => value.trim().replace(/9$/, ""
 const TemplateCopyEditEnhancer = ({ rootRef }: { rootRef: React.RefObject<HTMLDivElement | null> }) => {
   React.useEffect(() => {
     const root = rootRef.current;
-    if (!root) return;
+    if (!root) return undefined;
 
-    const fields = Array.from(root.querySelectorAll<HTMLElement>(
-      ".bci-reintroduction-form__copyable, .custom-wio-form__copyable, .ifh-overlay-field.is-copyable, .snow-issue-field--copyable",
-    ));
+    const selector =
+      ".bci-reintroduction-form__copyable, .custom-wio-form__copyable, .ifh-overlay-field.is-copyable, .snow-issue-field--copyable";
 
     const valueOf = (field: HTMLElement) => {
       const control = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
@@ -289,57 +290,110 @@ const TemplateCopyEditEnhancer = ({ rootRef }: { rootRef: React.RefObject<HTMLDi
       window.setTimeout(() => notice.remove(), 1100);
     };
 
-    const onRootClick = (event: MouseEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target) return;
-      const field = target.closest<HTMLElement>(
-        ".bci-reintroduction-form__copyable, .custom-wio-form__copyable, .ifh-overlay-field.is-copyable, .snow-issue-field--copyable",
-      );
-      if (!field || !root.contains(field)) return;
-      if (target.closest(".template-pencil")) return;
-      event.preventDefault();
-      event.stopPropagation();
-      void copyAndNotice(field);
-    };
-
-    fields.forEach((field) => {
+    const enhanceField = (field: HTMLElement) => {
       field.classList.add("template-copy-editable");
+      const controlForLayout = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
+      const updateScrollPositionClass = () => {
+        if (controlForLayout && controlForLayout.tagName === "TEXTAREA") {
+          const hasVerticalScroll = controlForLayout.scrollHeight > controlForLayout.clientHeight + 1;
+          field.classList.toggle("has-template-scroll", hasVerticalScroll);
+        } else {
+          field.classList.remove("has-template-scroll");
+        }
+      };
+      updateScrollPositionClass();
       if (field.querySelector(":scope > .template-pencil")) return;
+
       const button = document.createElement("button");
       button.type = "button";
       button.className = "template-pencil";
       button.setAttribute("aria-label", "Modifier");
       button.title = "Modifier";
-      button.innerHTML = "✎";
+      const setButtonIcon = (editing: boolean) => {
+        button.innerHTML = editing
+          ? '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+          : '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/></svg>';
+      };
+      setButtonIcon(false);
+
+      let editing = false;
       button.addEventListener("click", (event) => {
         event.preventDefault();
         event.stopPropagation();
-        const editable = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
-        if (editable) {
-          editable.readOnly = false;
-          editable.focus();
-          editable.setSelectionRange?.(editable.value.length, editable.value.length);
-          editable.addEventListener("blur", () => { editable.readOnly = true; }, { once: true });
-          return;
+
+        const control = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
+        editing = !editing;
+        setButtonIcon(editing);
+        button.setAttribute("aria-label", editing ? "Terminer la modification" : "Modifier");
+        button.title = editing ? "Terminer" : "Modifier";
+        field.classList.toggle("is-editing", editing);
+
+        if (control) {
+          control.readOnly = !editing;
+          control.classList.toggle("template-editing-control", editing);
+          if (editing) {
+            control.focus();
+            control.setSelectionRange?.(control.value.length, control.value.length);
+          }
+        } else {
+          field.contentEditable = editing ? "true" : "false";
+          if (editing) {
+            field.focus();
+            const selection = window.getSelection();
+            const range = document.createRange();
+            range.selectNodeContents(field);
+            range.collapse(false);
+            selection?.removeAllRanges();
+            selection?.addRange(range);
+          }
         }
-        field.contentEditable = "true";
-        field.focus();
-        const selection = window.getSelection();
-        const range = document.createRange();
-        range.selectNodeContents(field);
-        range.collapse(false);
-        selection?.removeAllRanges();
-        selection?.addRange(range);
       });
+
       field.appendChild(button);
-    });
+    };
+
+    const enhanceAll = () => {
+      root.querySelectorAll<HTMLElement>(selector).forEach(enhanceField);
+    };
+
+    // Template content is rendered after the enhancer itself, when a template is selected.
+    // Observe the workspace so every newly rendered template gets its pencil automatically.
+    enhanceAll();
+    const observer = new MutationObserver(() => enhanceAll());
+    observer.observe(root, { childList: true, subtree: true });
+
+    const onRootClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      const field = target.closest<HTMLElement>(selector);
+      if (!field || !root.contains(field)) return;
+      if (target.closest(".template-pencil")) return;
+      const control = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
+      if (field.classList.contains("is-editing") || (control && !control.readOnly)) {
+        // Edit mode must completely own the click. Some template fields have
+        // their own bubbling copy handler, so merely returning here is not
+        // enough: stop propagation so positioning the caret never copies.
+        event.stopPropagation();
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      void copyAndNotice(field);
+    };
 
     root.addEventListener("click", onRootClick, true);
     return () => {
+      observer.disconnect();
       root.removeEventListener("click", onRootClick, true);
-      fields.forEach((field) => {
+      root.querySelectorAll<HTMLElement>(selector).forEach((field) => {
         field.querySelector(":scope > .template-pencil")?.remove();
         field.querySelectorAll(".template-copy-notice").forEach((node) => node.remove());
+        const control = field.querySelector<HTMLInputElement | HTMLTextAreaElement>("input, textarea");
+        if (control) {
+          control.readOnly = true;
+          control.classList.remove("template-editing-control");
+        }
+        field.classList.remove("is-editing", "template-copy-editable");
         field.contentEditable = "false";
       });
     };
@@ -360,6 +414,7 @@ const AdditionalInformationDialog = ({
   const templateRootRef = React.useRef<HTMLDivElement | null>(null);
   const [draft, setDraft] = React.useState(value);
   const [selectedTemplate, setSelectedTemplate] = React.useState<AdditionalInformationTemplateId | null>(null);
+  const [openTemplateGroup, setOpenTemplateGroup] = React.useState<string | null>("autres");
   const [referenceNumber, setReferenceNumber] = React.useState(intervention.bciNumber || "");
   const [wioNumber, setWioNumber] = React.useState(intervention.wioNumber || "");
   const [task173, setTask173] = React.useState(intervention.tache173Content || "");
@@ -424,6 +479,7 @@ const AdditionalInformationDialog = ({
   const close = () => {
     setDraft(value);
     setSelectedTemplate(null);
+    setOpenTemplateGroup("autres");
     setReferenceNumber("");
     setCopied(null);
     setBciResPickerOpen(false);
@@ -437,9 +493,16 @@ const AdditionalInformationDialog = ({
   };
 
   const save = () => {
-    onChange?.(draft.trim());
+    let nextDraft = draft;
+    if (selectedTemplate && ["bciThreeCures", "bciWrongNumber", "bciReintroductionImport", "bciResiliation"].includes(selectedTemplate)) {
+      const descriptionControl = templateRootRef.current?.querySelector<HTMLTextAreaElement>(".bci-reintroduction-form__description-box textarea");
+      if (descriptionControl) nextDraft = descriptionControl.value;
+    }
+    onChange?.(nextDraft.trim());
     onTemplateDataChange?.({
       bciNumber: referenceNumber,
+      bciTemplateId: selectedTemplate ?? undefined,
+      bciDescription: nextDraft,
       wioNumber,
       tache173Content: task173,
       tache79Content: task79,
@@ -699,8 +762,8 @@ Bonne journée`;
               <aside className="additional-information-sidebar" aria-label="Modèles d'informations supplémentaires">
                 <div className="additional-information-sidebar__title">Modèles</div>
 
-                <div className="additional-information-group">
-                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                <div className={`additional-information-group ${openTemplateGroup === "bci" ? "is-open" : ""}`}>
+                  <button type="button" className="additional-information-group__header" onClick={() => setOpenTemplateGroup((current) => current === "bci" ? null : "bci")}>
                     <span>BCI</span><span aria-hidden="true">⌄</span>
                   </button>
                   <div className="additional-information-group__items">
@@ -711,8 +774,8 @@ Bonne journée`;
                   </div>
                 </div>
 
-                <div className="additional-information-group">
-                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                <div className={`additional-information-group ${openTemplateGroup === "wio" ? "is-open" : ""}`}>
+                  <button type="button" className="additional-information-group__header" onClick={() => setOpenTemplateGroup((current) => current === "wio" ? null : "wio")}>
                     <span>WIO</span><span aria-hidden="true">⌄</span>
                   </button>
                   <div className="additional-information-group__items">
@@ -721,8 +784,8 @@ Bonne journée`;
                   </div>
                 </div>
 
-                <div className="additional-information-group">
-                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                <div className={`additional-information-group ${openTemplateGroup === "snow" ? "is-open" : ""}`}>
+                  <button type="button" className="additional-information-group__header" onClick={() => setOpenTemplateGroup((current) => current === "snow" ? null : "snow")}>
                     <span>Snow création</span><span aria-hidden="true">⌄</span>
                   </button>
                   <div className="additional-information-group__items">
@@ -732,8 +795,8 @@ Bonne journée`;
                   </div>
                 </div>
 
-                <div className="additional-information-group">
-                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                <div className={`additional-information-group ${openTemplateGroup === "tasks" ? "is-open" : ""}`}>
+                  <button type="button" className="additional-information-group__header" onClick={() => setOpenTemplateGroup((current) => current === "tasks" ? null : "tasks")}>
                     <span>Tâches</span><span aria-hidden="true">⌄</span>
                   </button>
                   <div className="additional-information-group__items">
@@ -743,8 +806,8 @@ Bonne journée`;
                   </div>
                 </div>
 
-                {otherTemplates.length > 0 && <div className="additional-information-group is-open">
-                  <button type="button" className="additional-information-group__header" onClick={(e) => e.currentTarget.parentElement?.classList.toggle("is-open")}>
+                {otherTemplates.length > 0 && <div className={`additional-information-group ${openTemplateGroup === "autres" ? "is-open" : ""}`}>
+                  <button type="button" className="additional-information-group__header" onClick={() => setOpenTemplateGroup((current) => current === "autres" ? null : "autres")}>
                     <span>Autres</span><span aria-hidden="true">⌄</span>
                   </button>
                   <div className="additional-information-group__items">

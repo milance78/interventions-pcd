@@ -1369,10 +1369,39 @@ const CurrentInterventionPage = () => {
                   onChange={(value) => dispatch(updateField({ field: "additionalInformation", value }))}
                   onTemplateDataChange={(data) => {
                     let nextComment = newIntervention.comment;
-                    if (data.bciNumber !== undefined) {
-                      const line = data.bciNumber.trim() ? `BCI: ${data.bciNumber.trim()}` : "";
-                      nextComment = replaceActionCommentLine(nextComment, ["BCI:"], line);
-                      dispatch(updateField({ field: "bciNumber", value: data.bciNumber }));
+                    if (data.bciNumber !== undefined || data.bciTemplateId !== undefined) {
+                      const bciNumber = data.bciNumber ?? newIntervention.bciNumber;
+                      const templateId = data.bciTemplateId;
+                      const reference = bciNumber.trim();
+                      let line = "";
+                      if (templateId === "bciThreeCures" || templateId === "bciWrongNumber") {
+                        line = `Annulation + BCI: ${reference}`;
+                      } else if (templateId === "bciReintroductionImport") {
+                        line = `BCI reintroduction ${reference}`;
+                      } else if (templateId === "bciResiliation") {
+                        const lines = nextComment.replace(/\r\n/g, "\n").split("\n");
+                        const index = lines.findIndex((item) => /^RES en attente(?::|,)?/i.test(item.trim()));
+                        if (index >= 0) {
+                          lines[index] = lines[index].replace(/\s*,\s*BCI:.*$/i, "").replace(/\s*$/, "") + `, BCI: ${reference}`;
+                          nextComment = lines.join("\n");
+                          line = lines[index];
+                        } else {
+                          line = `BCI: ${reference}`;
+                          nextComment = nextComment.trim() ? `${nextComment.trim()}\n\n${line}` : line;
+                        }
+                      }
+                      nextComment = templateId === "bciResiliation" ? nextComment : replaceActionCommentLine(nextComment, ["Annulation + BCI:", "BCI reintroduction"], line);
+                      if (data.bciDescription !== undefined && templateId) {
+                        const prefix = templateId === "bciThreeCures"
+                          ? "BCI après 3 tentatives CURE"
+                          : templateId === "bciWrongNumber"
+                            ? "BCI numéro erroné"
+                            : templateId === "bciReintroductionImport"
+                              ? "BCI réintroduction"
+                              : "BCI résiliation";
+                        dispatch(updateField({ field: "additionalInformation", value: `${prefix}: \"${data.bciDescription}\"` }));
+                      }
+                      dispatch(updateField({ field: "bciNumber", value: bciNumber }));
                       dispatch(updateField({ field: "commentActionBci", value: line }));
                     }
                     if (data.tache173Content !== undefined) {
