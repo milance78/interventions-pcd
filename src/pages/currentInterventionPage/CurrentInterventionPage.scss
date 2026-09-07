@@ -6907,3 +6907,78 @@
   color: #315f84 !important;
   -webkit-text-fill-color: #315f84 !important;
 }
+
+/* v228 — outline-only action buttons: keep the established hues, remove all
+   fill/background, and slightly strengthen the border for a lively outline. */
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button--review {
+  color: #3b78a5 !important;
+  -webkit-text-fill-color: #3b78a5 !important;
+  border: 2px solid #78add2 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button:hover,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button--review:hover {
+  color: #326b96 !important;
+  -webkit-text-fill-color: #326b96 !important;
+  border-color: #619bc4 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history {
+  color: #358052 !important;
+  -webkit-text-fill-color: #358052 !important;
+  border: 2px solid #78bd90 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+.current-intervention-page .right-card-actions__bottom-right .add-to-today-button--history:hover {
+  color: #2e7148 !important;
+  -webkit-text-fill-color: #2e7148 !important;
+  border-color: #61aa7b !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* v229 — Enregistrer / Revu must stay completely fixed on hover.  The hover
+   state may change colours only; it must never alter geometry or position. */
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button--review {
+  transform: none !important;
+  position: relative !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+  box-sizing: border-box !important;
+  transition-property: color, border-color, background-color, background-image, box-shadow !important;
+}
+
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button:hover,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button--review:hover,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button:focus-visible,
+.current-intervention-page .right-card-actions__submit-slot .submit-intervention-button--review:focus-visible {
+  transform: none !important;
+  top: 0 !important;
+  left: 0 !important;
+  margin: 0 !important;
+}
+
+/* v230 — keep status backgrounds clipped cleanly inside their rounded borders. */
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select .MuiOutlinedInput-root,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .snow-status-select .MuiOutlinedInput-root {
+  overflow: hidden !important;
+  border-radius: 12px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .status-select .MuiSelect-select,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .snow-status-select .MuiSelect-select {
+  border-radius: 12px !important;
+}
