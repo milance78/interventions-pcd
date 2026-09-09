@@ -1369,7 +1369,8 @@ const CurrentInterventionPage = () => {
                   onChange={(value) => dispatch(updateField({ field: "additionalInformation", value }))}
                   onTemplateDataChange={(data) => {
                     let nextComment = newIntervention.comment;
-                    if (data.bciNumber !== undefined || data.bciTemplateId !== undefined) {
+                    const bciTemplateIds = ["bciThreeCures", "bciWrongNumber", "bciReintroductionImport", "bciResiliation"] as const;
+                    if (data.bciTemplateId && bciTemplateIds.includes(data.bciTemplateId as typeof bciTemplateIds[number])) {
                       const bciNumber = data.bciNumber ?? newIntervention.bciNumber;
                       const templateId = data.bciTemplateId;
                       const reference = bciNumber.trim();
@@ -1391,7 +1392,7 @@ const CurrentInterventionPage = () => {
                         }
                       }
                       nextComment = templateId === "bciResiliation" ? nextComment : replaceActionCommentLine(nextComment, ["Annulation + BCI:", "BCI reintroduction"], line);
-                      if (data.bciDescription !== undefined && templateId) {
+                      if (data.bciDescription !== undefined) {
                         const prefix = templateId === "bciThreeCures"
                           ? "BCI après 3 tentatives CURE"
                           : templateId === "bciWrongNumber"
@@ -1403,6 +1404,12 @@ const CurrentInterventionPage = () => {
                       }
                       dispatch(updateField({ field: "bciNumber", value: bciNumber }));
                       dispatch(updateField({ field: "commentActionBci", value: line }));
+                    }
+                    if (data.wioTemplateId) {
+                      const wioNumber = data.wioNumber ?? newIntervention.wioNumber;
+                      const line = `Annulation + WIO: ${wioNumber.trim()}`;
+                      nextComment = replaceActionCommentLine(nextComment, ["Annulation + WIO:"], line);
+                      dispatch(updateField({ field: "wioNumber", value: wioNumber }));
                     }
                     if (data.tache173Content !== undefined) {
                       const line = data.tache173Content.trim() ? `T173: "${data.tache173Content.trim()}"` : "";

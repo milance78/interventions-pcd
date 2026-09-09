@@ -2042,3 +2042,42 @@
 .template-copy-editable.is-editing textarea {
   cursor: text !important;
 }
+
+/* v231 — WIO overlays must stay anchored to the reference artwork.
+   The template pencil enhancer adds .template-copy-editable with position:relative;
+   that class is intentionally useful for normal fields, but it must never turn
+   these image overlays back into normal-flow elements. */
+.custom-wio-form__copyable.template-copy-editable {
+  position: absolute !important;
+  box-sizing: border-box !important;
+}
+
+/* v231 — return WIO operator-change Info to the original artwork field.
+   The Info message is now a single line, so do not enlarge, move, or cover it. */
+.custom-wio-form__canvas--operator-change {
+  margin-bottom: 0 !important;
+  padding-bottom: 0 !important;
+  overflow: visible !important;
+}
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info {
+  position: absolute !important;
+  left: 2.85% !important;
+  top: 86.5% !important;
+  width: 94.35% !important;
+  height: 11% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 8px 12px !important;
+  box-sizing: border-box !important;
+  background: transparent !important;
+  border: 0 !important;
+  color: #111827 !important;
+  font: 16px/1.35 Arial, Helvetica, sans-serif !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  z-index: 3 !important;
+}
+.custom-wio-form__canvas--operator-change .custom-wio-form__overlay-grid-info:hover {
+  background: transparent !important;
+  border: 0 !important;
+}

@@ -33,6 +33,7 @@ type Props = {
     bciTemplateId?: AdditionalInformationTemplateId;
     bciDescription?: string;
     wioNumber?: string;
+    wioTemplateId?: AdditionalInformationTemplateId;
     tache173Content?: string;
     tache79Content?: string;
     tache79JobId?: string;
@@ -494,21 +495,35 @@ const AdditionalInformationDialog = ({
 
   const save = () => {
     let nextDraft = draft;
-    if (selectedTemplate && ["bciThreeCures", "bciWrongNumber", "bciReintroductionImport", "bciResiliation"].includes(selectedTemplate)) {
+    const isBciTemplate = !!selectedTemplate && [
+      "bciThreeCures",
+      "bciWrongNumber",
+      "bciReintroductionImport",
+      "bciResiliation",
+    ].includes(selectedTemplate);
+    const isWioTemplate = selectedTemplate === "wioIncorrectAddress" || selectedTemplate === "wioOperatorChange";
+
+    if (isBciTemplate) {
       const descriptionControl = templateRootRef.current?.querySelector<HTMLTextAreaElement>(".bci-reintroduction-form__description-box textarea");
       if (descriptionControl) nextDraft = descriptionControl.value;
     }
+
+    if (selectedTemplate === "wioOperatorChange") {
+      nextDraft = wioOperatorChangeInfo;
+    }
+
     onChange?.(nextDraft.trim());
     onTemplateDataChange?.({
-      bciNumber: referenceNumber,
-      bciTemplateId: selectedTemplate ?? undefined,
-      bciDescription: nextDraft,
-      wioNumber,
-      tache173Content: task173,
-      tache79Content: task79,
-      tache79JobId: task79JobId,
-      tache96Content: task96,
-      tache96SnowId: task96SnowId,
+      bciNumber: isBciTemplate ? referenceNumber : undefined,
+      bciTemplateId: isBciTemplate ? selectedTemplate ?? undefined : undefined,
+      bciDescription: isBciTemplate ? nextDraft : undefined,
+      wioNumber: isWioTemplate ? wioNumber : undefined,
+      wioTemplateId: isWioTemplate ? selectedTemplate ?? undefined : undefined,
+      tache173Content: selectedTemplate === "tache173" ? task173 : undefined,
+      tache79Content: selectedTemplate === "tache79" ? task79 : undefined,
+      tache79JobId: selectedTemplate === "tache79" ? task79JobId : undefined,
+      tache96Content: selectedTemplate === "tache96" ? task96 : undefined,
+      tache96SnowId: selectedTemplate === "tache96" ? task96SnowId : undefined,
     });
     setOpen(false);
   };
@@ -640,11 +655,7 @@ const AdditionalInformationDialog = ({
   );
   const wioOperatorChangeInfo = React.useMemo(() => {
     const network = wioOperatorNetwork || "___";
-    return `Bonjour,
-
-Le même client est actuellement actif à l'adresse chez ${network}. Vu qu'il souhaite passer chez Mobile Vikings merci de procéder au changement d'opérateur
-
-Bonne journée`;
+    return `Client est actuellement actif chez ${network} Merci de réintroduire chez Vikings.`;
   }, [wioOperatorNetwork]);
 
   const bciFormInterventionLabel = isBciResiliation
@@ -780,7 +791,7 @@ Bonne journée`;
                   </button>
                   <div className="additional-information-group__items">
                     <Button type="button" variant={selectedTemplate === "wioIncorrectAddress" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("wioIncorrectAddress")}>WIO Adresse incorrecte en W6</Button>
-                    <Button type="button" variant={selectedTemplate === "wioOperatorChange" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("wioOperatorChange")}>Changement d'opérateur</Button>
+                    <Button type="button" variant={selectedTemplate === "wioOperatorChange" ? "contained" : "outlined"} className="additional-information-template-button" onClick={() => selectTemplate("wioOperatorChange")}>WIO Changement d'opérateur</Button>
                   </div>
                 </div>
 
@@ -967,7 +978,7 @@ Bonne journée`;
                 ) : selectedTemplate === "wioOperatorChange" ? (
                   <div className="custom-wio-form custom-wio-form--operator-change">
                     <TemplateHeader
-                      title="WIO changement d'opérateur"
+                      title="WIO Changement d'opérateur"
                       fields={[{ label: "Numéro WIO", value: wioNumber, onChange: setWioNumber }]}
                     />
 
