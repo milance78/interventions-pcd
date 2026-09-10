@@ -100,16 +100,40 @@ const joinedDetails = (client: AddressClient, infrastructure: string) => {
 
 const simpleClientCommentDetails = (client: AddressClient, infrastructure: string) => {
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
-  const parts: string[] = [];
-  const fullName = normalizePersonName(client.fullName);
-  if (fullName) parts.push(fullName);
-
-  const serviceValue = clean(isCopper ? client.na : client.utac);
-  if (serviceValue) parts.push(`${isCopper ? "NA" : "UTAC"}: ${serviceValue}`);
-
   const operator = clean(client.operator);
-  if (operator) parts.push(`chez ${operator}`);
+  const normalizedOperator = operator.toLocaleLowerCase("fr-FR");
+  const isMobileVikings = normalizedOperator === "mobile vikings";
+  const isAutreOlo = normalizedOperator === "autre olo";
+  const serviceValue = clean(isCopper ? client.na : client.utac);
+  const fullName = normalizePersonName(client.fullName);
 
+  // Mobile Vikings / Autre OLO are special cases: the operator name replaces
+  // the unavailable client name, and "chez <Réseau>" is deliberately omitted.
+  const displayName = isMobileVikings
+    ? "Mobile Vikings"
+    : isAutreOlo
+      ? "Autre OLO"
+      : fullName;
+
+  if (isCopper) {
+    const parts: string[] = [];
+    if (displayName) parts.push(displayName);
+    if (serviceValue) parts.push(`NA: ${serviceValue}`);
+    if (operator && !isMobileVikings && !isAutreOlo) parts.push(`chez ${operator}`);
+    return parts.join(", ");
+  }
+
+  if (isMobileVikings) {
+    return serviceValue ? `Mobile Vikings, UTAC: ${serviceValue}` : "Mobile Vikings";
+  }
+  if (isAutreOlo) {
+    return serviceValue ? `Autre OLO, UTAC: ${serviceValue}` : "Autre OLO";
+  }
+
+  const parts: string[] = [];
+  if (displayName) parts.push(displayName);
+  if (serviceValue) parts.push(`UTAC: ${serviceValue}`);
+  if (operator) parts.push(`chez ${operator}`);
   return parts.join(", ");
 };
 
@@ -132,11 +156,35 @@ export const formatAddressClientsForComment = (
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());
 
   if (active.length === 1) {
-    const details = simpleClientCommentDetails(active[0], infrastructure);
-    const header = isCopper
-      ? "Un TF à l'adresse"
-      : "L'UTAC à l'adresse occupé par";
-    return details ? `${header} ${details};` : header;
+    const client = active[0];
+    const operator = clean(client.operator);
+    const normalizedOperator = operator.toLocaleLowerCase("fr-FR");
+    const isMobileVikings = normalizedOperator === "mobile vikings";
+    const isAutreOlo = normalizedOperator === "autre olo";
+
+    if (isCopper) {
+      const na = clean(client.na);
+      const name = isMobileVikings
+        ? "Mobile Vikings"
+        : isAutreOlo
+          ? "Autre OLO"
+          : normalizePersonName(client.fullName);
+      const parts = [name, na ? `NA: ${na}` : ""].filter(Boolean);
+      if (!isMobileVikings && !isAutreOlo && operator) parts.push(`chez ${operator}`);
+      return `Un TF à l'adresse: ${parts.join(", ")};`;
+    }
+
+    const utac = clean(client.utac);
+    if (isMobileVikings) {
+      return `L'UTAC à l'adresse ${utac} est occupé par un Mobile Vikings;`;
+    }
+    if (isAutreOlo) {
+      return `L'UTAC à l'adresse ${utac} est occupé par autre OLO;`;
+    }
+
+    const name = normalizePersonName(client.fullName);
+    const occupant = [name, operator ? `chez ${operator}` : ""].filter(Boolean).join(", ");
+    return `L'UTAC à l'adresse ${utac} est occupé par ${occupant};`;
   }
 
   const lines = active.map((client, index) => {

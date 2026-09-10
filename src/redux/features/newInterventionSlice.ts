@@ -1144,10 +1144,26 @@ const NewInterventionSlice = createSlice({
       };
     },
 
-    clearTask: (state): Intervention => ({
-      ...initialState,
-      smsEnabled: state.smsEnabled,
-    }),
+    clearTask: (state): Intervention => {
+      const isDisplayedDraft = Boolean(
+        state.hasDraft &&
+          state.draftSnapshot &&
+          isSameInterventionData(state, state.draftSnapshot),
+      );
+
+      // Keep a background brouillon when the intervention currently on screen
+      // is another record. If the saved action was performed on the brouillon
+      // itself, it has now become a normal saved intervention and must not be
+      // resurrected as a brouillon.
+      return {
+        ...initialState,
+        smsEnabled: state.smsEnabled,
+        draftSnapshot: isDisplayedDraft ? null : state.draftSnapshot,
+        draftMode: isDisplayedDraft ? null : state.draftMode,
+        draftEditSnapshot: isDisplayedDraft ? null : state.draftEditSnapshot,
+        hasDraft: isDisplayedDraft ? false : state.hasDraft,
+      };
+    },
   },
 });
 

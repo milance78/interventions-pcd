@@ -1,17 +1,9 @@
 import * as React from "react";
 import AddRounded from "@mui/icons-material/AddRounded";
-import WarningAmberRounded from "@mui/icons-material/WarningAmberRounded";
 import GridOnRounded from "@mui/icons-material/GridOnRounded";
 import DashboardCustomizeRounded from "@mui/icons-material/DashboardCustomizeRounded";
 import Button from "@mui/material/Button";
-import Dialog from "@mui/material/Dialog";
-import DraggableDialogPaper from "../draggableDialogPaper/DraggableDialogPaper";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogTitle from "@mui/material/DialogTitle";
-import Grow from "@mui/material/Grow";
-import type { TransitionProps } from "@mui/material/transitions";
+import HistoryRounded from "@mui/icons-material/HistoryRounded";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import ProfileMenu from "../profileMenu/ProfileMenu";
@@ -19,20 +11,12 @@ import InterventionSearch from "./interventionSearch/InterventionSearch";
 import {
   resumeDraft,
   startNewIntervention,
+  isSameInterventionData,
 } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { getOnHoldInterventions } from "../../utils/onHoldUtils";
 
 import "./Header.scss";
-
-const DialogTransition = React.forwardRef(function DialogTransition(
-  props: TransitionProps & {
-    children: React.ReactElement;
-  },
-  ref: React.Ref<unknown>,
-) {
-  return <Grow ref={ref} {...props} timeout={180} />;
-});
 
 const SMART_IMPORT_AUTO_OPEN_KEY = "smart-import:auto-open";
 
@@ -40,7 +24,14 @@ const Header = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const [now, setNow] = React.useState(new Date());
-  const { hasDraft, mode } = useAppSelector((state) => state.newIntervention);
+  const newIntervention = useAppSelector((state) => state.newIntervention);
+  const { hasDraft } = newIntervention;
+  const isDisplayedDraft = Boolean(
+    hasDraft &&
+      newIntervention.draftSnapshot &&
+      isSameInterventionData(newIntervention, newIntervention.draftSnapshot),
+  );
+  const hasDisplacedDraft = hasDraft && !isDisplayedDraft;
   const historyInterventions = useAppSelector(
     (state) => state.history.interventions,
   );
@@ -49,7 +40,6 @@ const Header = () => {
     [historyInterventions, now],
   );
 
-  const [newDialogOpen, setNewDialogOpen] = React.useState(false);
   const [spreadsheetMode, setSpreadsheetMode] = React.useState(() =>
     window.localStorage.getItem("interventions-pcd-display-mode") === "spreadsheet",
   );
@@ -81,30 +71,22 @@ const Header = () => {
     });
   };
 
-  const closeNewInterventionDialog = () => {
-    setNewDialogOpen(false);
-  };
-
   const handleNewIntervention = () => {
-    if (hasDraft) {
-      setNewDialogOpen(true);
-      return;
-    }
-
     dispatch(startNewIntervention());
     openCurrentPage(true);
   };
 
   const handleResumeDraft = () => {
     dispatch(resumeDraft());
-    closeNewInterventionDialog();
     openCurrentPage(false);
   };
 
-  const handleStartFresh = () => {
-    dispatch(startNewIntervention());
-    closeNewInterventionDialog();
-    openCurrentPage(true);
+  const handleCurrentInterventionClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!hasDisplacedDraft) return;
+
+    event.preventDefault();
+    dispatch(resumeDraft());
+    navigate("/intervention-en-cours");
   };
 
   const date = now.toLocaleDateString("fr-BE");
@@ -120,6 +102,7 @@ const Header = () => {
       <nav className="header__navigation">
         <NavLink
           to="/intervention-en-cours"
+          onClick={handleCurrentInterventionClick}
           className={({ isActive }) =>
             `header__link ${isActive ? "header__link--active" : ""}`
           }
@@ -142,7 +125,6 @@ const Header = () => {
               aria-label={`${overdueCount} ticket${overdueCount > 1 ? "s" : ""} avec échéance dépassée`}
               title={`${overdueCount} ticket${overdueCount > 1 ? "s" : ""} avec échéance dépassée`}
             >
-              <WarningAmberRounded aria-hidden="true" />
               <strong>{overdueCount}</strong>
             </span>
           )}
@@ -210,6 +192,19 @@ const Header = () => {
           <span>{spreadsheetMode ? "Normal" : "XLS"}</span>
         </button>
 
+        {hasDisplacedDraft && (
+          <Button
+            type="button"
+            variant="outlined"
+            size="small"
+            startIcon={<HistoryRounded />}
+            className="header__draft-button"
+            onClick={handleResumeDraft}
+          >
+            Brouillon
+          </Button>
+        )}
+
         <Button
           type="button"
           variant="outlined"
@@ -225,68 +220,7 @@ const Header = () => {
         <ProfileMenu />
       </div>
 
-      <Dialog
-        PaperComponent={DraggableDialogPaper}
-        open={newDialogOpen}
-        onClose={closeNewInterventionDialog}
-        TransitionComponent={DialogTransition}
-        transitionDuration={180}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{
-          className: "new-intervention-dialog",
-        }}
-        aria-labelledby="new-intervention-dialog-title"
-        aria-describedby="new-intervention-dialog-description"
-      >
-        <DialogTitle
-          id="new-intervention-dialog-title"
-          className="new-intervention-dialog__title"
-        >
-          Un brouillon est déjà en cours
-        </DialogTitle>
 
-        <DialogContent className="new-intervention-dialog__content">
-          <DialogContentText
-            id="new-intervention-dialog-description"
-            className="new-intervention-dialog__text"
-          >
-            {mode === "VIEW_HISTORY"
-              ? "Vous consultez une intervention. Voulez-vous reprendre votre brouillon ou commencer une nouvelle intervention ?"
-              : "Voulez-vous reprendre le brouillon actuel ou supprimer son contenu et commencer une nouvelle intervention ?"}
-          </DialogContentText>
-        </DialogContent>
-
-        <DialogActions className="new-intervention-dialog__actions">
-          <Button
-            type="button"
-            variant="outlined"
-            className="new-intervention-dialog__button new-intervention-dialog__button--cancel"
-            onClick={closeNewInterventionDialog}
-          >
-            Annuler
-          </Button>
-
-          <Button
-            type="button"
-            variant="outlined"
-            className="new-intervention-dialog__button new-intervention-dialog__button--new"
-            onClick={handleStartFresh}
-          >
-            Nouvelle intervention
-          </Button>
-
-          <Button
-            type="button"
-            variant="contained"
-            className="new-intervention-dialog__button new-intervention-dialog__button--resume"
-            onClick={handleResumeDraft}
-            autoFocus
-          >
-            Reprendre le brouillon
-          </Button>
-        </DialogActions>
-      </Dialog>
     </header>
   );
 };
