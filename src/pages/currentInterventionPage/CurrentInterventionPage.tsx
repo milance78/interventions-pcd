@@ -25,6 +25,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 import { isDisplayedDraft } from "../../domain/intervention/draftSelectors";
+import { removeAutomaticAddressLines, replaceActionCommentLine, replaceResiliationBciLine } from "../../domain/comment/composer";
 import "./CurrentInterventionPage.scss";
 
 import AdditionalInformationDialog from "../../components/additionalInformationDialog/AdditionalInformationDialog";
@@ -313,15 +314,6 @@ const SnowTrailIcon = ({ direction, active }: SnowTrailIconProps) => (
     />
   </span>
 );
-
-const replaceActionCommentLine = (comment: string, prefixes: string[], nextLine: string) => {
-  const lines = comment.replace(/\r\n/g, "\n").split("\n");
-  const filtered = lines.filter((line) =>
-    !prefixes.some((prefix) => line.trim().toLowerCase().startsWith(prefix.toLowerCase())),
-  );
-  const cleaned = filtered.join("\n").replace(/\n{3,}/g, "\n\n").trim();
-  return nextLine.trim() ? (cleaned ? `${cleaned}\n\n${nextLine.trim()}` : nextLine.trim()) : cleaned;
-};
 
 const CurrentInterventionPage = () => {
   const dispatch = useAppDispatch();
@@ -649,21 +641,6 @@ const CurrentInterventionPage = () => {
 
   const confirmedAddressText = "Adresse confirmée";
   const notConfirmedAddressText = "Adresse pas confirmée";
-  const automaticAddressLine =
-    /^(?:Adresse confirmée\.?|Adresse pas confirmée\.?|Adresse pas encore confirmée\.?)$/;
-
-  const removeAutomaticAddressLines = (value: string) => {
-    const lines = value.replace(/\r\n/g, "\n").split("\n");
-    const cleanedLines = lines.filter(
-      (line) => !automaticAddressLine.test(line.trim()),
-    );
-
-    return cleanedLines
-      .join("\n")
-      .replace(/^\n+/, "")
-      .replace(/\n{3,}/g, "\n\n");
-  };
-
   const focusCommentAt = (cursorPosition: number) => {
     window.requestAnimationFrame(() => {
       const textarea = commentInputRef.current;
@@ -1377,16 +1354,9 @@ const CurrentInterventionPage = () => {
                       } else if (templateId === "bciReintroductionImport") {
                         line = `BCI reintroduction ${reference}`;
                       } else if (templateId === "bciResiliation") {
-                        const lines = nextComment.replace(/\r\n/g, "\n").split("\n");
-                        const index = lines.findIndex((item) => /^RES en attente(?::|,)?/i.test(item.trim()));
-                        if (index >= 0) {
-                          lines[index] = lines[index].replace(/\s*,\s*BCI:.*$/i, "").replace(/\s*$/, "") + `, BCI: ${reference}`;
-                          nextComment = lines.join("\n");
-                          line = lines[index];
-                        } else {
-                          line = `BCI: ${reference}`;
-                          nextComment = nextComment.trim() ? `${nextComment.trim()}\n\n${line}` : line;
-                        }
+                        const result = replaceResiliationBciLine(nextComment, reference);
+                        nextComment = result.comment;
+                        line = result.line;
                       }
                       nextComment = templateId === "bciResiliation" ? nextComment : replaceActionCommentLine(nextComment, ["Annulation + BCI:", "BCI reintroduction"], line);
                       if (data.bciDescription !== undefined) {
