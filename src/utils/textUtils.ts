@@ -67,7 +67,7 @@ export const prepareWctCureText = (value: string) => {
 };
 
 
-import type { CureRecords } from "../redux/features/newInterventionSlice";
+import type { CureRecords } from "../domain/intervention/types";
 
 const cureRecordSortValue = (record: CureRecords["firstCure"]) => {
   if (!record) return "";

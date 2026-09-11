@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { createInterventionThunk } from "../thunks/createInterventionThunk";
-import type { Intervention } from "./newInterventionSlice";
+import type { Intervention } from "../../domain/intervention/types";
 import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 const initialState: Intervention[] = [];

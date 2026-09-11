@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "./firebaseConfig";
-import type { Intervention, InterventionData } from "../redux/features/newInterventionSlice";
+import type { Intervention, InterventionData } from "../domain/intervention/types";
 import { parseLegacyAddressClients, serializeAddressClients } from "../utils/addressClients";
 import { normalizeCureRecords } from "../utils/cureRecords";
 import { composeMainAddress, normalizeNaNumber, parseMainAddress } from "../utils/interventionAddress";

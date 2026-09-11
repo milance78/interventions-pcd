@@ -1,4 +1,4 @@
-import type { Intervention } from "../redux/features/newInterventionSlice";
+import type { Intervention } from "../domain/intervention/types";
 import {
   interventionActivityValue,
   interventionLogicalKey,

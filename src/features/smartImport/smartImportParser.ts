@@ -1,4 +1,4 @@
-import type { InterventionData } from "../../redux/features/newInterventionSlice";
+import type { InterventionData } from "../../domain/intervention/types";
 
 export type SmartImportResult = {
   values: Partial<InterventionData>;

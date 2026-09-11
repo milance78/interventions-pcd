@@ -338,6 +338,12 @@ const CurrentInterventionPage = () => {
     (state) => state.interventionsList,
   );
 
+  const isDisplayedDraft = Boolean(
+    newIntervention.hasDraft &&
+      newIntervention.draftSnapshot &&
+      isSameInterventionData(newIntervention, newIntervention.draftSnapshot),
+  );
+
   const {
     clientName,
     comment,
@@ -360,11 +366,6 @@ const CurrentInterventionPage = () => {
     postponedDate,
   } = newIntervention;
 
-  const isDisplayedDraft = Boolean(
-    newIntervention.hasDraft &&
-      newIntervention.draftSnapshot &&
-      isSameInterventionData(newIntervention, newIntervention.draftSnapshot),
-  );
 
   const [clearDialogOpen, setClearDialogOpen] = React.useState(false);
   const [historyDialogOpen, setHistoryDialogOpen] = React.useState(false);

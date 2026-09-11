@@ -1,4 +1,4 @@
-import type { Intervention } from "../redux/features/newInterventionSlice";
+import type { Intervention } from "../domain/intervention/types";
 
 const HISTORY_CACHE_VERSION = 2;
 const HISTORY_CACHE_PREFIX = "interventions-pcd:history-cache";

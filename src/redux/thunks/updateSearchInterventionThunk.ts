@@ -6,7 +6,7 @@ import {
   addHistoryIntervention,
   updateHistoryIntervention,
 } from "../features/historySlice";
-import type { Intervention } from "../features/newInterventionSlice";
+import type { Intervention } from "../../domain/intervention/types";
 import { normalizeInterventionStrings } from "../../utils/textUtils";
 
 export const updateSearchInterventionThunk = createAsyncThunk<

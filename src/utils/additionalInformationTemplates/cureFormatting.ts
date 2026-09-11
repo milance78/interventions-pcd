@@ -1,4 +1,4 @@
-import type { CureRecord } from "../../redux/features/newInterventionSlice";
+import type { CureRecord } from "../../domain/intervention/types";
 
 export const formatCureDate = (record: CureRecord | null): string => {
   if (!record?.date) return "—";

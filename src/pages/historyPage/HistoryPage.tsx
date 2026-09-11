@@ -47,7 +47,7 @@ import CableCutOn from "../../assets/icons/CableCutOn.png";
 import { loadInterventionFromHistory } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { deleteInterventionThunk } from "../../redux/thunks/deleteInterventionThunk";
-import type { Intervention } from "../../redux/features/newInterventionSlice";
+import type { Intervention } from "../../domain/intervention/types";
 import { buildHistoryViewModel } from "../../utils/historyViewModel";
 import { writeTextToClipboard } from "../../utils/clipboard";
 import { exportInterventionsToExcel } from "../../utils/excelExport";

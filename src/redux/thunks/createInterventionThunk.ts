@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { auth } from "../../firebase/firebaseConfig";
 import { createIntervention } from "../../firebase/interventionsService";
-import type { Intervention } from "../features/newInterventionSlice";
+import type { Intervention } from "../../domain/intervention/types";
 import { normalizeInterventionStrings } from "../../utils/textUtils";
 import { addHistoryIntervention } from "../features/historySlice";
 import { addIntervention } from "../features/interventionsListSlice";

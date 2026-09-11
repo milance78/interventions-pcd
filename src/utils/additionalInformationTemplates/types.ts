@@ -1,4 +1,4 @@
-import type { CureRecords } from "../../redux/features/newInterventionSlice";
+import type { CureRecords } from "../../domain/intervention/types";
 
 export type AdditionalInformationTemplateId =
   | "bciThreeCures"

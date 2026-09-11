@@ -2,7 +2,7 @@ import TextField from "@mui/material/TextField";
 
 import "./AddressMiniInput.scss";
 
-import type { InterventionField } from "../../../redux/features/newInterventionSlice";
+import type { InterventionField } from "../../../domain/intervention/types";
 import { updateField } from "../../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 import { trimLeadingHorizontalWhitespace } from "../../../utils/textUtils";

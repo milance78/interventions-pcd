@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import type { Intervention } from "./newInterventionSlice";
+import type { Intervention } from "../../domain/intervention/types";
 import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
 type HistoryState = {

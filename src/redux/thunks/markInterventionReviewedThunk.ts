@@ -2,7 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { auth } from "../../firebase/firebaseConfig";
 import { markInterventionReviewed } from "../../firebase/interventionsService";
 import { updateHistoryIntervention } from "../features/historySlice";
-import type { Intervention } from "../features/newInterventionSlice";
+import type { Intervention } from "../../domain/intervention/types";
 
 export const markInterventionReviewedThunk = createAsyncThunk<Intervention, Intervention, { rejectValue: string }>(
   "interventions/markReviewed",

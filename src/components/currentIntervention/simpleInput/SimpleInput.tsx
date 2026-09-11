@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 
 import "./SimpleInput.scss";
 
-import type { InterventionField } from "../../../redux/features/newInterventionSlice";
+import type { InterventionField } from "../../../domain/intervention/types";
 import { updateField } from "../../../redux/features/newInterventionSlice";
 import { trimLeadingHorizontalWhitespace } from "../../../utils/textUtils";
 import {

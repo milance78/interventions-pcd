@@ -12,7 +12,7 @@ import {
   writeTextToClipboard,
 } from "../../utils/textUtils";
 
-import type { CureRecords } from "../../redux/features/newInterventionSlice";
+import type { CureRecords } from "../../domain/intervention/types";
 
 import "./CommentCopyActions.scss";
 

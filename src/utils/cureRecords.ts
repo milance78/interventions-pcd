@@ -2,7 +2,7 @@ import type {
   CureKey,
   CureRecord,
   CureRecords,
-} from "../redux/features/newInterventionSlice";
+} from "../domain/intervention/types";
 
 export const cureOrder: CureKey[] = [
   "firstCure",
