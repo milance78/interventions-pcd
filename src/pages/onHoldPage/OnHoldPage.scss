@@ -1124,3 +1124,34 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
     transform-origin: center center !important;
   }
 }
+
+/* v234 — overdue active background must be visually symmetric around the
+   shifted warning/count group while still reaching the divider on the right. */
+@media (min-width: 901px) {
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active {
+    background: #fff7f7 !important;
+    overflow: visible !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active {
+    z-index: 1 !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active::before {
+    content: "" !important;
+    position: absolute !important;
+    z-index: 0 !important;
+    top: 0 !important;
+    bottom: 0 !important;
+    left: -22px !important;
+    right: 0 !important;
+    background: #fff7f7 !important;
+    pointer-events: none !important;
+  }
+
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active .on-hold-tab__icon,
+  .on-hold-page .on-hold-tab--overdue.on-hold-tab--active > strong {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+}

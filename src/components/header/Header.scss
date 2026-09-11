@@ -274,3 +274,119 @@
 }
 
 /* v232 — draft lifecycle rules and compact header draft action. */
+
+/* v234 — overdue header notification: no fill, red 3px ring, centered count. */
+.header__on-hold-notification {
+  width: 32px !important;
+  height: 32px !important;
+  flex: 0 0 32px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 3px solid #dc2626 !important;
+  border-radius: 50% !important;
+  color: #dc2626 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.header__on-hold-notification strong {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  color: #dc2626 !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+}
+
+.header__link--active .header__on-hold-notification {
+  border-color: #dc2626 !important;
+  color: #dc2626 !important;
+  background: transparent !important;
+}
+
+/* v235 — softer red, thicker ring and larger centered overdue count. */
+.header__on-hold-notification {
+  width: 34px !important;
+  height: 34px !important;
+  flex: 0 0 34px !important;
+  border: 4px solid #d99595 !important;
+  color: #d99595 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.header__on-hold-notification strong {
+  color: #d99595 !important;
+  font-size: 16px !important;
+  font-weight: 400 !important;
+  line-height: 1 !important;
+}
+
+.header__link--active .header__on-hold-notification {
+  border-color: #d99595 !important;
+  color: #d99595 !important;
+  background: transparent !important;
+}
+
+/* v238 — optical vertical centering of the overdue notification digit. */
+.header__on-hold-notification {
+  position: relative !important;
+}
+
+.header__on-hold-notification strong {
+  position: absolute !important;
+  top: calc(50% - 1px) !important;
+  left: 50% !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: translate(-50%, -55%) !important;
+  line-height: 1 !important;
+}
+
+
+/* v239 — final optical centering: compensate for the font glyph's baseline inside the circular badge. */
+.header__on-hold-notification strong {
+  top: 50% !important;
+  transform: translate(-50%, -55%) !important;
+}
+
+/* v240 — simple flex centering for the notification digit. */
+.header__on-hold-notification {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.header__on-hold-notification strong {
+  position: static !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  line-height: 1 !important;
+}
+
+/* v242 — keep the notification digit on the normal flex centering path;
+   only a tiny margin adjusts the glyph optically without repositioning the badge. */
+.header__on-hold-notification strong {
+  position: static !important;
+  top: auto !important;
+  transform: none !important;
+  margin: 1px 0 0 !important;
+}
