@@ -241,6 +241,7 @@ const mapIntervention = (
     draftEditSnapshot: null,
     editSnapshot: null,
     hasDraft: false,
+    draftState: { active: null, displaced: null },
   } as Intervention;
 };
 
@@ -255,6 +256,7 @@ const stripUiFields = (intervention: Intervention) => {
     draftEditSnapshot: _draftEditSnapshot,
     editSnapshot: _editSnapshot,
     hasDraft: _hasDraft,
+    draftState: _draftState,
     createdAt: _createdAt,
     updatedAt: _updatedAt,
     dateKey: _dateKey,

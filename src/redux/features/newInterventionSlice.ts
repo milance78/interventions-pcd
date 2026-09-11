@@ -4,7 +4,14 @@ import { cureOrder, emptyCureRecords, localDateKey, localTimeKey, removeCureLine
 import { composeMainAddress, normalizeNaNumber, parseMainAddress } from "../../utils/interventionAddress";
 import { replaceCommentBlock } from "../../domain/comment/commentBlocks";
 import { emptyInterventionData, loadSmsPreference } from "../../domain/intervention/defaults";
-import { captureCurrentDraft, extractData, hasMeaningfulDraft, isSameInterventionData, refreshDraftMetadata } from "../../domain/intervention/draft";
+import { extractData, hasMeaningfulDraft, isSameInterventionData } from "../../domain/intervention/draft";
+import {
+  captureDraftBeforeNavigation,
+  emptyDraftState,
+  getCanonicalDraftState,
+  refreshDraftState,
+  resumeDisplacedDraft,
+} from "../../domain/intervention/draftState";
 
 import type {
   AddressClient,
@@ -82,6 +89,7 @@ export const initialState: Intervention = {
   draftEditSnapshot: null,
   editSnapshot: null,
   hasDraft: false,
+  draftState: emptyDraftState(),
 };
 
 const NewInterventionSlice = createSlice({
@@ -194,7 +202,8 @@ const NewInterventionSlice = createSlice({
           state.isSnowReceivedPending || state.isSnowSentPending;
       }
 
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     updateMainAddressManually: (state, action: PayloadAction<string>) => {
@@ -210,7 +219,8 @@ const NewInterventionSlice = createSlice({
       state.postalCode = parsed.postalCode;
       state.city = parsed.city;
 
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     applyPastedMainAddress: (
@@ -227,7 +237,8 @@ const NewInterventionSlice = createSlice({
       state.city = parsed.city;
       state.mainAddress = composeMainAddress(parsed);
 
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     recordCure: (state, action: PayloadAction<RecordCurePayload>) => {
@@ -271,7 +282,8 @@ const NewInterventionSlice = createSlice({
         })
         .filter(Boolean)
         .join("\n");
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     updateRecordedCureSms: (state, action: PayloadAction<UpdateCureSmsPayload>) => {
@@ -299,7 +311,8 @@ const NewInterventionSlice = createSlice({
         })
         .filter(Boolean)
         .join("\n");
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     clearTodaysCures: (state) => {
@@ -352,7 +365,8 @@ const NewInterventionSlice = createSlice({
         })
         .filter(Boolean)
         .join("\n");
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     addAddressClient: (state, action: PayloadAction<AddressClient>) => {
@@ -372,7 +386,8 @@ const NewInterventionSlice = createSlice({
         state.commentSegmentClientsOnAddress,
         state.commentSegmentAddressConfirmation.trim().length > 0,
       );
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     updateAddressClient: (state, action: PayloadAction<UpdateAddressClientPayload>) => {
@@ -392,7 +407,8 @@ const NewInterventionSlice = createSlice({
         state.commentSegmentClientsOnAddress,
         state.commentSegmentAddressConfirmation.trim().length > 0,
       );
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     removeAddressClient: (state, action: PayloadAction<string>) => {
@@ -400,7 +416,8 @@ const NewInterventionSlice = createSlice({
       state.addressClients = state.addressClients.filter((item) => item.id !== action.payload);
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
       state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     setAddressClients: (state, action: PayloadAction<AddressClient[]>) => {
@@ -420,7 +437,8 @@ const NewInterventionSlice = createSlice({
         state.commentSegmentClientsOnAddress,
         state.commentSegmentAddressConfirmation.trim().length > 0,
       );
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     applyImportedData: (state, action: PayloadAction<ImportedDataPayload>) => {
@@ -477,14 +495,15 @@ const NewInterventionSlice = createSlice({
       }));
       state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
 
-      refreshDraftMetadata(state);
+      state.draftState = refreshDraftState(state);
+      state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     loadInterventionForEdit: (
       state,
       action: PayloadAction<Intervention>,
     ): Intervention => {
-      const draftState = captureCurrentDraft(state);
+      const draftState = captureDraftBeforeNavigation(state);
       return {
         ...initialState,
         ...action.payload,
@@ -493,7 +512,11 @@ const NewInterventionSlice = createSlice({
         isHistoryView: false,
         mode: "TODAY_EDIT",
         editSnapshot: extractData(action.payload),
-        ...draftState,
+        draftState,
+        draftSnapshot: draftState.displaced?.snapshot ?? null,
+        draftMode: draftState.displaced?.mode ?? null,
+        draftEditSnapshot: draftState.displaced?.editSnapshot ?? null,
+        hasDraft: Boolean(draftState.active || draftState.displaced),
       };
     },
 
@@ -501,7 +524,7 @@ const NewInterventionSlice = createSlice({
       state,
       action: PayloadAction<Intervention>,
     ): Intervention => {
-      const draftState = captureCurrentDraft(state);
+      const draftState = captureDraftBeforeNavigation(state);
 
       return {
         ...initialState,
@@ -511,7 +534,11 @@ const NewInterventionSlice = createSlice({
         isHistoryView: false,
         mode: "HISTORY_EDIT",
         editSnapshot: extractData(action.payload),
-        ...draftState,
+        draftState,
+        draftSnapshot: draftState.displaced?.snapshot ?? null,
+        draftMode: draftState.displaced?.mode ?? null,
+        draftEditSnapshot: draftState.displaced?.editSnapshot ?? null,
+        hasDraft: Boolean(draftState.active || draftState.displaced),
       };
     },
 
@@ -519,7 +546,7 @@ const NewInterventionSlice = createSlice({
       state,
       action: PayloadAction<Intervention>,
     ): Intervention => {
-      const draftState = captureCurrentDraft(state);
+      const draftState = captureDraftBeforeNavigation(state);
 
       return {
         ...initialState,
@@ -529,7 +556,11 @@ const NewInterventionSlice = createSlice({
         isHistoryView: false,
         mode: "SEARCH_EDIT",
         editSnapshot: extractData(action.payload),
-        ...draftState,
+        draftState,
+        draftSnapshot: draftState.displaced?.snapshot ?? null,
+        draftMode: draftState.displaced?.mode ?? null,
+        draftEditSnapshot: draftState.displaced?.editSnapshot ?? null,
+        hasDraft: Boolean(draftState.active || draftState.displaced),
       };
     },
 
@@ -543,9 +574,10 @@ const NewInterventionSlice = createSlice({
       isEditing: false,
       isHistoryView: true,
       mode: "VIEW_HISTORY",
+      draftState: getCanonicalDraftState(state),
       draftSnapshot: state.draftSnapshot,
       editSnapshot: extractData(action.payload),
-      hasDraft: state.hasDraft,
+      hasDraft: Boolean(getCanonicalDraftState(state).active || getCanonicalDraftState(state).displaced),
     }),
 
     loadDraft: (
@@ -603,6 +635,9 @@ const NewInterventionSlice = createSlice({
         ...initialState,
         ...draft,
         mode: hasDraft ? "DRAFT" : "NEW",
+        draftState: hasDraft
+          ? { active: { snapshot: draft, mode: "DRAFT", editSnapshot: null }, displaced: null }
+          : emptyDraftState(),
         draftSnapshot: hasDraft ? draft : null,
         draftMode: hasDraft ? "DRAFT" : null,
         draftEditSnapshot: null,
@@ -611,43 +646,29 @@ const NewInterventionSlice = createSlice({
     },
 
     resumeDraft: (state): Intervention => {
-      const draft = state.draftSnapshot;
-      if (!draft || !hasMeaningfulDraft(draft)) {
-        return { ...initialState, smsEnabled: state.smsEnabled };
-      }
+      return resumeDisplacedDraft(state);
+    },
 
-      const targetMode = state.draftMode ?? "DRAFT";
-      const isEditMode =
-        targetMode === "TODAY_EDIT" ||
-        targetMode === "HISTORY_EDIT" ||
-        targetMode === "SEARCH_EDIT";
+    startNewIntervention: (state): Intervention => {
+      const draftState = getCanonicalDraftState(state);
+      const nextDraftState = draftState.active
+        ? { active: null, displaced: draftState.active }
+        : draftState;
 
       return {
         ...initialState,
-        ...draft,
-        isEditing: isEditMode,
-        isHistoryView: false,
-        mode: targetMode,
-        draftSnapshot: draft,
-        draftMode: targetMode,
-        draftEditSnapshot: state.draftEditSnapshot,
-        editSnapshot: isEditMode ? state.draftEditSnapshot : null,
-        hasDraft: true,
         smsEnabled: state.smsEnabled,
+        draftState: nextDraftState,
+        draftSnapshot: nextDraftState.displaced?.snapshot ?? null,
+        draftMode: nextDraftState.displaced?.mode ?? null,
+        draftEditSnapshot: nextDraftState.displaced?.editSnapshot ?? null,
+        hasDraft: Boolean(nextDraftState.active || nextDraftState.displaced),
       };
     },
 
-    startNewIntervention: (state): Intervention => ({
-      ...initialState,
-      smsEnabled: state.smsEnabled,
-      draftSnapshot: state.draftSnapshot,
-      draftMode: state.draftMode,
-      draftEditSnapshot: state.draftEditSnapshot,
-      hasDraft: state.hasDraft,
-    }),
-
     cancelDraft: (state): Intervention => ({
       ...state,
+      draftState: emptyDraftState(),
       draftSnapshot: null,
       draftMode: null,
       draftEditSnapshot: null,
@@ -666,23 +687,18 @@ const NewInterventionSlice = createSlice({
         isEditing: state.isEditing,
         isHistoryView: state.isHistoryView,
         mode: state.mode,
-        draftSnapshot:
+        draftState:
           state.mode === "NEW" || state.mode === "DRAFT"
-            ? null
-            : state.draftSnapshot,
-        draftMode:
-          state.mode === "NEW" || state.mode === "DRAFT"
-            ? null
-            : state.draftMode,
-        draftEditSnapshot:
-          state.mode === "NEW" || state.mode === "DRAFT"
-            ? null
-            : state.draftEditSnapshot,
+            ? { active: null, displaced: getCanonicalDraftState(state).displaced }
+            : getCanonicalDraftState(state),
+        draftSnapshot: getCanonicalDraftState(state).displaced?.snapshot ?? null,
+        draftMode: getCanonicalDraftState(state).displaced?.mode ?? null,
+        draftEditSnapshot: getCanonicalDraftState(state).displaced?.editSnapshot ?? null,
         editSnapshot: state.editSnapshot,
-        hasDraft:
-          state.mode === "NEW" || state.mode === "DRAFT"
-            ? false
-            : state.hasDraft,
+        hasDraft: Boolean(
+          (state.mode === "NEW" || state.mode === "DRAFT" ? null : getCanonicalDraftState(state).active) ||
+          getCanonicalDraftState(state).displaced,
+        ),
         smsEnabled: state.smsEnabled,
       };
 
@@ -711,6 +727,14 @@ const NewInterventionSlice = createSlice({
       return {
         ...initialState,
         ...restored,
+        draftState: restored.draftState ?? {
+          active: restored.hasDraft && restored.draftSnapshot && isSameInterventionData(restored, restored.draftSnapshot)
+            ? { snapshot: restored.draftSnapshot, mode: restored.draftMode ?? "DRAFT", editSnapshot: restored.draftEditSnapshot ?? null }
+            : null,
+          displaced: restored.hasDraft && restored.draftSnapshot && !isSameInterventionData(restored, restored.draftSnapshot)
+            ? { snapshot: restored.draftSnapshot, mode: restored.draftMode ?? "DRAFT", editSnapshot: restored.draftEditSnapshot ?? null }
+            : null,
+        },
         clientName: normalizePersonName(restored.clientName ?? ""),
         addressClients: restoredClients,
         clientsOnAddress: serializeAddressClients(
@@ -724,23 +748,21 @@ const NewInterventionSlice = createSlice({
     },
 
     clearTask: (state): Intervention => {
-      const isDisplayedDraft = Boolean(
-        state.hasDraft &&
-          state.draftSnapshot &&
-          isSameInterventionData(state, state.draftSnapshot),
-      );
-
-      // Keep a background brouillon when the intervention currently on screen
-      // is another record. If the saved action was performed on the brouillon
-      // itself, it has now become a normal saved intervention and must not be
-      // resurrected as a brouillon.
+      const draftState = getCanonicalDraftState(state);
+      // Saving the currently displayed draft consumes only the active draft.
+      // A displaced draft belongs to another intervention and remains available.
+      const nextDraftState = {
+        active: null,
+        displaced: draftState.displaced,
+      };
       return {
         ...initialState,
         smsEnabled: state.smsEnabled,
-        draftSnapshot: isDisplayedDraft ? null : state.draftSnapshot,
-        draftMode: isDisplayedDraft ? null : state.draftMode,
-        draftEditSnapshot: isDisplayedDraft ? null : state.draftEditSnapshot,
-        hasDraft: isDisplayedDraft ? false : state.hasDraft,
+        draftState: nextDraftState,
+        draftSnapshot: nextDraftState.displaced?.snapshot ?? null,
+        draftMode: nextDraftState.displaced?.mode ?? null,
+        draftEditSnapshot: nextDraftState.displaced?.editSnapshot ?? null,
+        hasDraft: Boolean(nextDraftState.displaced),
       };
     },
   },

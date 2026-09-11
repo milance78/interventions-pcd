@@ -1,5 +1,7 @@
 import type { Middleware } from "@reduxjs/toolkit";
 
+import { getCanonicalDraftState } from "../../domain/intervention/draftState";
+import { hasMeaningfulDraft } from "../../domain/intervention/draft";
 import {
   clearDraftFromStorage,
   loadCurrentSessionFromStorage,
@@ -8,7 +10,6 @@ import {
   saveDraftToStorage,
 } from "../../localStorage/localStorage";
 import {
-  hasMeaningfulDraft,
   type Intervention,
   type InterventionData,
 } from "../features/newInterventionSlice";
@@ -129,8 +130,9 @@ export const localStorageMiddleware: Middleware =
     // or reloading the browser must restore the exact form that was on screen.
     saveCurrentSessionToStorage(intervention);
 
-    const draft = intervention.draftSnapshot;
-    if (intervention.hasDraft && draft && hasMeaningfulDraft(draft)) {
+    const draftState = getCanonicalDraftState(intervention);
+    const draft = draftState.active?.snapshot ?? draftState.displaced?.snapshot ?? null;
+    if (draft && hasMeaningfulDraft(draft)) {
       saveDraftToStorage(draft);
     } else {
       clearDraftFromStorage();

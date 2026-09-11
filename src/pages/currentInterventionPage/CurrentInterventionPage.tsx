@@ -24,6 +24,7 @@ import Alert from "@mui/material/Alert";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isSameLogicalIntervention } from "../../utils/interventionIdentity";
 
+import { isDisplayedDraft } from "../../domain/intervention/draftSelectors";
 import "./CurrentInterventionPage.scss";
 
 import AdditionalInformationDialog from "../../components/additionalInformationDialog/AdditionalInformationDialog";
@@ -41,7 +42,6 @@ import {
   clearCurrentForm,
   clearTask,
   hasMeaningfulDraft,
-  isSameInterventionData,
   markSearchInterventionSaved,
   resumeDraft,
   recordCure,
@@ -338,11 +338,7 @@ const CurrentInterventionPage = () => {
     (state) => state.interventionsList,
   );
 
-  const isDisplayedDraft = Boolean(
-    newIntervention.hasDraft &&
-      newIntervention.draftSnapshot &&
-      isSameInterventionData(newIntervention, newIntervention.draftSnapshot),
-  );
+  const draftIsDisplayed = isDisplayedDraft(newIntervention);
 
   const {
     clientName,
@@ -1496,7 +1492,7 @@ const CurrentInterventionPage = () => {
         </section>
       </div>
 
-      {hasDraft && !isDisplayedDraft && (
+      {hasDraft && !draftIsDisplayed && (
         <aside className="floating-draft-reminder" aria-label="Brouillon disponible">
           <WarningAmberRounded className="floating-draft-reminder__status" />
           <strong>Brouillon</strong>

@@ -1,4 +1,4 @@
-import type { Intervention, InterventionData, InterventionMode } from "./types";
+import type { Intervention, InterventionData } from "./types";
 import { emptyInterventionData } from "./defaults";
 
 export const hasMeaningfulDraft = (
@@ -135,75 +135,3 @@ export const isSameInterventionData = (
     return firstItem === secondItem;
   });
 };
-
-export const refreshDraftMetadata = (state: Intervention) => {
-  const draft = extractData(state);
-
-  if (state.mode === "NEW" || state.mode === "DRAFT") {
-    const hasDraft = hasMeaningfulDraft(draft);
-    state.hasDraft = hasDraft;
-    state.mode = hasDraft ? "DRAFT" : "NEW";
-    state.draftSnapshot = hasDraft
-      ? { ...draft, documentId: "", createdAt: null, updatedAt: null, dateKey: undefined }
-      : null;
-    state.draftMode = hasDraft ? "DRAFT" : null;
-    state.draftEditSnapshot = null;
-    return;
-  }
-
-  if (state.mode === "VIEW_HISTORY" || !state.editSnapshot) return;
-
-  const changed = !isSameInterventionData(draft, state.editSnapshot);
-  if (changed) {
-    state.hasDraft = true;
-    state.draftSnapshot = draft;
-    state.draftMode = state.mode;
-    state.draftEditSnapshot = state.editSnapshot;
-    return;
-  }
-
-  // If this draft belongs to the currently displayed edit and every value was
-  // restored to its original baseline, it is no longer a brouillon. Preserve
-  // any unrelated background draft instead.
-  if (state.draftMode === state.mode && state.draftEditSnapshot) {
-    state.hasDraft = false;
-    state.draftSnapshot = null;
-    state.draftMode = null;
-    state.draftEditSnapshot = null;
-  }
-};
-
-export const captureCurrentDraft = (state: Intervention) => {
-  if (state.mode === "NEW" || state.mode === "DRAFT") {
-    const currentDraft = extractData(state);
-    const hasDraft = hasMeaningfulDraft(currentDraft);
-    return {
-      hasDraft,
-      draftSnapshot: hasDraft
-        ? { ...currentDraft, documentId: "", createdAt: null, updatedAt: null, dateKey: undefined }
-        : null,
-      draftMode: hasDraft ? ("DRAFT" as InterventionMode) : null,
-      draftEditSnapshot: null,
-    };
-  }
-
-  if (state.mode !== "VIEW_HISTORY" && state.editSnapshot) {
-    const currentData = extractData(state);
-    if (!isSameInterventionData(currentData, state.editSnapshot)) {
-      return {
-        hasDraft: true,
-        draftSnapshot: currentData,
-        draftMode: state.mode,
-        draftEditSnapshot: state.editSnapshot,
-      };
-    }
-  }
-
-  return {
-    draftSnapshot: state.draftSnapshot,
-    draftMode: state.draftMode,
-    draftEditSnapshot: state.draftEditSnapshot,
-    hasDraft: state.hasDraft,
-  };
-};
-

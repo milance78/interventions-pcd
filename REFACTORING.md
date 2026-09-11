@@ -41,3 +41,20 @@ npm run test:watch
 ## Important
 
 No intentional UI behavior was changed as part of this refactor foundation. The next phase should tackle the Brouillon lifecycle as an explicit state machine, with reducer tests for every transition defined by the functional requirements.
+
+## Draft state-machine (v249)
+
+The brouillon lifecycle now has an explicit domain state instead of inferring
+whether a draft is displayed by comparing the current form with a snapshot.
+
+- `draftState.active`: the brouillon currently displayed in Current Intervention.
+- `draftState.displaced`: a different brouillon temporarily hidden by another intervention.
+- Navigating away captures the current draft into `displaced`.
+- Starting a new intervention moves an active draft to `displaced`.
+- Editing another intervention creates an active draft while preserving the displaced one.
+- Restoring the saved baseline removes only the active edit draft.
+- `resumeDraft` promotes the displaced draft to active and clears the displaced slot.
+- Legacy `draftSnapshot` / `draftMode` / `draftEditSnapshot` fields remain as a compatibility boundary for old local sessions and are not the source of truth for new draft logic.
+
+This keeps the UI selectors (`displayed` / `displaced`) simple and makes the
+lifecycle independently testable in `draftState.test.ts`.

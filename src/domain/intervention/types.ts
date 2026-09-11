@@ -128,6 +128,17 @@ export interface InterventionData {
   dateKey?: string;
 }
 
+export interface DraftRecord {
+  snapshot: InterventionData;
+  mode: InterventionMode;
+  editSnapshot: InterventionData | null;
+}
+
+export interface DraftState {
+  active: DraftRecord | null;
+  displaced: DraftRecord | null;
+}
+
 export interface Intervention extends InterventionData {
   isEditing: boolean;
   isHistoryView: boolean;
@@ -137,6 +148,8 @@ export interface Intervention extends InterventionData {
   draftEditSnapshot: InterventionData | null;
   editSnapshot: InterventionData | null;
   hasDraft: boolean;
+  /** Canonical draft state-machine. Legacy draft* fields remain for migration compatibility. */
+  draftState?: DraftState;
 }
 
 export type InterventionField = keyof InterventionData;

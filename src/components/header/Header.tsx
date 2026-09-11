@@ -11,10 +11,10 @@ import InterventionSearch from "./interventionSearch/InterventionSearch";
 import {
   resumeDraft,
   startNewIntervention,
-  isSameInterventionData,
 } from "../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { getOnHoldInterventions } from "../../utils/onHoldUtils";
+import { hasDisplacedDraft } from "../../domain/intervention/draftSelectors";
 
 import "./Header.scss";
 
@@ -25,13 +25,7 @@ const Header = () => {
   const navigate = useNavigate();
   const [now, setNow] = React.useState(new Date());
   const newIntervention = useAppSelector((state) => state.newIntervention);
-  const { hasDraft } = newIntervention;
-  const isDisplayedDraft = Boolean(
-    hasDraft &&
-      newIntervention.draftSnapshot &&
-      isSameInterventionData(newIntervention, newIntervention.draftSnapshot),
-  );
-  const hasDisplacedDraft = hasDraft && !isDisplayedDraft;
+  const draftIsDisplaced = hasDisplacedDraft(newIntervention);
   const historyInterventions = useAppSelector(
     (state) => state.history.interventions,
   );
@@ -82,7 +76,7 @@ const Header = () => {
   };
 
   const handleCurrentInterventionClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!hasDisplacedDraft) return;
+    if (!draftIsDisplaced) return;
 
     event.preventDefault();
     dispatch(resumeDraft());
@@ -192,7 +186,7 @@ const Header = () => {
           <span>{spreadsheetMode ? "Normal" : "XLS"}</span>
         </button>
 
-        {hasDisplacedDraft && (
+        {draftIsDisplaced && (
           <Button
             type="button"
             variant="outlined"
