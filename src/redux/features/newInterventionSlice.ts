@@ -1,10 +1,17 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { formatAddressClientsForComment, normalizePersonName, parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
+import { normalizePersonName, parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
+import {
+  addAddressClientState,
+  removeAddressClientState,
+  setAddressClientsState,
+  updateAddressClientState,
+} from "../../domain/addressClients/state";
 import { clearTodaysCureState, recordCureState, updateRecordedCureSmsState } from "../../domain/cure/state";
 import { composeMainAddress, normalizeNaNumber, parseMainAddress } from "../../utils/interventionAddress";
 import { replaceCommentSegment } from "../../domain/comment/composer";
 import { emptyInterventionData, loadSmsPreference } from "../../domain/intervention/defaults";
 import { extractData, hasMeaningfulDraft, isSameInterventionData } from "../../domain/intervention/draft";
+import { prepareImportedIntervention } from "../../domain/intervention/importData";
 import { applyInterventionFieldUpdate } from "../../domain/intervention/fieldUpdate";
 import {
   captureDraftBeforeNavigation,
@@ -169,72 +176,28 @@ const NewInterventionSlice = createSlice({
 
     addAddressClient: (state, action: PayloadAction<AddressClient>) => {
       if (state.mode === "VIEW_HISTORY") return;
-      const previousSegment = state.commentSegmentClientsOnAddress;
-      state.addressClients.push({
-        ...action.payload,
-        isFuture: Boolean(action.payload.isFuture),
-        isSameClient: Boolean(action.payload.isSameClient),
-        na: normalizeNaNumber(action.payload.na ?? ""),
-      });
-      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
-      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
-      state.comment = replaceCommentSegment(
-        state.comment,
-        previousSegment,
-        state.commentSegmentClientsOnAddress,
-        state.commentSegmentAddressConfirmation.trim().length > 0,
-      );
+      addAddressClientState(state, action.payload);
       state.draftState = refreshDraftState(state);
       state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     updateAddressClient: (state, action: PayloadAction<UpdateAddressClientPayload>) => {
       if (state.mode === "VIEW_HISTORY") return;
-      const client = state.addressClients.find((item) => item.id === action.payload.id);
-      if (!client) return;
-      const previousSegment = state.commentSegmentClientsOnAddress;
-      // Keep raw input while the user is typing. Field-specific normalization
-      // (for example the leading zero in NA) is applied on blur by the UI.
-      (client as unknown as Record<string, unknown>)[action.payload.field] =
-        action.payload.value;
-      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
-      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
-      state.comment = replaceCommentSegment(
-        state.comment,
-        previousSegment,
-        state.commentSegmentClientsOnAddress,
-        state.commentSegmentAddressConfirmation.trim().length > 0,
-      );
+      if (!updateAddressClientState(state, action.payload)) return;
       state.draftState = refreshDraftState(state);
       state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     removeAddressClient: (state, action: PayloadAction<string>) => {
       if (state.mode === "VIEW_HISTORY") return;
-      state.addressClients = state.addressClients.filter((item) => item.id !== action.payload);
-      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
-      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
+      removeAddressClientState(state, action.payload);
       state.draftState = refreshDraftState(state);
       state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
 
     setAddressClients: (state, action: PayloadAction<AddressClient[]>) => {
       if (state.mode === "VIEW_HISTORY") return;
-      const previousSegment = state.commentSegmentClientsOnAddress;
-      state.addressClients = action.payload.map((client) => ({
-        ...client,
-        isFuture: Boolean(client.isFuture),
-        isSameClient: Boolean(client.isSameClient),
-        na: normalizeNaNumber(client.na ?? ""),
-      }));
-      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
-      state.commentSegmentClientsOnAddress = formatAddressClientsForComment(state.addressClients, state.infrastructure);
-      state.comment = replaceCommentSegment(
-        state.comment,
-        previousSegment,
-        state.commentSegmentClientsOnAddress,
-        state.commentSegmentAddressConfirmation.trim().length > 0,
-      );
+      setAddressClientsState(state, action.payload);
       state.draftState = refreshDraftState(state);
       state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },
@@ -243,56 +206,10 @@ const NewInterventionSlice = createSlice({
       if (state.mode === "VIEW_HISTORY") return;
 
       const importedAt = new Date().toISOString();
-      for (const [key, value] of Object.entries(action.payload)) {
-        if (value === undefined || value === null) continue;
-        const field = key as InterventionField;
-        (state as unknown as Record<string, unknown>)[field] = value;
-      }
-      if (action.payload.snowMentioned?.trim() && !state.snowMentionedCreatedAt) state.snowMentionedCreatedAt = importedAt;
-      if (action.payload.snowReceived?.trim() && !state.snowReceivedCreatedAt) state.snowReceivedCreatedAt = importedAt;
-      if (action.payload.snowSent?.trim() && !state.snowSentCreatedAt) state.snowSentCreatedAt = importedAt;
-
-      state.clientName = normalizePersonName(String(state.clientName ?? ""));
-
-      const importedAddress =
-        action.payload.streetName !== undefined ||
-        action.payload.streetNumber !== undefined ||
-        action.payload.streetAlpha !== undefined ||
-        action.payload.postalCode !== undefined ||
-        action.payload.city !== undefined
-          ? {
-              streetName: String(action.payload.streetName ?? state.streetName),
-              streetNumber: String(action.payload.streetNumber ?? state.streetNumber),
-              streetAlpha: String(action.payload.streetAlpha ?? state.streetAlpha),
-              postalCode: String(action.payload.postalCode ?? state.postalCode),
-              city: String(action.payload.city ?? state.city),
-            }
-          : parseMainAddress(String(action.payload.mainAddress ?? state.mainAddress));
-      state.streetName = importedAddress.streetName;
-      state.streetNumber = importedAddress.streetNumber;
-      state.streetAlpha = importedAddress.streetAlpha;
-      state.postalCode = importedAddress.postalCode;
-      state.city = importedAddress.city;
-      state.mainAddress = composeMainAddress(importedAddress);
-      state.na = normalizeNaNumber(String(state.na ?? ""));
-      state.addressClients = state.addressClients.map((client) => ({
-        ...client,
-        isFuture: Boolean(client.isFuture),
-        isSameClient: Boolean(client.isSameClient),
-        na: normalizeNaNumber(client.na ?? ""),
-      }));
-
-      if ((!action.payload.addressClients || action.payload.addressClients.length === 0) && action.payload.clientsOnAddress) {
-        state.addressClients = parseLegacyAddressClients(action.payload.clientsOnAddress);
-      }
-      state.addressClients = state.addressClients.map((client) => ({
-        ...client,
-        isFuture: Boolean(client.isFuture),
-        isSameClient: Boolean(client.isSameClient),
-        na: normalizeNaNumber(client.na ?? ""),
-      }));
-      state.clientsOnAddress = serializeAddressClients(state.addressClients, state.infrastructure);
-
+      Object.assign(
+        state,
+        prepareImportedIntervention(state, action.payload, importedAt),
+      );
       state.draftState = refreshDraftState(state);
       state.hasDraft = Boolean(state.draftState.active || state.draftState.displaced);
     },

@@ -58,3 +58,8 @@ whether a draft is displayed by comparing the current form with a snapshot.
 
 This keeps the UI selectors (`displayed` / `displaced`) simple and makes the
 lifecycle independently testable in `draftState.test.ts`.
+
+
+## v253 — Address Clients domain state
+Address-client state transitions are now isolated in `src/domain/addressClients/state.ts`.
+The Redux slice delegates add/update/remove/set operations to this domain module, while draft synchronization remains in Redux. This keeps address-client normalization, serialization and Commentaire synchronization together without changing the UI contract.
