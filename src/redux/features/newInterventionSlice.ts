@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { normalizePersonName, parseLegacyAddressClients, serializeAddressClients } from "../../utils/addressClients";
+import { normalizePersonName, parseLegacyAddressClients } from "../../utils/addressClients";
+import { serializeAddressClients } from "../../domain/addressClients/serialize";
 import {
   addAddressClientState,
   removeAddressClientState,
