@@ -138,3 +138,50 @@ Firestore document-reference construction for existing intervention and active-i
 ## v280
 - Restored exact v274 application state after reported regression.
 - No v275-v279 changes included.
+
+## v281 – isolated revision domain extraction
+
+- Extracted pure revision merging, legacy matching, de-duplication and sorting into `domain/intervention/revisions.ts`.
+- Firebase reads remain in `interventionsService.ts`.
+- Revision output and matching rules are preserved.
+- No history loading or repository behavior was changed.
+
+## v282 – history type extraction
+- Moved `HistoryDay` type to the history domain module.
+- Firebase service keeps loading behavior unchanged.
+
+
+## v283 – history day filtering extraction
+
+- Extracted filtering of successfully loaded, non-empty history days into the history domain.
+- History loading and error isolation remain unchanged.
+
+
+## v284 – history day normalization
+
+- Combined history-day filtering and newest-first sorting in `normalizeHistoryDays`.
+- `interventionsService.ts` delegates the final history-day normalization to the domain.
+- History loading, error isolation and Firebase access remain unchanged.
+
+## v285 – history day construction
+
+- Extracted pure `createHistoryDay()` helper into the history domain.
+- `interventionsService.ts` delegates history-day object construction to the domain.
+- Firebase loading and error isolation remain unchanged.
+
+
+## v286 – safe history-day loader
+
+Extracted the per-day error-isolated loader into the history domain. Firebase loading behavior remains unchanged.
+
+
+## v287 – history days orchestration
+
+- Added `loadHistoryDaysSafely()` to orchestrate per-day history loading in the history domain.
+- `interventionsService.ts` now delegates the `Promise.all` orchestration to the domain.
+- Firebase loading, per-day error isolation and normalization behavior remain unchanged.
+
+
+## v288
+- Extracted history date-key extraction into `domain/intervention/history.ts`.
+- No Firebase loading behavior changed.

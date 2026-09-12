@@ -1,22 +1,27 @@
 import type { Intervention, InterventionData } from "./types";
 
-export type RevisionSource = {
+export interface InterventionRevision {
   revisionId: string;
   changedAt: string | null;
   previousDateKey: string;
   snapshot: InterventionData;
-};
+}
 
-export const buildLegacyRevisions = (
+/**
+ * Merge stored revisions with legacy historical occurrences.
+ * This function is deliberately side-effect free; Firebase loading remains in
+ * the service layer.
+ */
+export const mergeInterventionRevisions = (
+  storedRevisions: InterventionRevision[],
   history: Array<{ interventions: Intervention[] }>,
   documentId: string,
-  interventionId: string,
-  oagID: string,
-): RevisionSource[] => {
+  interventionId = "",
+  oagID = "",
+): InterventionRevision[] => {
   const normalizedInterventionId = interventionId.trim().toLowerCase();
   const normalizedOagId = oagID.trim().toLowerCase();
-
-  return history
+  const legacy: InterventionRevision[] = history
     .flatMap((day) => day.interventions)
     .filter((item) => {
       if (item.documentId === documentId) return true;
@@ -29,13 +34,9 @@ export const buildLegacyRevisions = (
       previousDateKey: item.dateKey ?? "",
       snapshot: item as InterventionData,
     }));
-};
 
-export const mergeAndSortRevisions = (
-  revisions: RevisionSource[],
-): RevisionSource[] => {
-  const unique = new Map<string, RevisionSource>();
-  revisions.forEach((revision) => {
+  const unique = new Map<string, InterventionRevision>();
+  [...storedRevisions, ...legacy].forEach((revision) => {
     const key = `${revision.previousDateKey}-${revision.changedAt}-${revision.snapshot.comment}-${revision.snapshot.additionalInformation}`;
     if (!unique.has(key)) unique.set(key, revision);
   });

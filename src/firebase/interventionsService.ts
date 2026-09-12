@@ -24,7 +24,9 @@ import type { Intervention, InterventionData } from "../domain/intervention/type
 
 import { getLocalDateKey } from "../domain/intervention/dateKey";
 import { calculateDailySummary } from "../domain/intervention/summary";
-import { sortHistoryDateKeys } from "../domain/intervention/history";
+import { extractHistoryDateKeys, loadHistoryDaysSafely, normalizeHistoryDays, sortHistoryDateKeys } from "../domain/intervention/history";
+import type { HistoryDay } from "../domain/intervention/history";
+import { mergeInterventionRevisions } from "../domain/intervention/revisions";
 
 const updateSummaryInBackground = (userId: string, date: string) => {
   // A daily score is a snapshot. Once the calendar day has passed, later
@@ -61,14 +63,9 @@ export const loadInterventions = async (userId: string, date: string): Promise<I
   return snapshot.docs.map((item) => mapIntervention(item.data().caseId ?? item.id, date, item.data()));
 };
 
-export interface HistoryDay {
-  dateKey: string;
-  interventions: Intervention[];
-}
-
 export const loadHistoryDateKeys = async (userId: string): Promise<string[]> => {
   const daysSnapshot = await getDocs(getDaysReference(userId));
-  return sortHistoryDateKeys(daysSnapshot.docs.map((dayDocument) => dayDocument.id));
+  return sortHistoryDateKeys(extractHistoryDateKeys(daysSnapshot.docs));
 };
 
 export const loadCompleteHistory = async (
@@ -76,25 +73,12 @@ export const loadCompleteHistory = async (
   suppliedDateKeys?: string[],
 ): Promise<HistoryDay[]> => {
   const dateKeys = suppliedDateKeys ?? await loadHistoryDateKeys(userId);
-  const days = await Promise.all(
-    dateKeys.map(async (dateKey): Promise<HistoryDay | null> => {
-      try {
-        return {
-          dateKey,
-          interventions: await loadInterventions(userId, dateKey),
-        };
-      } catch (error) {
-        // One malformed/inaccessible historical day must not make the whole
-        // archive unavailable. The navigation list is already loaded from
-        // the days collection, so keep the remaining days usable.
-        console.error(`Unable to load history day ${dateKey}:`, error);
-        return null;
-      }
-    }),
+  const days = await loadHistoryDaysSafely(
+    dateKeys,
+    (key) => loadInterventions(userId, key),
+    (error, key) => console.error(`Unable to load history day ${key}:`, error),
   );
-  return days
-    .filter((day): day is HistoryDay => Boolean(day) && day.interventions.length > 0)
-    .sort((a, b) => b.dateKey.localeCompare(a.dateKey));
+  return normalizeHistoryDays(days);
 };
 
 
@@ -171,7 +155,7 @@ export const loadInterventionRevisions = async (
   oagID = "",
 ): Promise<InterventionRevision[]> => {
   const versionsSnapshot = await getDocs(getVersionsReference(userId, documentId));
-  const versions = versionsSnapshot.docs.map((item) => {
+  const versions: InterventionRevision[] = versionsSnapshot.docs.map((item) => {
     const raw = item.data();
     const data = normalizeLegacyFields(raw.data ?? raw.snapshot ?? {});
     return {
@@ -183,28 +167,7 @@ export const loadInterventionRevisions = async (
   });
 
   const history = await loadCompleteHistory(userId);
-  const normalizedInterventionId = interventionId.trim().toLowerCase();
-  const normalizedOagId = oagID.trim().toLowerCase();
-  const legacy = history
-    .flatMap((day) => day.interventions)
-    .filter((item) => {
-      if (item.documentId === documentId) return true;
-      if (normalizedInterventionId && item.interventionId?.trim().toLowerCase() === normalizedInterventionId) return true;
-      return Boolean(normalizedOagId && item.oagID?.trim().toLowerCase() === normalizedOagId);
-    })
-    .map((item) => ({
-      revisionId: `legacy-${item.dateKey}-${item.documentId}`,
-      changedAt: item.updatedAt ?? item.createdAt,
-      previousDateKey: item.dateKey ?? "",
-      snapshot: item as InterventionData,
-    }));
-
-  const unique = new Map<string, InterventionRevision>();
-  [...versions, ...legacy].forEach((revision) => {
-    const key = `${revision.previousDateKey}-${revision.changedAt}-${revision.snapshot.comment}-${revision.snapshot.additionalInformation}`;
-    if (!unique.has(key)) unique.set(key, revision);
-  });
-  return Array.from(unique.values()).sort((a, b) => (b.changedAt ?? b.previousDateKey).localeCompare(a.changedAt ?? a.previousDateKey));
+  return mergeInterventionRevisions(versions, history, documentId, interventionId, oagID);
 };
 
 export const updateSearchInterventionAndMoveToToday = async (
