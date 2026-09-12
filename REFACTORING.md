@@ -134,3 +134,7 @@ Firestore document-reference construction for existing intervention and active-i
 - History loading no longer waits for `loadLatestInterventions`.
 - A failure in the active/search index cannot make the historical archive show the generic loading error.
 - Historical days remain loaded independently from Today/Search data.
+
+## v280
+- Restored exact v274 application state after reported regression.
+- No v275-v279 changes included.
