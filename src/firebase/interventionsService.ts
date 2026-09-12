@@ -21,13 +21,8 @@ import {
 } from "./interventionsRepository";
 import { convertTimestampToString, mapIntervention, normalizeLegacyFields, stripUiFields } from "../domain/intervention/serialization";
 import type { Intervention, InterventionData } from "../domain/intervention/types";
-import {
-  interventionActivityValue,
-  interventionLogicalKey,
-} from "../utils/interventionIdentity";
 
-const getLocalDateKey = (date = new Date()) =>
-  `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+import { getLocalDateKey } from "../domain/intervention/dateKey";
 
 const updateSummaryInBackground = (userId: string, date: string) => {
   // A daily score is a snapshot. Once the calendar day has passed, later
@@ -93,48 +88,7 @@ export const loadCompleteHistory = async (
 };
 
 
-export const hydrateOccurrencesWithLatestState = (
-  occurrences: Intervention[],
-  latestInterventions: Intervention[],
-): Intervention[] => {
-  const latestByKey = new Map<string, Intervention>();
-
-  latestInterventions.forEach((intervention) => {
-    const key = interventionLogicalKey(intervention);
-    const current = latestByKey.get(key);
-
-    if (
-      !current ||
-      interventionActivityValue(intervention) >
-        interventionActivityValue(current)
-    ) {
-      latestByKey.set(key, intervention);
-    }
-  });
-
-  return occurrences.map((occurrence) => {
-    const latest = latestByKey.get(
-      interventionLogicalKey(occurrence),
-    );
-
-    if (!latest) return occurrence;
-
-    return {
-      ...occurrence,
-      ...latest,
-      // Membership in History/Today remains attached to its original day.
-      documentId: occurrence.documentId,
-      dateKey: occurrence.dateKey,
-      createdAt: occurrence.createdAt ?? latest.createdAt,
-      isEditing: false,
-      isHistoryView: false,
-      mode: "VIEW_HISTORY",
-      draftSnapshot: null,
-      editSnapshot: null,
-      hasDraft: false,
-    };
-  });
-};
+export { hydrateOccurrencesWithLatestState } from "../domain/intervention/history";
 
 export const deleteIntervention = async (userId: string, date: string, documentId: string) => {
   const snapshotRef = getInterventionReference(userId, date, documentId);
@@ -325,6 +279,17 @@ export const loadLatestInterventions = async (userId: string): Promise<Intervent
     const data = item.data();
     return mapIntervention(item.id, data.currentDateKey ?? "", data);
   });
+};
+
+import { prepareSearchValue, numericPart } from "../domain/intervention/search";
+export type SearchCriterion = {
+  label: "Intervention ID" | "OAG ID" | "Snow mentionné" | "Snow à mon nom" | "Snow créé";
+  value: string;
+};
+
+export type SearchInterventionResult = {
+  intervention: Intervention;
+  criterion: SearchCriterion;
 };
 
 export type SearchCriterion = {

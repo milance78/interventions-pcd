@@ -77,3 +77,18 @@ Firestore document-reference construction for existing intervention and active-i
 - Preserved Firestore write/read behavior and existing business rules.
 
 - v263: daily summary persistence moved into the Firestore repository; service retains only summary calculation/business flow.
+
+- `src/domain/intervention/search.ts` — pure search-value normalization helpers extracted from the Firebase service.
+
+## v266 – history hydration domain extraction
+
+- Extracted historical occurrence hydration into `src/domain/intervention/history.ts`.
+- `interventionsService.ts` now re-exports the domain function instead of containing the merge algorithm.
+- Historical day/document membership and view-state reset behavior are preserved.
+
+
+## v267 – local date key extraction
+
+- Extracted local `YYYY-MM-DD` date-key formatting into `src/domain/intervention/dateKey.ts`.
+- Firebase service now imports the pure date helper instead of owning date formatting.
+- Daily-summary timing behavior remains unchanged.
