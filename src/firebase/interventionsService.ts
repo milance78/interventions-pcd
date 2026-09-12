@@ -1,33 +1,28 @@
 import {
-  collection,
-  deleteDoc,
   doc,
   getDoc,
   getDocs,
   serverTimestamp,
   setDoc,
-  updateDoc,
   writeBatch,
 } from "firebase/firestore";
 
 import { db } from "./firebaseConfig";
+import {
+  getActiveReference,
+  getDayReference,
+  getInterventionsReference,
+  getSummaryReference,
+  getVersionsReference,
+  getDaysReference,
+  writeInterventionVersion,
+} from "./interventionsRepository";
 import { convertTimestampToString, mapIntervention, normalizeLegacyFields, stripUiFields } from "../domain/intervention/serialization";
 import type { Intervention, InterventionData } from "../domain/intervention/types";
 import {
   interventionActivityValue,
   interventionLogicalKey,
 } from "../utils/interventionIdentity";
-
-const getDayReference = (userId: string, date: string) =>
-  doc(db, "users", userId, "days", date);
-const getInterventionsReference = (userId: string, date: string) =>
-  collection(db, "users", userId, "days", date, "interventions");
-const getSummaryReference = (userId: string, date: string) =>
-  doc(db, "users", userId, "days", date, "summary", "daily");
-const getActiveReference = (userId: string) =>
-  collection(db, "users", userId, "activeInterventions");
-const getVersionsReference = (userId: string, caseId: string) =>
-  collection(db, "users", userId, "interventionVersions", caseId, "versions");
 
 const getLocalDateKey = (date = new Date()) =>
   `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
@@ -38,24 +33,6 @@ const updateSummaryInBackground = (userId: string, date: string) => {
   if (date !== getLocalDateKey()) return;
   void recalculateDailySummary(userId, date).catch((error) => {
     console.error("Daily summary update failed:", error);
-  });
-};
-
-const writeVersion = (
-  batch: ReturnType<typeof writeBatch>,
-  userId: string,
-  caseId: string,
-  dateKey: string,
-  data: Record<string, any>,
-  source: "CREATE" | "TODAY_EDIT" | "SEARCH_EDIT",
-) => {
-  const versionRef = doc(getVersionsReference(userId, caseId));
-  batch.set(versionRef, {
-    caseId,
-    dateKey,
-    source,
-    savedAt: serverTimestamp(),
-    data,
   });
 };
 
@@ -73,7 +50,7 @@ export const createIntervention = async (
   batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
   batch.set(snapshotRef, { ...data, caseId, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
   batch.set(activeRef, { ...data, caseId, currentDateKey: date, createdAt: serverTimestamp(), updatedAt: serverTimestamp() });
-  writeVersion(batch, userId, caseId, date, data, "CREATE");
+  writeInterventionVersion(batch, userId, caseId, date, data, "CREATE");
   await batch.commit();
 
   updateSummaryInBackground(userId, date);
@@ -91,7 +68,7 @@ export interface HistoryDay {
 }
 
 export const loadHistoryDateKeys = async (userId: string): Promise<string[]> => {
-  const daysSnapshot = await getDocs(collection(db, "users", userId, "days"));
+  const daysSnapshot = await getDocs(getDaysReference(userId));
   return daysSnapshot.docs
     .map((dayDocument) => dayDocument.id)
     .sort((a, b) => b.localeCompare(a));
@@ -189,7 +166,7 @@ export const updateIntervention = async (
   batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
   batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
   batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
-  writeVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
+  writeInterventionVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
   await batch.commit();
   updateSummaryInBackground(userId, date);
 };
@@ -209,7 +186,7 @@ export const markInterventionReviewed = async (
   const batch = writeBatch(db);
   batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
   batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
-  writeVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
+  writeInterventionVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
   await batch.commit();
   return { ...intervention, updatedAt: new Date().toISOString(), dateKey: date };
 };
@@ -304,7 +281,7 @@ export const updateSearchInterventionAndMoveToToday = async (
     updatedAt: serverTimestamp(),
   }, { merge: true });
   batch.set(getDayReference(userId, today), { date: today, updatedAt: serverTimestamp() }, { merge: true });
-  writeVersion(batch, userId, caseId, today, data, "SEARCH_EDIT");
+  writeInterventionVersion(batch, userId, caseId, today, data, "SEARCH_EDIT");
   await batch.commit();
 
   updateSummaryInBackground(userId, today);
