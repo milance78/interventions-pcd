@@ -15,6 +15,14 @@ type RevisionType = "TODAY_EDIT" | "SEARCH_EDIT";
 
 type SummaryUpdater = () => void;
 
+const commitBatch = async (
+  build: (batch: ReturnType<typeof writeBatch>) => void,
+): Promise<void> => {
+  const batch = writeBatch(db);
+  build(batch);
+  await batch.commit();
+};
+
 /** Persist deletion of one dated occurrence and remove its active search record. */
 export const persistInterventionDeletion = async (
   userId: string,
@@ -25,12 +33,11 @@ export const persistInterventionDeletion = async (
   const snapshotRef = getInterventionReference(userId, date, documentId);
   const snapshot = await getDoc(snapshotRef);
   const caseId = getStoredCaseId(snapshot, documentId);
-  const batch = writeBatch(db);
-
-  batch.delete(snapshotRef);
-  batch.delete(getActiveInterventionReference(userId, caseId));
-  batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
-  await batch.commit();
+  await commitBatch((batch) => {
+    batch.delete(snapshotRef);
+    batch.delete(getActiveInterventionReference(userId, caseId));
+    batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
+  });
   onSummaryUpdate?.();
   return caseId;
 };
@@ -50,15 +57,14 @@ export const persistInterventionSnapshot = async (
   const caseId = getStoredCaseId(snapshot, documentId);
   const activeRef = getActiveInterventionReference(userId, caseId);
   const data = stripUiFields(intervention);
-  const batch = writeBatch(db);
-
-  batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
-  batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
-  if (includeDay) {
-    batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
-  }
-  writeInterventionVersion(batch, userId, caseId, date, data, revisionType);
-  await batch.commit();
+  await commitBatch((batch) => {
+    batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
+    batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
+    if (includeDay) {
+      batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
+    }
+    writeInterventionVersion(batch, userId, caseId, date, data, revisionType);
+  });
   onSummaryUpdate?.();
   return caseId;
 };

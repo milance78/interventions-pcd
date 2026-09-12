@@ -1,6 +1,7 @@
 import { formatAddressClientsForComment } from "./commentFormatter";
 import { replaceCommentSegment } from "../comment/composer";
 import { normalizeNaNumber } from "../../utils/interventionAddress";
+import { normalizePersonName } from "./normalize";
 import { serializeAddressClients } from "../../utils/addressClients";
 import type { AddressClient, AddressClientMode, Intervention } from "../intervention/types";
 
@@ -26,6 +27,7 @@ const syncClientsComment = (state: Intervention, previousSegment: string) => {
 
 const normalizeClient = (client: AddressClient): AddressClient => ({
   ...client,
+  fullName: normalizePersonName(String(client.fullName ?? "")),
   isFuture: Boolean(client.isFuture),
   isSameClient: Boolean(client.isSameClient),
   na: normalizeNaNumber(client.na ?? ""),

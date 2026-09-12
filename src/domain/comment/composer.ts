@@ -61,7 +61,8 @@ export const removeAutomaticAddressLines = (comment: string): string => {
     .filter((line) => !automaticAddressLine.test(line.trim()))
     .join("\n")
     .replace(/^\n+/, "")
-    .replace(/\n{3,}/g, "\n\n");
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
 };
 
 export const replaceResiliationBciLine = (

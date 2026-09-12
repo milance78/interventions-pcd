@@ -55,14 +55,15 @@ export const normalizeLegacyFields = (data: Record<string, any>): Record<string,
   const snowStatus: "pending" | "resolved" =
     data.snowStatus === "resolved" ? "resolved" : "pending";
 
+  const rawCure = data.cure ?? data.Cure;
   const normalizedCure =
-    data.cure === "CURE1"
+    rawCure === "CURE1"
       ? "firstCure"
-      : data.cure === "CURE2"
+      : rawCure === "CURE2"
         ? "secondCure"
-        : data.cure === "CURE3"
+        : rawCure === "CURE3"
           ? "thirdCure"
-          : data.cure ?? data.Cure ?? "noCure";
+          : rawCure ?? "noCure";
 
   const addressClients = (Array.isArray(data.addressClients)
     ? data.addressClients

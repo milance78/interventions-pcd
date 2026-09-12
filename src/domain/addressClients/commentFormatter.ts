@@ -1,7 +1,7 @@
 import type { AddressClient } from "../intervention/types";
 import { addressClientHasData, normalizePersonName } from "./normalize";
 
-const clean = (value: string) => value.trim().replace(/;+$/, "");
+const clean = (value: unknown) => String(value ?? "").trim().replace(/;+$/, "");
 
 const simpleClientCommentDetails = (client: AddressClient, infrastructure: string) => {
   const isCopper = /^(?:copper|cuivre)$/i.test(infrastructure.trim());

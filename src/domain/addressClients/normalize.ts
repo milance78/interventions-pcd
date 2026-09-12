@@ -1,7 +1,7 @@
 import type { AddressClient, AddressClientMode } from "../intervention/types";
 
 export const normalizePersonName = (value: string) => {
-  const normalized = value.replace(/\s+/g, " ").replace(/^\s+/, "");
+  const normalized = value.replace(/\s+/g, " ").replace(/^\s+|\s+$/g, "");
   if (!normalized) return "";
 
   const capitalizeSegment = (segment: string) =>

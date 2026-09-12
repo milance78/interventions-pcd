@@ -224,3 +224,19 @@ Added the supplied decorative alphabet PNG assets to `src/assets/kitnjasta-slova
 - Extracted deletion, normal snapshot persistence, and reviewed persistence into `src/firebase/interventionPersistence.ts`.
 - Kept summary updates owned by the service through an injected callback.
 - No changes to Historique loading, Search matching, CURE logic, or create-intervention batch flow.
+
+## v297 – shared Firebase batch commit helper
+- Centralized creation and commit of Firestore write batches inside `interventionPersistence.ts`.
+- Applied the helper to deletion and normal snapshot persistence.
+- Preserved the existing write order, merge behavior, revision writes, and summary callbacks.
+- No changes to Historique loading, Search matching, CURE logic, or create-intervention flow.
+
+## v298 – vital domain test foundation
+
+Added focused Vitest coverage for the most vital pure workflows:
+- Historique date ordering and empty-day filtering
+- per-day history error isolation
+- independent history-day loading
+- Search identifier normalization and digit extraction
+
+No runtime application logic was changed.

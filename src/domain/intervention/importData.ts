@@ -4,12 +4,14 @@ import type { AddressClient, InterventionData, InterventionField } from "./types
 
 export type ImportedData = Partial<InterventionData>;
 
+const normalizeImportedNa = (value: unknown) => String(value ?? "").replace(/\D/g, "").replace(/^0+/, "");
+
 const normalizeAddressClients = (clients: AddressClient[]) =>
   clients.map((client) => ({
     ...client,
     isFuture: Boolean(client.isFuture),
     isSameClient: Boolean(client.isSameClient),
-    na: normalizeNaNumber(client.na ?? ""),
+    na: normalizeImportedNa(client.na),
   }));
 
 /**
@@ -64,7 +66,7 @@ export const prepareImportedIntervention = (
   patch.postalCode = importedAddress.postalCode;
   patch.city = importedAddress.city;
   patch.mainAddress = composeMainAddress(importedAddress);
-  patch.na = normalizeNaNumber(String(imported.na ?? current.na ?? ""));
+  patch.na = normalizeImportedNa(imported.na ?? current.na);
 
   let addressClients = normalizeAddressClients(current.addressClients ?? []);
   if ((!imported.addressClients || imported.addressClients.length === 0) && imported.clientsOnAddress) {

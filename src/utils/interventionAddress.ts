@@ -96,10 +96,8 @@ export const parsePastedNpsAddress = (
 };
 
 export const normalizeNaNumber = (value: string): string => {
-  const trimmedLeft = value.replace(/^\s+/, "");
-  if (!trimmedLeft) return "";
-
-  // Keep the user's content, but guarantee exactly one leading zero.
-  const withoutLeadingZeros = trimmedLeft.replace(/^0+/, "");
-  return `0${withoutLeadingZeros}`;
+  // NA is stored as digits only; pasted spaces, slashes and separators are ignored.
+  const digits = String(value ?? "").replace(/\D/g, "");
+  if (!digits) return "";
+  return `0${digits.replace(/^0+/, "")}`;
 };
