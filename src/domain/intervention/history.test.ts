@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import type { Intervention } from './types';
 import { loadHistoryDaySafely, loadHistoryDaysSafely, normalizeHistoryDays, sortHistoryDateKeys } from './history';
 
 describe('history helpers', () => {
@@ -30,7 +31,7 @@ describe('history helpers', () => {
   it('loads all days independently when one fails', async () => {
     const result = await loadHistoryDaysSafely(['a', 'b'], async (key) => {
       if (key === 'b') throw new Error('failed');
-      return [{ id: 'ok' }];
+      return [{ id: 'ok' } as unknown as Intervention];
     });
     expect(result).toEqual([{ dateKey: 'a', interventions: [{ id: 'ok' }] }, null]);
   });

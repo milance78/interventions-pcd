@@ -6,7 +6,7 @@ import {
   setAddressClientsState,
   updateAddressClientState,
 } from "./state";
-import type { Intervention } from "../intervention/types";
+import type { Intervention, AddressClient } from "../intervention/types";
 
 const makeState = (): Intervention => ({
   ...emptyInterventionData,
@@ -21,12 +21,17 @@ const makeState = (): Intervention => ({
   draftState: { active: null, displaced: null },
 });
 
-const client = {
+const client: AddressClient = {
   id: "1",
   fullName: "  Jean Dupont  ",
   na: "123",
-  network: "Orange",
-  mode: "normal" as const,
+  operator: "Orange",
+  naInService: "",
+  addressDetails: "",
+  clientId: "",
+  cid: "",
+  voip: "",
+  mode: "base",
   utac: "",
   isFuture: false,
   isSameClient: true,

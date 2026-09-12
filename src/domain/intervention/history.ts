@@ -60,13 +60,13 @@ export const filterHistoryDays = (days: Array<HistoryDay | null>): HistoryDay[] 
 export const normalizeHistoryDays = (days: Array<HistoryDay | null>): HistoryDay[] =>
   filterHistoryDays(days).sort((a, b) => b.dateKey.localeCompare(a.dateKey));
 
-export const createHistoryDay = <T>(dateKey: string, interventions: T[]): HistoryDay & { interventions: T[] } => ({
+export const createHistoryDay = <T extends Intervention>(dateKey: string, interventions: T[]): HistoryDay & { interventions: T[] } => ({
   dateKey,
   interventions,
 });
 
 /** Wrap a history-day loader so one failed day does not abort the archive. */
-export const loadHistoryDaySafely = async <T>(
+export const loadHistoryDaySafely = async <T extends Intervention>(
   dateKey: string,
   loader: (dateKey: string) => Promise<T[]>,
   onError: (error: unknown, dateKey: string) => void = () => undefined,
@@ -80,7 +80,7 @@ export const loadHistoryDaySafely = async <T>(
 };
 
 /** Load all history days while isolating failures per date. */
-export const loadHistoryDaysSafely = async <T>(
+export const loadHistoryDaysSafely = async <T extends Intervention>(
   dateKeys: string[],
   loader: (dateKey: string) => Promise<T[]>,
   onError: (error: unknown, dateKey: string) => void = () => undefined,
