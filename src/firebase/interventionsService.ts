@@ -9,6 +9,7 @@ import {
 import { db } from "./firebaseConfig";
 import {
   getActiveInterventionReference,
+  getActiveReference,
   getDayReference,
   getInterventionsReference,
   getInterventionReference,
@@ -37,6 +38,51 @@ const updateSummaryInBackground = (userId: string, date: string) => {
   });
 };
 
+const persistInterventionDeletion = async (
+  userId: string,
+  date: string,
+  documentId: string,
+) => {
+  const snapshotRef = getInterventionReference(userId, date, documentId);
+  const snapshot = await getDoc(snapshotRef);
+  const caseId = getStoredCaseId(snapshot, documentId);
+  const batch = writeBatch(db);
+
+  batch.delete(snapshotRef);
+  // Removing a historical occurrence also removes its active searchable record.
+  batch.delete(getActiveInterventionReference(userId, caseId));
+  batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
+  await batch.commit();
+  updateSummaryInBackground(userId, date);
+  return caseId;
+};
+
+const persistInterventionSnapshot = async (
+  userId: string,
+  date: string,
+  documentId: string,
+  intervention: Intervention,
+  revisionType: "TODAY_EDIT" | "SEARCH_EDIT",
+  includeDay = true,
+) => {
+  const snapshotRef = getInterventionReference(userId, date, documentId);
+  const snapshot = await getDoc(snapshotRef);
+  const caseId = getStoredCaseId(snapshot, documentId);
+  const activeRef = getActiveInterventionReference(userId, caseId);
+  const data = stripUiFields(intervention);
+  const batch = writeBatch(db);
+
+  batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
+  batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
+  if (includeDay) {
+    batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
+  }
+  writeInterventionVersion(batch, userId, caseId, date, data, revisionType);
+  await batch.commit();
+  updateSummaryInBackground(userId, date);
+  return caseId;
+};
+
 export const createIntervention = async (
   userId: string,
   date: string,
@@ -60,7 +106,7 @@ export const createIntervention = async (
 
 export const loadInterventions = async (userId: string, date: string): Promise<Intervention[]> => {
   const snapshot = await getDocs(getInterventionsReference(userId, date));
-  return snapshot.docs.map((item) => mapIntervention(item.data().caseId ?? item.id, date, item.data()));
+  return snapshot.docs.map((item) => mapIntervention(getStoredCaseId(item, item.id), date, item.data()));
 };
 
 export const loadHistoryDateKeys = async (userId: string): Promise<string[]> => {
@@ -85,19 +131,7 @@ export const loadCompleteHistory = async (
 export { hydrateOccurrencesWithLatestState } from "../domain/intervention/history";
 
 export const deleteIntervention = async (userId: string, date: string, documentId: string) => {
-  const snapshotRef = getInterventionReference(userId, date, documentId);
-  const snapshot = await getDoc(snapshotRef);
-  const caseId = getStoredCaseId(snapshot, documentId);
-  const batch = writeBatch(db);
-
-  batch.delete(snapshotRef);
-  // A deletion from Historique is a real deletion of the intervention from the
-  // searchable active index as well. Otherwise the active document survives
-  // and the deleted card keeps reappearing in Recherche.
-  batch.delete(getActiveInterventionReference(userId, caseId));
-  batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
-  await batch.commit();
-  updateSummaryInBackground(userId, date);
+  await persistInterventionDeletion(userId, date, documentId);
 };
 
 export const updateIntervention = async (
@@ -106,19 +140,7 @@ export const updateIntervention = async (
   documentId: string,
   intervention: Intervention,
 ) => {
-  const snapshotRef = getInterventionReference(userId, date, documentId);
-  const snapshot = await getDoc(snapshotRef);
-  const caseId = getStoredCaseId(snapshot, documentId);
-  const activeRef = getActiveInterventionReference(userId, caseId);
-  const data = stripUiFields(intervention);
-  const batch = writeBatch(db);
-
-  batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
-  batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
-  batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
-  writeInterventionVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
-  await batch.commit();
-  updateSummaryInBackground(userId, date);
+  await persistInterventionSnapshot(userId, date, documentId, intervention, "TODAY_EDIT");
 };
 
 export const markInterventionReviewed = async (
@@ -180,9 +202,7 @@ export const updateSearchInterventionAndMoveToToday = async (
 
   const originalSnapshotRef = getInterventionReference(userId, originalDate, intervention.documentId);
   const originalSnapshot = await getDoc(originalSnapshotRef);
-  const caseId = originalSnapshot.exists()
-    ? originalSnapshot.data().caseId ?? intervention.documentId
-    : intervention.documentId;
+  const caseId = getStoredCaseId(originalSnapshot, intervention.documentId);
   const activeRef = getActiveInterventionReference(userId, caseId);
   const activeSnapshot = await getDoc(activeRef);
   const currentData: Record<string, any> = activeSnapshot.exists()

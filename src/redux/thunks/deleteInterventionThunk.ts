@@ -25,9 +25,14 @@ const deleteInterventionThunk = createAsyncThunk<
     const dateKey = typeof payload === "string" ? getLocalDate() : payload.dateKey;
     if (!documentId) return rejectWithValue("Missing Firestore document ID");
 
-    await deleteIntervention(user.uid, dateKey, documentId);
+    // Remove the occurrence from the UI immediately. The Firebase deletion
+    // can require a network round trip (including resolving the stored caseId),
+    // so waiting for it here makes Historique feel frozen after confirmation.
+    // The thunk still awaits the backend operation and rejects if persistence fails.
     if (dateKey === getLocalDate()) dispatch(deleteLocalIntervention(documentId));
     dispatch(deleteHistoryIntervention(documentId));
+
+    await deleteIntervention(user.uid, dateKey, documentId);
     return { documentId, dateKey };
   } catch (error) {
     return rejectWithValue(error instanceof Error ? error.message : "Unable to delete intervention");

@@ -185,3 +185,36 @@ Extracted the per-day error-isolated loader into the history domain. Firebase lo
 ## v288
 - Extracted history date-key extraction into `domain/intervention/history.ts`.
 - No Firebase loading behavior changed.
+
+## v290 – centralizacija rešavanja caseId u Firebase servisu
+
+- `loadInterventions` sada koristi zajednički `getStoredCaseId` helper umesto lokalnog fallback izraza.
+- `updateSearchInterventionAndMoveToToday` koristi isti helper za očuvanje identiteta intervencije.
+- Nije menjana logika učitavanja Historique-a, Firebase batch upisa, CURE-a ili komentara.
+
+## v291 – shared intervention snapshot persistence
+- Extracted the repeated update/active/version Firestore write sequence into `persistInterventionSnapshot`.
+- Kept Historique loading, create batching, CURE logic, and search move logic unchanged.
+
+
+## v292 – shared intervention deletion persistence
+- Extracted the complete Firebase deletion workflow into `persistInterventionDeletion`.
+- `deleteIntervention` now delegates to the shared workflow.
+- Preserved deletion of the day snapshot, active index, and daily summary refresh.
+
+
+## v293 – fix missing getActiveReference import
+
+Restored the missing repository import used by `loadLatestInterventions`. This fixes the Search runtime error `getActiveReference is not defined`.
+
+
+## v294 – optimistic Historique deletion
+
+- Historique occurrence is removed from Redux immediately after deletion confirmation.
+- Firebase deletion still runs and is awaited by the thunk.
+- The delete confirmation dialog closes immediately instead of waiting for the network round trip.
+- No changes to Historique loading, CURE logic, or Firebase deletion persistence.
+
+## v295 – Kitnjasta slova assets
+
+Added the supplied decorative alphabet PNG assets to `src/assets/kitnjasta-slova/` for upcoming UI work. No application logic was changed.

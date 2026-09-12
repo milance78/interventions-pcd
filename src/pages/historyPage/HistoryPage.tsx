@@ -1285,8 +1285,9 @@ const HistoryPage = () => {
         onCancel={() => setDeleteTarget(null)}
         onConfirm={async () => {
           if (!deleteTarget) return;
-          await dispatch(deleteInterventionThunk(deleteTarget));
+          const target = deleteTarget;
           setDeleteTarget(null);
+          await dispatch(deleteInterventionThunk(target));
         }}
       />
 </main>
