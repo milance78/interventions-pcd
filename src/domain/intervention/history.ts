@@ -39,3 +39,8 @@ export const hydrateOccurrencesWithLatestState = (
     };
   });
 };
+
+
+/** Return history date keys in newest-first order. */
+export const sortHistoryDateKeys = (dateKeys: string[]): string[] =>
+  [...dateKeys].sort((a, b) => b.localeCompare(a));

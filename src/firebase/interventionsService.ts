@@ -23,6 +23,8 @@ import { convertTimestampToString, mapIntervention, normalizeLegacyFields, strip
 import type { Intervention, InterventionData } from "../domain/intervention/types";
 
 import { getLocalDateKey } from "../domain/intervention/dateKey";
+import { calculateDailySummary } from "../domain/intervention/summary";
+import { sortHistoryDateKeys } from "../domain/intervention/history";
 
 const updateSummaryInBackground = (userId: string, date: string) => {
   // A daily score is a snapshot. Once the calendar day has passed, later
@@ -66,9 +68,7 @@ export interface HistoryDay {
 
 export const loadHistoryDateKeys = async (userId: string): Promise<string[]> => {
   const daysSnapshot = await getDocs(getDaysReference(userId));
-  return daysSnapshot.docs
-    .map((dayDocument) => dayDocument.id)
-    .sort((a, b) => b.localeCompare(a));
+  return sortHistoryDateKeys(daysSnapshot.docs.map((dayDocument) => dayDocument.id));
 };
 
 export const loadCompleteHistory = async (
@@ -77,13 +77,23 @@ export const loadCompleteHistory = async (
 ): Promise<HistoryDay[]> => {
   const dateKeys = suppliedDateKeys ?? await loadHistoryDateKeys(userId);
   const days = await Promise.all(
-    dateKeys.map(async (dateKey) => ({
-      dateKey,
-      interventions: await loadInterventions(userId, dateKey),
-    })),
+    dateKeys.map(async (dateKey): Promise<HistoryDay | null> => {
+      try {
+        return {
+          dateKey,
+          interventions: await loadInterventions(userId, dateKey),
+        };
+      } catch (error) {
+        // One malformed/inaccessible historical day must not make the whole
+        // archive unavailable. The navigation list is already loaded from
+        // the days collection, so keep the remaining days usable.
+        console.error(`Unable to load history day ${dateKey}:`, error);
+        return null;
+      }
+    }),
   );
   return days
-    .filter((day) => day.interventions.length > 0)
+    .filter((day): day is HistoryDay => Boolean(day) && day.interventions.length > 0)
     .sort((a, b) => b.dateKey.localeCompare(a.dateKey));
 };
 
@@ -253,18 +263,7 @@ export const updateSearchInterventionAndMoveToToday = async (
 
 export const recalculateDailySummary = async (userId: string, date: string) => {
   const snapshot = await getDocs(getInterventionsReference(userId, date));
-  const summary = { total: 0, completed: 0, onHold: 0, transferred: 0, closedByAnotherAgent: 0, lastUpdated: null as null | ReturnType<typeof serverTimestamp> };
-  snapshot.docs.forEach((documentSnapshot) => {
-    const intervention = documentSnapshot.data();
-    summary.total += 1;
-    switch (intervention.status) {
-      case "completed": summary.completed += 1; break;
-      case "on hold": summary.onHold += 1; break;
-      case "transferred": summary.transferred += 1; break;
-      case "closed by another agent": summary.closedByAnotherAgent += 1; break;
-      default: break;
-    }
-  });
+  const summary = calculateDailySummary(snapshot.docs.map((documentSnapshot) => documentSnapshot.data()));
   await writeDailySummary(userId, date, summary);
 };
 
@@ -282,6 +281,7 @@ export const loadLatestInterventions = async (userId: string): Promise<Intervent
 };
 
 import { prepareSearchValue, numericPart } from "../domain/intervention/search";
+import { interventionActivityValue } from "../utils/interventionIdentity";
 export type SearchCriterion = {
   label: "Intervention ID" | "OAG ID" | "Snow mentionné" | "Snow à mon nom" | "Snow créé";
   value: string;
@@ -291,34 +291,6 @@ export type SearchInterventionResult = {
   intervention: Intervention;
   criterion: SearchCriterion;
 };
-
-export type SearchCriterion = {
-  label: "Intervention ID" | "OAG ID" | "Snow mentionné" | "Snow à mon nom" | "Snow créé";
-  value: string;
-};
-
-export type SearchInterventionResult = {
-  intervention: Intervention;
-  criterion: SearchCriterion;
-};
-
-type SearchMode = "exact" | "digits";
-
-const prepareSearchValue = (rawValue: string): { value: string; mode: SearchMode } => {
-  const trimmed = rawValue.trim();
-
-  if (trimmed.length === 18) {
-    return { value: trimmed, mode: "exact" };
-  }
-
-  if (trimmed.length === 17) {
-    return { value: `${trimmed}9`, mode: "exact" };
-  }
-
-  return { value: trimmed.replace(/\D/g, ""), mode: "digits" };
-};
-
-const numericPart = (value?: string | null) => (value ?? "").replace(/\D/g, "");
 
 export const searchInterventions = async (
   userId: string,

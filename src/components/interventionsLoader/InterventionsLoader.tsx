@@ -76,10 +76,10 @@ const InterventionsLoader = () => {
           // subcollections have finished downloading.
           dispatch(setHistoryDateKeys(dateKeys));
 
-          const [historyDays, latestInterventions] = await Promise.all([
-            loadCompleteHistory(user.uid, dateKeys),
-            latestPromise,
-          ]);
+          // History is independent from the active/search index. A failure in
+          // the active collection must never turn an otherwise readable archive
+          // into the generic history error screen.
+          const historyDays = await loadCompleteHistory(user.uid, dateKeys);
 
           if (cancelled) return;
 

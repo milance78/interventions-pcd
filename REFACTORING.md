@@ -105,3 +105,32 @@ Firestore document-reference construction for existing intervention and active-i
 - Removed an unused active-reference import from the service layer.
 - Normalized the repository module formatting and kept Firestore reference construction centralized.
 - No business behavior was intentionally changed.
+
+## v270 – search service cleanup
+
+- Removed duplicate search type declarations and local helper implementations from `interventionsService.ts`.
+- The service now consistently uses the extracted search domain helpers.
+- Added the missing `interventionActivityValue` import used by search result ordering.
+
+- v271: extracted daily summary calculation into domain/intervention/summary.ts.
+
+
+## v272 – history date sorting extraction
+
+- Extracted newest-first history date-key sorting into `domain/intervention/history.ts`.
+- Firebase service now delegates date ordering to the history domain helper.
+- No intentional business-logic change.
+
+
+## v273 – resilient history loading
+
+- A single failing historical day no longer prevents the complete archive from rendering.
+- `loadCompleteHistory` now isolates errors per date and keeps all successfully loaded days available.
+- Failed dates are logged for diagnosis while the history navigation remains usable.
+
+
+## v274 – History loading isolation
+
+- History loading no longer waits for `loadLatestInterventions`.
+- A failure in the active/search index cannot make the historical archive show the generic loading error.
+- Historical days remain loaded independently from Today/Search data.
