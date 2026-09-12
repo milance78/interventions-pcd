@@ -218,3 +218,9 @@ Restored the missing repository import used by `loadLatestInterventions`. This f
 ## v295 – Kitnjasta slova assets
 
 Added the supplied decorative alphabet PNG assets to `src/assets/kitnjasta-slova/` for upcoming UI work. No application logic was changed.
+
+
+## v296 – Firebase persistence extraction
+- Extracted deletion, normal snapshot persistence, and reviewed persistence into `src/firebase/interventionPersistence.ts`.
+- Kept summary updates owned by the service through an injected callback.
+- No changes to Historique loading, Search matching, CURE logic, or create-intervention batch flow.

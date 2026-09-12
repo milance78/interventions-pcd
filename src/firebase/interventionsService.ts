@@ -13,10 +13,10 @@ import {
   getDayReference,
   getInterventionsReference,
   getInterventionReference,
-  getStoredCaseId,
   getSummaryReference,
   getVersionsReference,
   getDaysReference,
+  getStoredCaseId,
   writeInterventionVersion,
   writeDailySummary,
 } from "./interventionsRepository";
@@ -38,50 +38,11 @@ const updateSummaryInBackground = (userId: string, date: string) => {
   });
 };
 
-const persistInterventionDeletion = async (
-  userId: string,
-  date: string,
-  documentId: string,
-) => {
-  const snapshotRef = getInterventionReference(userId, date, documentId);
-  const snapshot = await getDoc(snapshotRef);
-  const caseId = getStoredCaseId(snapshot, documentId);
-  const batch = writeBatch(db);
-
-  batch.delete(snapshotRef);
-  // Removing a historical occurrence also removes its active searchable record.
-  batch.delete(getActiveInterventionReference(userId, caseId));
-  batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
-  await batch.commit();
-  updateSummaryInBackground(userId, date);
-  return caseId;
-};
-
-const persistInterventionSnapshot = async (
-  userId: string,
-  date: string,
-  documentId: string,
-  intervention: Intervention,
-  revisionType: "TODAY_EDIT" | "SEARCH_EDIT",
-  includeDay = true,
-) => {
-  const snapshotRef = getInterventionReference(userId, date, documentId);
-  const snapshot = await getDoc(snapshotRef);
-  const caseId = getStoredCaseId(snapshot, documentId);
-  const activeRef = getActiveInterventionReference(userId, caseId);
-  const data = stripUiFields(intervention);
-  const batch = writeBatch(db);
-
-  batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
-  batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
-  if (includeDay) {
-    batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
-  }
-  writeInterventionVersion(batch, userId, caseId, date, data, revisionType);
-  await batch.commit();
-  updateSummaryInBackground(userId, date);
-  return caseId;
-};
+import {
+  persistInterventionDeletion,
+  persistInterventionSnapshot,
+  persistReviewedIntervention,
+} from "./interventionPersistence";
 
 export const createIntervention = async (
   userId: string,
@@ -131,7 +92,7 @@ export const loadCompleteHistory = async (
 export { hydrateOccurrencesWithLatestState } from "../domain/intervention/history";
 
 export const deleteIntervention = async (userId: string, date: string, documentId: string) => {
-  await persistInterventionDeletion(userId, date, documentId);
+  await persistInterventionDeletion(userId, date, documentId, () => updateSummaryInBackground(userId, date));
 };
 
 export const updateIntervention = async (
@@ -140,7 +101,7 @@ export const updateIntervention = async (
   documentId: string,
   intervention: Intervention,
 ) => {
-  await persistInterventionSnapshot(userId, date, documentId, intervention, "TODAY_EDIT");
+  await persistInterventionSnapshot(userId, date, documentId, intervention, "TODAY_EDIT", true, () => updateSummaryInBackground(userId, date));
 };
 
 export const markInterventionReviewed = async (
@@ -149,17 +110,7 @@ export const markInterventionReviewed = async (
   documentId: string,
   intervention: Intervention,
 ) => {
-  if (!documentId) throw new Error("Missing Firestore document ID");
-  const snapshotRef = getInterventionReference(userId, date, documentId);
-  const snapshot = await getDoc(snapshotRef);
-  const caseId = getStoredCaseId(snapshot, documentId);
-  const activeRef = getActiveInterventionReference(userId, caseId);
-  const data = stripUiFields(intervention);
-  const batch = writeBatch(db);
-  batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
-  batch.set(activeRef, { ...data, caseId, currentDateKey: date, updatedAt: serverTimestamp() }, { merge: true });
-  writeInterventionVersion(batch, userId, caseId, date, data, "TODAY_EDIT");
-  await batch.commit();
+  await persistReviewedIntervention(userId, date, documentId, intervention);
   return { ...intervention, updatedAt: new Date().toISOString(), dateKey: date };
 };
 
