@@ -1,4 +1,4 @@
-import { collection, doc } from "firebase/firestore";
+import { collection, doc, serverTimestamp, setDoc, type WriteBatch } from "firebase/firestore";
 
 import { db } from "./firebaseConfig";
 
@@ -25,8 +25,6 @@ export const getActiveReference = (userId: string) =>
 export const getVersionsReference = (userId: string, caseId: string) =>
   collection(db, "users", userId, "interventionVersions", caseId, "versions");
 
-import type { WriteBatch } from "firebase/firestore";
-import { serverTimestamp } from "firebase/firestore";
 
 export const getInterventionReference = (userId: string, date: string, documentId: string) =>
   doc(getInterventionsReference(userId, date), documentId);
@@ -52,4 +50,17 @@ export const writeInterventionVersion = (
     savedAt: serverTimestamp(),
     data,
   });
+};
+
+
+export const writeDailySummary = async (
+  userId: string,
+  date: string,
+  summary: Record<string, unknown>,
+) => {
+  await setDoc(
+    getSummaryReference(userId, date),
+    { ...summary, lastUpdated: serverTimestamp() },
+    { merge: true },
+  );
 };

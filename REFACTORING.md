@@ -63,3 +63,17 @@ lifecycle independently testable in `draftState.test.ts`.
 ## v253 — Address Clients domain state
 Address-client state transitions are now isolated in `src/domain/addressClients/state.ts`.
 The Redux slice delegates add/update/remove/set operations to this domain module, while draft synchronization remains in Redux. This keeps address-client normalization, serialization and Commentaire synchronization together without changing the UI contract.
+
+
+## v261 — Repository reference usage
+
+Firestore document-reference construction for existing intervention and active-intervention records now goes through `interventionsRepository.ts`. The service keeps creation of new snapshot IDs local, while reads/updates/deletes reuse centralized repository path helpers. Repository imports are consolidated at the top of the module. No UI or data semantics were intentionally changed.
+
+
+## v261 – Repository reference centralization
+
+- Centralized document reference construction for dated interventions and active interventions.
+- Removed direct nested `doc(collectionReference, id)` construction from service flows where repository helpers exist.
+- Preserved Firestore write/read behavior and existing business rules.
+
+- v263: daily summary persistence moved into the Firestore repository; service retains only summary calculation/business flow.

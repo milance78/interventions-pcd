@@ -3,19 +3,21 @@ import {
   getDoc,
   getDocs,
   serverTimestamp,
-  setDoc,
   writeBatch,
 } from "firebase/firestore";
 
 import { db } from "./firebaseConfig";
 import {
   getActiveReference,
+  getActiveInterventionReference,
   getDayReference,
   getInterventionsReference,
+  getInterventionReference,
   getSummaryReference,
   getVersionsReference,
   getDaysReference,
   writeInterventionVersion,
+  writeDailySummary,
 } from "./interventionsRepository";
 import { convertTimestampToString, mapIntervention, normalizeLegacyFields, stripUiFields } from "../domain/intervention/serialization";
 import type { Intervention, InterventionData } from "../domain/intervention/types";
@@ -43,7 +45,7 @@ export const createIntervention = async (
 ) => {
   const snapshotRef = doc(getInterventionsReference(userId, date));
   const caseId = snapshotRef.id;
-  const activeRef = doc(getActiveReference(userId), caseId);
+  const activeRef = getActiveInterventionReference(userId, caseId);
   const batch = writeBatch(db);
   const data = stripUiFields(intervention);
 
@@ -135,7 +137,7 @@ export const hydrateOccurrencesWithLatestState = (
 };
 
 export const deleteIntervention = async (userId: string, date: string, documentId: string) => {
-  const snapshotRef = doc(getInterventionsReference(userId, date), documentId);
+  const snapshotRef = getInterventionReference(userId, date, documentId);
   const snapshot = await getDoc(snapshotRef);
   const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
   const batch = writeBatch(db);
@@ -144,7 +146,7 @@ export const deleteIntervention = async (userId: string, date: string, documentI
   // A deletion from Historique is a real deletion of the intervention from the
   // searchable active index as well. Otherwise the active document survives
   // and the deleted card keeps reappearing in Recherche.
-  batch.delete(doc(getActiveReference(userId), caseId));
+  batch.delete(getActiveInterventionReference(userId, caseId));
   batch.set(getDayReference(userId, date), { date, updatedAt: serverTimestamp() }, { merge: true });
   await batch.commit();
   updateSummaryInBackground(userId, date);
@@ -156,10 +158,10 @@ export const updateIntervention = async (
   documentId: string,
   intervention: Intervention,
 ) => {
-  const snapshotRef = doc(getInterventionsReference(userId, date), documentId);
+  const snapshotRef = getInterventionReference(userId, date, documentId);
   const snapshot = await getDoc(snapshotRef);
   const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
-  const activeRef = doc(getActiveReference(userId), caseId);
+  const activeRef = getActiveInterventionReference(userId, caseId);
   const data = stripUiFields(intervention);
   const batch = writeBatch(db);
 
@@ -178,10 +180,10 @@ export const markInterventionReviewed = async (
   intervention: Intervention,
 ) => {
   if (!documentId) throw new Error("Missing Firestore document ID");
-  const snapshotRef = doc(getInterventionsReference(userId, date), documentId);
+  const snapshotRef = getInterventionReference(userId, date, documentId);
   const snapshot = await getDoc(snapshotRef);
   const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
-  const activeRef = doc(getActiveReference(userId), caseId);
+  const activeRef = getActiveInterventionReference(userId, caseId);
   const data = stripUiFields(intervention);
   const batch = writeBatch(db);
   batch.set(snapshotRef, { ...data, caseId, updatedAt: serverTimestamp() }, { merge: true });
@@ -249,20 +251,17 @@ export const updateSearchInterventionAndMoveToToday = async (
 ): Promise<Intervention> => {
   if (!intervention.documentId) throw new Error("Missing Firestore document ID");
 
-  const originalSnapshotRef = doc(
-    getInterventionsReference(userId, originalDate),
-    intervention.documentId,
-  );
+  const originalSnapshotRef = getInterventionReference(userId, originalDate, intervention.documentId);
   const originalSnapshot = await getDoc(originalSnapshotRef);
   const caseId = originalSnapshot.exists()
     ? originalSnapshot.data().caseId ?? intervention.documentId
     : intervention.documentId;
-  const activeRef = doc(getActiveReference(userId), caseId);
+  const activeRef = getActiveInterventionReference(userId, caseId);
   const activeSnapshot = await getDoc(activeRef);
   const currentData: Record<string, any> = activeSnapshot.exists()
     ? activeSnapshot.data()
     : stripUiFields(intervention);
-  const todaySnapshotRef = doc(getInterventionsReference(userId, today), caseId);
+  const todaySnapshotRef = getInterventionReference(userId, today, caseId);
   const data = stripUiFields(intervention);
   const batch = writeBatch(db);
 
@@ -312,7 +311,7 @@ export const recalculateDailySummary = async (userId: string, date: string) => {
       default: break;
     }
   });
-  await setDoc(getSummaryReference(userId, date), { ...summary, lastUpdated: serverTimestamp() }, { merge: true });
+  await writeDailySummary(userId, date, summary);
 };
 
 export const loadDailySummary = async (userId: string, date: string) => {
@@ -434,7 +433,7 @@ export const searchInterventions = async (
         const dateKey = result.intervention.dateKey ?? "";
         if (!dateKey || !result.intervention.documentId) return null;
         const snapshot = await getDoc(
-          doc(getInterventionsReference(userId, dateKey), result.intervention.documentId),
+          getInterventionReference(userId, dateKey, result.intervention.documentId),
         );
         return snapshot.exists() ? result : null;
       }),
