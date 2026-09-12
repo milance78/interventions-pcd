@@ -92,3 +92,16 @@ Firestore document-reference construction for existing intervention and active-i
 - Extracted local `YYYY-MM-DD` date-key formatting into `src/domain/intervention/dateKey.ts`.
 - Firebase service now imports the pure date helper instead of owning date formatting.
 - Daily-summary timing behavior remains unchanged.
+
+
+## v268 – Stored case ID extraction
+
+- Centralized recovery of the persisted `caseId` from a Firestore snapshot in `interventionsRepository.ts`.
+- Removed repeated snapshot-to-case-ID expressions from the service.
+- No intentional business-logic change.
+
+## v269 – Firebase reference cleanup
+
+- Removed an unused active-reference import from the service layer.
+- Normalized the repository module formatting and kept Firestore reference construction centralized.
+- No business behavior was intentionally changed.

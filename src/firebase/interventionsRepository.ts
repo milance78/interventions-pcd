@@ -35,6 +35,9 @@ export const getActiveInterventionReference = (userId: string, caseId: string) =
 export const getVersionReference = (userId: string, caseId: string) =>
   doc(getVersionsReference(userId, caseId));
 
+export const getStoredCaseId = (snapshot: { exists: () => boolean; data: () => Record<string, any> }, fallbackId: string) =>
+  snapshot.exists() ? snapshot.data().caseId ?? fallbackId : fallbackId;
+
 export const writeInterventionVersion = (
   batch: WriteBatch,
   userId: string,

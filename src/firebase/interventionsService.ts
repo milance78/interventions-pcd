@@ -8,11 +8,11 @@ import {
 
 import { db } from "./firebaseConfig";
 import {
-  getActiveReference,
   getActiveInterventionReference,
   getDayReference,
   getInterventionsReference,
   getInterventionReference,
+  getStoredCaseId,
   getSummaryReference,
   getVersionsReference,
   getDaysReference,
@@ -93,7 +93,7 @@ export { hydrateOccurrencesWithLatestState } from "../domain/intervention/histor
 export const deleteIntervention = async (userId: string, date: string, documentId: string) => {
   const snapshotRef = getInterventionReference(userId, date, documentId);
   const snapshot = await getDoc(snapshotRef);
-  const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
+  const caseId = getStoredCaseId(snapshot, documentId);
   const batch = writeBatch(db);
 
   batch.delete(snapshotRef);
@@ -114,7 +114,7 @@ export const updateIntervention = async (
 ) => {
   const snapshotRef = getInterventionReference(userId, date, documentId);
   const snapshot = await getDoc(snapshotRef);
-  const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
+  const caseId = getStoredCaseId(snapshot, documentId);
   const activeRef = getActiveInterventionReference(userId, caseId);
   const data = stripUiFields(intervention);
   const batch = writeBatch(db);
@@ -136,7 +136,7 @@ export const markInterventionReviewed = async (
   if (!documentId) throw new Error("Missing Firestore document ID");
   const snapshotRef = getInterventionReference(userId, date, documentId);
   const snapshot = await getDoc(snapshotRef);
-  const caseId = snapshot.exists() ? snapshot.data().caseId ?? documentId : documentId;
+  const caseId = getStoredCaseId(snapshot, documentId);
   const activeRef = getActiveInterventionReference(userId, caseId);
   const data = stripUiFields(intervention);
   const batch = writeBatch(db);
