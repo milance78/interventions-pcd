@@ -41,7 +41,8 @@ const App = () => (
         <Route path="/historique" element={<HistoryPage />} />
         <Route path="/statistiques" element={<StatisticsPage />} />
         <Route path="/recherche" element={<SearchResultsPage />} />
-        <Route path="/modeles" element={<TemplatesPage />} />
+        <Route path="/kb" element={<TemplatesPage />} />
+        <Route path="/modeles" element={<Navigate to="/kb" replace />} />
         <Route path="*" element={<Navigate to="/liste-du-jour" replace />} />
       </Routes>
     </section>

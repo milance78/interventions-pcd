@@ -152,12 +152,12 @@ const Header = () => {
         </NavLink>
 
         <NavLink
-          to="/modeles"
+          to="/kb"
           className={({ isActive }) =>
             `header__link ${isActive ? "header__link--active" : ""}`
           }
         >
-          Modèles
+          KB
         </NavLink>
       </nav>
 

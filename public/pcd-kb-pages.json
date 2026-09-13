@@ -1,0 +1,2092 @@
+[
+  {
+    "page": 1,
+    "title": "Termes/abréviations",
+    "content": "Termes/abréviations\nMonday, January 19, 2026   4:19 PM\n\n\n\nDSL – internet en cuivre.\n  • ADSL (petit vitesse - obsolète, 5–10 Mb/s),\n  • VDSL (vitesse élevée, 30–70 Mb/s). S'affaiblit avec la distance\n\nAGW – la ligne fixe en cuivre – peut avoir la voix (ligne téléphonique fix) ou\nd'autre coté juste être support pour le signal internet\n\nBSS - DSL + AGW - deux signales dans la même ligne cuivre:\n\n\n\n\nExemple ligne sans voix Without Voice - WOV\n\n\n\n\nUne paire – deux fils en cuivre, toujours utilisées et traitées ensemble. Un fil\nparticulier n'est jamais utilisé seul. Dans la paire:\n 1. un fil conduit le signal électromagnétique (téléphonique à basse\n     fréquence ou VDSL à haute fréquence), ou bien deux signaux\n     électromagnétiques en même temps (téléphonique et VDSL) grâce à des\n     fréquences différentes. Selon la loi belge, en cas de deux signaux dans le\n     même fil, ceux-ci doivent appartenir au même opérateur\n 2. Le deuxième fil conduit le signal électrique faible qui alimente les\n     fonctions de base de l'appareil téléphonique fixe de l'utilisateur (même en\n     cas de coupure de courant, le téléphone fixe simple continue de\n     fonctionner grâce à cette électricité)\n\nSignal téléphonique - signal électromagnétique de basse fréquence\n(téléphonie fixe), peut facilement parcourir de longues distances à travers des\nfils en cuivre.\n\nDSL – internet en cuivre\n  • VDSL – internet rapide. Le signal électromagnétique de haute fréquence,\n    perd en qualité sur de longues distances\n  • ADSL – internet très lent. Rarement utilisé - technologie obsolète. Basse\n    fréquence, ne perd pas en qualité sur des longues distances\n\nRépartiteur (centrale, réseau, LEX, bureau, 000, BCT) - source principal de\nsignal\n\nLDC (Local Distribution Center) - mini répartiteur locale\n\nROP (Remote Optical Platform)\n   • alimenté par la fibre optique\n   • distribue le signal électromagnétique\n     ROP est en couple avec la borne (la borne peut être placée soit dans la\n     même armoire soit dans une armoire séparé).\nBorne - alimentée par un signal électromagnétique et distribue même type de\nsignal. Il s'agit du point où un câble épais contenant de nombreuses paires de",
+    "displayTitle": "Termes/abréviations",
+    "section": "Termes, références, etc",
+    "images": []
+  },
+  {
+    "page": 2,
+    "title": "signal. Il s'agit du point où un câble épais contenant de nombreuses paires de",
+    "content": "signal. Il s'agit du point où un câble épais contenant de nombreuses paires de\nfils de cuivre est connecté, chaque paire alimentant une seule broche de\ndistribution.\n\nBroche de distribution - point de connexion dans la borne permettant de\ndistribuer le signal de la ligne individuelle d'un client.\nBroche d'introduction - point de connexion dans une boîte d'introduction chez\nle client\n\n\n\nEn vert - broche de distribution\n\n\nEn bleu – broche porte\n\n\nEn rouge – virtuel (rack/subrack) – utilisé pour configurer produits et faire\n\naction \"move\" en SALY\n\n\n\n\nAPA – Automatic Paire Assignement – logiciel qui attribue des paires en cuivre\nautomatiquement. Si APA échoue, une intervention manuelle est créé en NPS.\nADA – ADA est une intelligence artificielle qui analyse les paires attribuées\nmanuellement et, selon certains paramètres, envoie un électricien à la place\ndu jointeur (ce qui est juste dans environ 80 % des cas). À savoir que\nl'électricien coûte beaucoup moins cher, et alors on économise donc de\nl'argent malgré les 20% de cas injustes.\nTechnicien – un employé envoyé sur le terrain à l'adresse du client. Il fait le\ntravail nécessaire et fournit le client de l'équipement\n   • Technicien électricien - celui qui fait le raccordement dans la boîte de\n      distribution, sans creuser la terre et toucher aux câbles\n   • Technicien jointeur - celui qui jointe des paires en cuivre en creusant la\n      terre et en ouvrant les câbles\n\nCâble de distribution (autrement appelé câble de dispersion, ou câble \"bloc\")-\ncâble dans la rue, passe devant les maisons\nCâble d'introduction (intro) - câble qui connecte une maison avec le câble dans\nla rue\n\nBoîte d'intro (boîte d'introduction) - point de connexion du câble d'intro avec\nla maison. Contient les broches d'introduction – les prises ou les paires en\ncuivre sont branchés.\n\nSegment – partie du câble dans la rue (avec ses boucles), devant une adresse",
+    "displayTitle": "signal. Il s'agit du point où un câble épais contenant de nombreuses paires de",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-002-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 3,
+    "title": "Boucle - faisceau de paires en cuivre dans un câble, délimité par rapport aux",
+    "content": "Boucle - faisceau de paires en cuivre dans un câble, délimité par rapport aux\nautres paires uniquement au niveau documentation (pas physiquement). Les\ndifférentes boucles du câble sont censées s'éloigner de celui-ci lors des\nramifications.\n\n\nBoucle 1/n - les paires sont soudées au capot du câble coupé. Vu que la paire\nn'est pas toujours soudée à la paire consécutive – 1 soudée à 2 (1/2), cela peut\naussi être soudé au 3 (1/3), au 4 (1/4), 5 (1/5), etc., donc on a pris le nom\nuniverselle – 1/n.\n  • Une paire qui vient directement de la borne est appelée direct. Le signal\n     VDSL conduit par la paire directe est plutôt de bon qualité, ainsi que le\n     signal téléphonique\n  • Une paire qui revient du capot est appelé retour. Le signal téléphonique\n     (fréquence électromagnétique basse) conduit par la paire retour est de\n     qualité suffisante. Cependant, le signal VDSL (fréquence\n     électromagnétique\n     élevée) conduite par la paire retour n'est pas de qualité suffisante pour\n     être consommé par un client.",
+    "displayTitle": "Boucle - faisceau de paires en cuivre dans un câble, délimité par rapport aux",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-003-img-1.png"
+    ]
+  },
+  {
+    "page": 4,
+    "title": "* Sur les diagrammes, une ligne représente une paire en cuivre",
+    "content": "* Sur les diagrammes, une ligne représente une paire en cuivre\n\nBoucle ouverte - les paires ne sont pas soudées au capot du câble coupé. Les\npaires indirectes du G - D ne sont pas les retour, elles sont les bouts mort - car\nelles sont complétement déconnectées du courant.\n\n\n\n\nBoucle mixte -\nBoucle fermée -\n\n\nSIT - situation technique (TSI - technical situation) - la documentation du\nchemin de câblage entre le répartiteur/LDC et le client\n\n\nJointage G-D -\nJointage ITC -\nJointage CPT -\n\nSens gauche/droite -\n\nSens direct/indirect -\nSens NCVMP/CVMP -\n\nUn fut - la réservation sur une paire pour le nouveau client, qui la bloque pour\nd'autres clients\nUn fut fantôme - l'erreur du système où une paire est bloqué par une\nréservation inexistante",
+    "displayTitle": "* Sur les diagrammes, une ligne représente une paire en cuivre",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-004-img-1.png",
+      "kb-images/page-004-img-2.png"
+    ]
+  },
+  {
+    "page": 5,
+    "title": "réservation inexistante",
+    "content": "réservation inexistante\nUn fut forcé - la réservation forcée, mise sur un client actif qui n'a jamais\ndemandé résiliation\n\nLB -\nTF -\nPT -\n\nDépartement commercial (service client)\n • répond par téléphone aux questions des clients\n     ○ sur les différents produits,\n     ○ types d'abonnement,\n     ○ qualité de connexion...\n     ○ reçoit les demandes de\n        ▪ raccordement\n        ▪ résiliation\n        ▪ cession... etc.\n\n  • appelle des clients pour enregistrer des demandes.\n\nPour des questions diverses qui ne sont pas de notre ressort, il faut diriger les\nclients vers le service client\n\nTéléphones de différents services client:\n  • Proximus: 0800 33 800\n  • Scarlet: 0800 84 000\nOLO:\n  • Vikings: 0⁠4⁠5⁠6⁠1⁠9⁠1⁠9⁠7⁠6\n  • ...\n\nFormulaire BCI - nous sommes en contact avec service client Proximus/Scarlet\npar ce formulaire\nFormulaire WIO - nous sommes en contact avec service client Mobile Vikings\npar ce formulaire\n\nTSA – devis – visible dans un programme que les techniciens peuvent consulter\n\n\n\n\nUn SMY = Small YES, c'est un étude et installation différente qu'une fibre\nordinaire.",
+    "displayTitle": "réservation inexistante",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-005-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 6,
+    "title": "Termes, références, etc —",
+    "content": "",
+    "displayTitle": "Termes, références, etc —",
+    "section": "Termes, références, etc",
+    "images": []
+  },
+  {
+    "page": 7,
+    "title": "Références",
+    "content": "Références\n  Monday, January 19, 2026   9:06 AM\n\n\n\n• Réseaux (SubArea) - référence liée à la sub-région de Belgique.\n  Exemples: 87EUP0, ...\n  Structure de référence: 2 chiffres + 3 lettres + zéro (87EUP0)\n\n\n\n\n• CID (FCID) - circuit ID - numéro lié à une ligne internet cuivre ou fibre. Chez les clients qui changent la technologie\n  sur la même adresse, ou qui déménagent leur internet d'une adresse à une autre, ce numéro reste le même.\n  Exemple: 103090067905\n• NA (SN) - numéro fix attribué au moment où une nouvelle ligne est demandée\n• ID d'intervention (Intervention ID) - numéro unique d'intervention\n  exemple: 64569843\n• ID d'ordre de travail (ID OT) - numéro unique de l'ordre de travail\n  exemple: 278278429\n• OAG ID - référence d'intervention. Un OAG peut contenir plusieurs ID d'intervention. 3 formes:\n         ○ Japonais - commence par R00000\n            exemple: R0000001100011MDVL9 - demande encodé en SALTO – nouveau système. Pour individuels\n         ○ Chinois - exemple: P25101612121318919 - demande encodé en OMS – vieux système. Pour entreprises\n         ○ OLO – exemple: 6043451570126726669 (que des chiffres)\n\n      Finis toujours par le numéro 9\n• Order Reference - OAG ID sans 9 à la fin.\n  exemple: R0000001100011MDVL\n• ID client (Customer ID) - numéro unique de chaque client.\n      Un client (caractérisé par un ID client) peut avoir plusieurs interventions en cours(plusieurs OAG ID), plusieurs\n  lignes à la même adresse (plusieurs SN), ou plusieurs lignes aux plusieurs adresses.\n  exemple: 611810268\n\n  Tous les clients Mobile Vikings ont le même No client:",
+    "displayTitle": "Références",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-007-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 8,
+    "title": "Position BSS – position virtuelle de la situation technique reconnue par SALY",
+    "content": "Position BSS – position virtuelle de la situation technique reconnue par SALY\n\nPosition BSS cuivre AGW - réseau avec 3 zéros-RACK-SUBRACK-MODULE-PORTE\nExemple: 71MAR0000-75-59-108-22\n\n\n\n\nPosition BSS fibre – UTAC_UNI\nExemple: 541372900010023971_1-1",
+    "displayTitle": "Position BSS – position virtuelle de la situation technique reconnue par SALY",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-008-img-1.png",
+      "kb-images/page-008-img-2.png"
+    ]
+  },
+  {
+    "page": 9,
+    "title": "Equipes",
+    "content": "Equipes\nSunday, April 19, 2026   6:28 PM\n\n\n\n  • PCD(provisioning service desk) – notre équipe\n\n  • PCD 2 – agents PCD plus expérimentés\n\n  • M&P (méthodes et procédures) – notre support (coaches)\n\n\n        ○ Pour le cuivre - Hedi, Guillaume\n        ○ Fibre - Didier, Sophie\n        ○ Saly - Melissa, Francis\n\n  • Hotline – équipe IT, résolution des bugs, contacté via teams\n\n      \"Bugs\" (erreurs informatiques) simples devrait être envoyés à hotline –\n      formulaire Gui:\n\n\n\n\n      Bugs pas sur la liste formulaire Gui:",
+    "displayTitle": "Equipes",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-009-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 10,
+    "title": "Termes, références, etc —",
+    "content": "",
+    "displayTitle": "Termes, références, etc —",
+    "section": "Termes, références, etc",
+    "images": [
+      "kb-images/page-010-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 11,
+    "title": "Changement de status",
+    "content": "Changement de status\nWednesday, April 8, 2026   6:55 PM\n\n\n\nDans ARC, il existe deux catégories :\n\n\n 1. Current – ce qui est actuellement en vigueur, la situation active à\n    l’instant présent.\n 2. New – ce que nous souhaitons faire devenir la nouvelle situation.\n      Donc: dans NEW, nous indiquons le statut souhaité et nous\n      l’enregistrons avec SAVE afin qu’il devienne le statut actif (Current).\n\n\n\n\n  • CURE - utilisé pour attribuer TSI en cuivre et en fibre. On appelle les\n    clients (de préférence depuis NPS, mais aussi possible via SCRIPT)\n  • Start TSI-TSIS, Start Fiber, Start Saly - utilisé pour recevoir\n    callbacks en cuivre, fibre et Saly:\n       ○ Callbacks cuivre - Start TSI-TSIS\n       ○ Callbacks fibre - Start Fiber\n       ○ Callbacks saly - Start Saly",
+    "displayTitle": "Changement de status",
+    "section": "ARC",
+    "images": []
+  },
+  {
+    "page": 12,
+    "title": "ARC —",
+    "content": "",
+    "displayTitle": "ARC —",
+    "section": "ARC",
+    "images": [
+      "kb-images/page-012-img-1.png"
+    ]
+  },
+  {
+    "page": 13,
+    "title": "ARC basic",
+    "content": "ARC basic\nSaturday, April 18, 2026   8:59 AM\n\n\n\nLogiciel pour\n  • Choisir profile 'interaction\n      ○ CURE – profile pour appeler les clients et recevoir leurs appels.\n          Utilisé lors de faire TSI vgf (attribuer situations techniques en fibre ou\n          cuivre)\n\n\n\nOn bascule entre les profils ici:",
+    "displayTitle": "ARC basic",
+    "section": "ARC",
+    "images": [
+      "kb-images/page-013-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 14,
+    "title": "FTTH, FTTB",
+    "content": "FTTH, FTTB\nSaturday, April 11, 2026   2:13 PM\n\n\n\n\n FTTH – fiber to the home\n\n\n FTTB – fiber to the business\n\n\n\n\n  FTTH Greenfield – que de la fibre (nouveaux quartiers)\n\n\n  FTTH Brownfield - pour les résidentiels - les fibre et le cuivre, changement\n\ndu cuivre en fibre pour les.\n\nNouveau client est obligé de prendre la fibre, et celui qui est sur le cuivre\n\n\n FTTB – on laisse le cuivre à côté de la fibre pour les raisons de sécurité et\n\négalement il y a des appareils qui ne supportent pas la fibre (les alarmes\n\nd’incendie par exemple)",
+    "displayTitle": "FTTH, FTTB",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 15,
+    "title": "Infrastructure",
+    "content": "Infrastructure\nSunday, April 5, 2026   8:11 PM\n\n\n\n  1. Infrastructure Proximus\n\n  2. Infrastructure non-Proximus - \"Joint – Venture\" (JV)\n        a. Unifiber – région francophone\n        b. Fiber Klaar - région néerlandophone\n        c. GoFiber - région germanophone\n\nDTP - Distribution Termination Point – point de connexion fibre à\nl'extérieur de l'habitation\n\n 1. DTP-X – sous terre\n\n\n\n\n 2. DTP-P – sur le poteau\n\n\n\n\n 3. DTP-F – sur la façade",
+    "displayTitle": "Infrastructure",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-015-img-1.jpeg",
+      "kb-images/page-015-img-2.jpeg",
+      "kb-images/page-015-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 16,
+    "title": "ONTP – Optical Network Termination Point - point de connexion",
+    "content": "ONTP – Optical Network Termination Point - point de connexion\nfibre à l'intérieur de l'habitation\n\n\nONT – Optical Network Terminal – conversion du signal optique en\nsignal électrique\n   Selon le nombre de ports:\n  • 1 port (existe en GPON et en Multi Gigue). Placé dans une\n     habitation séparée\n  • 4 ports (existe uniquement en GPON). Placé soit dans une\n     habitation séparée, soit dans un espace commun (par exemple la\n     cave)\n\n (…technologie en 2 ports pour Multi Gigue est toujours dans la\nphase de test...)",
+    "displayTitle": "ONTP – Optical Network Termination Point - point de connexion",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 17,
+    "title": "Swap ONT – oui ou non",
+    "content": "Swap ONT – oui ou non\nFriday, April 10, 2026   3:20 PM\n\n\n\n 1. Si c'est le même client qui a besoin de deux/plusieurs lignes (et si c'est la vitesse moins de 1GB – GPON\n    classique) – on peut convertir un ONT à 1 port vers en ONT à 4 ports – \"SWAP ONT\"\n\n 2. Si ce n'est pas le même client on peut pas faire \"SWAP ONT\", on demande à NEO de rajouter des\n    nouvelles lignes – nouveaux UTACs.\n    On le fait par Tache 96 (on met la remarque en NPS, ensuite \"clôture\", \"work for NEO needed\")",
+    "displayTitle": "Swap ONT – oui ou non",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 18,
+    "title": "NEO/CUO",
+    "content": "NEO/CUO\nSunday, April 12, 2026   10:43 PM\n\n\n\n     NEO\n\nNEO = département de planification / orchestration réseau\n    NEO est l’entité qui planifie et orchestre les UTAC (Unités de Travaux\nd’Accès Client).\nRôle de NEO\n    Planification des UTAC\n    Coordination des activités techniques :\nactivations\nmigrations\nréparations\nadaptations réseau\n    Choix de la bonne route technique (cuivre, fibre, équipement, timing)\n    Interface entre :\ncommandes clients\nsystèmes IT\néquipes terrain\nEn résumé NEO\nNEO = QUI planifie / QUAND / COMMENT l’UTAC est exécutée\n\n\n     CUO\n\nCUO = Customer Operation Unit (exploitation / suivi opérationnel)\n    CUO exécute, suit et gère opérationnellement ce qui a été planifié.\nRôle de CUO.\nNous, en tant que PCD, faisons partie de CUO.\n    Suivi des interven ons terrain\n    Gestion des incidents clients\n    Analyse après échec UTAC\n    Communication client / support\n    Relance ou correction si nécessaire\nEn résumé CUO\nCUO = EXÉCUTE / SUIVIT / CORRIGE l’UTAC sur le terrain\n\n\nNEO → planifie et orchestre l’UTAC\n\nCUO → exécute et gère l’opérationnel",
+    "displayTitle": "NEO/CUO",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 19,
+    "title": "Rajouter tache SWAP ont",
+    "content": "Rajouter tache SWAP ont\nWednesday, April 15, 2026   12:00 PM\n\n\n\nEcran Rechecher OT\n\n\n\n\nSur l'écran Tâches - liste des taches",
+    "displayTitle": "Rajouter tache SWAP ont",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-019-img-1.jpeg",
+      "kb-images/page-019-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 20,
+    "title": "Changement type technicien",
+    "content": "Changement type technicien\nWednesday, April 15, 2026   1:21 PM\n\n\n\nTechniciens\n\nFIS - \"pantoufle\"\n\n\n\nQuand le système met un technicien incorrectement, on le change\nmanuellement.\n\nOn est obligé de corriger les tâches du technicien manuellement.\n\nSur l'écran Recherche OT – la partie Tâches en bas- liste des taches",
+    "displayTitle": "Changement type technicien",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 21,
+    "title": "Tache 79 – GREENFIELD",
+    "content": "Tache 79 – GREENFIELD\nFriday, April 10, 2026   10:49 AM\n\n\n\n\nProblème chez GREENFIELD - Tache 79 - on fait formulaire JMS 79 (PCD FIBER/JMS 2.0)\n\n\n  1. Design incorrect – UTAC enregistré sur le mauvais client\n\n\n        ○\n\n\n  2. UTAC orange– pas verte\n\n\n        ○ Quand l’UTAC est orange, On y met le numéro d’UTAC, et le message:\n\n              « Bonjour,\n             UTAC XXXXX s'affiche en OCK en orange, veuillez faire le nécessaire\n             Merci »\n\n             Ensuite on y rajoute le numéro de l’intervention\n\nExemple:\n\n\n\n\nOn clôture en \"Planning nécessaire\":",
+    "displayTitle": "Tache 79 – GREENFIELD",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-021-img-1.jpeg",
+      "kb-images/page-021-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 22,
+    "title": "Mauvais type/date tech",
+    "content": "Mauvais type/date tech\nMonday, May 11, 2026   9:46 AM",
+    "displayTitle": "Mauvais type/date tech",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-022-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 23,
+    "title": "Fichier Overview Fiber",
+    "content": "Fichier Overview Fiber\nWednesday, May 27, 2026   1:29 PM\n\n\n\nOverview Fiber contient la liste des descriptions d'erreur NPS:\n\n\n\n\nPour retrouver la description désirée, on fait CTRL + F, on met le mot clef ou la\nphrase entière dans le champ \"Find\" et on clique sur le bouton en bas à droite\n\"Find all\" pour voir la cellule correspondante (dans cet exemple cellule C39):",
+    "displayTitle": "Fichier Overview Fiber",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-023-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 24,
+    "title": "Fibre basic —",
+    "content": "",
+    "displayTitle": "Fibre basic —",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-024-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 25,
+    "title": "Tache 90 – probl. sur place",
+    "content": "Tache 90 – probl. sur place\nSunday, April 12, 2026   10:33 PM\n\n\n\n\n      Tâche 90 – Problème sur place – Callback du technicien\n\n✅ Signification globale\nLa Tâche 90 indique que :\n❌ L’intervention n’a pas pu être finalisée à cause d’un problème\nconstaté sur place,\n✅ et qu’un callback (appel) du technicien est requis vers le client ou\nle support.\n\n\n     Callback du technicien : à quoi ça correspond ?\nLe callback signifie que le technicien :\na identifié un blocage local\ndoit expliquer la situation (ou l’a déjà fait)\net transmet les informations nécessaires pour lever le blocage avant\ntoute replanification.\nLe callback peut être :\n     un appel direct au client\n     un appel au service support / CUO\n     ou un commentaire détaillé dans le rapport d’intervention,\ndéclenchant l’action CUO\n\n\n  Exemples typiques de Tâche 90 + callback\n  Client absent → appel pour fixer un nouveau rendez-vous\n  Local technique inaccessible → appel pour organiser l’accès\n⚡ Pas d’électricité → appel pour mise en conformité\n  Câblage interne non prêt → explication au client\n  Refus client / conditions de sécurité → information formelle\n  Danger sur site → justification + consignes",
+    "displayTitle": "Tache 90 – probl. sur place",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 26,
+    "title": "Tache 96 – probl. DESIGN",
+    "content": "Tache 96 – probl. DESIGN\nFriday, April 10, 2026   1:36 PM\n\n\n\nDESIGN - ce qu'on voit dans l'OCK - la liste des UTAC à l'adresse\n\nTache 96 – signaler problème design (design qui est faux ou qui n'existe pas) -\npour tout (pour FTTH (Brownfield, Greenfeld) et FTTB (Fiber To The Business))\n\nC'est la tâche qu'on envoie vers le département NEO:\n\n         1. On envoie message à NEO par remarque en NPS. S'il en OCK il y a une\n            erreur, on la copie dans le message\n             ○ Exemple erreur quand le désign n'existe pas: \"a technical error\n                (260 No Record found from DB) did occur, please contact the\n                Hotline or try again later\"\n         2. On clôture en \"Work for NEO needed\"\n\nEnsuite on attend une réponse qu'on appelle réponse INC (voir section\n\"Réponses INC\" de NEO).\n\n\n\n\nEXEMPLE: Besoin du changement de design:\n\nA cette adresse, le design est UN seul UTAC - 541372900026696169\n\n\n\n\nMais, en GNA, on voit DEUX boîtes aux lettres:",
+    "displayTitle": "Tache 96 – probl. DESIGN",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-026-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 27,
+    "title": "Donc, le design est incorrect – il existe le problème de design.",
+    "content": "Donc, le design est incorrect – il existe le problème de design.\n\n\n1. Contacter client pour confirmer l'adresse (si Proximus ou Scarlet)\n2. Expliquer au client qu'il sera recontacté lorsque le service infrastructure aura\n   fait le nécessaire, on ne sait pas dans combien de temps vu que cela ne dépend\n   pas de moi\n3. Envoyer message à NEO par remarque en NPS. S'il en OCK il y a une erreur, on\n   la copie dans le message et on clôture en \"work for NEO needed\".\n\n   Exemples des remarques:\n   …......\n\n   \"Client contacte, adresse confirmée. Il existe un seul UTAC\n   (541372900026696169) pour le rez-de-chaussée , mais deux appartements\n   avec deux boites aux lettres. Merci d'ajouter l'autre UTAC pour le client qui a\n   fait cette demande (il est au deuxième étage) Merci\"\n\n   …......\n\n   \"Pas d'UTAC à l'adresse.\n   Erreur dans OCK:",
+    "displayTitle": "Donc, le design est incorrect – il existe le problème de design.",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-027-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 28,
+    "title": "Erreur dans OCK:",
+    "content": "Erreur dans OCK:\nA technical error (260 No Record found from DB) did occur, please contact the\nHotline or try again later.\nVeuillez faire le nécessaire\"\n\n…......\n\nOn attend la réponse INC de NEO",
+    "displayTitle": "Erreur dans OCK:",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 29,
+    "title": "Réponses INC - de NEO",
+    "content": "Réponses INC - de NEO\n      Friday, April 10, 2026   11:22 AM\n\n\n\n\nRéponse de NEO à tache 96 s'appelle INC (incident) et peut être consulté dans SNOW lecture.\n\nOn n'appelle pas le client, vue que l'intervention a déjà été traitée et envoyée vers NEO.\n2 façons de consulter INC\n 1. On copie la référence INC du WCT et on la met dans le SNOW lecture (en haut à la droite, la loupe)\n 2. On met OAG id dans NPS, pour voir l'historique de la demande. Si une réponse NEO existe, on trouve lien cliquable INC sur la\n     liste:\n\n\n\n\nRéponse INC positive vs négative:\n  • Après une réponse favorable (positive) - on va en NPS, en on attribue l'UTAC de façon habituelle.\n  • Après une réponse négative - on va en NPS, en on annule l'intervention en \"impossible\"\n\n\nExemple de la réponse NEO positive\n\nOn regarde l'onglet \"résolution\", et on lit la réponse complète:",
+    "displayTitle": "Réponses INC - de NEO",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-029-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 30,
+    "title": "Quand NEO résolut la demande, l'UTAC peut bien être attribué. On clôture en \"technicien pas présent\" et une nouvelle intervention",
+    "content": "Quand NEO résolut la demande, l'UTAC peut bien être attribué. On clôture en \"technicien pas présent\" et une nouvelle intervention\nse crée (on la retrouve par OAG). Il ne faut pas prendre à son nom cette intervention, car elle est pour un autre team.\n\nExemple 1 de nouvelle intervention pour l'autre team, intitulée \"Prise de RDV NPTR801\":\n\n\n\n\nExemple 2 de nouvelle intervention pour l'autre team, intitulée \"en attente du feedback OLO\":\n\n\n\n\nExemple de la réponse NEO négative:",
+    "displayTitle": "Quand NEO résolut la demande, l'UTAC peut bien être attribué. On clôture en \"technicien pas présent\" et une nouvelle intervention",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-030-img-1.jpeg",
+      "kb-images/page-030-img-2.jpeg",
+      "kb-images/page-030-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 31,
+    "title": "Vu que la cliente a déjà refusé la pose du câble à l'intérieur, et NEO refuse de passer le câble par façade - on annule, pas d'autres",
+    "content": "Vu que la cliente a déjà refusé la pose du câble à l'intérieur, et NEO refuse de passer le câble par façade - on annule, pas d'autres\nsolutions.\n\n\n\n\nRéponse STOP EFFORT – on a essayé tout, aucune solution – annulation en impossible",
+    "displayTitle": "Vu que la cliente a déjà refusé la pose du câble à l'intérieur, et NEO refuse de passer le câble par façade - on annule, pas d'autres",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-031-img-1.jpeg",
+      "kb-images/page-031-img-2.png"
+    ]
+  },
+  {
+    "page": 32,
+    "title": "Ping-pong avec NEO",
+    "content": "Ping-pong avec NEO\n\nCUO dit que c'est pour NEO, NEO répond que c'est pour CUO. Et ça se continue ainsi...\n\nExemple:\n\nPremier réponse INC - NEO dis que c'est pour CUO\n\n\n\n\nDeuxième réponse INC pour la même demande - NEO dis encore une fois que c'est pour CUO:",
+    "displayTitle": "Ping-pong avec NEO",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-032-img-1.png",
+      "kb-images/page-032-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 33,
+    "title": "Cette réponse veut dire – moins de 5 LU, c'est pour CUO ( - veut dire moins)",
+    "content": "Cette réponse veut dire – moins de 5 LU, c'est pour CUO ( - veut dire moins)",
+    "displayTitle": "Cette réponse veut dire – moins de 5 LU, c'est pour CUO ( - veut dire moins)",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-033-img-1.png"
+    ]
+  },
+  {
+    "page": 34,
+    "title": "UTAC orange",
+    "content": "UTAC orange\nThursday, May 14, 2026   8:34 AM\n\n\n\nUTAC orange en greenfield – on le signale à NEO par Tache 79\n\nUTAC orange en brownfield (\"end of construction date\" dans le\npassé) – on explique dans la remarque que l'UTAC est toujours\norange et on clôture en \"Work for NEO needed\"(très rare, il arrive\nque l'UTAC orange dans le brownfield montre \"end of construction\ndate\" dans le futur, dans ce cas-là on fait le courrier - juste comme\navec l'UTAC rouge et \"end of construction date\" dans le futur).\n\n\"Planning nécessaire\" vs \"Work for NEO needed\"\n\n  • \"Planning nécessaire\" - design est correcte, mais l'UTAC est\n    orange - toujours pas affiché en vert, toujours pas disponible. On\n    laisse la remarque et on clôture intervention en \"Planning\n    nécessaire\" (boîte générale)\n\n  • \"Work for NEO needed\"- design pas correcte – on laisse la\n    remarque et on clôture intervention en \"Work for NEO\n    needed\" – tache 96 pour brownfield.",
+    "displayTitle": "UTAC orange",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 35,
+    "title": "UTAC rouge",
+    "content": "UTAC rouge\nTuesday, May 12, 2026   9:58 AM\n\n\n\n\nSi la fibre est Rouge pour du Brownfield ou FTTB, c'est OT annuler directement\navec la remarque :\"A réintroduire lorsque la fibre sera Verte en OCK\"\n\n\nException : il arrive parfois qu'on puisse attribuer l'UTAC en NPS, alors qu'il est\naffiché en rouge en OCK. Cela peut être expliqué par NEO étant en train\nd'adapter le design.",
+    "displayTitle": "UTAC rouge",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-035-img-1.png"
+    ]
+  },
+  {
+    "page": 36,
+    "title": "Pas la bonne adresse",
+    "content": "Pas la bonne adresse\nTuesday, May 12, 2026   10:23 AM\n\n\n\n\nAdresse renseignée:\n\n\n\n\nRegarder la remarque !!",
+    "displayTitle": "Pas la bonne adresse",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-036-img-1.png",
+      "kb-images/page-036-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 37,
+    "title": "Pas de lien \"reponse safe\"",
+    "content": "Pas de lien \"reponse safe\"\nTuesday, May 12, 2026   8:52 AM\n\n\n\nDéscription \"Adresse d'instalation fautive\"\nBrownfield – il y a des UTAC libres, ou il y a un seul UTAC\n\nMessage: \"Adres moet gevalideerd en bijgewerkt worden\" ou en français\n\"L'adresse doit être validée et mise à jour\" - on va sur \"traiter intervention\"",
+    "displayTitle": "Pas de lien \"reponse safe\"",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 38,
+    "title": "Prise de RDV",
+    "content": "Prise de RDV\nFriday, May 8, 2026   11:34 AM\n\n\n\n\n    Quand l'UTAC est correctement attribué, l'intervention \"Prise de RDV\" est créé pour le service DISPATCH. Cela veut dire que j'ai bien fait ma\n    partie de travail, et que le DISPATCH doit simplement dispatcher\n\n    Il ne faut pas prendre à son nom l'intervention \"Prise de RDV\", car c'est pour le dispatch",
+    "displayTitle": "Prise de RDV",
+    "section": "Fibre basic",
+    "images": [
+      "kb-images/page-038-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 39,
+    "title": "Ne pas confondre",
+    "content": "Ne pas confondre\nMonday, May 18, 2026   12:28 PM\n\n\n\n 1. \"Swap ONT\" de 1 à 4 ports vs mettre autre client sur un ONT 4\n    port déjà existant à l'adresse\n\n      ○ \"Swap ONT\" (remplacement de l'ONT 1 par l'ONT 4 ports)\n        est permis uniquement si le même client veut avoir une ligne\n        supplémentaire GPON (moins de 1gb)\n      ○ Mais, si un ONT 4 port déjà existe à l'adresse (visible en\n        OCK) on peut normalement mettre différent client sur le\n        deuxième (ou 3ᵉ, 4ᵉ) port.\n\n 2. \"Planning nécessaire\" vs \"Work for NEO needed\"\n\n      ○ \"Planning nécessaire\" - design est correcte, mais l'UTAC est\n        orange - toujours pas affiché en vert, toujours pas\n        disponible. On laisse la remarque et on clôture intervention\n        en \"Planning nécessaire\" (boîte générale)\n\n      ○ \"Work for NEO needed\"- design pas correcte – on laisse la\n        remarque et on clôture intervention en \"Work for NEO\n        needed\" – tache 96 pour brownfield.",
+    "displayTitle": "Ne pas confondre",
+    "section": "Fibre basic",
+    "images": []
+  },
+  {
+    "page": 40,
+    "title": "Attribuer l'UTAC",
+    "content": "Attribuer l'UTAC\nTuesday, April 14, 2026   9:21 AM\n\n\n\nL'UTAC est bien attribué au moment quand la description devient \"attente du\nfeedback de client\"",
+    "displayTitle": "Attribuer l'UTAC",
+    "section": "Flux FIBRE",
+    "images": []
+  },
+  {
+    "page": 41,
+    "title": "Err \"Pas de point d'installation libre\"",
+    "content": "Err \"Pas de point d'installation libre\"\nSaturday, April 11, 2026   9:00 PM\n\n\n\n\n   1. Prendre intervention du WCT\n       ○ Voir l'opérateur\n           ▪ Proximus/Scarlet\n           ▪ OLO Mobile Vikings\n           ▪ Autre OLO (Edpnet, Sewan Belgium...)\n       ○ Copier référence pour rechercher intervention\n           ▪ OAG id – le mieux - on voit l'historique\n           ▪ Intervention ID – intervention particulière\n           ▪ autres (NA, Customer ID...)\n   2. Mettre référence dans le champ prévu en NPS\n       ○ Etudier infos\n       ○ Copier adresse (Code postal, Nom de la ville, Nom de la rue, N° de\n          maison, N° de maison alphanumérique),\n\n\n\n\n   3. Mettre adresse en OCK, étudier le design, regarder les UTAC\n   4. Aller en SALY avec l'UTAC et port trouvés en OCK\n   5. Voir infos du client qui est actif à l'adresse en SALTO\n   6. Mettre adresse dans GNA dans le champ \"Find Google Address\", trouver\n      maison, compter les boîtes aux lettres sur la porte, comparer avec No\n      des UTAC dans le DESIGN en OCK.\n\n\n\n\n        Compter boites aux lettres:",
+    "displayTitle": "Err \"Pas de point d'installation libre\"",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-041-img-1.jpeg",
+      "kb-images/page-041-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 42,
+    "title": "7.",
+    "content": "7.\n     ○ Si un autre client est actif à l'adresse ➔ Appeler client, voir s'il peut\n       demander celui à l'adresse de résilier\n     ○ S'il manque des UTAC ou pas de design ➔ Appeler client, faire tâche\n       96 (voir section dans Fibre basic)",
+    "displayTitle": "7.",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-042-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 43,
+    "title": "Err \"IFH multiple Order Responses\"",
+    "content": "Err \"IFH multiple Order Responses\"\nMonday, April 13, 2026   1:01 PM\n\n\n\n\n Cela veut dire – plusieurs ordres en cours (pending) pour le même UTAC.\n\n Si en SALY l'UTAC s'affiche comme libre, mais NPS refuse de terminer l'action,\n Si l'UTAC en NPS correspond à l'UTAC en OCK, en cherchant par UTAC la ligne s'affiche comme libre, le NPS doit permettre que\n l'intervention soit clôturée.\n\n En Saly:\n\n ISIS      Status Free\n\n\n Comme toujours, on vérifie par OAG ID dans recherche OT si l'ordre a été bien crée (cela doit être \"dispatché\").\n\n Si l'OT n'a pas été créé et si en boîte de réception on a une nouvelle intervention créé avec le même OAG (on vérifie par OAG ), cela\n veut dire que l'NPS a refusé de créer l'ordre sans aucune raison visible.\n\n\n\n\n Une vérification fiable est d'aller en recherche OT pour vérifier s'il y a vraiment plusieurs ordres pour cette même adresse. On peut le\n faire simplement par insérer LOM key, puis cliquer juste à droite sur Recherche Adresse, puis tout en bas sur Rechercher:\n\n\n\n\n S'il n'y a pas de résultat, on est sûr que l'autre ordre de travail (OT) n'existe pas pour la même adresse.\n\n Donc – c'est un bug en NPS – on doit faire un ticket SNOW pour demander que le bug soit réglé.\n\n Ticket Snow NPS (voir section \"Créer ticket NPS\"):",
+    "displayTitle": "Err \"IFH multiple Order Responses\"",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-043-img-1.png",
+      "kb-images/page-043-img-2.png"
+    ]
+  },
+  {
+    "page": 44,
+    "title": "On met Order Case ID from SNOW dans la remarque et on met l'intervention \"on hold\"",
+    "content": "On met Order Case ID from SNOW dans la remarque et on met l'intervention \"on hold\"",
+    "displayTitle": "On met Order Case ID from SNOW dans la remarque et on met l'intervention \"on hold\"",
+    "section": "Flux FIBRE",
+    "images": []
+  },
+  {
+    "page": 45,
+    "title": "Client quitte l'adresse",
+    "content": "Client quitte l'adresse\nWednesday, May 13, 2026   11:44 AM\n\n\n\nClient qui est en train de quitter l'UTAC partir s'affiche comme \"pending\" dans\nl'OCK.\nAttention: \"Pending\" peut aussi provenir du client qui fait la demande.\n\n\n\n\nPour savoir jusqu'à quelle date le client restera en \"pending\" (autrement dit\nquand l'UTAC sera libéré), on peut consulter le logiciel SALTO.\n\nOn clique sur \"Ordres & Offres\":\n\n\n\n\nEnsuite, on clique sur ce qui est \"Déménager en exécution\":",
+    "displayTitle": "Client quitte l'adresse",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-045-img-1.jpeg",
+      "kb-images/page-045-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 46,
+    "title": "Ensuite, on clique sur \"Livraison & rendez-vous\":",
+    "content": "Ensuite, on clique sur \"Livraison & rendez-vous\":\n\n\n\n\nAprès, on remonte tout en haut, on clique sur les deux fléches:",
+    "displayTitle": "Ensuite, on clique sur \"Livraison & rendez-vous\":",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-046-img-1.png",
+      "kb-images/page-046-img-2.jpeg",
+      "kb-images/page-046-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 47,
+    "title": "Dans l'écran suivant:",
+    "content": "Dans l'écran suivant:\nEn rouge – la date quand le client sera résilié à l'adresse de notre demande\nEn bleu – la date quand le client sera activé à la nouvelle adresse là où il va (qui\nne nous intéresse pas)\n\n\n\n\nOn peut aussi re-vérifier cette même information en NPS en prenant référence\nordre (OAG moins le 9) et en le mettant dans \"recherche OT\"",
+    "displayTitle": "Dans l'écran suivant:",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-047-img-1.jpeg",
+      "kb-images/page-047-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 48,
+    "title": "On le met dans \"Order Ref\":",
+    "content": "On le met dans \"Order Ref\":",
+    "displayTitle": "On le met dans \"Order Ref\":",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-048-img-1.jpeg",
+      "kb-images/page-048-img-2.png"
+    ]
+  },
+  {
+    "page": 49,
+    "title": "VIKINGS – autre client",
+    "content": "VIKINGS – autre client\nFriday, May 22, 2026   12:18 PM\n\n\n\nAutre client actif à l'UTAC à adresse:",
+    "displayTitle": "VIKINGS – autre client",
+    "section": "Flux FIBRE",
+    "images": [
+      "kb-images/page-049-img-1.jpeg",
+      "kb-images/page-049-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 50,
+    "title": "ONU",
+    "content": "ONU\nWednesday, May 27, 2026   1:19 PM\n\n\n\nONU peut être une notification ou une intervention.\n\nSi on peut pas l'enlever, c'est la notification. On l'ouvre sans l'enlever et on la\nclôture.\n\nSi on peut l'enlever, c'est l'intervention. On la traite comme expliqué dans le\nExcel doc. Overview Fiber.xlsx (colonne C, ligne 39)",
+    "displayTitle": "ONU",
+    "section": "Flux FIBRE",
+    "images": []
+  },
+  {
+    "page": 51,
+    "title": "Perform PEC + T79",
+    "content": "Perform PEC + T79\nFriday, May 22, 2026   3:03 PM\n\n\n\nSi on doit faire tache 79 (Greenfield), mais la description est \"Perform PEC for\nestimation (PSTN/ISDN)\", on n'a pas d'option \"Planning nécessaire\" sur la liste.\nAlors, on clôture normalement et on fait recherche avec l'OAG pour retrouver\nnouvelle intervention \"FIBER SAFE OKBUT\". C'est là où l'option \"Planning\nnécessaire\" apparaît. Depuis ce moment-là, on fait de façon classique – tache\n79, on met JOB ID en remarque et on clôture en \"Planning nécessaire\"",
+    "displayTitle": "Perform PEC + T79",
+    "section": "Flux FIBRE",
+    "images": []
+  },
+  {
+    "page": 52,
+    "title": "Basic",
+    "content": "Basic\nFriday, May 8, 2026   1:34 PM\n\n\n\n\n       Flux cuivre basic:\n\n          • On prend le numéro d'intervention du WCT, on le met en NPS\n          • On prend le NA (SN) de l'NPS, on le met en ABR pour examiner le câble d'intro\n          • On attribue la TSI (situation technique) en utilisant le WebTA\n          • On fait mise à jour (si nécessaire on rajoute la tache 173), on clôture en NPS\n\n       Flux fibre basic:\n         • On prend l'OAG id du WCT, on le met en NPS\n         • On regarde s'il y a déjà des réponses NEO, etc.\n         • On va en OCK pour voir le design des UTAC sur place\n         • Si possible, on attribue l'UTAC et on clôture (soit normale, soit technicien pas présent)\n         • On vérifie obligatoirement avec l'OAG dans recherche OT pour voir si tout s'est bien passé",
+    "displayTitle": "Basic",
+    "section": "Flux cuvre vs. flux fibre",
+    "images": []
+  },
+  {
+    "page": 53,
+    "title": "Vikings/EDPNET",
+    "content": "Vikings/EDPNET\nFriday, May 15, 2026    9:08 AM\n\n\n\nMobile Vikings fait la demande , EDPNET Belgium à l'adresse,\n\nA l'aide de l'UTAC, j'ai pris No Client de Saly\nAvec No Client, en Salto, j'ai trouve que c'est EDPNET Belgium.\n\n\n\n\nJ'ai pris le Circuit ID du client actif de SALY pour le mettre dans le WIO. Le nom du client Mobile\nVikings est visible dans le WCT:\n\n\n\n\nLe texte de WIO: \"A l'adresse un client EDPNET avec CID 102850517614 est toujours actif. Veuillez\nvérifier avec le nouveau client Dylan Everaert\"",
+    "displayTitle": "Vikings/EDPNET",
+    "section": "Scénarios TSI fibre",
+    "images": [
+      "kb-images/page-053-img-1.png",
+      "kb-images/page-053-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 54,
+    "title": "Scénarios TSI fibre —",
+    "content": "",
+    "displayTitle": "Scénarios TSI fibre —",
+    "section": "Scénarios TSI fibre",
+    "images": [
+      "kb-images/page-054-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 55,
+    "title": "Ordre de priorité",
+    "content": "Ordre de priorité\nWednesday, February 18, 2026   12:06 PM\n\n\n\n  • Si possible, éviter de jointer\n      ○ Proximus/Scarlet - vérifier par téléphone si le nouveau client peut reprendre la ligne du client en service\n          (résiliation, cession);\n      ○ Mobile Vikings - vérifier dans le système si le nom du nouveau client correspond au nom du client actuel, si oui\n          faire WIO\n  • Si jointer est inévitable, éviter de jointer devant le voisin (éviter redressement/IAM autre adresse)\n  • Si possible, garder le type de jointage déjà existant dans le câble intro - éviter créer des câbles 'mixed' (chez les câbles\n    G-D on essaie de rester en G-D, chez les câbles ITC on essaie de rester en ITC).\n  • Surtout éviter d'augmenter la capacité du câble d'intro – la solution câble mixed est meilleure qu'augmenter capacité\n  • Si possible respecter les quartes, éviter de \"casser\" la quarte\n  • Si la boucle est fermée (CVMP/NCVMP) il faut éviter de jointer en interception, mais en même temps il faut éviter\n    l'augmentation du câble. Si on doit convertir de G-D en ITC pour éviter l'augmentation du câble, on a deux règles qui se\n    contra dictent:\n      1. Eviter l'augmentation de la capacité.\n      2. Eviter de jointer en interception dans la boucle fermée.\n    Compromis: Si on peut jointer sans rajouter câble 99, on convertit en G-D. Sinon, on fait augmentation de la capacité du\n    câble",
+    "displayTitle": "Ordre de priorité",
+    "section": "Flux cuivre plus détaillé",
+    "images": []
+  },
+  {
+    "page": 56,
+    "title": "Traitement basique",
+    "content": "Traitement basique\nThursday, February 19, 2026   8:44 AM\n\n\n\nClient Proximus/Scarlet\n\nEncodage de la demande du client → traitement automatique\n  • Si ça fonctionne → ✅\n  • Ça ne fonctionne pas → le système crée une intervention dans NPS,\n    ensuite le WCT en permet le triage et la distribution\n\n     Traitement manuel de l'intervention (traitement basic en bleu)\n\n  1. Enlever intervention\n\n  2. Préparation pour l'appel client\n       • Analyse dans le NPS\n              si traitement impossible → envoyer vers “planning” ✅\n       • Analyse dans l'ABR (voir s'il y a des actifs ou des fut à l'adresse et si le\n         nom est le même)\n       • Analyse supplémentaire - GNA, SALTO, LOM, OCK...\n\n  3. Appeler le client: confirmer l’adresse et vérifier si une nouvelle ligne est\n     nécessaire. On demande si le nouveau client remplace un client en\n     service, s'il veut que la ligne soit mise au nom d'un autre membre de\n     famille afin de recevoir un cadeau... etc.\n\n  4. Actions suivants l'appel client\n       • Nouvelle ligne est nécessaire :\n           ○ Sélectionner les paths, déclencher WebTA (MAN TSI)\n           ○ Attribuer SIT (TSI) d'une nouvelle ligne en WebTA (si nécessaire\n               chipoter en ABR)\n                     si pas possible → envoyer vers “planning” ✅\n           ○ Mettre à jour NPS, si nécessaire ajouter une tâche (add task)\n           ○ Envoyer le technicien avec “Clôture normale” ✅\n       • Nouvelle ligne pas nécessaire (le nouveau client remplace le client en\n          service):\n           ○ Le nouveau client peut contacter le client en service → expliquer\n               la démarche de résiliation, mettre en attente. Une fois la\n               résiliation initialisée → attribuer SIT (TSI) sur la paire libérée en\n               WebTA, “Clôture normale” ✅\n           ○ Le nouveau client incapable de contacter le client en service →\n               faire BCI résiliation ✅\n           ○ Le nouveau client veut reprendre les produits du client en",
+    "displayTitle": "Traitement basique",
+    "section": "Flux cuivre plus détaillé",
+    "images": []
+  },
+  {
+    "page": 57,
+    "title": "service → soit client en service demande une cession, soit faire",
+    "content": "○ Le nouveau client veut reprendre les produits du client en\n              service → soit client en service demande une cession, soit faire\n              BCI cession ✅\n      • Le client veut annuler (demande doublée, forcée, erronée, client pas\n        satisfait ) → annuler l’intervention ✅\n      • Le client ne répond pas après 3 appels, ou numéro incorrect →\n        annuler l’intervention + BCI ✅\n\n\nClient Mobile Vikings\n\nEncodage de la demande du client → Traitement automatique\n  • Ça fonctionne → ✅\n  • Ça ne fonctionne pas → Le système crée une intervention dans NPS,\n    ensuite le WCT en permet le triage et la distribution\n\n   Traitement manuel de l'intervention\n\n  • Analyse dans le NPS\n     ○ Si traitement impossible → Envoyer vers “planning” ✅\n     ○ Si cas spécifique \"keep PSTN\" → faire WIO \"réintroduction\n        incomplète\" ✅\n     ○ Autrement → continuer\n  • Analyse dans l'ABR\n     ○ Personne en service à l'adresse, aucun fut à l'adresse:\n          ▪ Attribuer SIT (TSI) d'une nouvelle ligne en WebTA (si nécessaire\n             chipoter en ABR)\n                  si pas possible → envoyer vers “planning” ✅\n          ▪ Mettre à jour NPS, si nécessaire ajouter une tâche (add task)\n          ▪ Envoyer le technicien avec “Clôture normale” ✅\n\n     ○ Client(s) actif(s) ou fut à l'adresse dont le nom est affiché → en\n       consultant WCT, vérifier si le nom du nouveau client correspond au\n       nom du client en service\n        ▪ Si le nom est différent → Attribuer SIT (TSI) d'une nouvelle ligne\n            en WebTA (si nécessaire chipoter en ABR)\n                  pas possible → envoyer vers “planning” ✅\n        ▪ Si le nom est le même → faire WIO de réintroduction ✅\n     ○ Client(s) actif(s) ou fut à l'adresse dont le nom n'est pas affiché (OLO):\n        ▪ Attribuer SIT (TSI) d'une nouvelle ligne en WebTA (si nécessaire\n            chipoter en ABR)\n                  si pas possible → envoyer vers “planning” ✅\n        ▪ Mettre à jour NPS, si nécessaire ajouter une tâche (add task)\n        ▪ Envoyer le technicien avec “Clôture normale” ✅",
+    "displayTitle": "service → soit client en service demande une cession, soit faire",
+    "section": "Flux cuivre plus détaillé",
+    "images": []
+  },
+  {
+    "page": 58,
+    "title": "▪ Envoyer le technicien avec “Clôture normale” ✅",
+    "content": "▪ Envoyer le technicien avec “Clôture normale” ✅\n\n\nClient OLO autre que Vikings\n\nEncodage de la demande du client → Traitement automatique\n  • Ça fonctionne → ✅\n  • Ça ne fonctionne pas → Le système crée une intervention dans NPS,\n    ensuite le WCT en permet le triage et la distribution\n\n   Traitement manuel de l'intervention\n\n  • Analyse dans le NPS\n         si traitement impossible → envoyer vers “planning” ✅\n  • Analyse dans l'ABR → simplement examiner la situation\n  • Sélectionner les paths, déclencher WebTA (MAN TSI)\n  • Attribuer SIT (TSI) d'une nouvelle ligne en WebTA (si nécessaire\n    chipoter en ABR)\n         si pas possible → envoyer vers “planning” ✅\n  • Mettre à jour NPS, si nécessaire ajouter une tâche (add task)\n  • Envoyer le technicien avec “Clôture normale” ✅",
+    "displayTitle": "▪ Envoyer le technicien avec “Clôture normale” ✅",
+    "section": "Flux cuivre plus détaillé",
+    "images": []
+  },
+  {
+    "page": 59,
+    "title": "Scénarios Proximus/Scarlet",
+    "content": "Scénarios Proximus/Scarlet\nThursday, February 19, 2026   8:38 AM\n\n\n\nPas de paire libre, pas de jointage possible – clôturer en \"planing nécessaire\",\non met Réseau et ROP/LDC\n\nIl n'y a personne en service à l'adresse\n\n      Il suffit de confirmer l'adresse avec le client\n\nUn ou plusieurs clients en service à l'adresse – les noms différents de celui qui\nfait la demande\n\n      Obligatoirement vérifier si le nouveau client remplace quelqu'un qui est\n      actif\n\nLe même client chez Vikings veut passer chez Proximus/Scarlet\n\nSelon une loi belge, si c'est le même client qui veut passer d'un opérateur vers\nl'autre, le nouveau opérateur a le droit de le prendre chez lui sans demander\nl'ancien opérateur.\n\nAlors, on envoie le formulaire BCI chez Proximus/Scarlet en disant que le client\nveut réintroduire la demande pour devenir Proximus/Scarlet.\n\n(Si ce n'est pas le même client, on n'a pas le droit de changer)\n\nUn Vikings est à l'adresse et un autre Vikings demande de s'y installer\n\nOn ne peut pas vérifier si une nouvelle ligne est nécessaire, alors on si on ne\npeut pas attribuer la paire, on jointe\n\nChangement Proximus vers Scarlet et vice versa\n\nOn fait BCI demande de réintroduction à celui ou le client veut passer",
+    "displayTitle": "Scénarios Proximus/Scarlet",
+    "section": "Flux cuivre plus détaillé",
+    "images": []
+  },
+  {
+    "page": 60,
+    "title": "Recherche",
+    "content": "Recherche\nMonday, May 4, 2026   1:38 PM\n\n\n\nOn fait recherche toujours avec l'adresse sans numéro de maison",
+    "displayTitle": "Recherche",
+    "section": "LOM",
+    "images": []
+  },
+  {
+    "page": 61,
+    "title": "Voir le plan",
+    "content": "Voir le plan\nTuesday, May 5, 2026   11:04 AM\n\n\n\n\nLes boules à gauche nous montrent l'adresse sur le plan:",
+    "displayTitle": "Voir le plan",
+    "section": "LOM",
+    "images": [
+      "kb-images/page-061-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 62,
+    "title": "Filtres",
+    "content": "Filtres\nSaturday, January 17, 2026   12:20 AM",
+    "displayTitle": "Filtres",
+    "section": "WCT",
+    "images": []
+  },
+  {
+    "page": 63,
+    "title": "Info générale",
+    "content": "Info générale\nFriday, February 27, 2026   1:34 PM\n\n\n\n\n      On prend les interventions du haut vers le bas, en sautant celles qui ont\n      un commentaire",
+    "displayTitle": "Info générale",
+    "section": "WCT",
+    "images": [
+      "kb-images/page-063-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 64,
+    "title": "Infos générales",
+    "content": "Infos générales\nFriday, January 16, 2026   11:17 PM\n\n\n\nNPS (Network Processing System)\nIntervention manuelle – le système échoue de créer un ordre de travail\nautomatiquement\nOrdre de travail (OT) – liste des actions qui doivent être faites par le technicien\nsur place (chez le client)\n\n\n      Intervention manuelle complétée et clôturée par agent PCD\n\n                             ⇩\n      Client choisit la date pour l'arrivée du technicien (jointeur, ou électricien)\n\n                             ⇩\n      Création de l'ordre de travail (OT)\n\n\nSi une intervention manuelle n'est pas clôturée, il n'y a pas d'ordre de travail\npour cette intervention.",
+    "displayTitle": "Infos générales",
+    "section": "NPS",
+    "images": []
+  },
+  {
+    "page": 65,
+    "title": "Menu principal",
+    "content": "Menu principal\nFriday, January 16, 2026   11:38 PM\n\n\n\n\n   • Boîte de réception (Inbox):\n  1. liste des interventions et des notifications attribuées à moi\n  2. recherche d'interventions dans la boîte de réception générale selon\n     différents critères\n\n\n\n\n  • Rechercher OT (Search Work Order) - recherche des OT (ordres de travail)\n    dans la boîte des ordres de travail générale, selon différents critères\n\n\n\n\n  • Historique de l'ordre (Order History) – recherche de l'historique complète\n    (interventions, ordres de travail,",
+    "displayTitle": "Menu principal",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-065-img-1.png",
+      "kb-images/page-065-img-2.png"
+    ]
+  },
+  {
+    "page": 66,
+    "title": "générale",
+    "content": "1. Interventions\n2. Ordres de travail\n3. Produits\n\n\n\n• affiche au même temps des interventions dans la boîte de réception\n  générale\n   a. recherche des ordres de travail existants\n• Préférences (Preferences) - changement de la langue – FR / ENG / NL\n• Générer intervention (Raise Intervention) - ???",
+    "displayTitle": "générale",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-066-img-1.png"
+    ]
+  },
+  {
+    "page": 67,
+    "title": "Interv. et notif. à mon nom",
+    "content": "Interv. et notif. à mon nom\nSaturday, January 17, 2026   12:17 AM\n\n\n\nCette section se trouve sur la page \"Boîte de réception\".\n\nAffichage des:\n  • interventions attribuées à mon nom\n  • notifications (fibre et cuivre) - \"Notification pour clôture tâche PCD\"\n\n\n\n\nSel – sélectionner une intervention\nID d'intervention - numéro unique d'intervention\nOAG ID - référence unique d'intervention\nDescription – code erreur retourné par le système après avoir essayé\nNA/CID - ici on affiche\n       ○ en cuivre - numéro AGW (ligne fixe),\n       ○ en fibre - numéro CID – circuit ID d'internet (car il n'y a pas de ligne\n          fixe)\nDate de création - date où le client a fait sa demande (création d'intervention)\nDare souhaitée - date approximative de rendez-vous mentionnée par le client\nlors de créer sa demande\n\n\nStatut de l'intervention (état actuel de l'intervention):\n 1. AssignedOp – juste après avoir assigné l'intervention à son nom – statut\n    initial\n 2. InProgess – traitement en cours\n 3. OnHold – traitement en attente\n 4. Closed – traitement fini\n\nStatut de notification:\n 1. Open\n 2. Read\n 3. Closed",
+    "displayTitle": "Interv. et notif. à mon nom",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-067-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 68,
+    "title": "Page \"Générer intervention\"",
+    "content": "Page \"Générer intervention\"\nSunday, January 18, 2026   10:05 PM\n\n\nQuand le technicien est chez le client avec son ordre de travail (OT) et il a besoin du\nrectification de l'ordre de travail car il ne peut pas suivre les éléments (p.ex. car paire en\ncuivre hors service - \"NOK\" - not ok, ou p.ex. l'UTAC en fibre pas correct), il contacte support\nPCD (nous) pour recevoir un nouvel ordre de travail avec des bons éléments et actions (paire\nen cuivre utilisable, ou UTAC utilisable).\n\nOT est toujours généré suite à la clôture d'une intervention (dans laquelle on attribue\nl'élément principal – paire en cuivre ou l'UTAC en fibre) – il est le résultat d'une intervention\n\nC'est pourquoi, pour pouvoir avoir un ordre de travail rectifié, on génère une nouvelle\nintervention dans laquelle on fait le changement désiré et en la clôturant, on obtient l'OT\nrectifié.",
+    "displayTitle": "Page \"Générer intervention\"",
+    "section": "NPS",
+    "images": []
+  },
+  {
+    "page": 69,
+    "title": "Page \"Rechercher OT\"",
+    "content": "Page \"Rechercher OT\"\nSunday, April 19, 2026   8:15 AM\n\n\n\nPage rechercher OT (Search Work Order) - recherche des OT (ordres de\ntravail) dans la boîte des ordres de travail générale, selon différents critères",
+    "displayTitle": "Page \"Rechercher OT\"",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-069-img-1.png"
+    ]
+  },
+  {
+    "page": 70,
+    "title": "Liste des OT",
+    "content": "Liste des OT\nWednesday, May 6, 2026   5:30 PM\n\n\n\nListe des ordres - résultat de recherche OT.\n\nEn cherchant par OAG ID – on voit tous les ordres de travail concernés",
+    "displayTitle": "Liste des OT",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-070-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 71,
+    "title": "Changer l'adresse",
+    "content": "Changer l'adresse\nTuesday, May 12, 2026   11:26 AM\n\n\n\nAstuce pratique: Aller en LOM avac l'adresse correcte, prendre LOM key, et\nensuite valider changement d'adresse en NPS avec LOM key – c'est largement\nplus facile",
+    "displayTitle": "Changer l'adresse",
+    "section": "NPS",
+    "images": []
+  },
+  {
+    "page": 72,
+    "title": "\"Paths\" en cuivre",
+    "content": "\"Paths\" en cuivre\nTuesday, January 20, 2026   9:07 AM\n\n\n\nOn sélectionne des \"paths\"",
+    "displayTitle": "\"Paths\" en cuivre",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-072-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 73,
+    "title": "Descriptions spécifiques",
+    "content": "Descriptions spécifiques\nMonday, January 19, 2026   4:13 PM\n\n\n\nContactez client précédent pour résiliation NA act (Contact prev cust to initiate cease-like order)\n\n\n\n\nIci, généralement, on voit un \"fut forcé\" à l'adresse (mis par un agent, ou par le système). Fut forcé\nest le cas exceptionnel où sur un client actif qui n'a jamais demandé de résiliation, on met une\nréservation par force. Le système réagit par créer l'intervention intitulée \"Contactez client\nprécédent pour résiliation NA act\". Le fut visible en ABR est le SN visible dans l'intervention:\n\n\n\n\nEn bas de page intervention il n'y a pas de bouton \"traiter intervention\" (\"handle intervention):\n\n\n\n\nA la base, cela est traité de même façon que le scénario avec un TF à l'adresse – on demande le",
+    "displayTitle": "Descriptions spécifiques",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-073-img-1.png",
+      "kb-images/page-073-img-2.jpeg",
+      "kb-images/page-073-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 74,
+    "title": "A la base, cela est traité de même façon que le scénario avec un TF à l'adresse – on demande le",
+    "content": "A la base, cela est traité de même façon que le scénario avec un TF à l'adresse – on demande le\nnouveau client s'il remplace le client visible en ABR (à condition qu'il n'est pas OLO), pour savoir si la\ndeuxième ligne est nécessaire.\n\n\n\n\nScénario \"Clôture normale\":\nSi le client TF à l'adresse (client actuel) a déjà initialisé la résiliation, on peut choisir \"Clôture\nnormale\", afin de finaliser le remplacement du client actif par le nouveau client. En choisissant\n\"Clôture normale\", on déclenche l'envoie de l'SMS à nouveau client. Si par contre le client actif n'a\njamais envoyé la demande de résiliation, en choisissant \"Clôture normale\" l'SMS ne sera pas envoyé,\nmais une nouvelle intervention \"Contactez client précédent pour résiliation NA act\" sera créée, ce\nqui ne sert à rien – on turne au rond.\nUniquement si la demande de résiliation est détecté dans le système que l'SMS sera envoyé à\nnouveau client.\n\nScénario \"Attribuer autre SIT\":\nEn choisissant \"Attribuer autre SIT\" on ne touche pas au client actif, on retire le fut forcé de la paire\nTF et on cherche la nouvelle paire pour attribuer SIT.\n\nDonc, si le nouvel client est Proximus ou Scarlet, on l'appelle et on lui demande s'il remplace celui\nqui est TF ou non. Si oui, soit il contacte client actif pour lui dire de résilier, soit on fait BCI et puis on\nattend le déclenchement de la résiliation. Une fois que la demande de résiliation est créée, on fait\n\"Clôture normale\", et cette fois-ci, l'SMS sera envoyé au nouveau client.\n\nSi le nouveau client est OLO, on n'a pas le droit d'appeler, alors on va directement choisir \"Attribuer\nautre SIT\"\n\nApres avoir choisi l'option \"Attribuer autre SIT\", on fait un recherche dans la boîte de réception à\nl'aide de SN ou OAG, et on retrouve ancienne et nouvelle intervention sur la liste:",
+    "displayTitle": "A la base, cela est traité de même façon que le scénario avec un TF à l'adresse – on demande le",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-074-img-1.png"
+    ]
+  },
+  {
+    "page": 75,
+    "title": "Puis, on enlève la nouvelle \"Assigner autre TSI parce que pas de résiliation\" et on la traite.",
+    "content": "Puis, on enlève la nouvelle \"Assigner autre TSI parce que pas de résiliation\" et on la traite.\n\nMauvaise infrastructure à l'adr. d'installation (Wrong infrastructure for the installation address)\n\n\n\n\nPas d' APA recommandé, voir champ des remarques (Man TSI alloc with\nInfrastructureConflictDesc)\n\n\n\n\n(IAC/LPE) MWO non clôturé, mauvaiseTSI – NDTV079 (Non-Closure of MWO for a CNP Request.\nWrong TSI. - NDTV079)",
+    "displayTitle": "Puis, on enlève la nouvelle \"Assigner autre TSI parce que pas de résiliation\" et on la traite.",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-075-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 76,
+    "title": "No vertical cable defined for the MDU unit (FR) (No vertical cable defined for the MDU unit)",
+    "content": "No vertical cable defined for the MDU unit (FR) (No vertical cable defined for the MDU unit)\n\nAu niveau documentation NEO (ce qui a été contacté par le ) a créé en LOM l'adresse avec tous les\ndétails des appartements, jointeur est passé pour jointer des paires pour pouvoir connecter tous les\ndétails de l'adresse et ils ont assigné les numéros de distribution aux sous adresses de chaqe\nappartement. Et maintenant, pour pouvoir attribuer la SIT il nous faut imérativement tous lels\ndétails de l'adresse (par exemple étage, bloc\n\n\n\n\nPour consulter les détails d'un MDU en ABR on fait F1, F11, F1, ENTER, ENTER\n\nC'est cur cet écran qu'on peut voir ce qui est enregistré par NEO:",
+    "displayTitle": "No vertical cable defined for the MDU unit (FR) (No vertical cable defined for the MDU unit)",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-076-img-1.png",
+      "kb-images/page-076-img-2.png",
+      "kb-images/page-076-img-3.png"
+    ]
+  },
+  {
+    "page": 77,
+    "title": "Uniquement pour Pxs/Scarlet on peut prendre LOM pour pouvoir corriger l'adresse pour pouvoir",
+    "content": "Uniquement pour Pxs/Scarlet on peut prendre LOM pour pouvoir corriger l'adresse pour pouvoir\nattribuer SIT. Exception – si les détails du client sont introuvables dans le MDU en ABR, on improvise\nen prenant ce qui est le plus proche – on le documente incorrectement.\n\nSi c'est un OLO, on ne fait jamais une modification d'adresse, alors on annule l'intervention en\nrajoutant la remarque:\n\"A réintroduire avec les détails d'adresse (boite, étage, etc)\"\n\n\n\n\nPour annuler internet, on choisit \"S6 no pair available\"",
+    "displayTitle": "Uniquement pour Pxs/Scarlet on peut prendre LOM pour pouvoir corriger l'adresse pour pouvoir",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-077-img-1.png"
+    ]
+  },
+  {
+    "page": 78,
+    "title": "Résiliation initialisé",
+    "content": "Résiliation initialisé\nWednesday, February 4, 2026   10:17 AM\n\n\n\nDès qu'un client qui est actif en ABR fait une demande de résiliation en\ndéfinissant n'importe quelle date, le logiciel WebTA détecte ce changement et\nnous propose d'attribuer la SIT du nouveau client sur sa paire.\n\nUne fois la demande de résiliation effectuée:\n • En WebTA, la paire planifiée pour être résiliée est proposée\n • En NPS, dans l'historique de l'ordre (order history) on trouve un ordre\n    désactivation \"DACTO\" pour le NA (SN) du client qui résilie\n • En ABR, aucun changement n'est visible\n\nVoici la page WebTA:\n\n\n\n\nCe n’est que sur cet écran là qu’on peut attribuer SIT sur la paire qui va être\nlibérée. Si on ignore cet écran en choisissant F1, sur les écrans suivants on ne\nverra que des paires actuellement libres ou des options pour jointer.\n\nComme cet écran WebTA peut également être affiché par erreur, il est\nnécessaire de vérifier en NPS si l'ordre DACTO existe vraiment à l'aide du NA\n« EX-UTILISAT » visible sur l'écran (encadré en rouge).\n\nSi la demande de résiliation n'existe pas en réalité (la paire du client actif est\nproposée par erreur) en attribuant la SIT on obtiendra un « fut forcée »",
+    "displayTitle": "Résiliation initialisé",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-078-img-1.png"
+    ]
+  },
+  {
+    "page": 79,
+    "title": "NPS —",
+    "content": "",
+    "displayTitle": "NPS —",
+    "section": "NPS",
+    "images": []
+  },
+  {
+    "page": 80,
+    "title": "Route vers (Route to)",
+    "content": "Route vers (Route to)\nMonday, January 26, 2026   10:47 AM\n\n\n\nL'option \"route vers\" (\"route to\") permet de retirer l'intervention de son nom\nen la renvoyant à la boîte de réception principale. On en a besoin dans le cas\noù:\n  • On a pris une intervention par erreur (mauvaise type, langue... etc.)\n  • Le client est enregistré par erreur comme francophone et insiste à parler à\n     un agent néerlandophone.\n\nPour que l'option \"Route vers\" (\"Route to\") en bleu devienne cliquable, il faut\nd'abord sélectionner \"Route\" (\"Route to\") dans le menu déroulant à gauche:\n\n\n\n\nEnsuite, pour envoyer l'intervention vers la boîte de réception principal, on\nchoisit PCD team:",
+    "displayTitle": "Route vers (Route to)",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-080-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 81,
+    "title": "NPS —",
+    "content": "",
+    "displayTitle": "NPS —",
+    "section": "NPS",
+    "images": [
+      "kb-images/page-081-img-1.png"
+    ]
+  },
+  {
+    "page": 82,
+    "title": "Types de jointage G-D",
+    "content": "Types de jointage G-D\nSunday, February 22, 2026   8:29 AM\n\n\n\nJointage gauche – droite (G-D)\n\nDans le type de jointage gauche - droite, deux paires intro se fixent à une seule\npaire distri. Autrement dit, d'une seule paire distri proviennent deux paires\nintro, une origine de direction gauche, l'autre de droite.\n\n\n\n\nDans cet exemple, on voit que les paires 3 et 4 de l'intro sont les deux jointées\nà la même paire 85 du segment (distri). Voici comment cela est affiché en ABR:\n\n\n\n\nLes paires 3 et 4 de l'intro sont les deux jointées à la même paire 80 du\nsegment (distri). Vu que la borne est à gauche, la paire 3 est dans ce cas\ndirecte, et la paire 4 est indirecte.",
+    "displayTitle": "Types de jointage G-D",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-082-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 83,
+    "title": "Type de jointage ITC",
+    "content": "Type de jointage ITC\nSaturday, May 16, 2026   9:21 PM\n\n\n\nJointage interception (ITC)\n\nDans le type de jointage interception, deux paires intro se fixent à deux paires\nde distri, les deUx viennent du même sens et les deux sont directes.\n\nDans cette exemple, les deux viennent de droite (la borne se trouve à droite)",
+    "displayTitle": "Type de jointage ITC",
+    "section": "ABR",
+    "images": []
+  },
+  {
+    "page": 84,
+    "title": "Types de câbles d'intro",
+    "content": "Types de câbles d'intro\nSunday, February 22, 2026   9:12 AM\n\n\n\nCable G-D\n\nDans un câble intro type G-D (comme celui-ci), toutes les paires sont jointées\nen type gauche - droite. Dans cet exemple avec un câble 6 paires:\n  • les paires 1 et 2 de l'intro sont les deux jointées en G-D à la même paire 85\n     du segment (dans le câble di distribution).\n  • les paires 3 et 4 de l'intro sont les deux jointées en G-D à la même paire 80\n     du segment (dans le câble di distribution).\n  • les paires 5 et 6 ne sont pas du tout jointées, alors, ne s'affichent pas en\n     ABR\n\n\n\n\nImportant de distinguer:\n\nNuméros de paires dans le câble d'intro\nNuméros de paires dans le segment (dans le câble de distri)\n\nCable MIX\n\nDans un câble intro type MIX il existe même des paires jointées en G-D et des\npaires jointées en ITC. Dans cet exemple avec un câble 6 paires:\n  • les paires 1 et 5 de l'intro sont les jointées en ITC aux paires 19 et 20 du\n     segment (même quarte)\n  • les paires 2 et 6 de l'intro sont les deux jointées en G-D à la même paire\n     49 du segment (distri)\n  • les paires 3 et 4 de l'intro sont les jointées en ITC aux paires 7 et 8 du\n     segment (même quarte)",
+    "displayTitle": "Types de câbles d'intro",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-084-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 85,
+    "title": "ABR —",
+    "content": "",
+    "displayTitle": "ABR —",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-085-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 86,
+    "title": "Situation technique",
+    "content": "Situation technique\nThursday, May 7, 2026   1:18 PM\n\n\n\n 1. Section où on voit:\n  • l'adresse du client - 4101 JEMEPPE-SUR-MEUSE RUE BOIS DE MONT 00288\n  • son NA (SN) - 043382104\n  • son nom – WILKINS ALYSSIA\n\n\n\n\n 2. Section où on voit le câble d'intro:\n  • numéro du câble d'intro - 1 (s'il y a plusieurs câbles, ils ont les numéros\n    différents - 2, 3, 99... etc.)\n  • numéro de la paire du client dans le câble d'intro – 1 (si la capacité du\n    câble est 2 paires comme ici, on peut y avoir paire 1 et paire 2. Si la\n    capacité est 6, on peut y avoir 1, 2, 3, 4, 5, 6... etc.)\n  • on voit également la capacité - CAP et si la paire du client est raccordée\n    avec signal ou non (TF ou LB).",
+    "displayTitle": "Situation technique",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-086-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 87,
+    "title": "client est jointée:",
+    "content": "3. Section où on voit sur quelle paire de câble de distribution la paire du\n   client est jointée:\n • paire 9 du droite (9 D)\n • fait partie de la boucle 401\n • appartient au câble de distribution No 18\n   (le numéro 00150 correspond à la borne – pas bien affiché)",
+    "displayTitle": "client est jointée:",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-087-img-1.jpeg",
+      "kb-images/page-087-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 88,
+    "title": "4. Section où on voit d’où vient le signal",
+    "content": "4. Section où on voit d’où vient le signal\n • Broche de distribution - DISTRIBUTION 409 – IMPORTANT! C'est le point\n   de raccordement de la paire du client à la borne.\n • On voit ici également le réseau principal – 41JMP0 et No de la borne\n   00150. Au cas où le client est directement lié au répartiteur (autrement\n   dit LDC, ou LEX), on voit trois zéros 000 quelque part dans la deuxième\n   ligne, et on voit le reste des infos à côté.",
+    "displayTitle": "4. Section où on voit d’où vient le signal",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-088-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 89,
+    "title": "ABR basic",
+    "content": "ABR basic\nFriday, April 17, 2026   11:15 AM\n\n\n\nABR est utilisé pour:\n\n  1. Consulter info sur l'infrastructure CUIVRE\n\n  2. Adapter l'infrastructure CUIVRE\n      ○ Adaptation avant attribution de TSI en WebTA –\n         WebTA qui sert à attribuer la situation technique dans le domaine\n         cuivre (les TSI cuivre) est toujours synchronisé avec ABR et\n         immédiatement mis à jour avec ABR. Alors WebTA ne fonctionne pas\n         tant que documentation ABR n'est pas adaptée à la TSI concrète.\n      ○ Adaptation après attribution de TSI en WebTA - quand on crée câble\n         fictif 99 en WebTA (quand WebTA refuse d'attribuer TSI – donne des\n         erreurs), on fait tache 173 pour le technicien.\n\n\nOn crée le câble fictif 99 supplémentaire dans le WebTA (cette modification est\nimmédiatement répercutée sur l'ABR)\n\n                                     ⬇\nEn créant tâche 173, on explique au jointeur comment faire jointage sur place\n\n                                     ⬇\nOn adapte documentation cuivre ABR à ce qui est effectué sur place (et décrit\ndans la tâche 173)",
+    "displayTitle": "ABR basic",
+    "section": "ABR",
+    "images": []
+  },
+  {
+    "page": 90,
+    "title": "Type jointage MIX",
+    "content": "Type jointage MIX\nTuesday, January 20, 2026   3:26 PM",
+    "displayTitle": "Type jointage MIX",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-090-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 91,
+    "title": "Type jointage CPT",
+    "content": "Type jointage CPT\nWednesday, February 4, 2026   12:55 PM\n\n\n\nCPT- capot. C'est le cas rare ou les paires intro sont jointées au but du câble -\nau capot. Si la documentation est correcte, toutes les paires sont directes.",
+    "displayTitle": "Type jointage CPT",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-091-img-1.jpeg",
+      "kb-images/page-091-img-2.png"
+    ]
+  },
+  {
+    "page": 92,
+    "title": "Adaptations d'ABR",
+    "content": "Adaptations d'ABR\nWednesday, March 4, 2026   9:21 AM\n\n\n\n  • Adaptations avant d'envoyer",
+    "displayTitle": "Adaptations d'ABR",
+    "section": "ABR",
+    "images": []
+  },
+  {
+    "page": 93,
+    "title": "Camping – cas spécifique",
+    "content": "Camping – cas spécifique\nSunday, April 26, 2026   10:41 PM\n\n\n\n\nQuand on a un camping – là il y a beaucoup de chalets\n\n(« caravanes ») – unités d’habitation.\n\nDans le WebTA on voit des câbles dans lesquels il y a des numéros\n\ndes chalets avec des paires en cuivre – lignes internet pour les\n\nchalets. C’est pourquoi lors d’appeler client il faut demander le No\n\ndu chalet\n\nSi on ne prend pas info sur No du chalet, on ne peut pas choisir en\n\nABR la paire correspondante. Dans ce cas, on choisit n’importe quelle\n\npaire dans n’importe quel câble, et une fois technicien sur place, en\n\nfaisant callback il nous donne le numéro du chalet (« caravane »)\n\nconcret, ce qui nous permet de faire le changement en ABR et\n\nattribuer la TSI correspondante.",
+    "displayTitle": "Camping – cas spécifique",
+    "section": "ABR",
+    "images": []
+  },
+  {
+    "page": 94,
+    "title": "With/without voice",
+    "content": "With/without voice\nTuesday, April 28, 2026   9:05 AM\n\n\n\n\nWOV – Without Voice – uniquement ligne qui est la base pour supporter\nl'internet\nWV – With Voice – la ligne avec le téléphone fix",
+    "displayTitle": "With/without voice",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-094-img-1.png"
+    ]
+  },
+  {
+    "page": 95,
+    "title": "Sens directe/indirecte",
+    "content": "Sens directe/indirecte\nSaturday, February 14, 2026   12:05 PM\n\n\n\nLes paires directes/directes apparaissent chez un câble coupé à la fin.\n\nChez un câble coupé à la fin, au capot du câble on peut avoir:\n  • paires soudées entre elles – type 1/n\n  • paires pas soudées – type ouvert\n\nAu niveau de boucle, on a 3 variations:\n 1. Boucle 1/n - la boucle dont toutes les paires sont soudés au capot\n 2. Boucle ouverte - la boucle ou aucune paire n'est soudée au capot\n 3. Boucle mixte – une partie des paires est soudée, l'autre non\n\nBoucle 1/n - les paires sont soudées au capot du câble coupé. Vu que la paire\nn'est pas toujours soudée à la paire consécutive – 1 à 2 (1/2), cela peut aussi\nêtre soudé au 3 (1/3), au 4 (1/4), 5 (1/5), etc., donc on a pris le nom\nuniverselle – 1/n\n  • Une paire qui vient directement de la borne est appelée direct. Le signal\n     VDSL conduit par la paire directe est plutôt de bon qualité, ainsi que le\n     signal téléphonique\n  • Une paire qui revient du capot est appelé retour. Le signal téléphonique\n     (fréquence électromagnétique basse) conduit par la paire retour est de\n     qualité suffisante. Cependant, le signal VDSL (fréquence\n     électromagnétique\n     élevée) conduite par la paire retour n'est pas de qualité suffisante pour\n     être consommé par un client.",
+    "displayTitle": "Sens directe/indirecte",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-095-img-1.png"
+    ]
+  },
+  {
+    "page": 96,
+    "title": "* Sur les diagrammes, une ligne représente une paire en cuivre",
+    "content": "* Sur les diagrammes, une ligne représente une paire en cuivre\n\nBoucle ouverte - les paires ne sont pas soudées au capot du câble coupé. Les\npaires indirectes du G - D ne sont pas les retour, elles sont les bouts mort - car\nelles sont complétement déconnectées du courant, et ne peuvent être utilisées\nmême pas pour le signal téléphonique.\n\n\n\n\nBoucle mixte – c'est une combinaison de plusieurs types de boucles (1/2, 1/n,\nouvert, etc..)",
+    "displayTitle": "* Sur les diagrammes, une ligne représente une paire en cuivre",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-096-img-1.png",
+      "kb-images/page-096-img-2.png"
+    ]
+  },
+  {
+    "page": 97,
+    "title": "ABR —",
+    "content": "",
+    "displayTitle": "ABR —",
+    "section": "ABR",
+    "images": []
+  },
+  {
+    "page": 98,
+    "title": "Sens CVMP/NCVMP",
+    "content": "Sens CVMP/NCVMP\nWednesday, February 18, 2026   10:45 PM\n\n\n\nLes sens CVMP/NCVMP apparaissent chez les paires dans un câble qui n'est pas\ncoupé, mais rattaché de deux cotés à une source de signal.\n\nVariations:\n 1. 'Même borne' – le câble sort d'une borne et revient à la même borne\n 2. 'Borne-borne' – le câble est étendu entre deux bornes\n 3. 'Répartiteur-borne/borne-répartiteur' – le câble est étendu entre la borne\n     et le répartiteur\n\nAu cas où des signaux électromagnétiques de sens opposés passeraient dans le\nmême câble, ils perdraient en qualité en raison d'un problème d'interférence,\net ne pourraient pas être utilisés pour transmettre Internet à un client. C'est\npourquoi on a besoin de définir au niveau documentation une limite (point\nvirtuel - \"Virtual Meeting Pont\") au niveau des adresses dans la rue pour\ndélimiter les signaux arrivant des deux directions opposées:\n\n\nMême borne:\n\n\n\n\nBorne-borne:",
+    "displayTitle": "Sens CVMP/NCVMP",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-098-img-1.png"
+    ]
+  },
+  {
+    "page": 99,
+    "title": "Répartiteur-borne/borne-répartiteur:",
+    "content": "Répartiteur-borne/borne-répartiteur:",
+    "displayTitle": "Répartiteur-borne/borne-répartiteur:",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-099-img-1.png",
+      "kb-images/page-099-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 100,
+    "title": "\"Casser\" situation",
+    "content": "\"Casser\" situation\nWednesday, April 15, 2026   11:19 AM\n\n\n\n\"Casser\" une situation technique veut dire enlever TF.\n\nImportant – prendre capture d'écran de la situation avant de la casser",
+    "displayTitle": "\"Casser\" situation",
+    "section": "ABR",
+    "images": []
+  },
+  {
+    "page": 101,
+    "title": "Bizarre",
+    "content": "Bizarre\nTuesday, May 26, 2026   8:55 AM\n\n\n\nNA: 082666878, LOM 406878\n\nIci, tout les paires ITC sont CVMP, tous les TF et celui qui est LB - bizarre",
+    "displayTitle": "Bizarre",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-101-img-1.png",
+      "kb-images/page-101-img-2.png"
+    ]
+  },
+  {
+    "page": 102,
+    "title": "Alors, la paire libre n'est pas prenable, car c'est CVMP (mais les TFs sont",
+    "content": "Alors, la paire libre n'est pas prenable, car c'est CVMP (mais les TFs sont\négalement CVMP)",
+    "displayTitle": "Alors, la paire libre n'est pas prenable, car c'est CVMP (mais les TFs sont",
+    "section": "ABR",
+    "images": [
+      "kb-images/page-102-img-1.png",
+      "kb-images/page-102-img-2.png"
+    ]
+  },
+  {
+    "page": 103,
+    "title": "Infos générales",
+    "content": "Infos générales\nFriday, January 16, 2026   11:03 PM\n\n\n\n\nLe flux de travail le plus courant est marqué en vert:\n\n     • Encodage de la demande du client\n     • Traitement automatique\n         • Ça fonctionne → ✅ Fin\n         •    ne on onne         →        e t me rée une interven on d n\n              • Traitement manuel\n                    • Analyse en NPS\n                        • i tr itement im o i le →             nvo er ver planning → ✅\n                             in\n                        • Sinon → Continuer\n                    • Analyse en ABR\n                    • Appeler le client\n                        • But de l’      el : confirmer l’adresse + vérifier si une nouvelle\n                           ligne est nécessaire\n                        • Si OUI (nouvelle ligne nécessaire) :\n                               • Choisir les paths et déclencher WebTA (MAN TSI)\n                               • Attribuer SIT (TSI) en WebTA\n                                     • Si pas possible → chipoter en ABR et ensuite\n                                        attribuer SIT\n                                     • Si toujours pas possible → envo er ver “ l nning”\n                               • Mettre à jour NPS + si nécessaire ajouter une tâche (add\n                                 task)\n                               • Envoyer le technicien avec “Clôture normale” → ✅ Fin\n                        • Si NON :\n                               • Nouvelle ligne pas nécessaire → nnuler l’intervention →\n                                 ✅ Fin\n                               • le client ne répond pas après 3 appels → Annuler\n                                 l’intervention + BCI → ✅ Fin\n\n\n\nLa\n\nWebTA – Web Technical Assistance (ou pas ???) - le logiciel pour attribuer les\nsituations techniques.\n\nPour répondre à la demande de raccordement du client, un technicien\n(électricien ou jointeur) doit être envoyé à l'adresse du client. Un ordre de\ntravail (OT) est la liste des instructions précises qui permettent au technicien\nde faire le nécessaire à l'adresse du client (travaux nécessaires pour le\nraccordement et fournir le client de l'équipement).\n\n\nPour qu'un OT puisse être envoyé au technicien par le NPS, la situation",
+    "displayTitle": "Infos générales",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 104,
+    "title": "Pour qu'un OT puisse être envoyé au technicien par le NPS, la situation",
+    "content": "Pour qu'un OT puisse être envoyé au technicien par le NPS, la situation\ntechnique doit d'abord être attribuée.\n\nLa SIT (situation technique) est attribuée au client soit automatiquement par le\nsystème (le plupart des cas), soit manuellement par un agent PCD en utilisant\nWebTA (quand l'attribution automatique échoue).\n\nWebTA est donc le logiciel permettant l'attribution manuelle de la SIT (TSI)",
+    "displayTitle": "Pour qu'un OT puisse être envoyé au technicien par le NPS, la situation",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 105,
+    "title": "Attribuer SIT",
+    "content": "Attribuer SIT\n   Friday, January 23, 2026   10:39 PM\n\n\n\n\nSi une paire disponible existe, elle est affichée en WebTA au tout début - sur\nl'écran \"PAIRES LB/PT\"\n\n 1. Si cette paire est affichée comme pas introduite avant, on la prend\n    simplement pour attribuer SIT\n\n\n\n\n* il n'y a rien comme numéro d'introductions avant – la paire est complétement libre\n\n\n\n 2. Si cette paire est affichée comme introduite avant, on ne la prend pas sauf s'il\n    n'y a pas d'autres solutions",
+    "displayTitle": "Attribuer SIT",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-105-img-1.png",
+      "kb-images/page-105-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 106,
+    "title": "* la paire introduite avant une fois",
+    "content": "* la paire introduite avant une fois\n\nA l'époque où le WebTA a été créé, les pontages des paires 'introduites avant' étaient permis, ce\nque n'est plus le cas aujourd'hui. Depuis, le WebTA n'était pas mis à jour, alors les paires\nintroduites avant sont toujours proposées, malgré l'interdiction actuel des pontages.\n\nPour une paire introduite avant, il existe la solution de faire \"redressement\" ou\n\"IAM autre adresse\" à l'adresse d'avant, mais cela est considéré du dernier\nrecours, car on évite de déranger le voisin. C'est pour quoi on cherche des\npossibilités de jointer à l'adresse actuelle.\n\nUniquement si on ne trouve pas la solution à notre adresse, on choisit la paire\nintroduite avant mais en faisant obligatoirement redressement ou IAM autre\nadresse.",
+    "displayTitle": "* la paire introduite avant une fois",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-106-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 107,
+    "title": "BUGS",
+    "content": "BUGS\nTuesday, April 28, 2026   12:29 PM\n\n\n\nBUG 1:\n\nOn choisit la quarte don’t une paire s'affiche comme introduite avant\n\n\n\n\nMais après, il n'y a pas de fameux F3 pontage:\n\n\n\n\nOn peut utiliser cette quarte malgré l'information sur l'écran\nprécédent, car c'est un bug\n\nBUG 2:",
+    "displayTitle": "BUGS",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-107-img-1.png",
+      "kb-images/page-107-img-2.png"
+    ]
+  },
+  {
+    "page": 108,
+    "title": "Manières de jointer",
+    "content": "Manières de jointer\nWednesday, February 18, 2026   1:00 AM\n\n\n\nDifférentes manières de jointer :\n\n 1. IAM (intro à modifier) - déplacement des 2 paires d’intro déjà jointées\n    vers l’autre(s) paire(s) de distri (vers 1 ou vers 2 paires de distri)\n 2. jointer 2 paires d’intro toujours pas jointées aux paire(s) de distri (à 1 ou\n    à 2 paires de distri).\n 3. remplacement du câble intro existant par un câble intro de plus grande\n    capacité, avec les jointages correspondants\n 4. introduction d’un nouveau câble d'intro, avec les jointages\n    correspondants\n 5. redressement - détachement des 2 paires d'intro jointées en G-D avec\n    reconstitution de la paire de distri. Au niveau documentation, on\n    supprime ces 2 paires d'intro\n\nEviter la confusion:\n  • Intro à modifier (IAM) - pas assez précis comme titre. Il s'agit en fait de\n     modifier 2 paires d'intro déjà jointées\n  • Modifier câble d'intro - ce titre est porté par deux actions distinctes:\n      ○ jointer 2 paires d’intro toujours pas jointées\n      ○ remplacer câble intro existant par un câble de plus grande capacité et\n           ensuite jointer 2 paires d’intro",
+    "displayTitle": "Manières de jointer",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 109,
+    "title": "IAM à l'adresse",
+    "content": "IAM à l'adresse\nTuesday, January 20, 2026   9:38 AM\n\n\n\nIAM – Intro A Modifier (paires déjà jointées à modifier).\n\nSi on déplace les 2 paires d’intro déjà jointées vers l’autre(s) paire(s) de distri,\nl'action est appelée IAM (si on jointe d'autres paires de l'intro ou si on augmente\nla capacité du câble, ce n'est plus IAM, cela est « Modifier câble intro »).\n\nScénarios IAM:\n 1. déplacer les deux paires intro G-D jointées à une paire distribution à l’ utre\n    paire distribution\n 2. convertir G-D en ITC\n\n\n\nExemples:\n\n\n  1. Ici, l'IAM serait de modifier les 4 paries existantes (jointées) d'un câble intro à\n\n      capacité 6 paires. Si on veut rajouter les paires 5 et 6, cela n’est plus IAM,\n\n      c’est « modifier câble intro ».\n\n\n\n\nSi on veut faire scénario 1, il nous faut deux paires intro LB à l'adresse, jointées au\nmême paire distri (dans ce cas 85):",
+    "displayTitle": "IAM à l'adresse",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-109-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 110,
+    "title": "Pour déplacer deux paires, on sélectionne celle qui est directe (ou NCVMP), dans",
+    "content": "Pour déplacer deux paires, on sélectionne celle qui est directe (ou NCVMP), dans\nce cas-là c'est la paire 1:",
+    "displayTitle": "Pour déplacer deux paires, on sélectionne celle qui est directe (ou NCVMP), dans",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-110-img-1.jpeg",
+      "kb-images/page-110-img-2.png",
+      "kb-images/page-110-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 111,
+    "title": "Web TA —",
+    "content": "",
+    "displayTitle": "Web TA —",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-111-img-1.png",
+      "kb-images/page-111-img-2.png"
+    ]
+  },
+  {
+    "page": 112,
+    "title": "Limitations WebTA - câble 99",
+    "content": "Limitations WebTA - câble 99\nFriday, February 13, 2026   12:06 AM\n\n\n\n\nDès fois, le WebTA n'est pas suffisamment flexible et sophistiqué pour répondre à\ntous les besoins.\n\nOn a deux méthodologies qui nous permettent de surmonter les limitations du\nWebTA:\n 1. D'abord adapter ABR, puis attribuer la situation. Ainsi, l'adaptation est\n    terminée immédiatement, et après le passage du technicien (réception de la\n    notification), il n'y a plus d'adaptation à faire. Cependant, en cas d'annulation\n    par le client, il faut reverser l'adaptation effectuée en ABR, ce qui représente\n    un engagement supplémentaire de notre part.\n 2. Faire un câble fictif et attribuer situation dessus. En cas où le client annule,\n    on reprend l'état initial très facilement, juste en effaçant le câble, sans\n    besoin de reverser l'adaptation effectuée en ABR. Si l'intervention a eu lieu,\n    c'est après le passage du technicien qu'on fait l'adaptation de l'ABR.\n\nEntre ces deux solutions, le câble fictif est considéré plus pratique. Pour le\nfacilement reconnaitre, on lui donne le numéro 99. En effet, on met la situation\nsur un câble qui n'existe pas, qui est juste temporairement documenté pour que\nWebTA puisse nous permettre l'attribution de la SIT.\n\nTypes de câble 99:\n  • Câble 99 en G-D.\n    Si le système ne nous permet pas le déplacement des deux paires intro\n    jointées à une paire du segment en G-D vers une autre paire du segment en\n    G-D (par exemple car les paires intro sont PT), on fait un câble intro fictif, et\n    on jointe ses deux paires à la paire du segment désirée.\n  • 99 en ITC.",
+    "displayTitle": "Limitations WebTA - câble 99",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 113,
+    "title": "Jointer à l'adresse d'avant",
+    "content": "Jointer à l'adresse d'avant\nWednesday, January 21, 2026   12:22 PM\n\n\n\n\nPour éviter de déranger un voisin (creuser un trou devant sa porte, provoquer\nles coupures du signal, etc.), on évite de jointer à l'adresse d'avant. On\ncommence toujours par chercher une solution à l'adresse de notre client (IAM,\nmodification de l'intro ou un câble fictif 99). Uniquement en l'absence de\nsolution à l'adresse de la demande, on est obligé de jointer devant une autre\nadresse.\n\nLes types de jointage à l'adresse d'avant (chez un voisin):\n\n 1. Redressement\n 2. IAM autre adresse\n\nRedressement\n\nC'est l'action où:\n  • Sur le terrain, on creuse un trou chez le voisin, on détache les 2 paires\n     d'intro jointées en G-D avec reconstitution de la paire de distri\n  • Au niveau documentation (dans l'ABR), on supprime ces 2 paires d'intro\n\nProcédure:\n\n  • Identifier l'adresse à laquelle la paire est introduite avant. Il existe 2\n    manières\n     ○ Avancer en WebTA jusqu'à la dernière page, là où on voit F3 –\n        pontage. Ensuite, appuyer sur F3 pour que l'adresse d'avant s'affiche\n     ○ Chercher l'adresse en ABR par la broche de distribution\n  • Copier l'adresse\n  •\n\n\nIAM autre adresse\n\nC'est préférable par rapport au redressement G - D simple, car:\n  • lors d'un redressement G-D, deux paires du câble intro sont détachées et\n     suite à cela ne sont plus utilisables à cette adresse. Si un client doit être\n     raccordé à ces paires à l'avenir, il faudra envoyer un nouveau jointeur\n  • chez IAM autre adresse, les paires du câble intro à l'autre adresse sont\n     détachées de la paire dont nous avons besoin pour l'intro, mais aussi\n     rejointées à l'autre paire/paires du câble distri. Alors, si un client doit être\n     raccordé à ces paires à l'avenir, un nouveau jointeur ne sera pas",
+    "displayTitle": "Jointer à l'adresse d'avant",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 114,
+    "title": "raccordé à ces paires à l'avenir, un nouveau jointeur ne sera pas",
+    "content": "raccordé à ces paires à l'avenir, un nouveau jointeur ne sera pas\n    nécessaire, un électricien suffira.\n\nUne fois que le bouton \"P4 - IAM autre adresse\" nous envoie chez l'intro du\nvoisin, on fait IAM comme d'habitude.",
+    "displayTitle": "raccordé à ces paires à l'avenir, un nouveau jointeur ne sera pas",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 115,
+    "title": "Paires PT à l'adresse",
+    "content": "Paires PT à l'adresse\nSaturday, February 21, 2026   5:42 AM",
+    "displayTitle": "Paires PT à l'adresse",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 116,
+    "title": "Ecran paire a rejointer",
+    "content": "Ecran paire a rejointer\nTuesday, January 20, 2026   10:14 AM",
+    "displayTitle": "Ecran paire a rejointer",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-116-img-1.png"
+    ]
+  },
+  {
+    "page": 117,
+    "title": "Les écrans WebTA",
+    "content": "Les écrans WebTA\nSaturday, February 21, 2026   5:49 AM",
+    "displayTitle": "Les écrans WebTA",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 118,
+    "title": "Ecran démarrage",
+    "content": "Ecran démarrage\nMonday, January 19, 2026   8:48 AM",
+    "displayTitle": "Ecran démarrage",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-118-img-1.png"
+    ]
+  },
+  {
+    "page": 119,
+    "title": "Ecran LB/PT utilisables",
+    "content": "Ecran LB/PT utilisables\nTuesday, January 20, 2026   9:15 AM\n\n\n\n Scénario 1\n\n Scénario 2\n\n La paire est disponible, mais avec un pontage planifié à l'adresse où cette\n paire est introduite avant:\n\n\n\n\n    • Les pontages classiques ne sont plus autorisés (sans IAM autre adresse\n      ou redressement). Avant, on est allé à l'autre adresse pour demander à\n      l'occupant de nous permettre d'accéder à sa boite d'intro\n    • IAM autre adresse ou redressement implique de creuser un trou devant\n      l'autre maison\n\n l'option P3: IAM MEME ADRESSE est privilégiée.\n\n\n Scénario 3\n Aucune paire LB ou PT utilisable pour passer le signal n'est disponible à\n l'adresse:",
+    "displayTitle": "Ecran LB/PT utilisables",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-119-img-1.png"
+    ]
+  },
+  {
+    "page": 120,
+    "title": "Là, le système nous propose de vérifier si l'IAM est faisable.",
+    "content": "Là, le système nous propose de vérifier si l'IAM est faisable.",
+    "displayTitle": "Là, le système nous propose de vérifier si l'IAM est faisable.",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-120-img-1.png"
+    ]
+  },
+  {
+    "page": 121,
+    "title": "Ecran LB/PT IAM",
+    "content": "Ecran LB/PT IAM\nTuesday, January 20, 2026   9:29 AM\n\n\n\n\n  Ecran des paires LB/PT disponibles pour IAM:",
+    "displayTitle": "Ecran LB/PT IAM",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-121-img-1.png"
+    ]
+  },
+  {
+    "page": 122,
+    "title": "Ecran RES en demande",
+    "content": "Ecran RES en demande\nMonday, February 16, 2026   11:28 PM\n\n\n\nDès qu'un client actif en ABR choisit une date de résiliation de sa ligne, le\nlogiciel WebTA détecte ce changement et nous suggère d'attribuer la SIT du\nnouveau client sur sa paire.\n\nUne fois la demande de résiliation effectuée:\n • En WebTA, la paire planifiée pour être résiliée nous est proposée\n • En NPS, dans l'historique de l'ordre (order history) on trouve\n    obligatoirement un ordre désactivation \"DACTO\" pour le NA (SN) du client\n    qui résilie\n • En ABR, aucun changement n'est visible\n\nVoici la page WebTA:\n\n\n\n\nCe n’est que sur cet écran là qu’on peut attribuer SIT sur la paire qui va être\nlibérée. Au cas où on ignore cet écran en choisissant F1, sur les écrans suivants\non ne verra que des paires actuellement libres ou des options pour jointer.\n\nComme cet écran WebTA peut également être affiché par erreur, il est\nobligatoire de vérifier en NPS si l'ordre DACTO vraiment existe, à l'aide du NA\n« EX-UTILISAT » visible sur l'écran (encadré en rouge).\n\nSi la demande de résiliation n'existe pas en réalité (la paire du client actif est\nproposée par erreur) et nous acceptons d'attribuer la SIT en utilisant cet écran,",
+    "displayTitle": "Ecran RES en demande",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-122-img-1.png"
+    ]
+  },
+  {
+    "page": 123,
+    "title": "proposée par erreur) et nous acceptons d'attribuer la SIT en utilisant cet écran,",
+    "content": "proposée par erreur) et nous acceptons d'attribuer la SIT en utilisant cet écran,\non obtiendra un « fut forcé ».",
+    "displayTitle": "proposée par erreur) et nous acceptons d'attribuer la SIT en utilisant cet écran,",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 124,
+    "title": "Flux 1",
+    "content": "Flux 1\nSunday, January 25, 2026   1:17 AM\n\n\n\nMan TSI ➙ Paire intro utilisable ➙ Attribuer SIT\n\nScénario 1\n\nLa paire est nettement disponible\n\nScénario 2\n\nLa paire est disponible, mais seulement avec un pontage planifié à l'adresse où\ncette paire est introduite avant:\n\n\n\n\nLes pontages ne sont plus autorisés. On peut le permettre uniquement si on\nfait IAM autre adresse ou redressement (autrefois, on est allé à l'autre adresse\npour demander à l'occupant de nous permettre d'accéder à sa boite d'intro).\nVu que IAM autre adresse ou redressement implique de creuser un trou\ndevant l'autre adresse et parfois de couper le signal du voisin pendant les\ntravaux, cette solution est évitée au maximum et considérée comme un\ndernier recours.\n\nl'option P3: IAM MEME ADRESSE est privilégiée.\n\n\nScénario 3\nLa paire est disponible, mais au lieu de LB, c'est PT à l'adresse",
+    "displayTitle": "Flux 1",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-124-img-1.png"
+    ]
+  },
+  {
+    "page": 125,
+    "title": "La paire est disponible, mais au lieu de LB, c'est PT à l'adresse",
+    "content": "La paire est disponible, mais au lieu de LB, c'est PT à l'adresse\n\n*** mettre image ***\n\nOn n'utilise pas cette paire, car il est possible qu'un agent ait envoyé un\njointeur pour effectuer un redressement (afin d'utiliser la paire en question\nailleurs) et qu'il ait oublié de supprimer la paire de la documentation. Si nous\nenvoyons l'électricien, il ne pourra pas effectuer le raccordement, car les\npaires d'intro sont détachées (suite au redressement). Un jointeur sera\nnécessaire.\n\nScénario 4\n\nAucune paire LB ou PT utilisable pour passer le signal n'est disponible à\nl'adresse:\n\n\n\n\nLà, le système nous propose de vérifier si l'IAM est faisable.",
+    "displayTitle": "La paire est disponible, mais au lieu de LB, c'est PT à l'adresse",
+    "section": "Web TA",
+    "images": [
+      "kb-images/page-125-img-1.png"
+    ]
+  },
+  {
+    "page": 126,
+    "title": "Flux 2",
+    "content": "Flux 2\nSunday, January 25, 2026   1:18 AM\n\n\n\nMan TSI ➙ a re ntro ut l sable ➙ E ectuer IAM ➙ Paire intro u lisable ➙\nA ribuer SIT",
+    "displayTitle": "Flux 2",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 127,
+    "title": "Flux 3",
+    "content": "Flux 3\nSunday, January 25, 2026   1:18 AM\n\n\n\nFlux 3: Man TSI ➙ Pa re ntro ut l sable ➙ Effectuer IAM ➙ Paire du segment\nu lisable ➙ Paire intro u lisable ➙ A ribuer SIT",
+    "displayTitle": "Flux 3",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 128,
+    "title": "Flux 4",
+    "content": "Flux 4\nSunday, January 25, 2026   1:19 AM\n\n\n\nMan TSI ➙ Pa re ntro ut l sable ➙ Effectuer IAM\n➙ Pa re du segment ut l sable ➙ Envoyer chez PCD2",
+    "displayTitle": "Flux 4",
+    "section": "Web TA",
+    "images": []
+  },
+  {
+    "page": 129,
+    "title": "Infos générales",
+    "content": "Infos générales\nWednesday, January 28, 2026   7:39 PM\n\n\n\nBCI est le formulaire utilisé pour envoyer des messages au département\ncommercial (service client) de Proximus et Scarlet.\n\n\n\n\nConfiguration:\n\nLangue: FR\nDe: IT\nVers: ASA/CIS/BSC\n\nCust. ID - ID client.\n  • Pour le nouveau client, on le voit en NPS.\n  • Pour le client en service, on le cherche en Salto à l'aide du NA du client\n     actif visible en ABR.\nNA - numéro fix.\n  • Pour le nouveau client, on le voit en NPS.\n  • Pour le client en service, on le voit en ABR comme client actif.\nOrder Ref - OAG ID sans le 9 à la fin.\nOAG ID - cette case est désactivée",
+    "displayTitle": "Infos générales",
+    "section": "BCI",
+    "images": [
+      "kb-images/page-129-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 130,
+    "title": "OAG ID - cette case est désactivée",
+    "content": "OAG ID - cette case est désactivée\nIntervention (menu déroulant) - sélectionner le département approprié\n(Proximus/Scarlet) et le type de demande\nDescription - bien décrire la demande destinée au service client",
+    "displayTitle": "OAG ID - cette case est désactivée",
+    "section": "BCI",
+    "images": []
+  },
+  {
+    "page": 131,
+    "title": "Cession vs résiliation",
+    "content": "Cession vs résiliation\nFriday, January 16, 2026   11:04 PM\n\n\n\n     Modèle de texte description\n\nBonjour,\n\nLe nouveau client (XXX) doit remplacer le client en service (XXX). La date de\nrésiliation du client actif doit être définie afin que le nouveau client puisse\nêtre raccordé.\n\nIl faut donc contacter le client en service pour effectuer les démarches de\nrésiliation.\n\nMerci de m'avertir par e-mail dès que la résiliation est engagée.\n\n    Paramètres:\n\nCust. ID (Customer ID, ID client) – celui du client en service à 'adresse. On le\ncherche en Salto à l'aide du NA du client actif visible en ABR.\nOrder Ref – on laisse vide pour éviter confusion au service client.\nIntervention (menu déroulant) - Réintroduction demandée par PCD (PXS pour\nProximus et SCA pour Scarlet).\n\n\nSi le nouveau client remplace le client actif, il existe deux possibilités:\n\n  1. Scénario cession\n\n  • reprise des mêmes produits\n  • aucune coupure de signal n'est nécessaire, le changement est effectué\n    automatiquement au niveau logiciel\n  • aucun technicien n'est envoyé à l'adresse – donc on annule l'intervention\n    en NPS\n  • les deux clients doivent remplir le même formulaire ensemble\n  • bien que les produits soient les mêmes au départ, ils peuvent être\n    modifiés par la suite en fonction des besoins du nouveau client\n  • soit le nouveau client explique au client actif qu'il doit faire une demande\n    pour obtenir le formulaire de cession, soit nous effectuons un BCI cession\n  • cession n'est jamais possible si le client actif déménage ses produits vers\n    une nouvelle adresse, ou le nouveau client déménage ses produits vers\n    l'adresse en question.\n\n  2. Scénario résiliation",
+    "displayTitle": "Cession vs résiliation",
+    "section": "BCI",
+    "images": []
+  },
+  {
+    "page": 132,
+    "title": "Une fois la date de résiliation définie, la paire devienne libre pour",
+    "content": "2. Scénario résiliation\n\n• attribuer SIT du nouveau client sur la paire résiliée du client actuel\n• coupure de signal d'environ 24h\n• pas de formulaire à remplir\n• le client actif doit initialiser la résiliation de sa ligne en choisissant la date.\n  Une fois la date de résiliation définie, la paire devienne libre pour\n  attribuer SIT du nouveau client et envoyer le technicien à l'adresse\n• en attendant que le client actif initialise sa résiliation, l'intervention est\n  mise en suspens en NPS\n• soit le nouveau client explique au client actif qu'il doit faire une demande\n  de résiliation, soit nous effectuons un BCI résiliation\n• si le client actif déménage ses produits vers une nouvelle adresse, ou le\n  nouveau client déménage ses produits vers l'adresse en question, la\n  résiliation du client actif est obligatoire",
+    "displayTitle": "Une fois la date de résiliation définie, la paire devienne libre pour",
+    "section": "BCI",
+    "images": []
+  },
+  {
+    "page": 133,
+    "title": "Réintroduction",
+    "content": "Réintroduction\nSunday, February 1, 2026   12:00 AM\n\n\n\n     Modèle de texte description\n\nBonjour,\n\nLa cliente confirme qu'elle est actuellement active chez XXX et souhaite passer\nchez XXX.\n\nPouvez-vous réintroduire un import internet?\n\nBien à vous,\n\n\n\nNotre client qui fait la demande Proximus/Scarlet est actuellement chez un\nOLO à l'adresse.\n\n    Paramètres:\n\nCust. ID (Customer ID, ID client) – celui de nouveau client. On le trouve en NPS.\nOrder Ref – c'est obligatoire (OAG id sans le 9 à la fin)\nIntervention (menu déroulant) - Réintroduction d'un ordre import (PXS pour\nProximus et SCA pour Scarlet).",
+    "displayTitle": "Réintroduction",
+    "section": "BCI",
+    "images": []
+  },
+  {
+    "page": 134,
+    "title": "BCI cuivre vs BCI fibre",
+    "content": "BCI cuivre vs BCI fibre\nMonday, June 8, 2026   6:27 AM\n\n\n\nOn fait BCI uniquement pour les demandes Scarlet ou Proximus\n\nCas de figure 1 – même client à l'adresse:\n\nLe client demande la ligne internet Scarlet ou Proximus en étant déjà en\nservice à l'adresse chez n'importe quel autre opérateur. Il confirme qu'il n'a\npas besoin d'une nouvelle ligne internet.\n\nCuivre:\n\nOn ne va pas jointer une nouvelle paire pour lui introduire une nouvelle ligne\ninternet (il ne veut surtout pas payer une nouvelle abonnement). On fait un\nBCI pour demander que la ligne chez autre opérateur soit maintenant reprise\npar Scarlet/Proximus en choisissant \"Réintroduction d'un ordre import\" (selon\nla loi Belge, il est permis de prendre la ligne sans demander la permission de\nl'autre opérateur).\n\nFibre:\n\nLa même démarche - on ne va pas chercher une nouvelle porte ou demander\nun nouvel UTAC de NEO, car le client ne veut pas un deuxième abonnement.\nOn fait le même BCI.\n\nExemple BCI:\n\n\"Bonjour,\n\nLe client confirme qu'il est actuellement active chez XXX et souhaite passer\nchez XXX.\n\nPouvez-vous réintroduire un import internet?\n\nBien à vous\"\n\n\n\nCas de figure 2 – autre client à l'adresse\n\nOn ne peut pas reprendre la ligne d'un autre client (on le fait seulement si c'est\nle même client).\n\nC'est important de demander le nouveau client s'il va remplacer l'autre, ou",
+    "displayTitle": "BCI cuivre vs BCI fibre",
+    "section": "BCI",
+    "images": []
+  },
+  {
+    "page": 135,
+    "title": "C'est important de demander le nouveau client s'il va remplacer l'autre, ou",
+    "content": "C'est important de demander le nouveau client s'il va remplacer l'autre, ou\nl'autre garde sa ligne.\n\na) Nouvel client remplace celui qui est actuellement actif",
+    "displayTitle": "C'est important de demander le nouveau client s'il va remplacer l'autre, ou",
+    "section": "BCI",
+    "images": []
+  },
+  {
+    "page": 136,
+    "title": "Changement d'opérateur incomplet",
+    "content": "Changement d'opérateur incomplet\nFriday, January 16, 2026   11:05 PM\n\n\n\n      L'ordre arrivé sans coupure de la ligne fix\n\n\n\n\n      Circuit id:",
+    "displayTitle": "Changement d'opérateur incomplet",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-136-img-1.jpeg",
+      "kb-images/page-136-img-2.png"
+    ]
+  },
+  {
+    "page": 137,
+    "title": "WIO —",
+    "content": "",
+    "displayTitle": "WIO —",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-137-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 138,
+    "title": "Mauvaise adresse",
+    "content": "Mauvaise adresse\nThursday, February 5, 2026   9:21 AM\n\n\n\nEn cas où il existe une soupçon raisonnable que l'adresse encodée dans une\ndemande Vikings est incorrecte, on utilise l'option \"Adresse incorrecte en S6\".\nC'est obligatoire de vérifier en LOM et ne fournir que les info enregistrées en\nLOM. Par contre, Vikings ne connait pas LOM key.\n\n\n\n\nExemple:",
+    "displayTitle": "Mauvaise adresse",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-138-img-1.png"
+    ]
+  },
+  {
+    "page": 139,
+    "title": "On fournit les infos que je crois d'être correctes.",
+    "content": "On fournit les infos que je crois d'être correctes.\n\nAprès avoir fait WIO, comme d'habitude, on annule intervention en mettant le\nNo WIO dans la remarque.",
+    "displayTitle": "On fournit les infos que je crois d'être correctes.",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-139-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 140,
+    "title": "Changement d'opérateur",
+    "content": "Changement d'opérateur\nMonday, January 19, 2026    3:03 PM\n\n\n\n\nOn ne met rien comme Info",
+    "displayTitle": "Changement d'opérateur",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-140-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 141,
+    "title": "Fut Vikings",
+    "content": "Fut Vikings\nFriday, January 23, 2026   1:13 PM\n\n\n\nLa nouvelle demande:\n\n\n\n\nLe fut qui est en cours (visible dans l'histoire de l'ordre):\n\nJe ne regarde que l'adresse de ma nouvelle demande:",
+    "displayTitle": "Fut Vikings",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-141-img-1.jpeg",
+      "kb-images/page-141-img-2.png"
+    ]
+  },
+  {
+    "page": 142,
+    "title": "Si un Viking est à l'adresse",
+    "content": "Si un Viking est à l'adresse\n\nVu que c'est un fut, ce n'est toujours pas existant à l'adresse. On laisse les\nchamps liés au client actif vide",
+    "displayTitle": "Si un Viking est à l'adresse",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-142-img-1.jpeg",
+      "kb-images/page-142-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 143,
+    "title": "WIO —",
+    "content": "",
+    "displayTitle": "WIO —",
+    "section": "WIO",
+    "images": [
+      "kb-images/page-143-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 144,
+    "title": "Fut PXS, demande Vikings",
+    "content": "Fut PXS, demande Vikings\nFriday, January 30, 2026   2:58 PM\n\n\n\nScénario:\nA l'adresse il existe un fut Proximus/Scarlet du même client qui a fait une\ndemande Mobil Vikings\n  • Si la date où le fut est dispatché est proche (1 – 2 jours), on met\n     l'intervention en attente pour voir si la demande Proximus/Scarlet serait\n     maintenue par le client au moment d'arrivé du technicien ou annulée.\n        a. Si annulée, le fut sera retiré et la paire sera libérée pour l'attribution\n           SIT chez Viking\n        b. Si la demande est maintenue, on procède à une réintroduction\n           classique, puis le service client Vikings va vérifier avec le client s'il\n           souhaite vraiment annuler Vikings ou l'introduire à la place du\n           nouveau-installé Proximus.\n  • Si la date où le fut est dispatché est plus loine",
+    "displayTitle": "Fut PXS, demande Vikings",
+    "section": "WIO",
+    "images": []
+  },
+  {
+    "page": 145,
+    "title": "Recherche",
+    "content": "Recherche\nWednesday, May 20, 2026   9:13 AM",
+    "displayTitle": "Recherche",
+    "section": "BCI - light",
+    "images": [
+      "kb-images/page-145-img-1.png",
+      "kb-images/page-145-img-2.png"
+    ]
+  },
+  {
+    "page": 146,
+    "title": "BCI Scarlet – pas visible",
+    "content": "BCI Scarlet – pas visible\nFriday, January 16, 2026   11:08 PM\n\n\n\nBCI Scarlet – ne peut pas être vérifié dans BCI light",
+    "displayTitle": "BCI Scarlet – pas visible",
+    "section": "BCI - light",
+    "images": [
+      "kb-images/page-146-img-1.png"
+    ]
+  },
+  {
+    "page": 147,
+    "title": "Chercher l'adresse",
+    "content": "Chercher l'adresse\nFriday, January 16, 2026   11:05 PM\n\n\n\n\nLes façons pratiques de chercher:\n\n  • Par LOM key\n\n\n\n\n  • Par adresse - on met cette partie de l'adresse dans la section\n    \"Find Google Address\"\n\n\n\n\nOn compare le nom de la rue en image avec le nom dans \"Find\nGoogle Address\". Dans cette exemple à gauche est version française\n\"Avenue Tolstoi\" et sur l'image est la version néerlandaise\n\"Tolstoilaan\".\n\nUtiliser DeepL ou Google Translate si nécessaire pour aligner les\nlangues.",
+    "displayTitle": "Chercher l'adresse",
+    "section": "GNA",
+    "images": [
+      "kb-images/page-147-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 148,
+    "title": "GNA —",
+    "content": "",
+    "displayTitle": "GNA —",
+    "section": "GNA",
+    "images": [
+      "kb-images/page-148-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 149,
+    "title": "Traitement 99 ITC spécifique",
+    "content": "Traitement 99 ITC spécifique\nMonday, January 19, 2026   10:16 AM\n\n\n\nDans le cas classique 99 ITC, le jointeur jointe nouveau client sur la paire\ndocumentée dans le 99,\n\n\nDans ce cas spécifique, le jointeur n'a pas respecté la paire que nous avons\ndocumentée dans notre câble fictif 99 (la paire prévue pour être jointée pour\nle nouveau client). Il nous informe de s'être écarté de notre plan en jointant\nune autre paire que celle documentée. On a documenté la paire 183, et il a\njointé la paire 187, dans ce cas-là sans spécifier la raison (cela pourrait être le\nproblème de qualité du signal ou autre chose).\n\n\n\n\nA l'envers\n\n\n\n\nOn essaye de respecter des quarts:",
+    "displayTitle": "Traitement 99 ITC spécifique",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-149-img-1.png"
+    ]
+  },
+  {
+    "page": 150,
+    "title": "Il existe la possibilité de déplacer une situation technique active d'une distri",
+    "content": "Il existe la possibilité de déplacer une situation technique active d'une distri\nvers une autre sans la supprimer (sans casser TF). Pour pouvoir faire cela, la\ndistri cible doit être documentée comme étant jointée dans une intro à\nl'adresse.\n\nLà, le jointeur parle de nouveau client\n\n\n\n\nVu qu'on ne peut (sait) pas toucher/convertir un câble qui contient un TF\ndedans, on va faire un troisième câble avec les bonnes paires que le jointeur a\njointées. Ce nouveau câble devrai être No 1, alors on renomme le câble 1\nactuel en No 2.\n\n\n\n\nLe plus pratique est de chercher les infos de la paire de distri dans le segment:",
+    "displayTitle": "Il existe la possibilité de déplacer une situation technique active d'une distri",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-150-img-1.jpeg",
+      "kb-images/page-150-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 151,
+    "title": "On peut aussi utiliser la section \"Nouvelle SIT - COPPER\" de l'OT:",
+    "content": "On peut aussi utiliser la section \"Nouvelle SIT - COPPER\" de l'OT:\n\n\n\n\nFaire attention – le numéro de la broche n'est toujours pas le même que le\nnuméro de la paire distri.",
+    "displayTitle": "On peut aussi utiliser la section \"Nouvelle SIT - COPPER\" de l'OT:",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-151-img-1.jpeg",
+      "kb-images/page-151-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 152,
+    "title": "Résultat:",
+    "content": "Résultat:",
+    "displayTitle": "Résultat:",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-152-img-1.jpeg",
+      "kb-images/page-152-img-2.jpeg",
+      "kb-images/page-152-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 153,
+    "title": "Comme précaution, il faut vérifier les paires introduites. On rentre dedans et",
+    "content": "Comme précaution, il faut vérifier les paires introduites. On rentre dedans et\non regarde si elles ne sont pas introduites avant.\n\nC' n'est que maintenant qu'on sait déplacer les paires TF, car les paires qui vont\nrecevoir les TF doivent être déjà jointées à l'adresse.\n\n\n\n\nColler SN, faire ENTER:",
+    "displayTitle": "Comme précaution, il faut vérifier les paires introduites. On rentre dedans et",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-153-img-1.jpeg",
+      "kb-images/page-153-img-2.jpeg",
+      "kb-images/page-153-img-3.png"
+    ]
+  },
+  {
+    "page": 154,
+    "title": "On arrive à la page de la situation technique, mais la version \"dérangement\".",
+    "content": "On arrive à la page de la situation technique, mais la version \"dérangement\".\nLà, on a l'option \"BR DIS\" qui nous sert à changer nottament les broches de\ndistribution:\n\n\n\n\nOn sélectionne le câble 1, cas c'est là u'on a mis les bonnes broches et paires\nde distribution:",
+    "displayTitle": "On arrive à la page de la situation technique, mais la version \"dérangement\".",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-154-img-1.png",
+      "kb-images/page-154-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 155,
+    "title": "de distribution:",
+    "content": "de distribution:\n\n\n\n\nVu que j'ai parti avec NA de nouveau client qui est jointé sur 187, on choisit ce\nnuméro de broche:\n\n\n\n\nLà, ce n'est pas grave:\n\n\n\n\nOn me montre la situation cible. On fait F1 régistration:",
+    "displayTitle": "de distribution:",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-155-img-1.jpeg",
+      "kb-images/page-155-img-2.jpeg",
+      "kb-images/page-155-img-3.png"
+    ]
+  },
+  {
+    "page": 156,
+    "title": "Le résultat - les TF sont déplacés:",
+    "content": "Le résultat - les TF sont déplacés:",
+    "displayTitle": "Le résultat - les TF sont déplacés:",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-156-img-1.jpeg",
+      "kb-images/page-156-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 157,
+    "title": "Traitement notifications —",
+    "content": "",
+    "displayTitle": "Traitement notifications —",
+    "section": "Traitement notifications",
+    "images": [
+      "kb-images/page-157-img-1.jpeg",
+      "kb-images/page-157-img-2.jpeg",
+      "kb-images/page-157-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 158,
+    "title": "Automatic response",
+    "content": "Automatic response\nThursday, April 30, 2026   3:58 PM",
+    "displayTitle": "Automatic response",
+    "section": "Mail Automatic resp",
+    "images": [
+      "kb-images/page-158-img-1.jpeg",
+      "kb-images/page-158-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 159,
+    "title": "Mail Automatic resp —",
+    "content": "",
+    "displayTitle": "Mail Automatic resp —",
+    "section": "Mail Automatic resp",
+    "images": [
+      "kb-images/page-159-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 160,
+    "title": "(Re)installer macro ABR",
+    "content": "(Re)installer macro ABR\nMonday, April 20, 2026   10:15 AM\n\n\n\nOn met ce lien \\\\bgc.net\\FS\\FS201318\\Setup_IAC_MACROS dans la bar en\n\"FILE EXPLORER\"",
+    "displayTitle": "(Re)installer macro ABR",
+    "section": "Installations",
+    "images": [
+      "kb-images/page-160-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 161,
+    "title": "Ivanti",
+    "content": "Ivanti\nMonday, April 20, 2026   10:21 AM",
+    "displayTitle": "Ivanti",
+    "section": "Installations",
+    "images": []
+  },
+  {
+    "page": 162,
+    "title": "Départements",
+    "content": "Départements\nFriday, April 10, 2026   4:28 PM\n\n\n\nHotline - département IT",
+    "displayTitle": "Départements",
+    "section": "Départements",
+    "images": []
+  },
+  {
+    "page": 163,
+    "title": "Menu/Infos basiques",
+    "content": "Menu/Infos basiques\n  Monday 6 April 2026   08:57\n\n\n\n\nPROVISIONING (actions):\n\nDans cette section on exécute des actions différentes:\n\n2 sub-menus:\n 1. xACTO,\n 2. non-xACTO\n\nActions dans xACTO, :\n\nPACTO, FACTO, DACTO, ACTO\n(pré activation, activation finale, désactivation, modification)\n\nActions dans non-xACTO :\n\nPACTA - A provient du ADSL\nPACTV - V provient du VOIP\nPACTW - W - ligne fixe - AGW\n\nFACTA - A du ADSL\nFACTV - V du VOIP\nFACTW - W - ligne fixe - AGW\n\nDACTA - A du ADSL\nDACTV - V du VOIP\nDACTW - W - ligne fixe - AGW",
+    "displayTitle": "Menu/Infos basiques",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-163-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 164,
+    "title": "Consultation informations",
+    "content": "Consultation informations\n\nRepair\n\nDSL/AGW subscription info - Cuivre\n  1. Internet en cuivre - DSL (ADSL - lent, VDSL - rapide)\n  2. ligne téléphonique fixe - AGW\n(les deux passent par un fil dans une paire en cuivre)\n\nDSL/AGW Subscription Info\n\nFibre -\nFiber Subscription Info\n\n\nDSS = Double Service Supporté\n  Cela signifie qu’une même paire de cuivre supporte deux services en même temps.\n\n\n\nExemple:\n03BER0-000-75-65-107-1\n\n\n\n\nD'habitude, la différence de module entre AGW et DSL est 100\n(0007 vs 0107)",
+    "displayTitle": "Consultation informations",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-164-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 165,
+    "title": "Saly —",
+    "content": "",
+    "displayTitle": "Saly —",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-165-img-1.png"
+    ]
+  },
+  {
+    "page": 166,
+    "title": "Configurer",
+    "content": "Configurer\nWednesday, June 3, 2026   10:16 AM\n\n\n\nConfigurer Scarlet/Proximus:\n\n\n….\n\nConfigurer OLO (Viking et autres):",
+    "displayTitle": "Configurer",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-166-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 167,
+    "title": "Gpon/Multigigue - vitesses",
+    "content": "Gpon/Multigigue - vitesses\nMonday 6 April 2026   16:38\n\n\n\n\nOn exprime la vitesse toujours par \"jusqu'au ...GB\". On ne garantit jamais la\nvitesse maximale\n\nCuivre – internet DSL - toujours moins de 1GB\nADSL2+: ~10 Mbps (moyenne)\nVDSL2: ~70 Mbps (moyenne)\n\nFibre\nGpon – vitesse moins de 1GB – MAXI Fiber\nMulti gigue – vitesse dépasse 1 GB – GIGA Fiber, ULTRA Fiber\n\n\n\n\nIci on voit vitesse Download/Upload\n2,5 Gbps + 0,5 Gbps = vitesse totale jusqu'au 3 Gbps\n8,5 Gbps + 1,5 Gbps = vitesse totale jusqu'au 10 Gbps",
+    "displayTitle": "Gpon/Multigigue - vitesses",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-167-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 168,
+    "title": "VOIP - entreprises",
+    "content": "VOIP - entreprises\nMonday 6 April 2026   21:42",
+    "displayTitle": "VOIP - entreprises",
+    "section": "Saly",
+    "images": []
+  },
+  {
+    "page": 169,
+    "title": "Design key",
+    "content": "Design key\nMonday 6 April 2026   21:55\n\n\n\nC'est créé au moment où une action (ACTO, ACTO… etc) est lancée.\n\nSi cette action échoue, le Design Key reste visible dans SALY - dans les 2\nsections différentes en SALY.\n  1. Section \"Provisioning\" - en catégorie xACTO\n\n\n\n\n 2. Section \"Repair\" (consultation), en onglet:\n\n\n\n\nLe Design Key bloque l'action, alors pour terminer l'action il faut absolument\nl'enlever\n\nTransformer statut de \"FullDone\" en \"None-none\"\n 1. Il faut essayer de faire \"Press Submit to send DACTO\"\n 2. Ensuite, on fait Abandone de \"None-none\"",
+    "displayTitle": "Design key",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-169-img-1.jpeg",
+      "kb-images/page-169-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 170,
+    "title": "Le modem de customer",
+    "content": "Le modem de customer\nWednesday, April 15, 2026   3:01 PM\n\n\n\nUn ONT qui appartient au client – CUSTOMER.\nAvant, les clients étaient obligés d'acheter les modems chez le Proximus.\nDepuis un moment, on permet aux clients d'acheter leurs propres Modem (ou\nBOX – Modem et ONT dans une seule boîte):\n\n\n\n\nChez le Proximus, ONT et MODEM sont toujours séparés.\nSi le client a un autre opérateur, il peut avoir les deux dans un seul BOX\nDans ce cas-là, un opérateur allemand – Fritzbox:\n\nDans cet exemple, le technicien doit informer le client de déconnecter son ONT\nde l'autre opérateur (opérateur externe) dans l'application de l'autre\nopérateur.",
+    "displayTitle": "Le modem de customer",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-170-img-1.png",
+      "kb-images/page-170-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 171,
+    "title": "Refresh",
+    "content": "Refresh\nThursday, April 16, 2026   9:30 AM",
+    "displayTitle": "Refresh",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-171-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 172,
+    "title": "Saly —",
+    "content": "Thursday, April 16, 2026   9:32 AM",
+    "displayTitle": "Saly —",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-172-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 173,
+    "title": "DACTO",
+    "content": "DACTO\nSunday, April 26, 2026   11:01 PM\n\n\n\nAnnulation des produits du client - désactivation.\n\nConseil pratique et important:\nAvant de faire désactivation on sauvegarde (copier-coller)\n  1. CID\n  2. Id client\n(pour ne pas aller les chercher après)\n\nNormalement, DACTO devrait être fait automatiquement par le système. En cas d'échec du\nsystème, ou lors des adaptations suite au Callback du technicien, on fait DACTO\nmanuellement dans le logiciel SALY.\n\nSi DACTO manuel en SALY échoue, on trouve obligatoirement un \"design key\" (qui est\ntoujours créé quand une action SALY est déclenchée et qui reste pas clôturée en cas d'action\nnon terminée).\nOn ferme design key manuellement et on refait.\n\nSi DACTO ne fonctionne pas, on clique sur \"clean\"",
+    "displayTitle": "DACTO",
+    "section": "Saly",
+    "images": []
+  },
+  {
+    "page": 174,
+    "title": "HIQ",
+    "content": "HIQ\nWednesday, April 15, 2026   4:33 PM\n\n\n\nHIQ est lié au CID et est indépendant de l'UTAC. Alors, si on change l'UTAC, HIQ\nqui est déjà fait restera valide.\n\n\n\n\nQuand on fait HIQ 14 (FACTO\n36 - ONT\n37 - UTAC\n27- VOIP prof market - pas pour nous",
+    "displayTitle": "HIQ",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-174-img-1.jpeg",
+      "kb-images/page-174-img-2.png"
+    ]
+  },
+  {
+    "page": 175,
+    "title": "Action \"Move\"",
+    "content": "Action \"Move\"\n Sunday, April 26, 2026   10:49 PM\n\n\n\n\nTout nouveau raccordement – provide\n\n\nDéménagement d’un produit – provide move",
+    "displayTitle": "Action \"Move\"",
+    "section": "Saly",
+    "images": []
+  },
+  {
+    "page": 176,
+    "title": "Lancer HIQ en NPS",
+    "content": "Lancer HIQ en NPS\nWednesday, April 15, 2026   3:03 PM\n\n\n\n\nOn doit être sur l'écran avec la LISTE des ordres de travail",
+    "displayTitle": "Lancer HIQ en NPS",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-176-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 177,
+    "title": "Synchro/binding",
+    "content": "Synchro/binding\nWednesday, April 15, 2026   3:08 PM\n\n\n\n\nExemple de MODEM avec des lampes\n\n\nLampe qui montre si l’internet (DSL) est synchronisé - en vert (SYNCHRO)\n\n\nLampe qui montre si le signal passe – en bleu (BINDING)",
+    "displayTitle": "Synchro/binding",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-177-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 178,
+    "title": "BOX/BOX+",
+    "content": "BOX/BOX+\nMonday 6 April 2026   23:56\n\n\n\nBOX - vitesse maximum 1GB\nBOX+ - vitesse plus de 1GB\n\nIci dans l'exemple – 2120000 (environs 2GB) - donc il s'agit du BOX+ :",
+    "displayTitle": "BOX/BOX+",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-178-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 179,
+    "title": "Les HIQ",
+    "content": "Les HIQ\nThursday, May 21, 2026   7:13 PM\n\n\n\nUn technicien sur place ne demande jamais une pré activation, il demande une\nactivation finale du client – FACTO.\n\n\nHIQ 37 - effectué par\n\nSEL – sat s lux (pour nous\nTechnicien entre l’adresse avec les détails\nIl choisit l’UTAC (les deux font partie de l’adresse)\nPousser le No ONT dans saly avec l’option dans son programme (pour nous HIQ\n36)\n\nC’est obligatoire de faire HIQ 37 (si le client a pris son matériel – il n’y a plus\nd’ONT, il faut pousser l’ONT donc HIQ 36 est à faire)\n\nHIQ final – HIQ 14 – à la fin (avant on l’appelé HIQ 1)\n\nHIQ final fait par le technicien – FHD\nHIQ final – internet et TV\n\nHIQ 24 (avant on l’appelé HIQ 2) – hiq VOIP conditionné par HIQ final (14)",
+    "displayTitle": "Les HIQ",
+    "section": "Saly",
+    "images": []
+  },
+  {
+    "page": 180,
+    "title": "HIQ 37 (SEL)",
+    "content": "HIQ 37 (SEL)\nWednesday, April 15, 2026   1:43 PM\n\n\n\nCela se fait en NPS\n\nHIQ 37: Confirmer (changer) l'adresse et assigner UTAC dans NPS\nQuan\n\nOn voit l'abréviation SEL dans la colonne HIQ:\n\n\n\n\nSEL – SATES LUX c'est le même que HIQ 37 (SEL)\n\n\nOn confirme l'adresse et",
+    "displayTitle": "HIQ 37 (SEL)",
+    "section": "Saly",
+    "images": [
+      "kb-images/page-180-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 181,
+    "title": "Callback (TEF) - basic",
+    "content": "Callback (TEF) - basic\nSaturday, April 18, 2026   8:08 PM\n\n\n\nNous recevons Callback via formulaire TEF\nTEF - Technical Escalation Form",
+    "displayTitle": "Callback (TEF) - basic",
+    "section": "Callback (TEF)",
+    "images": []
+  },
+  {
+    "page": 182,
+    "title": "CallBack Fibre- flux",
+    "content": "CallBack Fibre- flux\nWednesday, April 15, 2026     1:37 PM\n\n\n\nOn vérifie bien si c'est résidentiel ou repair, ou\n\n\n\n\nOrdre des actions:\n\n  1. Aller en NPS (ordre de travail)\n  2. Aller en OCK\n  3. Demander les détails de l'adresse - (No App, Etage,\n\n\n\n\n  4.",
+    "displayTitle": "CallBack Fibre- flux",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-182-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 183,
+    "title": "Callback Cuivre",
+    "content": "Callback Cuivre\nThursday, April 16, 2026   9:07 AM\n\n\n\n\nChercher par NA\n\n\n\n\nQuand la SIT est attribuée, c'est tout de suite que la DATA qui se génère.\nDATA programme le reste des actions – dacto, pacto... etc",
+    "displayTitle": "Callback Cuivre",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-183-img-1.jpeg",
+      "kb-images/page-183-img-2.jpeg",
+      "kb-images/page-183-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 184,
+    "title": "Exemples",
+    "content": "Exemples\nWednesday, April 15, 2026   4:49 PM",
+    "displayTitle": "Exemples",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-184-img-1.png"
+    ]
+  },
+  {
+    "page": 185,
+    "title": "Pousser ONT en SALY",
+    "content": "Pousser ONT en SALY\nWednesday, April 15, 2026   3:06 PM",
+    "displayTitle": "Pousser ONT en SALY",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-185-img-1.png"
+    ]
+  },
+  {
+    "page": 186,
+    "title": "CB pré-pavage",
+    "content": "CB pré-pavage\nSunday, April 19, 2026   11:24 PM\n\n\n\n Le cas ou un client planifie de construire une habitation. Avant des travaux de construction on\n introduit une seule ligne fixe téléphonique (une bête ligne) juste pour tester le signal – pas\n d'internet. On fait juste la préactivation (PACTO) pour des raisons de teste. On ne fait jamais\n d'activation finale (FACTO).",
+    "displayTitle": "CB pré-pavage",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-186-img-1.png"
+    ]
+  },
+  {
+    "page": 187,
+    "title": "Ecran premier",
+    "content": "Ecran premier\nTuesday, April 14, 2026   11:11 AM\n\n\n\nTEF en ordre\n\nIntervention IT- OUI ou NON\n Si j'utilise GUI (Hotline) pour résoudre - je met OUI",
+    "displayTitle": "Ecran premier",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-187-img-1.png"
+    ]
+  },
+  {
+    "page": 188,
+    "title": "Callback (TEF) —",
+    "content": "Wednesday, April 15, 2026   1:54 PM",
+    "displayTitle": "Callback (TEF) —",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-188-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 189,
+    "title": "Envoyer vers Hotline (IT)",
+    "content": "Envoyer vers Hotline (IT)\nWednesday, April 15, 2026   1:55 PM\n\n\n\nHotline - département IT\n\n\nC624_Ipphone_Gui - Power Apps\n\n\n\n\nAprès l'envoie on reçoit un rapport en \"Workflows\"\n\n\n\n\nUne fois résolu (peut être rapidement), il sera marqué \"DATA est lancé\":",
+    "displayTitle": "Envoyer vers Hotline (IT)",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-189-img-1.png"
+    ]
+  },
+  {
+    "page": 190,
+    "title": "Callback (TEF) —",
+    "content": "",
+    "displayTitle": "Callback (TEF) —",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-190-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 191,
+    "title": "ARC avec CallBack",
+    "content": "ARC avec CallBack\nWednesday, April 15, 2026   2:38 PM\n\n\n\nFermeture CB avant que statut \"Busy\" s'écoule - on ferme la croix:\n\n\n\n\nBug avec ARC\n\nDeux fois opérateur à droite – ce n'est pas un callback venu du technicien",
+    "displayTitle": "ARC avec CallBack",
+    "section": "Callback (TEF)",
+    "images": [
+      "kb-images/page-191-img-1.png",
+      "kb-images/page-191-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 192,
+    "title": "Abbreviations",
+    "content": "Abbreviations\nSunday, April 12, 2026   10:54 PM\n\n\n\nCB – call back\nHS – hors service\nPB - problème\nDISTRI – broche de distribution\nHIQ – activation finale (FACTO)\nNOK – Not OK – ne fonctionne pas\nC/C - copier – coller\nOQP - occupé",
+    "displayTitle": "Abbreviations",
+    "section": "Callback (TEF)",
+    "images": []
+  },
+  {
+    "page": 193,
+    "title": "Annulation TSI (F4 F1 F3)",
+    "content": "Annulation TSI (F4 F1 F3)\nSunday, May 3, 2026   8:46 PM\n\n\n\n   Très important: avant d'annuler TSI, d'abord on sauvegarde impérativement\n   la situation qu'on souhaite annuler (par exemple sur un simple NotePad) -\n   par exemple comme ça:\n\n\n\n\n   On peut également utiliser deux ABR en cliquant sur User A:\n\n\n\n\n   Procédure annulation TSI:\n\n   Menu principal → f4\n\n\n\n\n   Menu situation technique → f1",
+    "displayTitle": "Annulation TSI (F4 F1 F3)",
+    "section": "Callback cuivre",
+    "images": [
+      "kb-images/page-193-img-1.jpeg",
+      "kb-images/page-193-img-2.jpeg",
+      "kb-images/page-193-img-3.png"
+    ]
+  },
+  {
+    "page": 194,
+    "title": "Menu situation technique active → F3",
+    "content": "Menu situation technique active → F3\n(on met le No de téléphone)\n\n\n\n\nOn choisit SUPPRESSION DES PATHS COMPLETS - SANS RESERVATION\n\n\n\n\nOn fait F3 pour confirmer annulation:",
+    "displayTitle": "Menu situation technique active → F3",
+    "section": "Callback cuivre",
+    "images": [
+      "kb-images/page-194-img-1.jpeg",
+      "kb-images/page-194-img-2.jpeg",
+      "kb-images/page-194-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 195,
+    "title": "On est remis sur l'écran SITUATION TECHNIQUE ACTIVE",
+    "content": "On est remis sur l'écran SITUATION TECHNIQUE ACTIVE\n\n\n\n\nOn peut vérifier si on a bien annulé TSI en mettant le même numéro. Si c'est\nbien annulé, on voit TSI vide – il n'y a plus de TSI:",
+    "displayTitle": "On est remis sur l'écran SITUATION TECHNIQUE ACTIVE",
+    "section": "Callback cuivre",
+    "images": [
+      "kb-images/page-195-img-1.jpeg",
+      "kb-images/page-195-img-2.jpeg",
+      "kb-images/page-195-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 196,
+    "title": "Reconstruction TSI(F2 F15)",
+    "content": "Reconstruction TSI(F2 F15)\nSunday, May 3, 2026   10:22 PM\n\n\n\n(on fait F15 avec SHIFT+F5)\n\nLa mise (reconstruction) d'une TSI:\n\nMenu principal → F2\n\n\n\n\nOn entre soit LOM soit adresse\n\n\n\n\nEnsuite, on choisit le plus petit priorité - directe:",
+    "displayTitle": "Reconstruction TSI(F2 F15)",
+    "section": "Callback cuivre",
+    "images": [
+      "kb-images/page-196-img-1.png",
+      "kb-images/page-196-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 197,
+    "title": "Ensuite, on remplit les champs vides:",
+    "content": "Ensuite, on remplit les champs vides:\n\n\n\n\nOn utilise la situation technique initiale qu'on a copié sur Notepad\npour remplir les informations sur la réseau, borne, etc, et puis on\nmet les nouvelles infos sur …. qu'on veut mettre – pas claire",
+    "displayTitle": "Ensuite, on remplit les champs vides:",
+    "section": "Callback cuivre",
+    "images": [
+      "kb-images/page-197-img-1.jpeg",
+      "kb-images/page-197-img-2.jpeg",
+      "kb-images/page-197-img-3.jpeg"
+    ]
+  },
+  {
+    "page": 198,
+    "title": "Callback cuivre —",
+    "content": "",
+    "displayTitle": "Callback cuivre —",
+    "section": "Callback cuivre",
+    "images": []
+  },
+  {
+    "page": 199,
+    "title": "Callback en pratique",
+    "content": "Callback en pratique\nWednesday, June 10, 2026   6:28 AM\n\n\n\n2 types de base de callback – callback TSI et callback SALY. Chez un callback,\nordre de travail (OT) est déjà dispatché.\n\n 1. Dans le callback TSI, le technicien nous demande d'assigner un UTAC à\n    l'adresse du client (avec ou sans détail). Les raisons possibles: adresse\n    erronée, UTAC erroné, UTAC manquant. Donc, littéralement on attribue\n    TSI.\n\n     Vu qu'on est déjà au niveau de l'OT (ordre de travail), l'intervention pour\n     attribuer l'UTAC n'existe plus. En étant au niveau OT, on a deux manières\n     d'attribuer TSI :\n\n       ○ Par HIQ 37 (plus compliqué et souvent ne marche pas)\n\n       ○ En faisant \"générer intervention\" - on crée une nouvelle intervention\n         qui écrase l'ancienne adresse et UTAC. Que l'adresse soit erronée ou\n         correcte, le type de cette nouvelle intervention est toujours \"Wrong\n         installation address\". Puis, on prend cette nouvelle intervention à son\n         nom et on fait le nécessaire (éventuelle modification de l'adresse,\n         attribution de l'UTAC – soit l'UTAC précis demandé par le technicien,\n         soit au hasard).\n\n     Au niveau SALY, l'action d'attribution de l'UTAC à l'adresse se termine\n     avec PACTO clôturé:\n\n\n\n\n     FACTO, DACTO, ACTO restent \"en instance\", pas d'HIQ finale.",
+    "displayTitle": "Callback en pratique",
+    "section": "Callback fibre",
+    "images": [
+      "kb-images/page-199-img-1.png"
+    ]
+  },
+  {
+    "page": 200,
+    "title": "FACTO, DACTO, ACTO restent \"en instance\", pas d'HIQ finale.",
+    "content": "FACTO, DACTO, ACTO restent \"en instance\", pas d'HIQ finale.\n\n   Après cela, soit le technicien fait l'HIQ finale lui-même tout de suite, soit il\n   s'agit de l'HIQ finale futur qui est censé d'être fait un autre jour.\n\n2. Dans le callback SALY, le technicien n'arrive pas à effectuer son HIQ finale\n   (tous les ACTO de la liste SALY bien clôturés), qui est indispensable pour\n   que le client puisse consommer les produits – internet, TV, VOIP.",
+    "displayTitle": "FACTO, DACTO, ACTO restent \"en instance\", pas d'HIQ finale.",
+    "section": "Callback fibre",
+    "images": []
+  },
+  {
+    "page": 201,
+    "title": "Flux callback fibre",
+    "content": "Flux callback fibre\nThursday, May 21, 2026   7:10 PM\n\n\n\n  • On prend le CID du callback, on fait recherche OT en NPS\n  • On prend l'OAG de l'NPS, on fait une nouvelle recherche OT en NPS avec\n    l'OAG\n  • On regarde bien la colonne HIQ AAWO pour comprendre si le tech avait\n    fait SEL (pour nous HIQ 37) ou FHD (pour nous HIQ 14). Les deux ne\n    peuvent être fait qu'une seule fois\n\n\n\n\n  •",
+    "displayTitle": "Flux callback fibre",
+    "section": "Callback fibre",
+    "images": [
+      "kb-images/page-201-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 202,
+    "title": "Les HIQ",
+    "content": "Les HIQ\nMonday, June 1, 2026   9:37 PM",
+    "displayTitle": "Les HIQ",
+    "section": "Callback fibre",
+    "images": []
+  },
+  {
+    "page": 203,
+    "title": "MAWO",
+    "content": "MAWO\nMonday, June 1, 2026   4:21 PM\n\n\n\nTechnicien n'arrive pas à faire HIQ finale et me demande de le faire à sa place.\nJe fais recherche OT par OAG et j'y retrouve intervention manuelle MAWO .\n\nMAWO peut se générer au niveau FACTO, mais aussi au niveau PACTO (ou\nautres ?)\n\n\"retry full\" (ou \"retry\") vs clôture normale:\n\nSi l'action a bien tournée en SALY, on fait clôture normale\nSi l'action n'a pas tournée en SALY on accède à l'intervention MAWO et on\nessaye de la clôturer en \"retry full\"(\"retry\").\nSi ça fonctionne, l'action (PACTO, FACTO) va bien tourner – visible sur la liste\nrecherche OT.\nSi ça ne passe pas, une nouvelle intervention MAWO au même niveau se\ngénère. On est obligé de faire l'action manuelle en SALY . Souvent, il suffit de\nclôturer le design key. Sinon, vu que dans un callback le but est toujours\nd'obtenir FACTO, on fait l'action appropriée pour y arriver (dans xACTO on fait\nFACTO, ou MOVE, on fait attention avec les design Key, etc).\n\nUne fois l'action SALY effectuée, on revient en intervention MAWO ET on la\nclôture en clôture normal.",
+    "displayTitle": "MAWO",
+    "section": "Callback fibre",
+    "images": []
+  },
+  {
+    "page": 204,
+    "title": "HIQ 37",
+    "content": "HIQ 37\nWednesday, June 3, 2026   10:12 AM\n\n\n\nLe technicien n'arrive pas à faire SatEstLux, ce qui veut dire – il n'arrive pas à\nlier le détail d'adresse concrète (boîte aux lettres + l'étage) à l'UTAC concret.\nDans son ordre de travail, l'UTAC reste vide (no installation point). Il me\ndemande de le faire à sa place.\n\nOn essaye d'abord d'attribuer l'UTAC au détail de l'adresse par NPS en faisant\nHIQ 37.\n\nSi le détail est sur la liste, on le sélectionne.\nSinon, on clique sur \"adresse manuelle\" pour arriver à cet écran:\n\n\n\n\nSi le détail n'est toujours pas visible, on coche celui qui est le plus proche et on\nrajoute le nécessaire, puis on clique sur \"update adresse\" et on sélectionne\nl'adresse.\n\nDans un HIQ37, avant de clôturer le callback il faut plusieurs choses:\n\n  • Que le détail d'adresse soit précisé (boîte + étage)\n  • Que l'UTAC soit attribué sur l'OT\n  • Que le DATA soit clôturé\n  • Que l'éventuelle pré activation SALY soit réalisée (PACTO)",
+    "displayTitle": "HIQ 37",
+    "section": "Callback fibre",
+    "images": [
+      "kb-images/page-204-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 205,
+    "title": "Pon crossing",
+    "content": "Pon crossing\nWednesday, June 3, 2026   10:22 AM",
+    "displayTitle": "Pon crossing",
+    "section": "Callback fibre",
+    "images": [
+      "kb-images/page-205-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 206,
+    "title": "Erreur VOIP",
+    "content": "Erreur VOIP\nWednesday, June 3, 2026   2:02 PM\n\n\n\nProblème - VOIP s'affiche dans la liste des produits comme ServiceEnabled Yes,\nmais il n'y a rien dans",
+    "displayTitle": "Erreur VOIP",
+    "section": "Callback fibre",
+    "images": [
+      "kb-images/page-206-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 207,
+    "title": "Différentes options pour les HOTLINE - IT",
+    "content": "Thursday, April 16, 2026   9:27 AM\n\n\n\n\nDifférentes options pour les HOTLINE - IT",
+    "displayTitle": "Différentes options pour les HOTLINE - IT",
+    "section": "GUI",
+    "images": [
+      "kb-images/page-207-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 208,
+    "title": "Traiter ticket SNOW",
+    "content": "Traiter ticket SNOW\nMonday, June 1, 2026   3:49 PM\n\n\n\nD'habitude, c'est le client qui appelle le service client pour se renseigner sur le\ntraitement de sa demande, ce qui entraîne la création d'un ticket Snow par le\nservice client. Un agent trie ensuite les tickets provenant du service client et\nles assigne aux agents PCD concernés.\n\n\n\n\nIl faut:\n    • Accéder à l'intervention à l'aide de l'OAG mentionné dans le message\n      Teams\n    • Accéder au ticket dans \"SNOW lecture\" champs recherche, à l'aide du\n      numéro encadré en rouge\n    • Regarder l'historique de traitement dans l'onglet \"History\"\n\n\n\n\nCas possibles :\n\n 1. Intervention déjà traitée entretemps",
+    "displayTitle": "Traiter ticket SNOW",
+    "section": "Snow",
+    "images": [
+      "kb-images/page-208-img-1.png",
+      "kb-images/page-208-img-2.jpeg"
+    ]
+  },
+  {
+    "page": 209,
+    "title": "choisit le \"Resolution code\" approprié.",
+    "content": "○ Dans l'onglet \"Resolution\" on laisse la note (Resolution notes) et on\n      choisit le \"Resolution code\" approprié.\n\n\n\n\n    ○\n\n\n\n\n    ○ on met ticket en statut \"Resolved\" (jamais utiliser \"Closed Case\")\n\n\n\n\n2. L'intervention est traitable – on la traite et on fait le même comme dans le\n   cas 1.\n3. L'intervention ne peut toujours pas être traitée - on laise un commentaire\n   dans l'onglet \"Notes\" et on clique sur \"Update\"",
+    "displayTitle": "choisit le \"Resolution code\" approprié.",
+    "section": "Snow",
+    "images": [
+      "kb-images/page-209-img-1.png",
+      "kb-images/page-209-img-2.jpeg",
+      "kb-images/page-209-img-3.png"
+    ]
+  },
+  {
+    "page": 210,
+    "title": "Snow —",
+    "content": "",
+    "displayTitle": "Snow —",
+    "section": "Snow",
+    "images": [
+      "kb-images/page-210-img-1.jpeg"
+    ]
+  },
+  {
+    "page": 211,
+    "title": "Créer ticket Snow NPS",
+    "content": "Créer ticket Snow NPS\nTuesday 7 April 2026   11:04\n\n\n\n\n En Snow tickets création logiciel, on a la possibilité de créer \"ticket NPS\".\n\n Pour créer le ticket NPS, on tape PCD dans le champ de recherche\n\n\n\n\n CDB ID – ID client\n Order ref – OAG avec ou sans 9, peu importe\n Intervetnion code - numéro d'intervention\n Intervention description – descriptions de l'erreur\n UTAC UNI – numéro de l'UTAC et de la porte",
+    "displayTitle": "Créer ticket Snow NPS",
+    "section": "Snow",
+    "images": [
+      "kb-images/page-211-img-1.jpeg",
+      "kb-images/page-211-img-2.png"
+    ]
+  },
+  {
+    "page": 212,
+    "title": "Exemple ticket Snow:",
+    "content": "Exemple ticket Snow:\n\n\n\n\nLa dernière ligne \"PcdInterventionTeam\" est obligatoire. Si on ne met pas cette\nligne-là, le système automatique (\"robot\") risque de clôturer le ticket!\n\nAutre exemple:",
+    "displayTitle": "Exemple ticket Snow:",
+    "section": "Snow",
+    "images": [
+      "kb-images/page-212-img-1.jpeg",
+      "kb-images/page-212-img-2.png"
+    ]
+  },
+  {
+    "page": 213,
+    "title": "Snow —",
+    "content": "",
+    "displayTitle": "Snow —",
+    "section": "Snow",
+    "images": []
+  },
+  {
+    "page": 214,
+    "title": "Consulter SNOW en cours",
+    "content": "Consulter SNOW en cours\nMonday, June 8, 2026   1:16 PM",
+    "displayTitle": "Consulter SNOW en cours",
+    "section": "Snow",
+    "images": [
+      "kb-images/page-214-img-1.png"
+    ]
+  },
+  {
+    "page": 215,
+    "title": "Faire attention",
+    "content": "Faire attention\nFriday, April 10, 2026   1:03 PM\n\n\n\n  • Ne pas laisser l'intervention en statut \"in progress\" à son nom, car\n    cela bloque d'autres agents de la reprendre.\n    Exemple: lors du callback on génère l'intervention, mais il arrive\n    qu'il soit transféré chez l'autre agent à cause de la perte\n    d'internet. Il faut surtout libérer cette intervention générée en la\n    mettant \"en suspens\" pour que l'autre agent ne reste pas bloqué.\n  • Ne jamais traiter l'intervention avec le code B255\n    (exemple B255 call GetNetworkPathOrdering failure). Ce n'est pas\n    pour PCD\n\n      (la mettre en Planning nécessaire??)\n\n  • Faire attention aux No alpha numériques\n\n\n\n\nOn les met collées:",
+    "displayTitle": "Faire attention",
+    "section": "FAIRE ATTENTION",
+    "images": [
+      "kb-images/page-215-img-1.jpeg",
+      "kb-images/page-215-img-2.jpeg"
+    ]
+  }
+]
