@@ -190,3 +190,164 @@
   .kb-first-paragraph { grid-template-columns: 120px minmax(0, 1fr); min-height: 120px; }
   .kb-first-paragraph .kb-initial { width: 120px; height: 120px; }
 }
+
+/* KB manuscript page: the content is kept inside the blank central parchment area. */
+.kb-content {
+  padding: 112px 170px 150px 170px;
+  background: #f8edcf url('../../assets/kb-manuscript-clean.png') center / 100% 100% no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: auto;
+}
+.kb-content h1,
+.kb-breadcrumb,
+.kb-body,
+.kb-page-images { position: relative; z-index: 1; }
+.kb-content h1 { margin-bottom: 18px; }
+.kb-breadcrumb { color: #765638; }
+.kb-body { font-size: 20px; line-height: 1.42; }
+.kb-paragraph { margin-bottom: 14px; }
+.kb-page-images { margin-top: 24px; }
+@media(max-width:1000px){ .kb-content { padding: 82px 110px 110px; } }
+@media(max-width:700px){ .kb-content { padding: 56px 42px 80px; background-size: cover; } }
+
+
+/* The red reference rectangle is not rendered. It defines this strict content viewport. */
+.kb-content {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  background: #f8edcf url('../../assets/kb-manuscript-clean.png') center / 100% 100% no-repeat;
+  border-radius: 0;
+  box-shadow: none;
+}
+.kb-manuscript-viewport {
+  position: absolute;
+  top: 13.15%;
+  right: 23.15%;
+  bottom: 20.15%;
+  left: 14.05%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 0;
+  box-sizing: border-box;
+}
+.kb-manuscript-viewport::-webkit-scrollbar { display: none; }
+.kb-page::-webkit-scrollbar { display: none; }
+.kb-page { scrollbar-width: none; -ms-overflow-style: none; }
+.kb-manuscript-viewport > * { max-width: 100%; box-sizing: border-box; }
+.kb-manuscript-viewport .kb-content h1,
+.kb-manuscript-viewport .kb-breadcrumb,
+.kb-manuscript-viewport .kb-body,
+.kb-manuscript-viewport .kb-page-images { position: relative; z-index: 1; }
+.kb-manuscript-viewport .kb-content h1 { margin-top: 0; }
+.kb-manuscript-viewport .kb-page-images img { max-width: 100%; height: auto; }
+@media(max-width:700px){
+  .kb-manuscript-viewport { top: 12%; right: 13%; bottom: 16%; left: 13%; }
+}
+
+/* Final KB background correction: keep the manuscript image on the outer canvas,
+   preserve its proportions, and let both panels occupy the full available height. */
+.kb-page {
+  height: calc(100vh - 58px);
+  min-height: 0;
+  background: #24160e url('../../assets/kb-manuscript-clean.png') center center / cover no-repeat;
+  align-items: stretch;
+}
+
+.kb-content {
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  background: #f8edcf;
+  padding: 0;
+}
+
+.kb-manuscript-viewport {
+  position: relative;
+  inset: auto;
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  box-sizing: border-box;
+  padding: 38px 74px 90px 82px;
+}
+
+.kb-sidebar {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  box-sizing: border-box;
+  background: #efcc89;
+}
+
+@media (max-width: 1000px) {
+  .kb-manuscript-viewport { padding: 30px 34px 80px; }
+}
+
+@media (max-width: 700px) {
+  .kb-page { height: auto; min-height: calc(100vh - 58px); }
+  .kb-content { height: auto; }
+  .kb-manuscript-viewport { height: auto; padding: 24px; }
+  .kb-sidebar { height: auto; }
+}
+
+/* Corrected KB composition: no manuscript image on the outer canvas.
+   The manuscript artwork belongs to the reading page and sidebar, each
+   stretched to its own full available height. */
+.kb-page {
+  background: #24160e !important;
+  height: calc(100vh - 58px);
+  min-height: 0;
+  align-items: stretch;
+}
+
+.kb-content {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+  padding: 0 !important;
+  overflow: hidden;
+  background: #f8edcf url('../../assets/kb-manuscript-clean.png') center / 100% 100% no-repeat !important;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.kb-manuscript-viewport {
+  position: absolute;
+  top: 13.15%;
+  right: 23.15%;
+  bottom: 20.15%;
+  left: 14.05%;
+  height: auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 0;
+  box-sizing: border-box;
+  background: transparent;
+}
+
+.kb-sidebar {
+  height: 100%;
+  min-height: 0;
+  overflow: auto;
+  box-sizing: border-box;
+  background: #efcc89 url('../../assets/kb-manuscript-clean.png') center / 100% 100% no-repeat !important;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 28px 20px 34px;
+}
+
+@media (max-width: 1000px) {
+  .kb-manuscript-viewport { top: 12%; right: 13%; bottom: 16%; left: 13%; }
+}
+
+@media (max-width: 700px) {
+  .kb-page { height: auto; min-height: calc(100vh - 58px); background: #24160e !important; }
+  .kb-content { height: auto; min-height: 500px; }
+  .kb-manuscript-viewport { position: relative; inset: auto; height: auto; min-height: 500px; padding: 24px !important; }
+  .kb-sidebar { height: auto; }
+}

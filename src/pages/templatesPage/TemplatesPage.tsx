@@ -7,6 +7,7 @@ const initials = import.meta.glob("../../assets/illuminated-initials/*.png", { e
 const kbArtwork = import.meta.glob("../../assets/**/*.{png,jpg,jpeg,webp}", { eager: true, query: "?url", import: "default" }) as Record<string, string>;
 const initialFor = (text: string) => initials[Object.keys(initials).find((key) => key.endsWith(`/${(text.trim()[0] || "A").toUpperCase()}.png`)) || ""];
 const defaultArtwork = Object.entries(kbArtwork).find(([key]) => /pcd[-_ ]?kb/i.test(key) && !/manuscript/i.test(key))?.[1];
+const replaceBullets = (text: string) => text.replace(/^[•·▪●○◦]\s*/gm, "⚜ ");
 const stripMetadata = (text: string) => text
   .replace(/^\s*[^\n]+\n\s*(?:(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),[^\n]+|(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)[^\n]+)\n\s*/i, "")
   .replace(/\n\s*(?:Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday),[^\n]+$/i, "")
@@ -38,11 +39,12 @@ export default function TemplatesPage() {
 
   return <div className="kb-page">
     <main className="kb-content">
+      <div className="kb-manuscript-viewport">
       {error ? <div className="kb-error">Impossible de charger la KB : {error}</div> : current ? <>
         <div className="kb-breadcrumb">KB / {current.section || "Autres"} / {current.title} / page {current.page}</div>
         <h1>{current.title}</h1>
         <div className="kb-body">
-          {stripMetadata(current.content).split(/\n{2,}/).filter(Boolean).map((part, index) => {
+          {replaceBullets(stripMetadata(current.content)).split(/\n{2,}/).filter(Boolean).map((part, index) => {
             const initial = index === 0 ? initialFor(part) : undefined;
             return <div key={index} className={index === 0 ? "kb-paragraph kb-first-paragraph" : "kb-paragraph"}>
               {initial ? <><img className="kb-initial" src={initial} alt="" aria-hidden="true" /><span className="kb-first-text">{part.slice(1)}</span></> : part}
@@ -51,6 +53,7 @@ export default function TemplatesPage() {
         </div>
         {!!current.images?.length && <div className="kb-page-images">{current.images.map((image, index) => <figure className="kb-page-image" key={image}><img src={`${base}${image}`} alt={`Illustration ${index + 1} de la page ${current.page}`} /><figcaption>Illustration {index + 1} — page {current.page}</figcaption></figure>)}</div>}
       </> : pages.length === 0 ? <div className="kb-empty">Chargement du contenu KB…</div> : <div className="kb-welcome">{defaultArtwork && <img src={defaultArtwork} alt="PCD-KB" />}<h1>PCD – Knowledge Base</h1><p>Choisissez une section et une page dans le manuscrit à droite.</p></div>}
+      </div>
     </main>
     <aside className="kb-sidebar">
       <div className="kb-brand">KB</div>
