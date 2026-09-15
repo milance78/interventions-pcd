@@ -7,6 +7,7 @@ import ArrowForwardRounded from "@mui/icons-material/ArrowForwardRounded";
 import HelpOutlineRounded from "@mui/icons-material/HelpOutlineRounded";
 import EventRepeatRounded from "@mui/icons-material/EventRepeatRounded";
 import PhoneInTalkRounded from "@mui/icons-material/PhoneInTalkRounded";
+import EditRounded from "@mui/icons-material/EditRounded";
 
 import { useAppDispatch, useAppSelector } from "../../redux/store";
 import { loadInterventionFromSearch } from "../../redux/features/newInterventionSlice";
@@ -452,7 +453,17 @@ const OnHoldPage = () => {
           {activeTab === "other" && intervention.postponedDate && (
             <span className="on-hold-card__snow-ticket">
               <strong>Postposé au</strong>
-              <span>{intervention.postponedDate.split("-").reverse().join("/")}</span>
+              <span>{intervention.postponedDate.split("-").reverse().join("/")}
+                <button
+                  type="button"
+                  className="on-hold-card__edit-date"
+                  aria-label="Modifier la date de report"
+                  title="Modifier la date de report"
+                  onClick={(event) => { event.stopPropagation(); openIntervention(intervention); }}
+                >
+                  <EditRounded fontSize="inherit" />
+                </button>
+              </span>
             </span>
           )}
           <span className="on-hold-card__timestamps">

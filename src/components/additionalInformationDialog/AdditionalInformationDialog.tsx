@@ -431,6 +431,7 @@ const AdditionalInformationDialog = ({
   const [bciResPickerOpen, setBciResPickerOpen] = React.useState(false);
   const [snowUtac, setSnowUtac] = React.useState("");
   const [snowInterventionNumber, setSnowInterventionNumber] = React.useState("");
+  const [snowReference, setSnowReference] = React.useState("");
   const [snowFree, setSnowFree] = React.useState({ NPS: false, SALY: true, OCK: false });
   const [ifhUtac, setIfhUtac] = React.useState("");
   const [copiedWioField, setCopiedWioField] = React.useState<string | null>(null);
@@ -487,6 +488,7 @@ const AdditionalInformationDialog = ({
     setBciResClientId(null);
     setSnowUtac("");
     setSnowInterventionNumber("");
+    setSnowReference("");
     setSnowFree({ NPS: false, SALY: true, OCK: false });
     setIfhUtac("");
     setCopiedWioField(null);
@@ -510,6 +512,10 @@ const AdditionalInformationDialog = ({
 
     if (selectedTemplate === "wioOperatorChange") {
       nextDraft = wioOperatorChangeInfo;
+    }
+
+    if (isSnowForm && snowReference.trim()) {
+      nextDraft = `Snow en attente ${snowReference.trim()}\n${nextDraft}`;
     }
 
     onChange?.(nextDraft.trim());
@@ -572,6 +578,7 @@ const AdditionalInformationDialog = ({
     setHeaderNow(new Date());
     setSnowUtac("");
     setSnowInterventionNumber("");
+    setSnowReference("");
     setSnowFree({ NPS: false, SALY: true, OCK: false });
     setIfhUtac("");
     setDraft(buildAdditionalInformationTemplate(templateId, templateSource));
@@ -655,7 +662,7 @@ const AdditionalInformationDialog = ({
   );
   const wioOperatorChangeInfo = React.useMemo(() => {
     const network = wioOperatorNetwork || "___";
-    return `Client est actuellement actif chez ${network} Merci de réintroduire chez Vikings.`;
+    return `Client à l'adresse est actuellement en service chez ${network}. Merci de réintroduire chez Vikings.`;
   }, [wioOperatorNetwork]);
 
   const bciFormInterventionLabel = isBciResiliation

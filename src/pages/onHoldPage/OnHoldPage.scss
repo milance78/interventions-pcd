@@ -1155,3 +1155,10 @@ html[data-on-hold-slide-direction="previous"]::view-transition-new(on-hold-list)
     z-index: 1 !important;
   }
 }
+
+
+.on-hold-card__edit-date {
+  display:inline-flex; align-items:center; justify-content:center;
+  margin-left:6px; padding:2px; border:0; background:transparent;
+  color:inherit; cursor:pointer; vertical-align:middle;
+}

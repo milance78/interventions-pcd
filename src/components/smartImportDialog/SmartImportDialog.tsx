@@ -97,9 +97,11 @@ const SmartImportDialog = ({
       return;
     }
 
-    // The paste gesture gives us the best chance to place OAG ID directly
-    // into the clipboard before the dialog closes.
-    copyOagIdToClipboard(String(result.values.oagID ?? ""));
+    // Keep the automatically imported main address in the clipboard too.
+    // This is intentionally done during the paste gesture, before the dialog closes.
+    const clipboardValue = String(result.values.mainAddress ?? "").trim();
+    if (clipboardValue) copyOagIdToClipboard(clipboardValue);
+    else copyOagIdToClipboard(String(result.values.oagID ?? ""));
     setProcessing(true);
 
     window.setTimeout(() => {

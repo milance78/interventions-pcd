@@ -248,9 +248,16 @@ const ClientsOnAddress = () => {
       .filter(Boolean)
       .join("\n\n");
 
-    if (nextComment !== normalizedComment) {
+    // Remove duplicate generated address blocks while preserving all manual text.
+    const uniqueBlocks = nextComment
+      .split(/\n{2,}/)
+      .map((block) => block.trim())
+      .filter((block, index, blocks) => block && blocks.indexOf(block) === index);
+    const deduplicatedComment = uniqueBlocks.join("\n\n");
+
+    if (deduplicatedComment !== normalizedComment) {
       commentRef.current = nextComment;
-      dispatch(updateField({ field: "comment", value: nextComment }));
+      dispatch(updateField({ field: "comment", value: deduplicatedComment }));
     }
   }, [addressClients, infrastructure, dispatch]);
 

@@ -9,6 +9,8 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import CalendarMonthRounded from "@mui/icons-material/CalendarMonthRounded";
+import EditRounded from "@mui/icons-material/EditRounded";
+import IconButton from "@mui/material/IconButton";
 import { updateField } from "../../../redux/features/newInterventionSlice";
 import { useAppDispatch, useAppSelector } from "../../../redux/store";
 
@@ -67,6 +69,11 @@ const StatusInput = () => {
   return (
     <>
       <div className="status-input-shell">
+        {status === "postponed" && postponedDate && (
+          <IconButton size="small" aria-label="Modifier la date de report" title="Modifier la date de report" onClick={() => { setPendingDate(postponedDate); setCalendarOpen(true); }}>
+            <EditRounded fontSize="small" />
+          </IconButton>
+        )}
         <FormControl variant="outlined" className="status-input" size="small" fullWidth>
           <Select
             className={`status-select status-select--${status === "completed" ? "completed" : status === "on hold" ? "on-hold" : status === "transferred" ? "transferred" : status === "postponed" ? "postponed" : "default"}`}
