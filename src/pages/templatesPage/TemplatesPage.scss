@@ -443,3 +443,42 @@
   object-fit: cover;
   object-position: center;
 }
+
+
+/* Welcome page only: the book-and-candle artwork must cover the entire left panel.
+   Other KB pages keep the manuscript/parchment composition unchanged. */
+.kb-content--welcome {
+  background: #24160e !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+
+.kb-content--welcome .kb-manuscript-viewport {
+  position: relative !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  background: transparent !important;
+}
+
+.kb-content--welcome .kb-welcome {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.kb-content--welcome .kb-welcome img {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  max-width: none !important;
+  max-height: none !important;
+  object-fit: cover !important;
+  object-position: center center !important;
+}

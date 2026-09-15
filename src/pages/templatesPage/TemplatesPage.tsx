@@ -46,7 +46,7 @@ export default function TemplatesPage() {
   const removeSection = (name: string) => { if (!window.confirm(`Supprimer la section « ${name} » et toutes ses pages ?`)) return; persist(pages.filter((p) => (p.section || "Autres") !== name)); setSelected(-1); setOpen(null); };
 
   return <div className="kb-page">
-    <main className="kb-content"><div className="kb-manuscript-viewport">
+    <main className={current ? "kb-content" : "kb-content kb-content--welcome"}><div className="kb-manuscript-viewport">
       {error ? <div className="kb-error">Impossible de charger la KB : {error}</div> : current ? <>
         <div className="kb-breadcrumb">KB / {current.section || "Autres"} / {current.title} / page {current.page}</div>
         <div className="kb-crud kb-page-actions"><button onClick={() => startEdit(current)}>Modifier</button><button onClick={() => removePage(current)}>Supprimer</button></div>
