@@ -335,7 +335,7 @@
   min-height: 0;
   overflow: auto;
   box-sizing: border-box;
-  background: #efcc89 url('../../assets/kb-manuscript-clean.png') center / 100% 100% no-repeat !important;
+  background: #efcc89 !important;
   border-radius: 0;
   box-shadow: none;
   padding: 28px 20px 34px;
@@ -350,4 +350,96 @@
   .kb-content { height: auto; min-height: 500px; }
   .kb-manuscript-viewport { position: relative; inset: auto; height: auto; min-height: 500px; padding: 24px !important; }
   .kb-sidebar { height: auto; }
+}
+
+/* Keep the manuscript canvas filling the viewport below the header. */
+.kb-page { height: calc(100vh - 58px); }
+.kb-content { height: 100%; }
+.kb-crud { display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px; }
+.kb-crud button { border:1px solid #8f6b35; background:#f8edcf; color:#3c2414; border-radius:4px; padding:7px 10px; cursor:pointer; font:600 15px Georgia,serif; }
+.kb-page-actions { justify-content:flex-end; }
+.kb-editor-backdrop { position:fixed; inset:0; z-index:20; display:grid; place-items:center; padding:20px; background:rgba(20,10,4,.55); }
+.kb-editor { width:min(760px,100%); max-height:90vh; overflow:auto; padding:24px; background:#f8edcf; color:#2d2118; border:1px solid #8f6b35; border-radius:6px; box-shadow:0 12px 40px rgba(0,0,0,.35); }
+.kb-editor h2 { margin-top:0; font-family:Georgia,serif; }
+.kb-editor label { display:block; margin:12px 0; font:600 16px Georgia,serif; }
+.kb-editor input, .kb-editor textarea { display:block; width:100%; box-sizing:border-box; margin-top:6px; padding:9px; border:1px solid #a78650; background:#fff8e8; color:#2d2118; font:16px Georgia,serif; }
+.kb-editor button { margin-right:8px; padding:8px 14px; border:1px solid #8f6b35; background:#d9b66e; color:#2d2118; border-radius:4px; cursor:pointer; }
+
+.kb-sidebar-actions {
+  align-items: center;
+  margin: 0 0 12px;
+}
+
+.kb-sidebar-actions button {
+  font-size: 14px;
+}
+
+/* CRUD for pages, sections and images. Existing manuscript layout remains unchanged. */
+.kb-group-heading { display:flex; align-items:center; gap:4px; }
+.kb-group-heading .kb-group-title { flex:1; }
+.kb-section-actions { display:flex; gap:2px; }
+.kb-section-actions button { border:0; background:transparent; color:#5b351c; cursor:pointer; font-weight:700; padding:2px 5px; }
+.kb-section-actions button:hover { background:#e4c783; }
+.kb-editor-images { margin-top:14px; border-top:1px solid #c8a56a; padding-top:12px; }
+.kb-image-row { display:flex; align-items:center; gap:8px; margin-top:6px; font-size:13px; }
+.kb-image-row span { flex:1; min-width:0; overflow-wrap:anywhere; }
+.kb-image-row button, .kb-add-image button { flex-shrink:0; }
+.kb-add-image { display:flex; gap:8px; margin-top:10px; }
+.kb-add-image input { flex:1; min-width:0; }
+.kb-editor-buttons { display:flex; gap:10px; margin-top:16px; }
+
+/* Corrected illuminated-initial layout: bottom-aligned first line, no overlap. */
+.kb-first-paragraph {
+  display: block;
+  min-height: 180px;
+  white-space: normal;
+}
+
+.kb-first-paragraph .kb-initial {
+  float: left;
+  width: 180px;
+  height: 180px;
+  margin: 0 18px 0 0;
+  object-fit: contain;
+  shape-outside: margin-box;
+}
+
+.kb-first-text {
+  display: block;
+  padding-top: calc(180px - 1.48em);
+}
+
+@media (max-width: 1000px) {
+  .kb-first-paragraph .kb-initial { width: 140px; height: 140px; }
+  .kb-first-text { padding-top: calc(140px - 1.48em); }
+}
+
+@media (max-width: 700px) {
+  .kb-first-paragraph .kb-initial { width: 120px; height: 120px; }
+  .kb-first-text { padding-top: calc(120px - 1.48em); }
+}
+
+
+/* Final requested composition: clean sidebar and full-cover welcome artwork. */
+.kb-sidebar {
+  background: #efcc89 !important;
+}
+
+.kb-welcome {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: block;
+  text-align: initial;
+  overflow: hidden;
+}
+
+.kb-welcome img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  object-position: center;
 }

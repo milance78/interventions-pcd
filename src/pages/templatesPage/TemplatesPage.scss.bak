@@ -1,0 +1,314 @@
+.templates-page { height:100%; }
+
+.kb-page {
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 310px;
+  height:calc(100vh - 58px);
+  min-height:0;
+  padding:0;
+  gap:0;
+  box-sizing:border-box;
+  overflow:hidden;
+  color:#2d2118;
+  background:transparent;
+}
+
+.kb-content,
+.kb-sidebar {
+  height:100%;
+  min-width:0;
+  min-height:0;
+  overflow:auto;
+  scrollbar-width:none;
+  -ms-overflow-style:none;
+  box-sizing:border-box;
+}
+.kb-content::-webkit-scrollbar,
+.kb-sidebar::-webkit-scrollbar { display:none; }
+
+/* Opaque reading surface: the ornament remains outside the text, never behind it. */
+.kb-content {
+  padding:38px 74px 90px 82px;
+  background:#f8edcf;
+  border-radius:0;
+  box-shadow:none;
+}
+
+.kb-sidebar {
+  padding:28px 20px 34px;
+  background:#efcc89;
+  border-radius:0;
+  box-shadow:none;
+}
+
+.kb-brand {
+  margin:0 0 16px;
+  color:#3c2414;
+  font-family:"Uncial Antiqua","Cinzel Decorative",Georgia,serif;
+  font-size:48px;
+  line-height:1;
+  font-weight:900;
+  text-shadow:1px 1px 0 #f3d99a;
+}
+
+.kb-default-artwork {
+  display:block;
+  width:100%;
+  max-height:150px;
+  object-fit:contain;
+  margin:0 0 18px;
+  border:0;
+  box-shadow:none;
+  background:transparent;
+}
+
+.kb-search {
+  display:block;
+  width:100%;
+  box-sizing:border-box;
+  margin:0 0 16px;
+  padding:11px 12px;
+  border:1px solid #a78650;
+  border-radius:5px;
+  background:#fff4d9;
+  color:#3c2414;
+  font:18px "Cormorant Garamond",Georgia,serif;
+}
+
+.kb-nav { padding-bottom:24px; }
+.kb-group { border-bottom:1px solid rgba(93,57,22,.28); }
+.kb-group-title,
+.kb-item {
+  width:100%;
+  box-sizing:border-box;
+  border:0;
+  background:transparent;
+  text-align:left;
+  cursor:pointer;
+  color:#3c2414;
+  font:600 16px/1.22 "Cormorant Garamond",Georgia,serif;
+}
+.kb-group-title {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 7px;
+  font-weight:800;
+}
+.kb-item {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:8px;
+  padding:8px 7px 8px 16px;
+}
+.kb-item span { min-width:0; }
+.kb-item small { flex:0 0 auto; color:#806644; font-size:12px; }
+.kb-item.active { background:#d9b66e; border-radius:4px; box-shadow:inset 0 0 0 1px rgba(126,82,25,.2); }
+
+.kb-breadcrumb { margin:0 0 16px; color:#806644; font-size:14px; }
+.kb-content h1 {
+  margin:0 0 24px;
+  color:#29170d;
+  font:700 clamp(32px,3vw,46px)/1.08 "Uncial Antiqua","Cinzel Decorative",Georgia,serif;
+  letter-spacing:.1px;
+}
+.kb-body {
+  max-width:100%;
+  color:#2d2118;
+  font:21px/1.48 "Cormorant Garamond",Georgia,"Times New Roman",serif;
+  overflow-wrap:break-word;
+}
+.kb-paragraph { margin:0 0 18px; white-space:pre-wrap; }
+.kb-first-paragraph { display:flow-root; min-height:180px; }
+.kb-initial {
+  float:left;
+  width:180px;
+  height:180px;
+  margin:0 18px 0 0;
+  object-fit:contain;
+  shape-outside:margin-box;
+}
+.kb-first-text { display:inline; }
+
+.kb-page-images { display:flex; flex-direction:column; gap:24px; margin-top:34px; }
+.kb-page-image { margin:0; max-width:100%; }
+.kb-page-image img { display:block; max-width:100%; width:auto; height:auto; max-height:900px; object-fit:contain; border:1px solid #a78650; background:#f8edcf; }
+.kb-page-image figcaption { margin-top:8px; color:#806644; font-size:14px; }
+.kb-empty { color:#806644; font:22px Georgia,serif; }
+.kb-error { color:#7e241c; background:#f8d8c8; border:1px solid #bd806d; border-radius:6px; padding:16px; }
+.kb-welcome { min-height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:18px; }
+.kb-welcome img { width:100%; max-width:100%; max-height:68vh; object-fit:contain; }
+.kb-welcome h1 { margin:0; }
+.kb-welcome p { font-size:22px; }
+
+@media(max-width:1000px){
+  .kb-page{grid-template-columns:minmax(0,1fr) 280px;padding:20px;gap:14px}
+  .kb-content{padding:30px 34px 80px}
+  .kb-sidebar{padding:22px 14px 30px}
+  .kb-body{font-size:19px}
+  .kb-initial{width:140px;height:140px}
+}
+@media(max-width:700px){
+  .kb-page{grid-template-columns:minmax(0,1fr);height:auto;min-height:calc(100vh - 58px);overflow:auto}
+  .kb-sidebar{order:-1;max-height:360px}
+  .kb-content{padding:24px}
+  .kb-initial{width:120px;height:120px}
+}
+
+/* Final alignment: the first text line sits on the lower edge of the illuminated initial. */
+.kb-first-paragraph {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  column-gap: 18px;
+  align-items: end;
+  min-height: 180px;
+  white-space: normal;
+}
+.kb-first-paragraph .kb-initial {
+  float: none;
+  grid-column: 1;
+  grid-row: 1;
+  width: 180px;
+  height: 180px;
+  margin: 0;
+  align-self: end;
+}
+.kb-first-paragraph .kb-first-text {
+  display: block;
+  grid-column: 2;
+  grid-row: 1;
+  align-self: end;
+  min-width: 0;
+}
+@media (max-width: 1000px) {
+  .kb-first-paragraph { grid-template-columns: 140px minmax(0, 1fr); min-height: 140px; }
+  .kb-first-paragraph .kb-initial { width: 140px; height: 140px; }
+}
+@media (max-width: 700px) {
+  .kb-first-paragraph { grid-template-columns: 120px minmax(0, 1fr); min-height: 120px; }
+  .kb-first-paragraph .kb-initial { width: 120px; height: 120px; }
+}
+
+/* KB manuscript page: the content is kept inside the blank central parchment area. */
+.kb-content {
+  padding: 112px 170px 150px 170px;
+  background: #f8edcf;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: auto;
+}
+.kb-content h1,
+.kb-breadcrumb,
+.kb-body,
+.kb-page-images { position: relative; z-index: 1; }
+.kb-content h1 { margin-bottom: 18px; }
+.kb-breadcrumb { color: #765638; }
+.kb-body { font-size: 20px; line-height: 1.42; }
+.kb-paragraph { margin-bottom: 14px; }
+.kb-page-images { margin-top: 24px; }
+@media(max-width:1000px){ .kb-content { padding: 82px 110px 110px; } }
+@media(max-width:700px){ .kb-content { padding: 56px 42px 80px; } }
+
+
+/* The red reference rectangle is not rendered. It defines this strict content viewport. */
+.kb-content {
+  position: relative;
+  padding: 0;
+  overflow: hidden;
+  background: #f8edcf;
+  border-radius: 0;
+  box-shadow: none;
+}
+.kb-manuscript-viewport {
+  position: static;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  padding: 38px 74px 90px 82px;
+  box-sizing: border-box;
+}
+.kb-manuscript-viewport::-webkit-scrollbar { display:none; }
+.kb-manuscript-viewport > * { max-width: 100%; box-sizing: border-box; }
+.kb-manuscript-viewport .kb-content h1,
+.kb-manuscript-viewport .kb-breadcrumb,
+.kb-manuscript-viewport .kb-body,
+.kb-manuscript-viewport .kb-page-images { position: relative; z-index: 1; }
+.kb-manuscript-viewport .kb-content h1 { margin-top: 0; }
+.kb-manuscript-viewport .kb-page-images img { max-width: 100%; height: auto; }
+@media(max-width:700px){
+  .kb-manuscript-viewport { top: 12%; right: 13%; bottom: 16%; left: 13%; }
+}
+.kb-toolbar,.kb-sidebar-actions{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}.kb-toolbar button,.kb-sidebar-actions button{border:1px solid #a78650;background:#f3d99a;color:#3c2414;border-radius:5px;padding:7px 10px;cursor:pointer}.kb-edit-title,.kb-edit-section{display:block;width:100%;box-sizing:border-box;margin:0 0 12px;padding:10px;border:1px solid #a78650;background:#fff4d9;color:#2d2118;font:700 30px Georgia,serif}.kb-edit-section{font-size:16px;font-weight:400}.kb-editor{min-height:420px;padding:18px;background:#fff8e8;border:1px dashed #a78650;color:#2d2118;font:20px/1.5 Georgia,serif;outline:none}.kb-editor:focus{border-color:#704b20}.kb-editor img{display:block;max-width:100%;height:auto;resize:both;overflow:auto;cursor:nwse-resize;margin:14px 0}.kb-editor-help{font-size:13px;color:#806644}.kb-group-title{display:flex;align-items:center;justify-content:space-between}.kb-group-title>button{background:transparent;border:0;color:inherit;font:inherit;cursor:pointer}.kb-group-title span{display:flex;gap:3px}.kb-group-title span button{border:0;background:transparent;color:inherit;cursor:pointer;padding:2px}
+
+/* Final KB layout: keep the manuscript artwork, but never stretch it independently from the page. */
+.kb-content { background-color:#f8edcf; background-repeat:no-repeat; background-position:center top; background-size:cover; }
+.kb-manuscript-viewport { padding:112px 170px 150px; }
+.kb-toolbar { position:relative; z-index:3; }
+.kb-editor { border:1px dashed #a78650; background:rgba(255,248,232,.92); min-height:420px; }
+.kb-edit-title,.kb-edit-section { border:1px solid #a78650; background:rgba(255,244,217,.96); }
+.kb-body img { max-width:100%; height:auto; }
+@media(max-width:1000px){ .kb-manuscript-viewport{padding:82px 110px 110px;} }
+@media(max-width:700px){ .kb-manuscript-viewport{padding:56px 42px 80px;} }
+
+
+/* Final vertical manuscript boundaries: keep all readable content inside the blank parchment area. */
+.kb-manuscript-viewport {
+  width: 100%;
+  max-width: 100%;
+  padding: 112px 150px 150px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.kb-manuscript-viewport > .kb-breadcrumb,
+.kb-manuscript-viewport > .kb-content h1,
+.kb-manuscript-viewport > .kb-body,
+.kb-manuscript-viewport > .kb-page-images,
+.kb-manuscript-viewport > .kb-editor,
+.kb-manuscript-viewport > .kb-edit-title,
+.kb-manuscript-viewport > .kb-edit-section {
+  width: 100%;
+  max-width: 1080px;
+  box-sizing: border-box;
+}
+.kb-manuscript-viewport .kb-body,
+.kb-manuscript-viewport .kb-body > div,
+.kb-manuscript-viewport .kb-body p,
+.kb-manuscript-viewport .kb-body span {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+.kb-manuscript-viewport .kb-body img {
+  max-width: 100%;
+  height: auto;
+}
+.kb-manuscript-viewport .kb-first-paragraph {
+  width: 100%;
+  max-width: 1080px;
+}
+.kb-manuscript-viewport .kb-toolbar {
+  max-width: 1080px;
+}
+@media (max-width: 1000px) {
+  .kb-manuscript-viewport { padding: 82px 90px 110px; }
+  .kb-manuscript-viewport > .kb-breadcrumb,
+  .kb-manuscript-viewport > .kb-content h1,
+  .kb-manuscript-viewport > .kb-body,
+  .kb-manuscript-viewport > .kb-page-images,
+  .kb-manuscript-viewport > .kb-editor,
+  .kb-manuscript-viewport > .kb-edit-title,
+  .kb-manuscript-viewport > .kb-edit-section,
+  .kb-manuscript-viewport .kb-first-paragraph,
+  .kb-manuscript-viewport .kb-toolbar { max-width: 100%; }
+}
+@media (max-width: 700px) {
+  .kb-manuscript-viewport { padding: 56px 42px 80px; }
+}

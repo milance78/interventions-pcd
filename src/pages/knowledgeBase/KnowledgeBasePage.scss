@@ -1,0 +1,302 @@
+/* Knowledge Base layout. This file is the single source of truth for /kb. */
+
+.kb-page {
+  --kb-header-height: 78px;
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 310px;
+  width: 100%;
+  height: calc(100vh - var(--kb-header-height));
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  box-sizing: border-box;
+  color: #2d2118;
+}
+
+.kb-content,
+.kb-sidebar {
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.kb-content {
+  position: relative;
+  overflow: hidden;
+  background-color: #f8edcf;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+/* Only the document column scrolls. The background remains inside the viewport. */
+.kb-manuscript-viewport {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 28px clamp(24px, 7vw, 112px) 48px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.kb-manuscript-viewport::-webkit-scrollbar,
+.kb-sidebar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Every document element uses the same left/right and top/bottom safe area. */
+.kb-manuscript-viewport > * {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.kb-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 auto 18px;
+  position: relative;
+  z-index: 2;
+}
+
+.kb-toolbar button,
+.kb-sidebar-actions button {
+  border: 1px solid #a78650;
+  border-radius: 5px;
+  background: #f3d99a;
+  color: #3c2414;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.kb-breadcrumb {
+  margin: 0 auto 14px;
+  color: #806644;
+  font: 14px/1.35 Arial, sans-serif;
+}
+
+.kb-content h1 {
+  margin: 0 auto 30px;
+  color: #29170d;
+  font: 700 clamp(32px, 3vw, 46px)/1.08 "Uncial Antiqua", "Cinzel Decorative", Georgia, serif;
+  overflow-wrap: anywhere;
+}
+
+.kb-body {
+  color: #2d2118;
+  font: 21px/1.48 Arial, sans-serif;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}
+
+.kb-paragraph {
+  margin: 0 0 18px;
+  white-space: pre-wrap;
+}
+
+.kb-first-paragraph {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 18px;
+  align-items: end;
+  min-height: 180px;
+  white-space: normal;
+}
+
+.kb-initial {
+  grid-column: 1;
+  grid-row: 1;
+  width: 180px;
+  height: 180px;
+  margin: 0;
+  object-fit: contain;
+  align-self: end;
+}
+
+.kb-first-text {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  display: block;
+  align-self: end;
+}
+
+.kb-page-images {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  margin: 26px auto 0;
+}
+
+.kb-page-image {
+  max-width: 100%;
+  margin: 0;
+}
+
+.kb-page-image img,
+.kb-body img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.kb-page-image img {
+  border: 1px solid #a78650;
+  background: #f8edcf;
+}
+
+.kb-page-image figcaption,
+.kb-editor-help {
+  margin-top: 8px;
+  color: #806644;
+  font-size: 13px;
+}
+
+.kb-sidebar {
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px 20px 34px;
+  background: #efcc89;
+}
+
+.kb-brand {
+  margin: 0 0 16px;
+  color: #3c2414;
+  font-family: "Uncial Antiqua", "Cinzel Decorative", Georgia, serif;
+  font-size: 48px;
+  line-height: 1;
+  font-weight: 900;
+  text-shadow: 1px 1px 0 #f3d99a;
+}
+
+.kb-default-artwork {
+  display: block;
+  width: 100%;
+  max-height: 165px;
+  margin: 0 0 18px;
+  object-fit: contain;
+}
+
+.kb-search {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 0 16px;
+  padding: 11px 12px;
+  border: 1px solid #a78650;
+  border-radius: 5px;
+  background: #fff4d9;
+  color: #3c2414;
+  font: 18px Georgia, serif;
+}
+
+.kb-sidebar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.kb-nav { padding-bottom: 24px; }
+.kb-group { border-bottom: 1px solid rgba(93, 57, 22, .28); }
+
+.kb-group-title,
+.kb-item {
+  width: 100%;
+  box-sizing: border-box;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: #3c2414;
+  font: 600 16px/1.22 Georgia, serif;
+}
+
+.kb-group-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 7px;
+}
+
+.kb-group-title > button,
+.kb-group-title span button {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.kb-group-title span { display: flex; gap: 3px; }
+
+.kb-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 7px 8px 16px;
+  cursor: pointer;
+}
+
+.kb-item span { min-width: 0; }
+.kb-item small { flex: 0 0 auto; color: #806644; font-size: 12px; }
+.kb-item.active { background: #d9b66e; border-radius: 4px; box-shadow: inset 0 0 0 1px rgba(126, 82, 25, .2); }
+
+.kb-edit-title,
+.kb-edit-section {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  margin: 0 auto 12px;
+  padding: 10px;
+  border: 1px solid #a78650;
+  background: rgba(255, 244, 217, .96);
+  color: #2d2118;
+  font: 700 30px Georgia, serif;
+}
+
+.kb-edit-section { font-size: 16px; font-weight: 400; }
+
+.kb-editor {
+  width: 100%;
+  min-height: 420px;
+  box-sizing: border-box;
+  padding: 18px;
+  border: 1px dashed #a78650;
+  background: rgba(255, 248, 232, .94);
+  color: #2d2118;
+  font: 20px/1.5 Arial, sans-serif;
+  outline: none;
+  overflow-wrap: anywhere;
+}
+
+.kb-editor:focus { border-color: #704b20; }
+.kb-editor img { display: block; max-width: 100%; height: auto; margin: 14px 0; cursor: nwse-resize; }
+.kb-empty { color: #806644; font: 22px Georgia, serif; }
+.kb-error { padding: 16px; border: 1px solid #bd806d; border-radius: 6px; background: #f8d8c8; color: #7e241c; }
+
+@media (max-width: 1100px) {
+  .kb-page { grid-template-columns: minmax(0, 1fr) 280px; }
+  .kb-manuscript-viewport { padding-inline: 52px; }
+  .kb-body { font-size: 20px; }
+}
+
+@media (max-width: 760px) {
+  .kb-page { grid-template-columns: minmax(0, 1fr); height: calc(100vh - var(--kb-header-height)); overflow: hidden; }
+  .kb-sidebar { order: -1; max-height: 360px; }
+  .kb-content { height: 100%; min-height: 0; overflow: hidden; }
+  .kb-manuscript-viewport { height: 100%; overflow-y: auto; overflow-x: hidden; padding: 24px 24px 48px; }
+  .kb-first-paragraph { grid-template-columns: 120px minmax(0, 1fr); min-height: 120px; }
+  .kb-initial { width: 120px; height: 120px; }
+}
