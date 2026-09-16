@@ -1422,9 +1422,6 @@ const CurrentInterventionPage = () => {
 
             <div className="right-card-actions__row right-card-actions__row--bottom">
               <div className="right-card-actions__status-slot">
-                {newIntervention.status === "postponed" && postponedDate && (
-                  <div className="postponed-date-line">Postposé au {postponedDate}</div>
-                )}
                 <div className={`status-wrapper ${snowReceived.trim() ? "status-wrapper--dual" : ""}`.trim()}>
                   <StatusInput />
                   {snowReceived.trim() && <SnowStatusInput />}

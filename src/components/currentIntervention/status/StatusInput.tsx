@@ -68,12 +68,15 @@ const StatusInput = () => {
 
   return (
     <>
-      <div className="status-input-shell">
-        {status === "postponed" && postponedDate && (
+      {status === "postponed" && postponedDate && (
+        <div className="postponed-date-line">
+          <span>Postposé au {postponedDate}</span>
           <IconButton size="small" aria-label="Modifier la date de report" title="Modifier la date de report" onClick={() => { setPendingDate(postponedDate); setCalendarOpen(true); }}>
             <EditRounded fontSize="small" />
           </IconButton>
-        )}
+        </div>
+      )}
+      <div className="status-input-shell">
         <FormControl variant="outlined" className="status-input" size="small" fullWidth>
           <Select
             className={`status-select status-select--${status === "completed" ? "completed" : status === "on hold" ? "on-hold" : status === "transferred" ? "transferred" : status === "postponed" ? "postponed" : "default"}`}

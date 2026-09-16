@@ -6982,3 +6982,228 @@
 .current-intervention-page .right-card-actions__status-slot .status-wrapper .snow-status-select .MuiSelect-select {
   border-radius: 12px !important;
 }
+
+
+/* Final alignment: postponed edit pencil sits beside the date, never below the buttons. */
+.current-intervention-page .right-card-actions__status-slot .status-input-shell > .MuiIconButton-root {
+  position: absolute !important;
+  left: 128px !important;
+  top: -31px !important;
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  padding: 1px !important;
+  margin: 0 !important;
+  z-index: 5 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-input-shell > .MuiIconButton-root svg {
+  font-size: 17px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line {
+  bottom: 57px !important;
+  height: 20px !important;
+  line-height: 20px !important;
+}
+
+
+/* Final Postposé layout: date and small edit control share one line. */
+.current-intervention-page .right-card-actions__status-slot {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 5px !important;
+  min-height: 20px !important;
+  margin: 0 !important;
+  line-height: 20px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line .MuiIconButton-root {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  padding: 1px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line .MuiIconButton-root svg {
+  font-size: 16px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  margin: 0 !important;
+}
+
+/* FINAL FIX — keep Postposé date visible and place its small pencil inline. */
+.current-intervention-page .right-card-actions__row--bottom {
+  height: auto !important;
+  min-height: 53px !important;
+  align-items: start !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot {
+  height: auto !important;
+  min-height: 53px !important;
+  overflow: visible !important;
+  display: flex !important;
+  align-items: stretch !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: auto !important;
+  min-height: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper .postponed-date-line {
+  display: flex !important;
+  position: static !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  width: auto !important;
+  height: 20px !important;
+  min-height: 20px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  line-height: 20px !important;
+  white-space: nowrap !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line .MuiIconButton-root {
+  width: 20px !important;
+  height: 20px !important;
+  min-width: 20px !important;
+  padding: 1px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line .MuiIconButton-root svg {
+  font-size: 16px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-input-shell {
+  width: 100% !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+/* Final Postposé layout: keep both button rows intact and reserve a stable
+   date line between them. The date belongs to the status column, not to a
+   floating/absolute layer. */
+.current-intervention-page .right-card-actions__row--top {
+  margin-bottom: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom {
+  margin-top: 8px !important;
+  align-items: flex-start !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot,
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  min-width: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-wrapper {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  gap: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .postponed-date-line,
+.current-intervention-page .right-card-actions__row--bottom .postponed-date-line {
+  position: static !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 4px !important;
+  width: 100% !important;
+  min-height: 20px !important;
+  height: 20px !important;
+  margin: 0 0 6px !important;
+  padding: 0 !important;
+  box-sizing: border-box !important;
+  white-space: nowrap !important;
+  line-height: 20px !important;
+}
+
+.current-intervention-page .postponed-date-line .MuiIconButton-root,
+.current-intervention-page .right-card-actions__row--bottom .postponed-date-line .MuiIconButton-root {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  padding: 1px !important;
+  margin: 0 !important;
+}
+
+.current-intervention-page .postponed-date-line .MuiIconButton-root svg,
+.current-intervention-page .right-card-actions__row--bottom .postponed-date-line .MuiIconButton-root svg {
+  font-size: 15px !important;
+}
+
+.current-intervention-page .right-card-actions__status-slot .status-input-shell {
+  width: 100% !important;
+}
+
+/* v-final — lift the complete upper action row slightly as one unit.
+   This creates a stable, even breathing space for the Postposé date line
+   without moving or resizing any individual button. */
+.current-intervention-page .right-card-actions__row--top {
+  transform: translateY(-8px) !important;
+  margin-bottom: 8px !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom {
+  margin-top: 0 !important;
+}
+
+/* Final spacing correction: keep the complete status row intact and give
+   the postponed date its own breathing room above the status control. */
+.current-intervention-page .right-card-actions__row--bottom {
+  align-items: stretch !important;
+  row-gap: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom .right-card-actions__status-slot {
+  align-self: stretch !important;
+  min-width: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom .status-wrapper {
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  gap: 0 !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom .postponed-date-line {
+  margin: 8px 0 10px !important;
+  min-height: 20px !important;
+  height: 20px !important;
+}
+
+.current-intervention-page .right-card-actions__row--bottom .status-input-shell {
+  width: 100% !important;
+  margin: 0 !important;
+}

@@ -1,2 +1,32 @@
-.status-input-shell { display: flex; align-items: center; gap: 4px; }
-.status-input-shell > .MuiIconButton-root { flex: 0 0 auto; }
+.status-input-shell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+}
+
+.postponed-date-line {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 20px;
+  margin: 0 0 6px;
+  color: #6b21a8;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.postponed-date-line .MuiIconButton-root {
+  width: 20px;
+  height: 20px;
+  padding: 1px;
+  margin: 0;
+  color: #6b7280;
+}
+
+.postponed-date-line .MuiIconButton-root svg {
+  font-size: 16px;
+}
