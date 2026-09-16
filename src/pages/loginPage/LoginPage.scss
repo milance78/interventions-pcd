@@ -1,133 +1,203 @@
-.login-page {
-  width: 100%;
-}
+.login-page { width: 100%; }
 
 .login-page__card {
   width: 100%;
-
   padding: 20px;
-
   background: transparent;
-
   border-radius: 0;
-
   box-shadow: none;
-
   display: flex;
   flex-direction: column;
-
   gap: 16px;
 
   input {
     width: 100%;
     height: 42px;
-
     padding: 0 12px;
-
     box-sizing: border-box;
-
-    border: 1px solid #ccc;
-    border-radius: 6px;
-
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
     font-size: 14px;
+    background: #fff;
+    transition: border-color 140ms ease, box-shadow 140ms ease;
 
     &:focus {
       outline: none;
-      border-color: #2563eb;
+      border-color: #64748b;
+      box-shadow: 0 0 0 3px rgba(100, 116, 139, .14);
     }
   }
 
   button {
-    height: 42px;
-
-    border: none;
-    border-radius: 6px;
-
+    min-height: 42px;
+    border: 1px solid transparent;
+    border-radius: 9px;
     cursor: pointer;
-
-    background: #2563eb;
+    background: #334155;
     color: white;
+    font-size: 14px;
+    font-weight: 600;
+    transition: background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
 
-    font-size: 15px;
-
-    &:hover {
-      background: #1d4ed8;
-    }
+    &:hover { background: #1e293b; }
+    &:active { transform: translateY(1px); }
+    &:disabled { opacity: .6; cursor: not-allowed; transform: none; }
   }
 }
 
-.password-field {
-  position: relative;
-
-  width: 100%;
-
-  input {
-    padding-right: 45px;
-  }
-}
-
+.password-field { position: relative; width: 100%; input { padding-right: 45px; } }
 .eye-button {
-  position: absolute;
-
-  right: 8px;
-  top: 50%;
-
-  transform: translateY(-50%);
-
-  width: 32px !important;
-  height: 32px !important;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  background: transparent !important;
-
-  color: #555 !important;
-
-  font-size: 20px;
-
-  &:hover {
-    color: #2563eb !important;
-  }
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  width: 32px !important; height: 32px !important; display: flex;
+  align-items: center; justify-content: center; background: transparent !important;
+  color: #64748b !important; font-size: 20px;
+  &:hover { color: #0f172a !important; background: #f1f5f9 !important; }
 }
-
-.link-button {
-  background: transparent !important;
-
-  color: #2563eb !important;
-}
-
-.secondary-button {
-  background: #e5e7eb !important;
-
-  color: #111827 !important;
-}
-
-.login-page__welcome {
-  margin: 0;
-  color: #1f2937;
-  font-size: 20px;
-  font-weight: 500;
-  line-height: 1.2;
-}
-
-.login-page__username {
-  margin: -6px 0 2px;
-  color: #64748b;
-  font-size: 14px;
-  font-weight: 400;
-}
-
-.profile-menu__popup .login-page__card {
-  padding: 22px;
-  gap: 14px;
-}
+.link-button { background: transparent !important; color: #475569 !important; }
+.secondary-button { background: #f1f5f9 !important; color: #334155 !important; border-color: #e2e8f0 !important; }
+.login-page__welcome { margin: 0; color: #0f172a; font-size: 20px; font-weight: 700; line-height: 1.2; }
+.login-page__username { margin: -6px 0 2px; color: #64748b; font-size: 14px; }
+.profile-menu__popup .login-page__card { padding: 24px; gap: 12px; }
 
 .profile-menu__popup .login-page__card > button:not(.eye-button):not(.link-button):not(.secondary-button) {
   background: #334155;
+  &:hover { background: #1e293b; }
+}
 
-  &:hover {
-    background: #1f2937;
-  }
+.danger-button {
+  background: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #fff !important;
+  &:hover { background: #b91c1c !important; }
+}
+
+.account-delete-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, .58);
+  backdrop-filter: blur(4px);
+  animation: account-dialog-fade-in 160ms ease-out;
+}
+
+.account-delete-dialog__panel {
+  position: relative;
+  width: min(100%, 460px);
+  box-sizing: border-box;
+  padding: 28px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, .28);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.account-delete-dialog__icon {
+  width: 46px; height: 46px; display: grid; place-items: center;
+  border-radius: 14px; background: #fee2e2; color: #dc2626;
+}
+.account-delete-dialog h3 { margin: 0; color: #0f172a; font-size: 21px; line-height: 1.25; }
+.account-delete-dialog p { margin: 0; color: #475569; font-size: 14px; line-height: 1.55; }
+.account-delete-dialog input { width: 100%; height: 44px; box-sizing: border-box; padding: 0 13px; border: 1px solid #cbd5e1; border-radius: 9px; font-size: 14px; }
+.account-delete-dialog input:focus { outline: none; border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220, 38, 38, .12); }
+.account-delete-dialog__actions { display: flex; flex-direction: column; gap: 9px; }
+.account-delete-dialog__actions button { min-height: 42px; border-radius: 9px; border: 1px solid transparent; font-weight: 600; cursor: pointer; }
+.account-delete-dialog__confirm { background: #dc2626; color: #fff; }
+.account-delete-dialog__confirm:hover { background: #b91c1c; }
+.account-delete-dialog__cancel { background: #f8fafc; color: #334155; border-color: #cbd5e1 !important; }
+.account-delete-dialog__cancel:hover { background: #f1f5f9; }
+
+@keyframes account-dialog-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@media (max-width: 480px) { .account-delete-dialog__panel { padding: 22px; } }
+
+
+.account-action-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, .52);
+  backdrop-filter: blur(4px);
+  animation: account-dialog-fade-in 160ms ease-out;
+}
+
+.account-action-dialog__panel {
+  width: min(100%, 420px);
+  box-sizing: border-box;
+  padding: 26px;
+  border: 1px solid #e2e8f0;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, .25);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.account-action-dialog__icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #e0e7ff;
+  color: #3730a3;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.account-action-dialog h3 {
+  margin: 0;
+  color: #0f172a;
+  font-size: 20px;
+  line-height: 1.25;
+}
+
+.account-action-dialog p {
+  margin: 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.account-action-dialog__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.account-action-dialog__actions button {
+  min-height: 42px;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.account-action-dialog__confirm {
+  background: #334155;
+  color: #fff;
+}
+
+.account-action-dialog__confirm:hover {
+  background: #1e293b;
+}
+
+.account-action-dialog__cancel {
+  background: #f8fafc;
+  color: #334155;
+  border-color: #cbd5e1 !important;
+}
+
+.account-action-dialog__cancel:hover {
+  background: #f1f5f9;
 }

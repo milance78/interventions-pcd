@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { MouseEvent as ReactMouseEvent } from "react";
 import { onAuthStateChanged, type User } from "firebase/auth";
+import { Settings } from "lucide-react";
 
 import "./ProfileMenu.scss";
 import { auth } from "../../firebase/firebaseConfig";
@@ -10,7 +11,7 @@ import LoginPage from "../../pages/loginPage/LoginPage";
 const ProfileMenu = () => {
   const [user, setUser] = useState<User | null>(null);
   const [username, setUsername] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [openPanel, setOpenPanel] = useState<"profile" | "settings" | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(
@@ -51,7 +52,7 @@ const ProfileMenu = () => {
         containerRef.current &&
         !containerRef.current.contains(clickedElement)
       ) {
-        setIsOpen(false);
+        setOpenPanel(null);
       }
     };
 
@@ -65,27 +66,50 @@ const ProfileMenu = () => {
   const avatarText = displayName ? displayName.charAt(0).toUpperCase() : "👤";
 
   const toggleMenu = (_event: ReactMouseEvent<HTMLButtonElement>) => {
-    setIsOpen((currentValue) => !currentValue);
+    setOpenPanel((currentValue) =>
+      currentValue === "profile" ? null : "profile",
+    );
+  };
+
+  const toggleSettings = () => {
+    setOpenPanel((currentValue) =>
+      currentValue === "settings" ? null : "settings",
+    );
   };
 
   return (
     <div className="profile-menu" ref={containerRef}>
-      <button
-        type="button"
-        className="profile-menu__trigger"
-        onClick={toggleMenu}
-        aria-expanded={isOpen}
-        aria-label="Ouvrir le profil utilisateur"
-      >
-        <span className="profile-menu__label">
-          {user ? displayName : "Non connecté"}
-        </span>
-        <span className="profile-menu__avatar">{avatarText}</span>
-      </button>
+      <div className="profile-menu__actions">
+        <button
+          type="button"
+          className="profile-menu__trigger"
+          onClick={toggleMenu}
+          aria-expanded={openPanel === "profile"}
+          aria-label="Ouvrir le profil utilisateur"
+        >
+          <span className="profile-menu__label">
+            {user ? displayName : "Non connecté"}
+          </span>
+          <span className="profile-menu__avatar">{avatarText}</span>
+        </button>
+        <button
+          type="button"
+          className="profile-menu__settings-button"
+          onClick={toggleSettings}
+          aria-expanded={openPanel === "settings"}
+          aria-label="Paramètres"
+          title="Paramètres"
+        >
+          <Settings size={18} strokeWidth={2} />
+        </button>
+      </div>
 
-      {isOpen && (
+      {openPanel && (
         <div className="profile-menu__popup">
-          <LoginPage profileDisplayName={displayName} />
+          <LoginPage
+            profileDisplayName={displayName}
+            menuMode={openPanel}
+          />
         </div>
       )}
     </div>
