@@ -11,7 +11,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "test:all": "npm test -- --run && npm run typecheck && npm run build"
+    "test:all": "npm test -- --run && npm run typecheck && npm run build",
+    "test:security": "vitest run src/security tests"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

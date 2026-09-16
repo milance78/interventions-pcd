@@ -2,22 +2,61 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    function admin() { return signedIn() && request.auth.token.admin == true; }
+
+    // Knowledge base remains readable by authenticated users as requested.
     match /knowledgeBase/main {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null
-        && request.auth.token.admin == true;
+      allow read: if signedIn();
+      allow write: if admin();
     }
 
-    // A user may manage only their own application-session marker.
-    match /users/{uid}/security/session {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow create, update: if request.auth != null
-        && request.auth.uid == uid
-        && request.resource.data.keys().hasOnly([
-          "sessionVersion", "updatedAt"
-        ])
-        && request.resource.data.sessionVersion is string;
-      allow delete: if request.auth != null && request.auth.uid == uid;
+    match /users/{uid} {
+      allow create: if owner(uid)
+        && request.resource.data.keys().hasOnly(['username', 'email', 'createdAt'])
+        && request.resource.data.email == request.auth.token.email;
+      allow read: if owner(uid);
+      allow update: if owner(uid)
+        && request.resource.data.keys().hasOnly(['username', 'email', 'createdAt'])
+        && request.resource.data.email == resource.data.email
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if false; // Account deletion is server-only.
+
+      match /security/session {
+        allow read: if owner(uid);
+        allow create, update: if owner(uid)
+          && request.resource.data.keys().hasOnly(['sessionVersion', 'updatedAt'])
+          && request.resource.data.sessionVersion is string
+          && request.resource.data.sessionVersion.size() <= 128;
+        allow delete: if false;
+      }
+
+      match /days/{date} {
+        allow read, write: if owner(uid);
+        match /interventions/{interventionId} {
+          allow read, write: if owner(uid);
+        }
+        match /summary/{summaryId} {
+          allow read, write: if owner(uid);
+        }
+      }
+
+      match /activeInterventions/{interventionId} {
+        allow read, write: if owner(uid);
+      }
+
+      match /interventionVersions/{caseId} {
+        allow read, write: if owner(uid);
+        match /versions/{versionId} {
+          allow read, write: if owner(uid);
+        }
+      }
+    }
+
+    // Explicit deny-by-default for every undeclared path.
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }

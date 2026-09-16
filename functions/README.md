@@ -21,3 +21,6 @@ The function recursively deletes `users/{uid}`, deletes Storage files under
 `users/{uid}/`, and then deletes the Firebase Authentication account.
 
 Keep all future Firebase security code in `src/security/` or `functions/`.
+
+
+> Deploying Cloud Functions requires a billing-enabled Firebase project (Blaze).
